@@ -46,12 +46,25 @@ const TOUR_STEPS: TourStep[] = [
   },
 ];
 
+/**
+ * Retrieve the bounding rectangle of a DOM element identified by a CSS selector, or indicate absence for 'body'.
+ *
+ * @param selector - A CSS selector for the target element, or the literal string `'body'` to represent no specific target.
+ * @returns The element's bounding client rect in viewport coordinates, or `null` if `selector` is `'body'` or no matching element is found.
+ */
 function getTargetRect(selector: string): DOMRect | null {
   if (selector === 'body') return null;
   const el = document.querySelector(selector);
   return el ? el.getBoundingClientRect() : null;
 }
 
+/**
+ * Compute inline CSS positioning for a tour tooltip or centered modal.
+ *
+ * @param rect - Bounding client rect of the target element; pass `null` to position a centered modal.
+ * @param placement - Desired tooltip placement relative to the target (`'center'`, `'right'`, or `'bottom'`).
+ * @returns A CSS properties object positioning the tooltip: when `rect` is `null` it returns a centered modal layout; otherwise it returns a fixed-positioned tooltip anchored to the target with bounds clamped to the viewport for `'right'` and `'bottom'` placements.
+ */
 function computeTooltipStyle(
   rect: DOMRect | null,
   placement: TourStep['placement']
@@ -93,6 +106,15 @@ function computeTooltipStyle(
   };
 }
 
+/**
+ * Renders the onboarding tour UI and controls a guided, step-by-step walkthrough for new users.
+ *
+ * The component automatically starts for a logged-in user who has not previously completed the tour,
+ * persists completion in localStorage under "hasSeenOnboardingTour", and provides Skip, Back, Next/Finish
+ * controls with step indicators and targeted tooltips or a centered modal.
+ *
+ * @returns The tour's React element when running; `null` when the tour is not active.
+ */
 export function OnboardingTour() {
   const [stepIndex, setStepIndex] = useState(0);
   const [run, setRun] = useState(false);
