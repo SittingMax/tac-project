@@ -92,6 +92,7 @@ export const Header: React.FC = () => {
 
       <div className="flex-1 max-w-md px-4 hidden lg:flex justify-end lg:justify-center">
         <button
+          data-tour="command-palette"
           onClick={() => setCommandOpen(true)}
           className="flex w-[400px] items-center gap-2 rounded-none border border-input bg-background/50 px-4 py-2 text-sm text-muted-foreground shadow-sm transition-all hover:shadow-md hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
         >

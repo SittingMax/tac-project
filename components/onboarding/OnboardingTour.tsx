@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { createPortal } from 'react-dom';
+import * as Dialog from '@radix-ui/react-dialog';
 import { useStore } from '@/store';
 
 interface TourStep {
@@ -32,7 +32,7 @@ const TOUR_STEPS: TourStep[] = [
             'Tap on any KPI card to instantly drill down into the related data table view.',
     },
     {
-        target: '.lucide-search',
+        target: '[data-tour="command-palette"]',
         placement: 'bottom',
         title: 'Command Palette',
         content:
@@ -68,20 +68,29 @@ function computeTooltipStyle(
         };
     }
     const GAP = 12;
+    const CARD_WIDTH = 300;
+    const PADDING = 16;
+
+    // Fallback bounds safely clamping X/Y off-screen overflow
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 1000;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+
     if (placement === 'right') {
+        const rawLeft = rect.right + GAP;
         return {
             position: 'fixed',
-            top: rect.top,
-            left: rect.right + GAP,
-            width: 300,
+            top: Math.min(Math.max(PADDING, rect.top), vh - PADDING * 10),
+            left: Math.max(PADDING, Math.min(rawLeft, vw - CARD_WIDTH - PADDING)),
+            width: CARD_WIDTH,
         };
     }
     // bottom
+    const rawLeft = rect.left + rect.width / 2 - CARD_WIDTH / 2;
     return {
         position: 'fixed',
-        top: rect.bottom + GAP,
-        left: Math.max(8, rect.left + rect.width / 2 - 150),
-        width: 300,
+        top: Math.min(rect.bottom + GAP, vh - PADDING * 10),
+        left: Math.max(PADDING, Math.min(rawLeft, vw - CARD_WIDTH - PADDING)),
+        width: CARD_WIDTH,
     };
 }
 
@@ -124,147 +133,152 @@ export function OnboardingTour() {
     const isLast = stepIndex === TOUR_STEPS.length - 1;
     const isCenter = step.target === 'body';
 
-    return createPortal(
-        <>
-            {/* Backdrop */}
-            <div
-                aria-hidden="true"
-                style={{
-                    position: 'fixed',
-                    inset: 0,
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                    zIndex: 9998,
-                }}
-                onClick={() => finish(true)}
-            />
-
-            {/* Tooltip card */}
-            <div
-                role="dialog"
-                aria-modal="true"
-                aria-label={step.title}
-                style={{
-                    ...tooltipStyle,
-                    zIndex: 9999,
-                    backgroundColor: 'var(--card)',
-                    color: 'var(--card-foreground)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius)',
-                    padding: '20px',
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
-                }}
-            >
-                {/* Step counter */}
-                <div
+    return (
+        <Dialog.Root open={run} onOpenChange={(open) => { if (!open) finish(true); }}>
+            <Dialog.Portal>
+                {/* Backdrop */}
+                <Dialog.Overlay
                     style={{
-                        fontSize: '0.75rem',
-                        color: 'var(--muted-foreground)',
-                        marginBottom: '8px',
+                        position: 'fixed',
+                        inset: 0,
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        zIndex: 9998,
+                    }}
+                />
+
+                {/* Tooltip card */}
+                <Dialog.Content
+                    aria-describedby={undefined}
+                    onInteractOutside={(e) => {
+                        // Prevent accidental closes unless they hit the skip button or Escape
+                        e.preventDefault();
+                    }}
+                    style={{
+                        ...tooltipStyle,
+                        zIndex: 9999,
+                        backgroundColor: 'var(--card)',
+                        color: 'var(--card-foreground)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)',
+                        padding: '20px',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
                     }}
                 >
-                    Step {stepIndex + 1} of {TOUR_STEPS.length}
-                </div>
+                    <Dialog.Title className="sr-only" style={{ display: 'none' }}>
+                        {step.title}
+                    </Dialog.Title>
 
-                {/* Title */}
-                <h3
-                    style={{
-                        fontWeight: 600,
-                        fontSize: '1rem',
-                        color: isCenter ? 'var(--primary)' : 'var(--foreground)',
-                        marginBottom: '8px',
-                    }}
-                >
-                    {step.title}
-                </h3>
-
-                {/* Content */}
-                <p
-                    style={{
-                        fontSize: '0.875rem',
-                        color: 'var(--muted-foreground)',
-                        lineHeight: 1.5,
-                        marginBottom: '16px',
-                    }}
-                >
-                    {step.content}
-                </p>
-
-                {/* Progress dots */}
-                <div
-                    style={{
-                        display: 'flex',
-                        gap: '6px',
-                        marginBottom: '16px',
-                    }}
-                >
-                    {TOUR_STEPS.map((_, i) => (
-                        <div
-                            key={i}
-                            style={{
-                                width: 6,
-                                height: 6,
-                                borderRadius: '50%',
-                                backgroundColor:
-                                    i === stepIndex
-                                        ? 'var(--primary)'
-                                        : 'var(--muted)',
-                            }}
-                        />
-                    ))}
-                </div>
-
-                {/* Buttons */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <button
-                        onClick={() => finish(true)}
+                    {/* Step counter */}
+                    <div
                         style={{
-                            fontSize: '0.8rem',
+                            fontSize: '0.75rem',
                             color: 'var(--muted-foreground)',
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: '4px 0',
+                            marginBottom: '8px',
                         }}
                     >
-                        Skip tour
-                    </button>
+                        Step {stepIndex + 1} of {TOUR_STEPS.length}
+                    </div>
 
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        {stepIndex > 0 && (
+                    {/* Title */}
+                    <h3
+                        style={{
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            color: isCenter ? 'var(--primary)' : 'var(--foreground)',
+                            marginBottom: '8px',
+                        }}
+                    >
+                        {step.title}
+                    </h3>
+
+                    {/* Content */}
+                    <p
+                        style={{
+                            fontSize: '0.875rem',
+                            color: 'var(--muted-foreground)',
+                            lineHeight: 1.5,
+                            marginBottom: '16px',
+                        }}
+                    >
+                        {step.content}
+                    </p>
+
+                    {/* Progress dots */}
+                    <div
+                        style={{
+                            display: 'flex',
+                            gap: '6px',
+                            marginBottom: '16px',
+                        }}
+                    >
+                        {TOUR_STEPS.map((_, i) => (
+                            <div
+                                key={i}
+                                style={{
+                                    width: 6,
+                                    height: 6,
+                                    borderRadius: '50%',
+                                    backgroundColor:
+                                        i === stepIndex
+                                            ? 'var(--primary)'
+                                            : 'var(--muted)',
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Buttons */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <button
+                            onClick={() => finish(true)}
+                            style={{
+                                fontSize: '0.8rem',
+                                color: 'var(--muted-foreground)',
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '4px 0',
+                            }}
+                        >
+                            Skip tour
+                        </button>
+
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            {stepIndex > 0 && (
+                                <button
+                                    onClick={back}
+                                    style={{
+                                        fontSize: '0.875rem',
+                                        color: 'var(--muted-foreground)',
+                                        background: 'none',
+                                        border: '1px solid var(--border)',
+                                        borderRadius: 'var(--radius)',
+                                        padding: '6px 14px',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    Back
+                                </button>
+                            )}
                             <button
-                                onClick={back}
+                                onClick={next}
                                 style={{
                                     fontSize: '0.875rem',
-                                    color: 'var(--muted-foreground)',
-                                    background: 'none',
-                                    border: '1px solid var(--border)',
+                                    backgroundColor: 'var(--primary)',
+                                    color: 'var(--primary-foreground)',
+                                    border: 'none',
                                     borderRadius: 'var(--radius)',
                                     padding: '6px 14px',
                                     cursor: 'pointer',
+                                    fontWeight: 500,
                                 }}
                             >
-                                Back
+                                {isLast ? 'Finish' : 'Next'}
                             </button>
-                        )}
-                        <button
-                            onClick={next}
-                            style={{
-                                fontSize: '0.875rem',
-                                backgroundColor: 'var(--primary)',
-                                color: 'var(--primary-foreground)',
-                                border: 'none',
-                                borderRadius: 'var(--radius)',
-                                padding: '6px 14px',
-                                cursor: 'pointer',
-                                fontWeight: 500,
-                            }}
-                        >
-                            {isLast ? 'Finish' : 'Next'}
-                        </button>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </>,
-        document.body
+                </Dialog.Content>
+            </Dialog.Portal>
+        </Dialog.Root>
     );
 }

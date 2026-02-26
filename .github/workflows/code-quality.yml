@@ -26,11 +26,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --no-audit --legacy-peer-deps
+        run: npm ci --no-audit
 
       - name: Run npm audit
         run: npm audit --audit-level=high
-        continue-on-error: true
 
       - name: Check for hardcoded secrets
         run: |
@@ -63,7 +62,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --no-audit --legacy-peer-deps
+        run: npm ci --no-audit
 
       - name: Run ESLint
         run: npm run lint
@@ -115,7 +114,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --no-audit --legacy-peer-deps
+        run: npm ci --no-audit
 
       - name: Run unit tests with coverage
         run: npm run test:unit:coverage
@@ -146,7 +145,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --no-audit --legacy-peer-deps
+        run: npm ci --no-audit
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -211,7 +210,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --no-audit --legacy-peer-deps
+        run: npm ci --no-audit
 
       - name: Build project
         run: npm run build
