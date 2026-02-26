@@ -35,9 +35,7 @@ export function ManifestScanLog({ entries, className }: ManifestScanLogProps) {
       </div>
       <ScrollArea className="h-40">
         {entries.length === 0 ? (
-          <div className="p-4 text-xs text-muted-foreground">
-            No scans yet. Start scanning CNs.
-          </div>
+          <div className="p-4 text-xs text-muted-foreground">No scans yet. Start scanning CNs.</div>
         ) : (
           <div className="divide-y">
             {entries.map((entry, index) => (

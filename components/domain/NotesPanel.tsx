@@ -242,11 +242,11 @@ export const NotesPanel = memo<NotesPanelProps>(
           onKeyDown={
             collapsible
               ? (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setIsCollapsed(!isCollapsed);
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setIsCollapsed(!isCollapsed);
+                  }
                 }
-              }
               : undefined
           }
           role={collapsible ? 'button' : undefined}
@@ -318,7 +318,12 @@ export const NotesPanel = memo<NotesPanelProps>(
         )}
 
         {/* Add / Edit Note — Dialog */}
-        <Dialog open={isAdding || !!editingNote} onOpenChange={(open) => { if (!open) handleCancel(); }}>
+        <Dialog
+          open={isAdding || !!editingNote}
+          onOpenChange={(open) => {
+            if (!open) handleCancel();
+          }}
+        >
           <DialogContent className="sm:max-w-[560px]">
             <DialogHeader>
               <DialogTitle>{editingNote ? 'Edit Note' : 'New Note'}</DialogTitle>

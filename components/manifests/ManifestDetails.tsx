@@ -26,7 +26,12 @@ export const ManifestDetails: React.FC = () => {
     documentTitle: `Manifest-${manifest?.manifest_no}`,
   });
 
-  if (isLoading || !manifest) return <div className="p-6"><PageSkeleton /></div>;
+  if (isLoading || !manifest)
+    return (
+      <div className="p-6">
+        <PageSkeleton />
+      </div>
+    );
 
   const handleUpdateStatus = async (status: 'OPEN' | 'CLOSED' | 'DEPARTED' | 'ARRIVED') => {
     try {

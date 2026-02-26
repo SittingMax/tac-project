@@ -24,7 +24,8 @@ export function PageHeader({ title, description, icon, children, className }: Pa
       <div className="flex flex-col gap-2">
         <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none flex items-center gap-2.5 text-foreground">
           {icon && <span className="shrink-0">{icon}</span>}
-          {title}<span className="text-primary">.</span>
+          {title}
+          <span className="text-primary">.</span>
         </h1>
         {description && (
           <p className="text-muted-foreground font-mono text-xs tracking-widest uppercase">

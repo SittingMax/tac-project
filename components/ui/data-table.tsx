@@ -150,12 +150,14 @@ export function DataTable<TData, TValue>({
                           className={cn(
                             'flex items-center gap-1 font-mono uppercase text-[10px] tracking-widest text-muted-foreground',
                             header.column.getCanSort() &&
-                            'cursor-pointer select-none hover:text-foreground transition-colors'
+                              'cursor-pointer select-none hover:text-foreground transition-colors'
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
-                          {header.column.getCanSort() && <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                          {header.column.getCanSort() && (
+                            <ArrowUpDown className="w-3 h-3 opacity-50" />
+                          )}
                         </div>
                       )}
                     </TableHead>
@@ -173,7 +175,10 @@ export function DataTable<TData, TValue>({
                   className="hover:bg-muted/30 transition-colors border-b border-border/40 group"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-4 align-middle font-medium group-hover:text-primary transition-colors">
+                    <TableCell
+                      key={cell.id}
+                      className="py-4 align-middle font-medium group-hover:text-primary transition-colors"
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -181,7 +186,10 @@ export function DataTable<TData, TValue>({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={tableColumns.length} className="h-48 text-center bg-muted/5 font-mono uppercase text-xs tracking-widest text-muted-foreground border-b-0">
+                <TableCell
+                  colSpan={tableColumns.length}
+                  className="h-48 text-center bg-muted/5 font-mono uppercase text-xs tracking-widest text-muted-foreground border-b-0"
+                >
                   <div className="flex flex-col items-center justify-center gap-2">
                     <span className="w-1 h-8 bg-destructive/50"></span>
                     No telemetry streams found.

@@ -191,11 +191,11 @@ export const sendInvoiceEmail = async (
     html: template.html,
     attachments: data.pdfBase64
       ? [
-        {
-          filename: `invoice-${data.invoiceNumber}.pdf`,
-          content: data.pdfBase64,
-        },
-      ]
+          {
+            filename: `invoice-${data.invoiceNumber}.pdf`,
+            content: data.pdfBase64,
+          },
+        ]
       : undefined,
   });
 };

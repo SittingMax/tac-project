@@ -31,7 +31,6 @@ const AUTO_SUBMIT_DELAY_MS = 100;
 // Debug mode: submit buffer regardless of timing detection
 const DEBUG_MODE = false; // Set to true to capture all input regardless of speed (DEBUG ONLY)
 
-
 export function ScanningProvider({ children }: ScanningProviderProps) {
   const [isScanning, setIsScanning] = useState(false);
   const listenersRef = useRef<Set<ScanCallback>>(new Set());

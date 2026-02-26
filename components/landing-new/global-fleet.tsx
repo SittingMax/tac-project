@@ -60,7 +60,8 @@ export function GlobalFleet() {
               </span>
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl font-medium">
-              A multi-modal network engineered for speed, reliability, and security across every terrain. Deploy cargo across the world with seamless automated handoffs.
+              A multi-modal network engineered for speed, reliability, and security across every
+              terrain. Deploy cargo across the world with seamless automated handoffs.
             </p>
           </div>
         </FadeUp>
@@ -72,7 +73,11 @@ export function GlobalFleet() {
               <motion.div
                 whileHover={{ y: -5 }}
                 className="group relative h-full min-h-[380px] rounded-none border border-border bg-card/60 backdrop-blur-3xl overflow-hidden p-8 lg:p-10 flex flex-col transition-all duration-500 hover:shadow-[0_0_40px_-5px_var(--tw-shadow-color)]"
-                style={{ '--tw-shadow-color': `oklch(from ${item.color} l c h / 0.3)` } as React.CSSProperties}
+                style={
+                  {
+                    '--tw-shadow-color': `oklch(from ${item.color} l c h / 0.3)`,
+                  } as React.CSSProperties
+                }
               >
                 {/* Minimalist Glowing Edge on Hover (replaces the muddy blob) */}
                 <div
@@ -84,11 +89,20 @@ export function GlobalFleet() {
                   <div className="flex justify-between items-start mb-6">
                     <div className="flex items-center gap-4">
                       <div className="w-14 h-14 rounded-none flex items-center justify-center border border-border bg-background group-hover:scale-110 transition-transform duration-500 overflow-hidden relative">
-                        <div className="absolute inset-0 opacity-20" style={{ backgroundColor: item.color }} />
-                        <span className="font-mono font-bold text-lg" style={{ color: item.color }}>0{index + 1}</span>
+                        <div
+                          className="absolute inset-0 opacity-20"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <span className="font-mono font-bold text-lg" style={{ color: item.color }}>
+                          0{index + 1}
+                        </span>
                       </div>
                       <div className="w-12 h-12 flex items-center justify-center text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                        <item.icon className="w-7 h-7" style={{ color: item.color }} strokeWidth={1.5} />
+                        <item.icon
+                          className="w-7 h-7"
+                          style={{ color: item.color }}
+                          strokeWidth={1.5}
+                        />
                       </div>
                     </div>
                     <div className="px-3 py-1 text-[10px] font-mono tracking-widest uppercase rounded-none border border-border bg-background/50 hidden sm:block">
@@ -106,8 +120,12 @@ export function GlobalFleet() {
                   {/* Decorative Elements replacing standard images for a technical look */}
                   <div className="mt-8 pt-6 border-t border-border flex items-center justify-between opacity-60 group-hover:opacity-100 transition-opacity duration-500">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Status</span>
-                      <span className="text-xs font-semibold" style={{ color: item.color }}>Operational</span>
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                        Status
+                      </span>
+                      <span className="text-xs font-semibold" style={{ color: item.color }}>
+                        Operational
+                      </span>
                     </div>
                     {/* Simulated tech bar */}
                     <div className="w-1/2 h-1 rounded-none overflow-hidden bg-background">

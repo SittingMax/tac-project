@@ -55,8 +55,12 @@ export default function ShiftReport() {
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-border/40 pb-4 mb-8">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">Shift Handover<span className="text-primary">.</span></h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">Operations summary for designated duration</p>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
+            Shift Handover<span className="text-primary">.</span>
+          </h1>
+          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
+            Operations summary for designated duration
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -72,11 +76,21 @@ export default function ShiftReport() {
             </SelectContent>
           </Select>
 
-          <Button variant="outline" size="icon" className="rounded-none h-10 w-10 border-border" onClick={() => refetch()} disabled={isFetching}>
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-none h-10 w-10 border-border"
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
           </Button>
 
-          <Button className="rounded-none font-mono uppercase tracking-widest text-xs h-10 px-6" onClick={handleExport} disabled={!report || exportMutation.isPending}>
+          <Button
+            className="rounded-none font-mono uppercase tracking-widest text-xs h-10 px-6"
+            onClick={handleExport}
+            disabled={!report || exportMutation.isPending}
+          >
             <Download className="h-4 w-4 mr-2" />
             Export Data
           </Button>
@@ -94,7 +108,9 @@ export default function ShiftReport() {
                 {format(new Date(report.shiftPeriod.start), 'PPp')}
               </span>
               <ArrowRight className="h-4 w-4 text-muted-foreground" />
-              <span className="font-bold text-foreground">{format(new Date(report.shiftPeriod.end), 'PPp')}</span>
+              <span className="font-bold text-foreground">
+                {format(new Date(report.shiftPeriod.end), 'PPp')}
+              </span>
               <span className="bg-primary/10 text-primary border border-primary/30 px-2 py-0.5 ml-auto">
                 {report.shiftPeriod.durationHours} HRS
               </span>
@@ -122,7 +138,9 @@ export default function ShiftReport() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40 border-y border-border/40 my-8">
             <Card className="rounded-none border-0 shadow-none bg-background p-6">
               <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Shipments</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Shipments
+                </span>
                 <Package className="h-4 w-4 text-primary opacity-50" />
               </div>
               <div className="text-3xl font-black tracking-tighter">{report.shipments.total}</div>
@@ -133,7 +151,9 @@ export default function ShiftReport() {
 
             <Card className="rounded-none border-0 shadow-none bg-background p-6">
               <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Manifests</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Manifests
+                </span>
                 <Truck className="h-4 w-4 text-primary opacity-50" />
               </div>
               <div className="text-3xl font-black tracking-tighter">{report.manifests.total}</div>
@@ -144,10 +164,14 @@ export default function ShiftReport() {
 
             <Card className="rounded-none border-0 shadow-none bg-background p-6">
               <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-destructive">Exceptions</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-destructive">
+                  Exceptions
+                </span>
                 <AlertTriangle className="h-4 w-4 text-destructive opacity-50" />
               </div>
-              <div className="text-3xl font-black tracking-tighter text-destructive">{report.exceptions.total}</div>
+              <div className="text-3xl font-black tracking-tighter text-destructive">
+                {report.exceptions.total}
+              </div>
               <p className="text-xs text-destructive/80 font-mono mt-2">
                 {report.exceptions.resolved} RSV / {report.exceptions.pending} PND
               </p>
@@ -155,7 +179,9 @@ export default function ShiftReport() {
 
             <Card className="rounded-none border-0 shadow-none bg-background p-6">
               <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Scans</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  Scans
+                </span>
                 <ScanLine className="h-4 w-4 text-primary opacity-50" />
               </div>
               <div className="text-3xl font-black tracking-tighter">{report.scans.total}</div>

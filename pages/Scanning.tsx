@@ -200,9 +200,10 @@ export const Scanning: React.FC = () => {
                   className={`
                     relative flex items-center gap-1.5 px-3 py-2.5 font-mono uppercase tracking-widest text-[10px]
                     transition-all duration-200 border-b-2
-                    ${isActive
-                      ? `${m.bg} text-white border-transparent`
-                      : 'text-muted-foreground hover:bg-muted/50 border-transparent hover:border-border'
+                    ${
+                      isActive
+                        ? `${m.bg} text-white border-transparent`
+                        : 'text-muted-foreground hover:bg-muted/50 border-transparent hover:border-border'
                     }
                   `}
                   aria-pressed={isActive}
@@ -220,15 +221,17 @@ export const Scanning: React.FC = () => {
       {/* ── ACTIVE MANIFEST BANNER ─────────────────────── */}
       {(scanMode === 'LOAD_MANIFEST' || scanMode === 'VERIFY_MANIFEST') && activeManifest && (
         <div
-          className={`flex-shrink-0 flex items-center justify-between px-6 py-2.5 border-b border-l-4 ${scanMode === 'LOAD_MANIFEST'
-            ? 'bg-status-info/5 border-b-border border-l-status-info'
-            : 'bg-status-warning/5 border-b-border border-l-status-warning'
-            }`}
+          className={`flex-shrink-0 flex items-center justify-between px-6 py-2.5 border-b border-l-4 ${
+            scanMode === 'LOAD_MANIFEST'
+              ? 'bg-status-info/5 border-b-border border-l-status-info'
+              : 'bg-status-warning/5 border-b-border border-l-status-warning'
+          }`}
         >
           <div className="flex items-center gap-3">
             <Truck
-              className={`w-4 h-4 ${scanMode === 'LOAD_MANIFEST' ? 'text-status-info' : 'text-status-warning'
-                }`}
+              className={`w-4 h-4 ${
+                scanMode === 'LOAD_MANIFEST' ? 'text-status-info' : 'text-status-warning'
+              }`}
             />
             <div>
               <span className="text-sm font-bold font-mono text-foreground">
@@ -255,20 +258,22 @@ export const Scanning: React.FC = () => {
             <div className="flex gap-1 bg-background/90 border border-border backdrop-blur-sm">
               <button
                 onClick={() => setUseCameraScanner(true)}
-                className={`p-2 transition-all ${useCameraScanner
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-muted/50'
-                  }`}
+                className={`p-2 transition-all ${
+                  useCameraScanner
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted/50'
+                }`}
                 title="Camera scanner"
               >
                 <Camera className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setUseCameraScanner(false)}
-                className={`p-2 transition-all ${!useCameraScanner
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-muted/50'
-                  }`}
+                className={`p-2 transition-all ${
+                  !useCameraScanner
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted/50'
+                }`}
                 title="Manual / HID scanner"
               >
                 <Keyboard className="w-4 h-4" />
@@ -347,7 +352,9 @@ export const Scanning: React.FC = () => {
           <div className="flex-shrink-0 p-4 border-b border-border">
             <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2 flex items-center gap-1.5">
               <Keyboard className="w-3 h-3" />
-              {needsManifest ? 'Enter manifest code' : `Scan ${scanMode === 'DELIVER' ? 'delivery' : 'shipment'}`}
+              {needsManifest
+                ? 'Enter manifest code'
+                : `Scan ${scanMode === 'DELIVER' ? 'delivery' : 'shipment'}`}
             </label>
             <form onSubmit={handleScanSubmit} className="flex gap-0" data-testid="scan-form">
               <Input
@@ -420,7 +427,12 @@ export const Scanning: React.FC = () => {
                           Scan the barcode below to test your scanner connection:
                         </p>
                         <div className="flex justify-center py-2 bg-white">
-                          <UniversalBarcode value="TAC123456789" mode="screen" width={5} height={80} />
+                          <UniversalBarcode
+                            value="TAC123456789"
+                            mode="screen"
+                            width={5}
+                            height={80}
+                          />
                         </div>
                         <p className="text-[10px] text-center text-muted-foreground font-mono">
                           TAC123456789
@@ -436,9 +448,10 @@ export const Scanning: React.FC = () => {
                     className={`
                       flex items-center gap-3 px-4 py-3 border-l-3
                       animate-in slide-in-from-right-4 duration-300
-                      ${item.status === 'SUCCESS'
-                        ? 'border-l-status-success bg-status-success/5'
-                        : 'border-l-status-error bg-status-error/5'
+                      ${
+                        item.status === 'SUCCESS'
+                          ? 'border-l-status-success bg-status-success/5'
+                          : 'border-l-status-error bg-status-error/5'
                       }
                       ${idx === 0 ? 'bg-opacity-100' : ''}
                     `}
@@ -502,16 +515,12 @@ export const Scanning: React.FC = () => {
 
           {/* Pending sync */}
           {pendingScans.length > 0 && (
-            <span className="text-status-warning">
-              {pendingScans.length} pending sync
-            </span>
+            <span className="text-status-warning">{pendingScans.length} pending sync</span>
           )}
 
           {/* Failed scans */}
           {failedScans.length > 0 && (
-            <span className="text-status-error">
-              {failedScans.length} failed
-            </span>
+            <span className="text-status-error">{failedScans.length} failed</span>
           )}
 
           {/* Session timer */}

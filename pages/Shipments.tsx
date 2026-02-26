@@ -109,9 +109,9 @@ export const Shipments: React.FC = () => {
         },
         onDelete: isSuperAdmin
           ? (row) => {
-            setRowToDelete(row);
-            setDeleteOpen(true);
-          }
+              setRowToDelete(row);
+              setDeleteOpen(true);
+            }
           : undefined,
       }),
     [isSuperAdmin]
@@ -132,7 +132,10 @@ export const Shipments: React.FC = () => {
 
   return (
     <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
-      <PageHeader title="Shipments" description="Manage and track all logistics orders / Master Record" />
+      <PageHeader
+        title="Shipments"
+        description="Manage and track all logistics orders / Master Record"
+      />
 
       {/* Table with CRUD */}
       <CrudTable
@@ -174,7 +177,9 @@ export const Shipments: React.FC = () => {
           if (selectedRows.length === 0) return null;
           return (
             <div className="flex items-center gap-2 mr-4 border-r border-border pr-4">
-              <span className="text-sm text-primary font-medium">{selectedRows.length} selected</span>
+              <span className="text-sm text-primary font-medium">
+                {selectedRows.length} selected
+              </span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="secondary" size="sm" className="h-8">
@@ -188,7 +193,9 @@ export const Shipments: React.FC = () => {
                   <DropdownMenuItem onClick={() => handleBulkAction('update_status', selectedRows)}>
                     <CheckCircle className="w-4 h-4 mr-2" /> Update Statuses
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleBulkAction('assign_manifest', selectedRows)}>
+                  <DropdownMenuItem
+                    onClick={() => handleBulkAction('assign_manifest', selectedRows)}
+                  >
                     <MapPin className="w-4 h-4 mr-2" /> Assign to Manifest
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -253,7 +260,9 @@ export const Shipments: React.FC = () => {
       {/* Details Modal */}
       <Dialog
         open={!!selectedShipment}
-        onOpenChange={(open) => { if (!open) setSelectedShipment(null); }}
+        onOpenChange={(open) => {
+          if (!open) setSelectedShipment(null);
+        }}
       >
         <DialogContent className="sm:max-w-4xl w-[95vw] overflow-y-auto max-h-[90vh]">
           <DialogHeader>

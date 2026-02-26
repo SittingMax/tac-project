@@ -5,10 +5,24 @@ import { InvoiceWithRelations } from '@/hooks/useInvoices';
 import { KPIGrid } from '../components/dashboard/KPIGrid';
 
 // Dynamically import heavy charting components to reduce initial bundle size
-const DashboardCharts = lazy(() => import('../components/dashboard/Charts').then(m => ({ default: m.DashboardCharts })));
-const RealtimeCorridorActivity = lazy(() => import('../components/dashboard/RealtimeCorridorActivity').then(m => ({ default: m.RealtimeCorridorActivity })));
-const ChartBarInteractive = lazy(() => import('../components/dashboard/charts/ChartBarInteractive').then(m => ({ default: m.ChartBarInteractive })));
-const ChartRadialGrid = lazy(() => import('../components/dashboard/charts/ChartRadialGrid').then(m => ({ default: m.ChartRadialGrid })));
+const DashboardCharts = lazy(() =>
+  import('../components/dashboard/Charts').then((m) => ({ default: m.DashboardCharts }))
+);
+const RealtimeCorridorActivity = lazy(() =>
+  import('../components/dashboard/RealtimeCorridorActivity').then((m) => ({
+    default: m.RealtimeCorridorActivity,
+  }))
+);
+const ChartBarInteractive = lazy(() =>
+  import('../components/dashboard/charts/ChartBarInteractive').then((m) => ({
+    default: m.ChartBarInteractive,
+  }))
+);
+const ChartRadialGrid = lazy(() =>
+  import('../components/dashboard/charts/ChartRadialGrid').then((m) => ({
+    default: m.ChartRadialGrid,
+  }))
+);
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { RefreshCw } from 'lucide-react';
@@ -127,9 +141,12 @@ export const Dashboard: React.FC = () => {
       <div className="relative overflow-hidden rounded-none bg-gradient-to-br from-primary via-primary/90 to-primary/60 p-8 text-primary-foreground shadow-lg">
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight mb-2">Good morning, {user?.name?.split(' ')[0] || 'Team'}</h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-2">
+              Good morning, {user?.name?.split(' ')[0] || 'Team'}
+            </h2>
             <p className="text-primary-foreground/80 text-lg max-w-xl">
-              Here is what's happening with your logistics operations today. You have {user?.role === 'SUPER_ADMIN' ? 'full access' : 'limited access'} to system features.
+              Here is what's happening with your logistics operations today. You have{' '}
+              {user?.role === 'SUPER_ADMIN' ? 'full access' : 'limited access'} to system features.
             </p>
           </div>
           <div className="mt-6 md:mt-0 hidden md:block">
@@ -156,24 +173,48 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
         <div className="flex flex-col gap-4">
           <ErrorBoundary fallback={<InlineError message="Failed to load map" />}>
-            <Suspense fallback={<div className="h-[300px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">Loading Map...</div>}>
+            <Suspense
+              fallback={
+                <div className="h-[300px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">
+                  Loading Map...
+                </div>
+              }
+            >
               <RealtimeCorridorActivity />
             </Suspense>
           </ErrorBoundary>
           <ErrorBoundary fallback={<InlineError message="Failed to load shipments chart" />}>
-            <Suspense fallback={<div className="h-[300px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">Loading Charts...</div>}>
+            <Suspense
+              fallback={
+                <div className="h-[300px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">
+                  Loading Charts...
+                </div>
+              }
+            >
               <ChartBarInteractive />
             </Suspense>
           </ErrorBoundary>
           <ErrorBoundary fallback={<InlineError message="Failed to load efficiency index" />}>
-            <Suspense fallback={<div className="h-[300px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">Loading Indexes...</div>}>
+            <Suspense
+              fallback={
+                <div className="h-[300px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">
+                  Loading Indexes...
+                </div>
+              }
+            >
               <ChartRadialGrid />
             </Suspense>
           </ErrorBoundary>
         </div>
 
         <ErrorBoundary fallback={<InlineError message="Failed to load charts" />}>
-          <Suspense fallback={<div className="h-[full] min-h-[500px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">Loading Dashboard Charts...</div>}>
+          <Suspense
+            fallback={
+              <div className="h-[full] min-h-[500px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">
+                Loading Dashboard Charts...
+              </div>
+            }
+          >
             <DashboardCharts />
           </Suspense>
         </ErrorBoundary>

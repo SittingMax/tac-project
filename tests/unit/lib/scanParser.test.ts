@@ -28,16 +28,17 @@ describe('scanParser', () => {
         expect(result.awb).toBe('TAC12345678');
       });
 
-      it('should reject AWB with wrong prefix', () => {
-        expect(() => parseScanInput('ABC12345678')).toThrow();
+      it('should passthrough unknown strings as shipment', () => {
+        expect(parseScanInput('ABC12345678').type).toBe('shipment');
+        expect(parseScanInput('ABC12345678').awb).toBe('ABC12345678');
       });
 
-      it('should reject AWB with too few digits (< 8)', () => {
-        expect(() => parseScanInput('TAC1234567')).toThrow(); // 7 digits
+      it('should passthrough AWB with too few digits (< 8) as shipment', () => {
+        expect(parseScanInput('TAC1234567').type).toBe('shipment'); // 7 digits
       });
 
-      it('should reject AWB with too many digits (> 11)', () => {
-        expect(() => parseScanInput('TAC123456789012')).toThrow(); // 12 digits
+      it('should passthrough AWB with too many digits (> 11) as shipment', () => {
+        expect(parseScanInput('TAC123456789012').type).toBe('shipment'); // 12 digits
       });
 
       it('should accept AWB with 9-11 digits', () => {
@@ -62,7 +63,7 @@ describe('scanParser', () => {
 
       it('should reject invalid AWB in payload', () => {
         const payload = JSON.stringify({ v: 1, awb: 'INVALID123' });
-        expect(() => parseScanInput(payload)).toThrow('Invalid AWB format');
+        expect(() => parseScanInput(payload)).toThrow('Invalid CN format');
       });
 
       it('should include metadata from payload', () => {
@@ -172,8 +173,10 @@ describe('scanParser', () => {
         expect(() => parseScanInput('{invalid}')).toThrow('Invalid JSON');
       });
 
-      it('should reject unknown format', () => {
-        expect(() => parseScanInput('RANDOM123')).toThrow('Invalid scan format');
+      it('should passthrough unknown format as shipment', () => {
+        const result = parseScanInput('RANDOM123');
+        expect(result.type).toBe('shipment');
+        expect(result.awb).toBe('RANDOM123');
       });
     });
   });

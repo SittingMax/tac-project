@@ -48,7 +48,10 @@ test.describe('Uncovered Module Workflow Smoke', () => {
     await expect(page.getByTestId('create-dialog')).not.toBeVisible();
   });
 
-  test('Management basic workflow: open invite dialog and cancel', async ({ page, browserName }) => {
+  test('Management basic workflow: open invite dialog and cancel', async ({
+    page,
+    browserName,
+  }) => {
     test.skip(browserName !== 'chromium', 'Interactive workflow — Chromium only');
     await page.goto('/management');
 
@@ -75,7 +78,10 @@ test.describe('Uncovered Module Workflow Smoke', () => {
     await expect(page.getByText(/12 hours/i)).toBeVisible();
   });
 
-  test('Settings basic workflow: switch tabs and search audit logs', async ({ page, browserName }) => {
+  test('Settings basic workflow: switch tabs and search audit logs', async ({
+    page,
+    browserName,
+  }) => {
     test.skip(browserName !== 'chromium', 'Interactive workflow — Chromium only');
     await page.goto('/settings');
 

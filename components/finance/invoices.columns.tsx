@@ -193,35 +193,35 @@ export function getInvoicesColumns(
                 },
                 ...(params.onShareWhatsapp
                   ? [
-                    {
-                      label: 'Share WhatsApp',
-                      icon: <MessageCircle className="w-4 h-4" />,
-                      onClick: () => params.onShareWhatsapp!(row.original),
-                    },
-                  ]
+                      {
+                        label: 'Share WhatsApp',
+                        icon: <MessageCircle className="w-4 h-4" />,
+                        onClick: () => params.onShareWhatsapp!(row.original),
+                      },
+                    ]
                   : []),
                 ...(params.onShareEmail
                   ? [
-                    {
-                      label: 'Share Email',
-                      icon: <Mail className="w-4 h-4" />,
-                      onClick: () => params.onShareEmail!(row.original),
-                    },
-                  ]
+                      {
+                        label: 'Share Email',
+                        icon: <Mail className="w-4 h-4" />,
+                        onClick: () => params.onShareEmail!(row.original),
+                      },
+                    ]
                   : []),
                 ...(row.original.status === 'ISSUED'
                   ? [
-                    {
-                      label: 'Mark as Paid',
-                      icon: <CheckCircle className="w-4 h-4" />,
-                      onClick: () => params.onMarkPaid(row.original),
-                    },
-                    {
-                      label: 'Cancel',
-                      icon: <XCircle className="w-4 h-4" />,
-                      onClick: () => params.onCancel(row.original),
-                    },
-                  ]
+                      {
+                        label: 'Mark as Paid',
+                        icon: <CheckCircle className="w-4 h-4" />,
+                        onClick: () => params.onMarkPaid(row.original),
+                      },
+                      {
+                        label: 'Cancel',
+                        icon: <XCircle className="w-4 h-4" />,
+                        onClick: () => params.onCancel(row.original),
+                      },
+                    ]
                   : []),
               ]}
             />

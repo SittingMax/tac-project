@@ -45,8 +45,8 @@ export interface CrudTableProps<TData> {
   emptyMessage?: string;
   loadingState?: React.ReactNode;
   emptyState?:
-  | React.ReactNode
-  | ((ctx: { isFiltered: boolean; filter: string }) => React.ReactNode);
+    | React.ReactNode
+    | ((ctx: { isFiltered: boolean; filter: string }) => React.ReactNode);
   /** Toolbar content (e.g., filters, create button) */
   toolbar?: React.ReactNode;
   /** Optional callback for server-side search */
@@ -60,7 +60,9 @@ export interface CrudTableProps<TData> {
   /** Controlled row selection state */
   rowSelection?: RowSelectionState;
   /** Callback for row selection changes */
-  onRowSelectionChange?: (updater: import('@tanstack/react-table').Updater<RowSelectionState>) => void;
+  onRowSelectionChange?: (
+    updater: import('@tanstack/react-table').Updater<RowSelectionState>
+  ) => void;
   /** Content to render for bulk actions (usually buttons that react to table.getSelectedRowModel()) */
   bulkActions?: (table: import('@tanstack/react-table').Table<TData>) => React.ReactNode;
 }
@@ -97,7 +99,9 @@ export function CrudTable<TData>({
 
   const isControlledRowSelection = controlledRowSelection !== undefined;
   const rowSelection = isControlledRowSelection ? controlledRowSelection : internalRowSelection;
-  const setRowSelection = isControlledRowSelection ? onRowSelectionChange! : setInternalRowSelection;
+  const setRowSelection = isControlledRowSelection
+    ? onRowSelectionChange!
+    : setInternalRowSelection;
 
   const finalColumns = useMemo(() => {
     if (!enableRowSelection) return columns;
@@ -105,7 +109,10 @@ export function CrudTable<TData>({
       id: 'select',
       header: ({ table }) => (
         <Checkbox
-          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
           className="translate-y-[2px]"
@@ -191,7 +198,9 @@ export function CrudTable<TData>({
               <DropdownMenuContent align="end" className="w-[150px]">
                 {table
                   .getAllColumns()
-                  .filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide())
+                  .filter(
+                    (column) => typeof column.accessorFn !== 'undefined' && column.getCanHide()
+                  )
                   .map((column) => {
                     return (
                       <DropdownMenuCheckboxItem
@@ -238,7 +247,7 @@ export function CrudTable<TData>({
                               className={cn(
                                 'flex items-center gap-1',
                                 header.column.getCanSort() &&
-                                'cursor-pointer select-none hover:text-foreground'
+                                  'cursor-pointer select-none hover:text-foreground'
                               )}
                               onClick={header.column.getToggleSortingHandler()}
                             >
@@ -292,7 +301,7 @@ export function CrudTable<TData>({
                 to{' '}
                 {Math.min(
                   (table.getState().pagination.pageIndex + 1) *
-                  table.getState().pagination.pageSize,
+                    table.getState().pagination.pageSize,
                   table.getFilteredRowModel().rows.length
                 )}{' '}
                 of {table.getFilteredRowModel().rows.length} results

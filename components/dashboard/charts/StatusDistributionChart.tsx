@@ -2,26 +2,14 @@ import React, { useMemo } from 'react';
 import { Label, Pie, PieChart, Sector } from 'recharts';
 import { type PieSectorDataItem } from 'recharts/types/polar/Pie';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '../../ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../ui/card';
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
 } from '../../ui/chart';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { ChartSkeleton } from '../../ui/skeleton';
 import { useShipments } from '../../../hooks/useShipments';
 
@@ -86,7 +74,10 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
     () => statusChartData.findIndex((item) => item.status === activeStatus),
     [activeStatus, statusChartData]
   );
-  const statuses = React.useMemo(() => statusChartData.map((item) => item.status), [statusChartData]);
+  const statuses = React.useMemo(
+    () => statusChartData.map((item) => item.status),
+    [statusChartData]
+  );
 
   if (isLoading) return <ChartSkeleton />;
 
@@ -167,7 +158,11 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
               activeShape={({ outerRadius = 0, ...props }: PieSectorDataItem) => (
                 <g>
                   <Sector {...props} outerRadius={outerRadius + 10} />
-                  <Sector {...props} outerRadius={outerRadius + 25} innerRadius={outerRadius + 12} />
+                  <Sector
+                    {...props}
+                    outerRadius={outerRadius + 25}
+                    innerRadius={outerRadius + 12}
+                  />
                 </g>
               )}
             >
@@ -194,7 +189,8 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
                             y={(viewBox.cy || 0) + 24}
                             className="fill-muted-foreground text-xs"
                           >
-                            {chartConfig[activeStatus as keyof typeof chartConfig]?.label || 'Shipments'}
+                            {chartConfig[activeStatus as keyof typeof chartConfig]?.label ||
+                              'Shipments'}
                           </tspan>
                         </text>
                       );

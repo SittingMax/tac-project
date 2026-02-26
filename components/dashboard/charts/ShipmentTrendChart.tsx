@@ -2,13 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 import { format, subDays, startOfDay } from 'date-fns';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '../../ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../ui/card';
 import {
   ChartContainer,
   ChartLegend,
@@ -17,13 +11,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '../../ui/chart';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { ChartSkeleton } from '../../ui/skeleton';
 import { useShipments } from '../../../hooks/useShipments';
 
@@ -97,9 +85,7 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>Shipment Volume Trend</CardTitle>
-          <CardDescription>
-            Showing inbound vs outbound shipments
-          </CardDescription>
+          <CardDescription>Showing inbound vs outbound shipments</CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger
@@ -132,35 +118,16 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
             </div>
           </div>
         ) : (
-          <ChartContainer
-            config={chartConfig}
-            className="aspect-auto h-[250px] w-full"
-          >
+          <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
             <AreaChart data={filteredData}>
               <defs>
                 <linearGradient id="fillOutbound" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-outbound)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-outbound)"
-                    stopOpacity={0.1}
-                  />
+                  <stop offset="5%" stopColor="var(--color-outbound)" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="var(--color-outbound)" stopOpacity={0.1} />
                 </linearGradient>
                 <linearGradient id="fillInbound" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-inbound)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-inbound)"
-                    stopOpacity={0.1}
-                  />
+                  <stop offset="5%" stopColor="var(--color-inbound)" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="var(--color-inbound)" stopOpacity={0.1} />
                 </linearGradient>
               </defs>
               <CartesianGrid vertical={false} />
@@ -172,9 +139,9 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
                 minTickGap={32}
                 tickFormatter={(value) => {
                   const date = new Date(value);
-                  return date.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
+                  return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
                   });
                 }}
               />
@@ -183,9 +150,9 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
                 content={
                   <ChartTooltipContent
                     labelFormatter={(value) => {
-                      return new Date(value).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
+                      return new Date(value).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
                       });
                     }}
                     indicator="dot"

@@ -331,7 +331,9 @@ const ColorsSection: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {colorTokens.map((token) => (
             <div key={token.name} className="space-y-2">
-              <div className={`${token.var} ${token.text} p-4 rounded-none text-center font-medium`}>
+              <div
+                className={`${token.var} ${token.text} p-4 rounded-none text-center font-medium`}
+              >
                 {token.name}
               </div>
               <p className="text-xs text-muted-foreground text-center font-mono">{token.var}</p>
@@ -458,7 +460,9 @@ const ScannerDebugSection: React.FC = () => {
           Focus anywhere on this page and scan/type. This logger intercepts events globally (capture
           phase).
           <br />
-          <span className="text-xs font-mono bg-muted px-1 rounded-none">Threshold: &lt; 100ms</span>
+          <span className="text-xs font-mono bg-muted px-1 rounded-none">
+            Threshold: &lt; 100ms
+          </span>
         </p>
 
         <div className="border rounded-none overflow-hidden">

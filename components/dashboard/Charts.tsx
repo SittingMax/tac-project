@@ -38,7 +38,6 @@ export const DashboardCharts: React.FC = () => {
       <div className="col-span-1 h-full">
         <ChartPieDonutText />
       </div>
-
     </div>
   );
 };

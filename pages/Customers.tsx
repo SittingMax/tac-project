@@ -131,22 +131,22 @@ export const Customers: React.FC = () => {
   // Form default values for editing
   const formDefaultValues: CustomerFormValues = activeRow
     ? (() => {
-      const normalized = normalizeCustomerAddressForForm(activeRow);
-      return {
-        type: activeRow.type as 'INDIVIDUAL' | 'BUSINESS' | 'CORPORATE',
-        name: activeRow.name,
-        companyName: activeRow.companyName ?? '',
-        email: activeRow.email ?? '',
-        phone: activeRow.phone,
-        address: normalized.line1 || '',
-        city: normalized.city || '',
-        state: normalized.state || '',
-        zip: normalized.zip || '',
-        tier: (activeRow.tier as 'STANDARD' | 'PRIORITY' | 'ENTERPRISE') ?? 'STANDARD',
-        gstin: activeRow.gstin ?? '',
-        credit_limit: activeRow.credit_limit ?? 0,
-      };
-    })()
+        const normalized = normalizeCustomerAddressForForm(activeRow);
+        return {
+          type: activeRow.type as 'INDIVIDUAL' | 'BUSINESS' | 'CORPORATE',
+          name: activeRow.name,
+          companyName: activeRow.companyName ?? '',
+          email: activeRow.email ?? '',
+          phone: activeRow.phone,
+          address: normalized.line1 || '',
+          city: normalized.city || '',
+          state: normalized.state || '',
+          zip: normalized.zip || '',
+          tier: (activeRow.tier as 'STANDARD' | 'PRIORITY' | 'ENTERPRISE') ?? 'STANDARD',
+          gstin: activeRow.gstin ?? '',
+          credit_limit: activeRow.credit_limit ?? 0,
+        };
+      })()
     : defaultFormValues;
 
   // Handlers
@@ -199,8 +199,12 @@ export const Customers: React.FC = () => {
     <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
       <div className="flex justify-between items-end border-b border-border/40 pb-4">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">Client Roster<span className="text-primary">.</span></h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">Manage profiles and structured contracts</p>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
+            Client Roster<span className="text-primary">.</span>
+          </h1>
+          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
+            Manage profiles and structured contracts
+          </p>
         </div>
       </div>
 

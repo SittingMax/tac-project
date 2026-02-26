@@ -1,10 +1,6 @@
 {
-  "extends": [
-    "stylelint-config-standard"
-  ],
-  "plugins": [
-    "stylelint-no-indistinguishable-colors"
-  ],
+  "extends": ["stylelint-config-standard"],
+  "plugins": ["stylelint-no-indistinguishable-colors"],
   "rules": {
     "at-rule-no-unknown": [
       true,
@@ -21,12 +17,7 @@
       }
     ],
     "color-function-notation": "modern",
-    "function-disallowed-list": [
-      "rgb",
-      "rgba",
-      "hsl",
-      "hsla"
-    ],
+    "function-disallowed-list": ["rgb", "rgba", "hsl", "hsla"],
     "color-no-hex": [
       true,
       {

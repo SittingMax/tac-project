@@ -48,7 +48,9 @@ const App: React.FC = () => {
     root.classList.remove('light', 'dark');
 
     if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
       root.classList.add(systemTheme);
       return;
     }
@@ -77,7 +79,13 @@ const App: React.FC = () => {
                       <Routes>
                         <Route path="/login" element={<Login />} />
                         {routes.map((route: AppRoute) => {
-                          const { path, element: Element, protected: isProtected, layout: hasLayout, allowedRoles } = route;
+                          const {
+                            path,
+                            element: Element,
+                            protected: isProtected,
+                            layout: hasLayout,
+                            allowedRoles,
+                          } = route;
                           let routeElement = <Element />;
 
                           if (hasLayout) {
@@ -85,7 +93,11 @@ const App: React.FC = () => {
                           }
 
                           if (isProtected) {
-                            routeElement = <ProtectedRoute allowedRoles={allowedRoles}>{routeElement}</ProtectedRoute>;
+                            routeElement = (
+                              <ProtectedRoute allowedRoles={allowedRoles}>
+                                {routeElement}
+                              </ProtectedRoute>
+                            );
                           }
 
                           return <Route key={path} path={path} element={routeElement} />;
@@ -95,7 +107,11 @@ const App: React.FC = () => {
                   </PageTransition>
                 </ErrorBoundary>
               </Suspense>
-              <Toaster position="top-right" richColors toastOptions={{ className: '!rounded-none' }} />
+              <Toaster
+                position="top-right"
+                richColors
+                toastOptions={{ className: '!rounded-none' }}
+              />
             </div>
           </Router>
         </ScanContextProvider>

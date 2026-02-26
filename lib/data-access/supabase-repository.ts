@@ -95,7 +95,8 @@ const mapShipment = (row: ShipmentRow): Shipment => {
     consignor: {
       name: row.consignor_name || '',
       phone: row.consignor_phone || '',
-      address: typeof consignorAddress === 'string' ? consignorAddress : consignorAddress?.line1 || '',
+      address:
+        typeof consignorAddress === 'string' ? consignorAddress : consignorAddress?.line1 || '',
       gstin: consignorAddress?.gstin,
       city: consignorAddress?.city,
       state: consignorAddress?.state,
@@ -104,7 +105,8 @@ const mapShipment = (row: ShipmentRow): Shipment => {
     consignee: {
       name: row.consignee_name,
       phone: row.consignee_phone,
-      address: typeof consigneeAddress === 'string' ? consigneeAddress : consigneeAddress?.line1 || '',
+      address:
+        typeof consigneeAddress === 'string' ? consigneeAddress : consigneeAddress?.line1 || '',
       gstin: consigneeAddress?.gstin,
       city: consigneeAddress?.city,
       state: consigneeAddress?.state,

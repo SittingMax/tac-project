@@ -75,8 +75,12 @@ export const QuickActions: React.FC = () => {
       <div data-testid="quick-actions" className="flex flex-col gap-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-border/40 pb-4">
           <div>
-            <h3 className="text-xl font-bold uppercase tracking-tight text-foreground">Command Center</h3>
-            <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">High-frequency operations</p>
+            <h3 className="text-xl font-bold uppercase tracking-tight text-foreground">
+              Command Center
+            </h3>
+            <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
+              High-frequency operations
+            </p>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40 border border-border/40">
@@ -88,7 +92,9 @@ export const QuickActions: React.FC = () => {
               onClick={action.onClick}
             >
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">{action.label}</span>
+                <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
+                  {action.label}
+                </span>
                 <action.icon className="w-4 h-4 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
               </div>
               <p className="text-sm font-medium tracking-tight group-hover:text-primary transition-colors pr-8">
@@ -119,7 +125,12 @@ export const QuickActions: React.FC = () => {
               className="flex-1 rounded-none border-r-0 font-mono text-xs uppercase"
               autoComplete="off"
             />
-            <Button type="submit" variant="default" className="rounded-none font-mono text-xs uppercase tracking-widest px-8" disabled={!quickScanInput.trim()}>
+            <Button
+              type="submit"
+              variant="default"
+              className="rounded-none font-mono text-xs uppercase tracking-widest px-8"
+              disabled={!quickScanInput.trim()}
+            >
               Execute
             </Button>
           </form>
@@ -127,7 +138,9 @@ export const QuickActions: React.FC = () => {
           {/* Recent Scans */}
           {recentScans.length > 0 && (
             <div className="space-y-4">
-              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Recent Queries:</p>
+              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+                Recent Queries:
+              </p>
               <div className="grid gap-px bg-border/40 border border-border/40">
                 {recentScans.map((awb, index) => (
                   <div
@@ -136,15 +149,12 @@ export const QuickActions: React.FC = () => {
                     onClick={() => navigate(`/tracking?cn=${awb}`)}
                   >
                     <div className="flex items-center gap-4 flex-1">
-                      <span className="text-xs font-mono font-medium tracking-widest group-hover:text-primary transition-colors">{awb}</span>
+                      <span className="text-xs font-mono font-medium tracking-widest group-hover:text-primary transition-colors">
+                        {awb}
+                      </span>
                     </div>
                     <div className="flex-shrink-0 opacity-50 group-hover:opacity-100 transition-opacity mix-blend-difference">
-                      <UniversalBarcode
-                        value={awb}
-                        mode="compact"
-                        width={2}
-                        height={30}
-                      />
+                      <UniversalBarcode value={awb} mode="compact" width={2} height={30} />
                     </div>
                   </div>
                 ))}

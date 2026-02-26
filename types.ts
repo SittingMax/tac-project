@@ -28,7 +28,14 @@ export type ManifestStatus = 'OPEN' | 'CLOSED' | 'DEPARTED' | 'ARRIVED';
 
 export type InvoiceStatus = 'DRAFT' | 'ISSUED' | 'PAID' | 'CANCELLED' | 'OVERDUE';
 
-export type ExceptionType = 'DAMAGE' | 'SHORTAGE' | 'MISROUTE' | 'DELAY' | 'CUSTOMER_REFUSAL' | 'ADDRESS_ISSUE' | 'OTHER';
+export type ExceptionType =
+  | 'DAMAGE'
+  | 'SHORTAGE'
+  | 'MISROUTE'
+  | 'DELAY'
+  | 'CUSTOMER_REFUSAL'
+  | 'ADDRESS_ISSUE'
+  | 'OTHER';
 
 export type ExceptionSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 

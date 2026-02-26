@@ -75,17 +75,17 @@ export function mapManifestItemWithShipment(item: any): ManifestItemWithShipment
     ...item,
     shipment: item.shipment
       ? {
-        ...item.shipment,
-        // Map to expected interface names (columns use receiver_*/sender_* names)
-        consignee_name: item.shipment.consignee_name,
-        consignee_phone: item.shipment.consignee_phone,
-        consignee_address: item.shipment.consignee_address,
-        consignor_name: item.shipment.consignor_name,
-        consignor_phone: item.shipment.consignor_phone,
-        package_count: item.shipment.package_count,
-        total_weight: item.shipment.total_weight,
-        consignee_city: item.shipment.consignee_address?.city,
-      }
+          ...item.shipment,
+          // Map to expected interface names (columns use receiver_*/sender_* names)
+          consignee_name: item.shipment.consignee_name,
+          consignee_phone: item.shipment.consignee_phone,
+          consignee_address: item.shipment.consignee_address,
+          consignor_name: item.shipment.consignor_name,
+          consignor_phone: item.shipment.consignor_phone,
+          package_count: item.shipment.package_count,
+          total_weight: item.shipment.total_weight,
+          consignee_city: item.shipment.consignee_address?.city,
+        }
       : undefined,
   };
 }
@@ -687,7 +687,12 @@ export const manifestService = {
       }
 
       // Validate status
-      const validStatuses = ['CREATED', 'PICKED_UP', 'RECEIVED_AT_ORIGIN', 'RECEIVED_AT_ORIGIN_HUB'];
+      const validStatuses = [
+        'CREATED',
+        'PICKED_UP',
+        'RECEIVED_AT_ORIGIN',
+        'RECEIVED_AT_ORIGIN_HUB',
+      ];
       if (validateStatus && !validStatuses.includes(shipment.status)) {
         return {
           success: false,
@@ -835,15 +840,15 @@ export const manifestService = {
     const vehicleMeta =
       params.type === 'AIR'
         ? {
-          flight_no: params.flightNumber,
-          flight_date: params.flightDate,
-          airline_code: params.airlineCode,
-        }
+            flight_no: params.flightNumber,
+            flight_date: params.flightDate,
+            airline_code: params.airlineCode,
+          }
         : {
-          vehicle_no: params.vehicleNumber,
-          driver_name: params.driverName,
-          driver_phone: params.driverPhone,
-        };
+            vehicle_no: params.vehicleNumber,
+            driver_name: params.driverName,
+            driver_phone: params.driverPhone,
+          };
 
     const { data, error } = await (supabase.from('manifests') as any)
       .insert({

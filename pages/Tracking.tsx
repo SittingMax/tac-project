@@ -33,31 +33,31 @@ export const Tracking: React.FC = () => {
   // Map Supabase data to legacy format for existing components
   const result = shipmentData
     ? {
-      shipment: {
-        id: shipmentData.id,
-        awb: shipmentData.cn_number,
-        status: shipmentData.status,
-        mode: shipmentData.mode,
-        originHub: shipmentData.origin_hub?.code || 'ORIGIN',
-        destinationHub: shipmentData.destination_hub?.code || 'DEST',
-        eta: 'TBD',
-        consigneeName: shipmentData.consignee_name,
-        consigneePhone: shipmentData.consignee_phone,
-        weight: shipmentData.total_weight,
-        pieces: shipmentData.package_count,
-      } as unknown as Shipment,
-      events: (eventsData || []).map((e) => ({
-        id: e.id,
-        shipmentId: e.shipment_id,
-        awb: shipmentData?.cn_number || '',
-        timestamp: e.event_time || e.created_at,
-        status: e.event_code,
-        eventCode: e.event_code,
-        location: e.hub?.name || e.location || '',
-        description: e.notes || `Status: ${e.event_code}`,
-        actorId: e.actor_staff_id || '',
-      })) as unknown as TrackingEvent[],
-    }
+        shipment: {
+          id: shipmentData.id,
+          awb: shipmentData.cn_number,
+          status: shipmentData.status,
+          mode: shipmentData.mode,
+          originHub: shipmentData.origin_hub?.code || 'ORIGIN',
+          destinationHub: shipmentData.destination_hub?.code || 'DEST',
+          eta: 'TBD',
+          consigneeName: shipmentData.consignee_name,
+          consigneePhone: shipmentData.consignee_phone,
+          weight: shipmentData.total_weight,
+          pieces: shipmentData.package_count,
+        } as unknown as Shipment,
+        events: (eventsData || []).map((e) => ({
+          id: e.id,
+          shipmentId: e.shipment_id,
+          awb: shipmentData?.cn_number || '',
+          timestamp: e.event_time || e.created_at,
+          status: e.event_code,
+          eventCode: e.event_code,
+          location: e.hub?.name || e.location || '',
+          description: e.notes || `Status: ${e.event_code}`,
+          actorId: e.actor_staff_id || '',
+        })) as unknown as TrackingEvent[],
+      }
     : null;
 
   const handleTrack = () => {
@@ -74,7 +74,8 @@ export const Tracking: React.FC = () => {
   }, [shipmentError]);
 
   useEffect(() => {
-    const awbParam = searchParams.get('cn') || searchParams.get('awb') || searchParams.get('CN Number');
+    const awbParam =
+      searchParams.get('cn') || searchParams.get('awb') || searchParams.get('CN Number');
     if (awbParam) {
       setTrackId(awbParam);
       setSearchAwb(awbParam.toUpperCase());
@@ -88,8 +89,12 @@ export const Tracking: React.FC = () => {
     <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
       <div className="flex justify-between items-end border-b border-border/40 pb-4">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">Live Tracking<span className="text-primary">.</span></h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">Public visibility portal</p>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
+            Live Tracking<span className="text-primary">.</span>
+          </h1>
+          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
+            Public visibility portal
+          </p>
         </div>
       </div>
 
@@ -108,11 +113,19 @@ export const Tracking: React.FC = () => {
               onChange={(e) => setTrackId(e.target.value)}
             />
           </div>
-          <Button size="lg" className="px-12 rounded-none font-mono uppercase text-xs tracking-widest" onClick={handleTrack}>
+          <Button
+            size="lg"
+            className="px-12 rounded-none font-mono uppercase text-xs tracking-widest"
+            onClick={handleTrack}
+          >
             Execute
           </Button>
         </div>
-        {error && <div className="text-status-error mt-4 text-left text-xs font-mono uppercase tracking-widest bg-status-error/10 p-2 border border-status-error/20 inline-block">{error}</div>}
+        {error && (
+          <div className="text-status-error mt-4 text-left text-xs font-mono uppercase tracking-widest bg-status-error/10 p-2 border border-status-error/20 inline-block">
+            {error}
+          </div>
+        )}
       </Card>
 
       {result && (
@@ -120,11 +133,15 @@ export const Tracking: React.FC = () => {
           {/* Timeline */}
           <Card className="lg:col-span-1 p-8 rounded-none border-border">
             <div className="mb-12">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4">Current Status</div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4">
+                Current Status
+              </div>
               <StatusBadge status={result.shipment.status} size="lg" />
             </div>
 
-            <h3 className="text-xl font-bold uppercase tracking-tight text-foreground mb-8">Journey Audit</h3>
+            <h3 className="text-xl font-bold uppercase tracking-tight text-foreground mb-8">
+              Journey Audit
+            </h3>
             <TrackingTimeline events={result.events} />
           </Card>
 

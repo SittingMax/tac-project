@@ -85,26 +85,26 @@ export const generateLabelFromShipment = (
     dates: {
       shipDate: shipment.bookingDate
         ? new Date(shipment.bookingDate).toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        })
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          })
         : new Date().toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        }),
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          }),
       invoiceDate: invoiceData?.createdAt
         ? new Date(invoiceData.createdAt).toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        })
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          })
         : new Date().toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        }),
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          }),
     },
     gstNumber: shipment.consignee?.gstin || invoiceData?.gstNumber,
   };
@@ -164,26 +164,26 @@ export const generateLabelFromFormData = (formData: any): LabelData => {
     dates: {
       shipDate: formData.bookingDate
         ? new Date(formData.bookingDate).toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        })
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          })
         : new Date().toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        }),
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          }),
       invoiceDate: formData.bookingDate
         ? new Date(formData.bookingDate).toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        })
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          })
         : new Date().toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        }),
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          }),
     },
     gstNumber: formData.consigneeGstin || formData.gstNumber,
   };
