@@ -1,136 +1,270 @@
-import { useState, useEffect } from 'react';
-import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
+import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useStore } from '@/store';
 
+interface TourStep {
+    title: string;
+    content: string;
+    target: string; // CSS selector or 'body' for centered modal
+    placement: 'center' | 'right' | 'bottom';
+}
+
+const TOUR_STEPS: TourStep[] = [
+    {
+        target: 'body',
+        placement: 'center',
+        title: 'Welcome to TAC Cargo v2.0',
+        content:
+            "We've completely redesigned your interface to help you manage logistics faster than ever. Let's take a quick look around.",
+    },
+    {
+        target: '[data-testid="sidebar-nav"]',
+        placement: 'right',
+        title: 'Navigation Sidebar',
+        content:
+            'Everything is organized cleanly in this collapsible sidebar. Look out for the live badges!',
+    },
+    {
+        target: '[data-testid="kpi-grid"]',
+        placement: 'bottom',
+        title: 'Dashboard KPIs',
+        content:
+            'Tap on any KPI card to instantly drill down into the related data table view.',
+    },
+    {
+        target: '.lucide-search',
+        placement: 'bottom',
+        title: 'Command Palette',
+        content:
+            'Press CMD+K (or CTRL+K) anywhere to instantly search shipments, manifests, or take action.',
+    },
+    {
+        target: '[aria-label="Toggle menu"]',
+        placement: 'bottom',
+        title: 'Mobile Ready',
+        content:
+            "On smaller screens, you can toggle the sidebar navigation here. Everything is built to be responsive.",
+    },
+];
+
+function getTargetRect(selector: string): DOMRect | null {
+    if (selector === 'body') return null;
+    const el = document.querySelector(selector);
+    return el ? el.getBoundingClientRect() : null;
+}
+
+function computeTooltipStyle(
+    rect: DOMRect | null,
+    placement: TourStep['placement']
+): React.CSSProperties {
+    if (!rect) {
+        // Centered modal
+        return {
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 340,
+        };
+    }
+    const GAP = 12;
+    if (placement === 'right') {
+        return {
+            position: 'fixed',
+            top: rect.top,
+            left: rect.right + GAP,
+            width: 300,
+        };
+    }
+    // bottom
+    return {
+        position: 'fixed',
+        top: rect.bottom + GAP,
+        left: Math.max(8, rect.left + rect.width / 2 - 150),
+        width: 300,
+    };
+}
+
 export function OnboardingTour() {
+    const [stepIndex, setStepIndex] = useState(0);
     const [run, setRun] = useState(false);
     const { user } = useStore();
 
     useEffect(() => {
-        // Only run the tour if the user hasn't seen it yet
         const hasSeenTour = localStorage.getItem('hasSeenOnboardingTour');
         if (!hasSeenTour && user) {
-            // Small delay to ensure the UI is fully rendered
-            const timer = setTimeout(() => {
-                setRun(true);
-            }, 1000);
+            const timer = setTimeout(() => setRun(true), 1000);
             return () => clearTimeout(timer);
         }
     }, [user]);
 
-    const steps: Step[] = [
-        {
-            target: 'body',
-            placement: 'center',
-            content: (
-                <div className="text-left space-y-2">
-                    <h3 className="font-semibold text-lg text-primary">Welcome to TAC Cargo v2.0</h3>
-                    <p className="text-sm text-muted-foreground">
-                        We've completely redesigned your interface to help you manage logistics faster than ever.
-                        Let's take a quick look around.
-                    </p>
-                </div>
-            ),
-            disableBeacon: true,
-        },
-        {
-            target: '[data-testid="sidebar-nav"]',
-            content: (
-                <div className="text-left space-y-2">
-                    <h3 className="font-semibold">Navigation Sidebar</h3>
-                    <p className="text-sm">
-                        Everything is organized cleanly in this collapsible sidebar. Look out for the live badges!
-                    </p>
-                </div>
-            ),
-            placement: 'right',
-        },
-        {
-            target: '[data-testid="kpi-grid"]',
-            content: (
-                <div className="text-left space-y-2">
-                    <h3 className="font-semibold">Dashboard KPIs</h3>
-                    <p className="text-sm">
-                        Tap on any KPI card to instantly drill down into the related data table view.
-                    </p>
-                </div>
-            ),
-            placement: 'bottom',
-        },
-        {
-            target: '.lucide-search',
-            content: (
-                <div className="text-left space-y-2">
-                    <h3 className="font-semibold">Command Palette</h3>
-                    <p className="text-sm">
-                        Press CMD+K (or CTRL+K) anywhere to instantly search shipments, manifests, or take action.
-                    </p>
-                </div>
-            ),
-            placement: 'bottom',
-        },
-        {
-            target: '[aria-label="Toggle menu"]',
-            content: (
-                <div className="text-left space-y-2">
-                    <h3 className="font-semibold">Mobile Ready</h3>
-                    <p className="text-sm">
-                        On smaller screens, you can toggle the sidebar navigation here. Everything is built to be responsive.
-                    </p>
-                </div>
-            ),
-            placement: 'bottom',
-        },
-    ];
+    const finish = useCallback((skipped = false) => {
+        setRun(false);
+        if (!skipped) localStorage.setItem('hasSeenOnboardingTour', 'true');
+        else localStorage.setItem('hasSeenOnboardingTour', 'true');
+    }, []);
 
-    const handleJoyrideCallback = (data: CallBackProps) => {
-        const { status } = data;
-        const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
-
-        if (finishedStatuses.includes(status)) {
-            setRun(false);
-            localStorage.setItem('hasSeenOnboardingTour', 'true');
+    const next = useCallback(() => {
+        if (stepIndex < TOUR_STEPS.length - 1) {
+            setStepIndex((i) => i + 1);
+        } else {
+            finish();
         }
-    };
+    }, [stepIndex, finish]);
+
+    const back = useCallback(() => {
+        setStepIndex((i) => Math.max(0, i - 1));
+    }, []);
 
     if (!run) return null;
 
-    return (
-        <Joyride
-            callback={handleJoyrideCallback}
-            continuous
-            hideCloseButton
-            run={run}
-            scrollToFirstStep
-            showProgress
-            showSkipButton
-            steps={steps}
-            styles={{
-                options: {
-                    primaryColor: 'var(--primary)',
-                    textColor: 'var(--foreground)',
-                    zIndex: 10000,
-                    backgroundColor: 'var(--card)',
-                    arrowColor: 'var(--card)',
-                },
-                tooltip: {
+    const step = TOUR_STEPS[stepIndex];
+    const rect = getTargetRect(step.target);
+    const tooltipStyle = computeTooltipStyle(rect, step.placement);
+    const isLast = stepIndex === TOUR_STEPS.length - 1;
+    const isCenter = step.target === 'body';
+
+    return createPortal(
+        <>
+            {/* Backdrop */}
+            <div
+                aria-hidden="true"
+                style={{
+                    position: 'fixed',
+                    inset: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    zIndex: 9998,
+                }}
+                onClick={() => finish(true)}
+            />
+
+            {/* Tooltip card */}
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-label={step.title}
+                style={{
+                    ...tooltipStyle,
+                    zIndex: 9999,
                     backgroundColor: 'var(--card)',
                     color: 'var(--card-foreground)',
-                    borderRadius: 0,
-                    padding: 20,
-                },
-                tooltipContainer: {
-                    textAlign: 'left',
-                },
-                buttonNext: {
-                    backgroundColor: 'var(--primary)',
-                    color: 'var(--primary-foreground)',
-                    borderRadius: 0,
-                },
-                buttonBack: {
-                    color: 'var(--muted-foreground)',
-                },
-            }}
-        />
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    padding: '20px',
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+                }}
+            >
+                {/* Step counter */}
+                <div
+                    style={{
+                        fontSize: '0.75rem',
+                        color: 'var(--muted-foreground)',
+                        marginBottom: '8px',
+                    }}
+                >
+                    Step {stepIndex + 1} of {TOUR_STEPS.length}
+                </div>
+
+                {/* Title */}
+                <h3
+                    style={{
+                        fontWeight: 600,
+                        fontSize: '1rem',
+                        color: isCenter ? 'var(--primary)' : 'var(--foreground)',
+                        marginBottom: '8px',
+                    }}
+                >
+                    {step.title}
+                </h3>
+
+                {/* Content */}
+                <p
+                    style={{
+                        fontSize: '0.875rem',
+                        color: 'var(--muted-foreground)',
+                        lineHeight: 1.5,
+                        marginBottom: '16px',
+                    }}
+                >
+                    {step.content}
+                </p>
+
+                {/* Progress dots */}
+                <div
+                    style={{
+                        display: 'flex',
+                        gap: '6px',
+                        marginBottom: '16px',
+                    }}
+                >
+                    {TOUR_STEPS.map((_, i) => (
+                        <div
+                            key={i}
+                            style={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: '50%',
+                                backgroundColor:
+                                    i === stepIndex
+                                        ? 'var(--primary)'
+                                        : 'var(--muted)',
+                            }}
+                        />
+                    ))}
+                </div>
+
+                {/* Buttons */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <button
+                        onClick={() => finish(true)}
+                        style={{
+                            fontSize: '0.8rem',
+                            color: 'var(--muted-foreground)',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: '4px 0',
+                        }}
+                    >
+                        Skip tour
+                    </button>
+
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        {stepIndex > 0 && (
+                            <button
+                                onClick={back}
+                                style={{
+                                    fontSize: '0.875rem',
+                                    color: 'var(--muted-foreground)',
+                                    background: 'none',
+                                    border: '1px solid var(--border)',
+                                    borderRadius: 'var(--radius)',
+                                    padding: '6px 14px',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                Back
+                            </button>
+                        )}
+                        <button
+                            onClick={next}
+                            style={{
+                                fontSize: '0.875rem',
+                                backgroundColor: 'var(--primary)',
+                                color: 'var(--primary-foreground)',
+                                border: 'none',
+                                borderRadius: 'var(--radius)',
+                                padding: '6px 14px',
+                                cursor: 'pointer',
+                                fontWeight: 500,
+                            }}
+                        >
+                            {isLast ? 'Finish' : 'Next'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </>,
+        document.body
     );
 }
