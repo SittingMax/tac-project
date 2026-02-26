@@ -80,7 +80,7 @@
     "jspdf": "^4.1.0",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "0.574.0",
-    "motion": "^12.34.0",
+    "motion": "^12.34.3",
     "pdf-lib": "1.17.1",
     "qrcode": "1.5.4",
     "qrcode.react": "^4.2.0",
