@@ -1,0 +1,36 @@
+# CodeQL Ignore File
+# Excludes build artifacts and third-party code from security scanning
+# This file provides redundant protection alongside codeql-config.yml
+
+# Build output - contains minified third-party library code
+dist/
+build/
+out/
+
+# Dependencies (analyzed separately by Dependabot)
+node_modules/
+
+# Minified files (unreadable, from dependencies)
+*.min.js
+*.min.css
+*.min.mjs
+
+# Test artifacts and reports
+playwright-report/
+test-results/
+coverage/
+.nyc_output/
+
+# Archive/backup directories
+.archive/
+
+# Generated type definitions
+*.d.ts
+
+# Vendor/third-party assets
+public/assets/generated/
+
+# Lock files (not source code)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

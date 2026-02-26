@@ -1,0 +1,11 @@
+CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON public.bookings (user_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_shipment_id ON public.invoices (shipment_id);
+CREATE INDEX IF NOT EXISTS idx_manifest_container_items_container_id ON public.manifest_container_items (container_id);
+CREATE INDEX IF NOT EXISTS idx_manifest_container_items_org_id ON public.manifest_container_items (org_id);
+CREATE INDEX IF NOT EXISTS idx_manifest_containers_org_id ON public.manifest_containers (org_id);
+CREATE INDEX IF NOT EXISTS idx_manifest_scan_logs_org_id ON public.manifest_scan_logs (org_id);
+CREATE INDEX IF NOT EXISTS idx_manifest_scan_logs_shipment_id ON public.manifest_scan_logs (shipment_id);
+CREATE INDEX IF NOT EXISTS idx_packages_org_id ON public.packages (org_id);
+CREATE INDEX IF NOT EXISTS idx_role_permissions_permission_code ON public.role_permissions (permission_code);
+CREATE INDEX IF NOT EXISTS idx_shipments_customer_id ON public.shipments (customer_id);
+CREATE INDEX IF NOT EXISTS idx_staff_hub_id ON public.staff (hub_id);

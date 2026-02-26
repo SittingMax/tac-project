@@ -1,0 +1,1 @@
+hooks/useRealtime.ts(167,74): error TS2339: Property 'byAwb' does not exist on type '{ readonly all: readonly ["tracking"]; readonly events: (awb: string) => readonly ["tracking", "events", string]; readonly byCN: (awb: string) => readonly ["tracking", "CN Number", string]; readonly shipment: (shipmentId: string) => readonly [...]; }'.

@@ -1,0 +1,6 @@
+﻿
+> tac-cargo@1.0.0 typecheck
+> tsc --noEmit
+
+components/finance/MultiStepCreateInvoice.tsx(52,1): error TS6133: 'CustomerAddress' is declared but its value is never read.
+components/finance/MultiStepCreateInvoice.tsx(62,1): error TS6133: 'Json' is declared but its value is never read.

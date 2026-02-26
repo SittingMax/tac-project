@@ -1,0 +1,112 @@
+[
+  {
+    "schemaname": "public",
+    "tablename": "invoices",
+    "policyname": "Invoices org-scoped",
+    "permissive": "PERMISSIVE",
+    "roles": "{authenticated}",
+    "cmd": "ALL",
+    "qual": "(org_id = get_current_org_id())",
+    "with_check": "(org_id = get_current_org_id())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "invoices",
+    "policyname": "Super Admin can delete invoices",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "(( SELECT staff.role\n   FROM staff\n  WHERE (staff.auth_user_id = auth.uid())) = 'SUPER_ADMIN'::text)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "orgs",
+    "policyname": "Org admins can modify their org",
+    "permissive": "PERMISSIVE",
+    "roles": "{authenticated}",
+    "cmd": "ALL",
+    "qual": "(id IN ( SELECT staff.org_id\n   FROM staff\n  WHERE ((staff.auth_user_id = ( SELECT auth.uid() AS uid)) AND (staff.role = ANY (ARRAY['ADMIN'::text, 'MANAGER'::text])))))",
+    "with_check": "(id IN ( SELECT staff.org_id\n   FROM staff\n  WHERE ((staff.auth_user_id = ( SELECT auth.uid() AS uid)) AND (staff.role = ANY (ARRAY['ADMIN'::text, 'MANAGER'::text])))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipments",
+    "policyname": "Anon can read shipments for tracking",
+    "permissive": "PERMISSIVE",
+    "roles": "{anon}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipments",
+    "policyname": "Authorized users can update shipments with hub access",
+    "permissive": "PERMISSIVE",
+    "roles": "{authenticated}",
+    "cmd": "UPDATE",
+    "qual": "((org_id = get_user_org_id()) AND has_role(ARRAY['ADMIN'::text, 'MANAGER'::text, 'OPS'::text, 'WAREHOUSE_IMPHAL'::text, 'WAREHOUSE_DELHI'::text]) AND ((NOT is_warehouse_role()) OR (origin_hub_id = get_user_hub_id()) OR (destination_hub_id = get_user_hub_id())))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipments",
+    "policyname": "Shipments org-scoped delete",
+    "permissive": "PERMISSIVE",
+    "roles": "{authenticated}",
+    "cmd": "DELETE",
+    "qual": "(org_id = get_current_org_id())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipments",
+    "policyname": "Shipments org-scoped insert",
+    "permissive": "PERMISSIVE",
+    "roles": "{authenticated}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(org_id = get_current_org_id())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipments",
+    "policyname": "Super Admin can delete shipments",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "(( SELECT staff.role\n   FROM staff\n  WHERE (staff.auth_user_id = auth.uid())) = 'SUPER_ADMIN'::text)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shipments",
+    "policyname": "Users can view shipments with hub access",
+    "permissive": "PERMISSIVE",
+    "roles": "{authenticated}",
+    "cmd": "SELECT",
+    "qual": "((org_id = get_user_org_id()) AND ((NOT is_warehouse_role()) OR (origin_hub_id = get_user_hub_id()) OR (destination_hub_id = get_user_hub_id())))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "staff",
+    "policyname": "Staff org-scoped modify",
+    "permissive": "PERMISSIVE",
+    "roles": "{authenticated}",
+    "cmd": "ALL",
+    "qual": "(org_id = get_current_org_id())",
+    "with_check": "(org_id = get_current_org_id())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "staff",
+    "policyname": "Users can view own staff profile",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "(auth_user_id = auth.uid())",
+    "with_check": null
+  }
+]
