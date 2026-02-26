@@ -17,7 +17,7 @@ export async function getOrCreateDefaultOrg(): Promise<string> {
   if (import.meta.env.PROD) {
     throw new Error(
       'getOrCreateDefaultOrg() is a development utility and cannot be used in production. ' +
-      'Organizations should be created through proper onboarding flows.'
+        'Organizations should be created through proper onboarding flows.'
     );
   }
 

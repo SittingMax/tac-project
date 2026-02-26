@@ -143,12 +143,9 @@ export const shipmentService = {
     // Generate AWB if not provided
     let awbNumber = shipment.cn_number;
     if (!awbNumber) {
-      const { data: awbData, error: awbError } = await (supabase.rpc as any)(
-        'generate_cn_number',
-        {
-          p_org_id: orgId,
-        }
-      );
+      const { data: awbData, error: awbError } = await (supabase.rpc as any)('generate_cn_number', {
+        p_org_id: orgId,
+      });
       if (awbError) throw mapSupabaseError(awbError);
       if (typeof awbData !== 'string' || !awbData) {
         throw new Error('AWB service unavailable');

@@ -93,10 +93,11 @@ export function getShipmentsColumns(
       header: 'Service',
       cell: ({ row }) => (
         <span
-          className={`text-xs font-bold px-2 py-0.5 rounded-none ${row.original.service_level === 'EXPRESS'
+          className={`text-xs font-bold px-2 py-0.5 rounded-none ${
+            row.original.service_level === 'EXPRESS'
               ? 'bg-status-warning/20 text-status-warning'
               : 'bg-muted text-muted-foreground'
-            }`}
+          }`}
         >
           {row.original.service_level?.substring(0, 3) || 'STD'}
         </span>

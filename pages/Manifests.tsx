@@ -239,8 +239,12 @@ export const Manifests: React.FC = () => {
     <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
       <div className="flex justify-between items-end border-b border-border/40 pb-4">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">Fleet Manifests<span className="text-primary">.</span></h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">Manage linehaul movements between hubs</p>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
+            Fleet Manifests<span className="text-primary">.</span>
+          </h1>
+          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
+            Manage linehaul movements between hubs
+          </p>
         </div>
         <Button
           onClick={() => {
@@ -279,7 +283,9 @@ export const Manifests: React.FC = () => {
       {manifests.length === 0 ? (
         <Card className="p-12 rounded-none border-border bg-muted/5 flex flex-col items-center justify-center text-center">
           <div className="w-16 h-1 bg-primary/20 mb-8"></div>
-          <h3 className="text-xl font-black uppercase tracking-tighter text-foreground mb-2">No manifests yet</h3>
+          <h3 className="text-xl font-black uppercase tracking-tighter text-foreground mb-2">
+            No manifests yet
+          </h3>
           <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-8">
             Create your first manifest to start managing linehaul movements
           </p>

@@ -27,7 +27,8 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-muted-foreground text-base leading-relaxed max-w-sm mb-8">
-              Advanced logistics for the modern world. Connecting the Northeast corridor with precision, speed, and unwavering reliability.
+              Advanced logistics for the modern world. Connecting the Northeast corridor with
+              precision, speed, and unwavering reliability.
             </p>
             <div className="flex gap-4">{/* Social placeholders could go here */}</div>
           </motion.div>

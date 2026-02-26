@@ -190,12 +190,24 @@ export const Inventory: React.FC = () => {
           <Table>
             <TableHeader className="bg-muted/5">
               <TableRow className="border-b-2 border-border/40 hover:bg-transparent">
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">cn_number</TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">PKG_COUNT</TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">WEIGHT_KG</TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">NODE_LOCATION</TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">SYSTEM_STATUS</TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">AGING_INDEX</TableHead>
+                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
+                  cn_number
+                </TableHead>
+                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
+                  PKG_COUNT
+                </TableHead>
+                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
+                  WEIGHT_KG
+                </TableHead>
+                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
+                  NODE_LOCATION
+                </TableHead>
+                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
+                  SYSTEM_STATUS
+                </TableHead>
+                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
+                  AGING_INDEX
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -233,7 +245,10 @@ export const Inventory: React.FC = () => {
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
-                        <Badge variant="outline" className="rounded-none font-mono text-[9px] uppercase tracking-widest border-border/60">
+                        <Badge
+                          variant="outline"
+                          className="rounded-none font-mono text-[9px] uppercase tracking-widest border-border/60"
+                        >
                           {s.status.replace(/_/g, ' ')}
                         </Badge>
                       </TableCell>

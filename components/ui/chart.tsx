@@ -63,7 +63,9 @@ const ChartContainer = React.forwardRef<
           {
             ...Object.fromEntries(
               Object.entries(config)
-                .filter(([, value]) => typeof value === 'object' && value !== null && 'color' in value)
+                .filter(
+                  ([, value]) => typeof value === 'object' && value !== null && 'color' in value
+                )
                 .map(([key, value]) => [`--color-${key}`, (value as { color: string }).color])
             ),
           } as React.CSSProperties

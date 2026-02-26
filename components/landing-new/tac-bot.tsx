@@ -53,7 +53,10 @@ function useMockChat({ onFinish }: { onFinish?: (opts: { message: Message }) => 
       let responseText =
         'Thagatchari for your message! I am a simulated UI demo. In the real app, I would connect to the TAC AI backend to track shipments (e.g., TAC-12345) or answer service queries. How else can I assist?';
 
-      if (userText.toLowerCase().includes('track') || userText.toLowerCase().includes('CN Number')) {
+      if (
+        userText.toLowerCase().includes('track') ||
+        userText.toLowerCase().includes('CN Number')
+      ) {
         responseText =
           'I can help with tracking! Please provide your **CN Number**, **Full Name**, and **Phone Number** so I can check the status.';
       } else if (

@@ -75,10 +75,14 @@ export function HeroSection() {
 
           <h1 className="text-5xl md:text-7xl lg:text-[6.5rem] leading-[1.1] font-extrabold tracking-tighter text-foreground pb-1">
             Seamless Logistics <br />
-            with <span className="text-transparent bg-clip-text bg-gradient-to-r from-foreground to-muted-foreground">TAC.</span>
+            with{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-foreground to-muted-foreground">
+              TAC.
+            </span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
-            TAC delivers high-performance freight solutions specialized for the Northeast corridor. <br className="hidden md:block" />
+            TAC delivers high-performance freight solutions specialized for the Northeast corridor.{' '}
+            <br className="hidden md:block" />
             Experience speed, reliability, and total transparency for every shipment.
           </p>
         </div>
@@ -101,7 +105,11 @@ export function HeroSection() {
           {/* Secondary CTA */}
           <TrackingDialog
             trigger={
-              <Button variant="outline" size="lg" className="rounded-none px-10 h-14 text-base font-bold border-primary/20 hover:border-primary/40 hover:bg-primary/5 backdrop-blur-sm transition-all">
+              <Button
+                variant="outline"
+                size="lg"
+                className="rounded-none px-10 h-14 text-base font-bold border-primary/20 hover:border-primary/40 hover:bg-primary/5 backdrop-blur-sm transition-all"
+              >
                 Track Cargo
               </Button>
             }

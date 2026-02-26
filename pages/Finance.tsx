@@ -76,7 +76,7 @@ export const Finance: React.FC = () => {
     handleShareEmail,
     buildInvoiceFromRow,
     getShipment,
-    mapShipmentForLabel
+    mapShipmentForLabel,
   } = useInvoiceActions();
 
   // Open invoice detail view
@@ -162,9 +162,9 @@ export const Finance: React.FC = () => {
         onShareEmail: (row) => handleShareEmail(buildInvoiceFromRow(row)),
         onDelete: isSuperAdmin
           ? (row) => {
-            setRowToDelete(buildInvoiceFromRow(row));
-            setDeleteOpen(true);
-          }
+              setRowToDelete(buildInvoiceFromRow(row));
+              setDeleteOpen(true);
+            }
           : undefined,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -192,8 +192,12 @@ export const Finance: React.FC = () => {
     <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
       <div className="flex justify-between items-end border-b border-border/40 pb-4">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">Financial Log<span className="text-primary">.</span></h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">Manage invoices, billing engines, and payment gateways</p>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
+            Financial Log<span className="text-primary">.</span>
+          </h1>
+          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
+            Manage invoices, billing engines, and payment gateways
+          </p>
         </div>
       </div>
 
@@ -201,7 +205,9 @@ export const Finance: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40 border-y border-border/40 my-8">
         <Card className="rounded-none border-0 shadow-none bg-background p-6">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Total Ledgers</span>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Total Ledgers
+            </span>
             <FileText className="w-4 h-4 text-primary opacity-50" />
           </div>
           <div className="text-3xl font-black tracking-tighter">{invoicesData.length}</div>
@@ -209,30 +215,45 @@ export const Finance: React.FC = () => {
 
         <Card className="rounded-none border-0 shadow-none bg-background p-6">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-status-success">Revenue (Paid)</span>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-status-success">
+              Revenue (Paid)
+            </span>
             <CreditCard className="w-4 h-4 text-status-success opacity-50" />
           </div>
-          <div className="text-3xl font-black tracking-tighter text-status-success truncate" title={formatCurrency(totalRevenue)}>
+          <div
+            className="text-3xl font-black tracking-tighter text-status-success truncate"
+            title={formatCurrency(totalRevenue)}
+          >
             {formatCurrency(totalRevenue)}
           </div>
         </Card>
 
         <Card className="rounded-none border-0 shadow-none bg-background p-6">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-status-warning">Pending Auth</span>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-status-warning">
+              Pending Auth
+            </span>
             <FileText className="w-4 h-4 text-status-warning opacity-50" />
           </div>
-          <div className="text-3xl font-black tracking-tighter text-status-warning truncate" title={formatCurrency(pendingAmount)}>
+          <div
+            className="text-3xl font-black tracking-tighter text-status-warning truncate"
+            title={formatCurrency(pendingAmount)}
+          >
             {formatCurrency(pendingAmount)}
           </div>
         </Card>
 
         <Card className="rounded-none border-0 shadow-none bg-background p-6">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-destructive">Delinquent</span>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-destructive">
+              Delinquent
+            </span>
             <FileText className="w-4 h-4 text-destructive opacity-50" />
           </div>
-          <div className="text-3xl font-black tracking-tighter text-destructive truncate" title={formatCurrency(overdueAmount)}>
+          <div
+            className="text-3xl font-black tracking-tighter text-destructive truncate"
+            title={formatCurrency(overdueAmount)}
+          >
             {formatCurrency(overdueAmount)}
           </div>
         </Card>
@@ -248,7 +269,10 @@ export const Finance: React.FC = () => {
         emptyState={<EmptyInvoices onCreate={() => setIsCreateOpen(true)} />}
         emptyMessage="No invoices found."
         toolbar={
-          <Button onClick={() => setIsCreateOpen(true)} className="rounded-none font-mono text-xs uppercase tracking-widest px-8">
+          <Button
+            onClick={() => setIsCreateOpen(true)}
+            className="rounded-none font-mono text-xs uppercase tracking-widest px-8"
+          >
             <Plus className="w-4 h-4 mr-2" /> Init Ledger
           </Button>
         }
@@ -267,7 +291,9 @@ export const Finance: React.FC = () => {
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>
-              {editingInvoice ? `Edit Invoice ${editingInvoice.invoice_no}` : 'Generate New Invoice'}
+              {editingInvoice
+                ? `Edit Invoice ${editingInvoice.invoice_no}`
+                : 'Generate New Invoice'}
             </DialogTitle>
           </DialogHeader>
           <CreateInvoiceForm
@@ -284,7 +310,9 @@ export const Finance: React.FC = () => {
       {/* Success Modal */}
       <Dialog
         open={!!successData}
-        onOpenChange={(open) => { if (!open) setSuccessData(null); }}
+        onOpenChange={(open) => {
+          if (!open) setSuccessData(null);
+        }}
       >
         <DialogContent className="max-w-md">
           <DialogHeader>

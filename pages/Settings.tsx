@@ -8,17 +8,7 @@ import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import {
-  Building2,
-  Shield,
-  Bell,
-  User,
-  Truck,
-  MapPin,
-  Moon,
-  Sun,
-  Monitor,
-} from 'lucide-react';
+import { Building2, Shield, Bell, User, Truck, MapPin, Moon, Sun, Monitor } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -64,8 +54,6 @@ export const Settings = () => {
     driver_updates: false,
   });
 
-
-
   const handleSaveGeneral = () => {
     setIsLoading(true);
     setTimeout(() => {
@@ -80,8 +68,6 @@ export const Settings = () => {
       [id]: !prev[id],
     }));
   };
-
-
 
   return (
     <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
@@ -245,9 +231,14 @@ export const Settings = () => {
                   <TableBody>
                     {Object.entries(HUBS).map(([key, hub]) => (
                       <TableRow key={key}>
-                        <TableCell className="font-bold text-foreground font-mono">{hub.name}</TableCell>
+                        <TableCell className="font-bold text-foreground font-mono">
+                          {hub.name}
+                        </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="font-mono rounded-none tracking-widest text-[10px]">
+                          <Badge
+                            variant="outline"
+                            className="font-mono rounded-none tracking-widest text-[10px]"
+                          >
                             {hub.code}
                           </Badge>
                         </TableCell>
@@ -271,13 +262,19 @@ export const Settings = () => {
                 </Table>
               </div>
               <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-4">
-                Hub configuration is managed at the infrastructure level. Contact support to add or modify hubs.
+                Hub configuration is managed at the infrastructure level. Contact support to add or
+                modify hubs.
               </p>
             </Card>
 
             {/* Save Button — Full width */}
             <div className="md:col-span-2 p-8 bg-background flex justify-end">
-              <Button onClick={handleSaveGeneral} disabled={isLoading} size="lg" className="rounded-none font-mono text-xs uppercase tracking-widest px-12 h-14">
+              <Button
+                onClick={handleSaveGeneral}
+                disabled={isLoading}
+                size="lg"
+                className="rounded-none font-mono text-xs uppercase tracking-widest px-12 h-14"
+              >
                 {isLoading ? 'Saving...' : 'Execute Changes'}
               </Button>
             </div>
@@ -308,7 +305,10 @@ export const Settings = () => {
                       {user?.email || '—'}
                     </div>
                   </div>
-                  <Badge variant="outline" className="shrink-0 rounded-none font-mono text-[10px] uppercase tracking-widest border-primary/30 text-primary">
+                  <Badge
+                    variant="outline"
+                    className="shrink-0 rounded-none font-mono text-[10px] uppercase tracking-widest border-primary/30 text-primary"
+                  >
                     {user?.role || '—'}
                   </Badge>
                 </div>
@@ -355,7 +355,9 @@ export const Settings = () => {
                         className={`flex flex-col items-center justify-center p-4 transition-all duration-300 ${theme === id ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-muted/10 border-l first:border-l-0 border-border/40'}`}
                       >
                         <ThemeIcon className="w-4 h-4 mb-2" />
-                        <span className="text-[10px] font-mono uppercase tracking-widest">{label}</span>
+                        <span className="text-[10px] font-mono uppercase tracking-widest">
+                          {label}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -434,7 +436,11 @@ export const Settings = () => {
                       Identity Provider Managed
                     </div>
                   </div>
-                  <Button variant="outline" className="rounded-none font-mono text-[10px] uppercase tracking-widest h-8" disabled>
+                  <Button
+                    variant="outline"
+                    className="rounded-none font-mono text-[10px] uppercase tracking-widest h-8"
+                    disabled
+                  >
                     Config
                   </Button>
                 </div>
@@ -447,7 +453,10 @@ export const Settings = () => {
                       Privileged access only
                     </div>
                   </div>
-                  <Button variant="outline" className="rounded-none font-mono text-[10px] uppercase tracking-widest h-8">
+                  <Button
+                    variant="outline"
+                    className="rounded-none font-mono text-[10px] uppercase tracking-widest h-8"
+                  >
                     Manage
                   </Button>
                 </div>
@@ -460,7 +469,10 @@ export const Settings = () => {
                       8+ Chars / Leak Protection
                     </div>
                   </div>
-                  <Badge variant="outline" className="bg-status-success/10 text-status-success border-status-success/40 rounded-none font-mono text-[10px] uppercase tracking-widest">
+                  <Badge
+                    variant="outline"
+                    className="bg-status-success/10 text-status-success border-status-success/40 rounded-none font-mono text-[10px] uppercase tracking-widest"
+                  >
                     ACTIVE
                   </Badge>
                 </div>

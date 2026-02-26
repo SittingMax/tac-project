@@ -22,12 +22,7 @@ import { StatusBadge } from '../components/domain/StatusBadge';
 import { KPICard } from '../components/domain/KPICard';
 import { EmptyExceptions } from '@/components/ui/empty-state';
 import { CrudTable } from '@/components/crud/CrudTable';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -239,10 +234,7 @@ export const Exceptions: React.FC = () => {
       />
 
       {/* Raise Modal */}
-      <Dialog
-        open={isRaiseModalOpen}
-        onOpenChange={setIsRaiseModalOpen}
-      >
+      <Dialog open={isRaiseModalOpen} onOpenChange={setIsRaiseModalOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Raise New Exception</DialogTitle>
@@ -324,7 +316,9 @@ export const Exceptions: React.FC = () => {
       {/* Resolve Modal */}
       <Dialog
         open={!!selectedException}
-        onOpenChange={(open) => { if (!open) setSelectedException(null); }}
+        onOpenChange={(open) => {
+          if (!open) setSelectedException(null);
+        }}
       >
         <DialogContent>
           <DialogHeader>
@@ -332,7 +326,9 @@ export const Exceptions: React.FC = () => {
           </DialogHeader>
           <form onSubmit={handleSubmitResolve(onResolveSubmit)} className="space-y-4">
             <div className="bg-muted/50 p-4 rounded-none text-sm mb-4 border border-border">
-              <div className="font-medium text-foreground">Exception: {selectedException?.type}</div>
+              <div className="font-medium text-foreground">
+                Exception: {selectedException?.type}
+              </div>
               <div className="text-muted-foreground mt-1">{selectedException?.description}</div>
             </div>
             <div>

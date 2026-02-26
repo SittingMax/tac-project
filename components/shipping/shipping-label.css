@@ -197,7 +197,7 @@
   border-bottom: var(--rule) solid var(--ink);
 }
 
-.routingRow>div:first-child {
+.routingRow > div:first-child {
   border-right: var(--thin) solid var(--ink);
 }
 
@@ -226,7 +226,7 @@
   border-bottom: var(--rule) solid var(--ink);
 }
 
-.contentsRow>div:first-child {
+.contentsRow > div:first-child {
   border-right: var(--thin) solid var(--ink);
 }
 

@@ -104,9 +104,7 @@ export function TrackingSection() {
                 <div className="flex-1 w-full relative">
                   <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
-                    placeholder={
-                      trackingMode === 'gps' ? 'ENTER CN / HAWB ID' : 'ENTER CUSTODY ID'
-                    }
+                    placeholder={trackingMode === 'gps' ? 'ENTER CN / HAWB ID' : 'ENTER CUSTODY ID'}
                     className="w-full h-12 pl-14 pr-4 bg-transparent border-none text-base font-mono placeholder:text-muted-foreground/50 focus-visible:ring-0 shadow-none"
                     value={trackingNumber}
                     onChange={(e) => setTrackingNumber(e.target.value)}

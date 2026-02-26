@@ -104,7 +104,10 @@ export function parseScanInput(input: string): ScanResult {
 
       // Handle shipment scan (default)
       if (payload.awb) {
-        if (!/^(TAC|WEE|WGS)\d{8,11}$/i.test(payload.awb) && !/^(CN|WEE|TAC)-\d{4}-\d{4}$/i.test(payload.awb)) {
+        if (
+          !/^(TAC|WEE|WGS)\d{8,11}$/i.test(payload.awb) &&
+          !/^(CN|WEE|TAC)-\d{4}-\d{4}$/i.test(payload.awb)
+        ) {
           throw new ValidationError('Invalid CN format in payload');
         }
         return {

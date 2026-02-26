@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import url('tailwindcss');
+@import url('tw-animate-css');
 
 @source "./**/*.{js,ts,jsx,tsx,html}";
 
@@ -7,8 +7,8 @@
 
 @theme {
   /* Layer 1: Typography Scale */
-  --font-sans: "Plus Jakarta Sans", "Inter", sans-serif;
-  --font-mono: "Geist Mono", "JetBrains Mono", monospace;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', monospace;
 
   /* Layer 1: Color Primitives Routing */
   --color-background: var(--background);
@@ -119,7 +119,7 @@
 
   /* Charts - Brand Harmonious Scale */
   --chart-1: oklch(53% 0.26 285deg);
-  --chart-2: oklch(58% 0.20 300deg);
+  --chart-2: oklch(58% 0.2 300deg);
   --chart-3: oklch(50% 0.24 292deg);
   --chart-4: oklch(55% 0.22 275deg);
   --chart-5: oklch(60% 0.22 320deg);
@@ -160,9 +160,9 @@
   --ring: var(--primary);
   --status-live: oklch(53% 0.26 285deg);
   --status-active: oklch(55% 0.22 275deg);
-  --feature-air: oklch(60% 0.20 270deg);
+  --feature-air: oklch(60% 0.2 270deg);
   --feature-ground: oklch(65% 0.18 280deg);
-  --feature-delivery: oklch(70% 0.20 290deg);
+  --feature-delivery: oklch(70% 0.2 290deg);
   --grid-line: var(--border);
 }
 
@@ -179,10 +179,10 @@
   --primary: oklch(62% 0.22 285deg);
   --primary-foreground: oklch(16% 0.01 264deg);
   --status-live: oklch(62% 0.22 285deg);
-  --status-active: oklch(66% 0.20 275deg);
-  --feature-air: oklch(60% 0.20 270deg);
+  --status-active: oklch(66% 0.2 275deg);
+  --feature-air: oklch(60% 0.2 270deg);
   --feature-ground: oklch(65% 0.18 280deg);
-  --feature-delivery: oklch(70% 0.20 290deg);
+  --feature-delivery: oklch(70% 0.2 290deg);
   --grid-line: var(--border);
 }
 
@@ -220,7 +220,7 @@
   --chart-1: oklch(62% 0.22 285deg);
   --chart-2: oklch(68% 0.18 300deg);
   --chart-3: oklch(65% 0.19 292deg);
-  --chart-4: oklch(66% 0.20 275deg);
+  --chart-4: oklch(66% 0.2 275deg);
   --chart-5: oklch(72% 0.18 320deg);
 
   /* Sidebar */
@@ -239,7 +239,7 @@
   --status-warning: oklch(85% 0.14 85deg);
   --status-error: oklch(70% 0.18 25deg);
   --status-live: oklch(62% 0.22 285deg);
-  --status-active: oklch(66% 0.20 275deg);
+  --status-active: oklch(66% 0.2 275deg);
 }
 
 @layer base {
@@ -318,10 +318,12 @@
   }
 
   .tracking-route-gradient {
-    background-image: linear-gradient(90deg,
-        oklch(var(--status-info)),
-        oklch(var(--status-warning)),
-        oklch(var(--status-success)));
+    background-image: linear-gradient(
+      90deg,
+      oklch(var(--status-info)),
+      oklch(var(--status-warning)),
+      oklch(var(--status-success))
+    );
   }
 
   /* --- NEW PREMIUM EFFECTS --- */
@@ -376,9 +378,11 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y),
-        color-mix(in srgb, var(--primary) 15%, transparent),
-        transparent 40%);
+    background: radial-gradient(
+      800px circle at var(--mouse-x) var(--mouse-y),
+      color-mix(in srgb, var(--primary) 15%, transparent),
+      transparent 40%
+    );
     opacity: 0;
     transition: opacity 0.5s;
     pointer-events: none;
@@ -394,9 +398,11 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y),
-        color-mix(in srgb, var(--primary) 40%, transparent),
-        transparent 40%);
+    background: radial-gradient(
+      600px circle at var(--mouse-x) var(--mouse-y),
+      color-mix(in srgb, var(--primary) 40%, transparent),
+      transparent 40%
+    );
     opacity: 0;
     z-index: 3;
     transition: opacity 0.5s;
@@ -450,7 +456,6 @@
 
 /* Reduced Motion - Respect user preferences */
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {
@@ -672,11 +677,11 @@
     align-items: flex-start;
   }
 
-  ul[data-type='taskList'] li>label {
+  ul[data-type='taskList'] li > label {
     margin-top: 0.25rem;
   }
 
-  ul[data-type='taskList'] li>div {
+  ul[data-type='taskList'] li > div {
     flex: 1;
   }
 

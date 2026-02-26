@@ -45,7 +45,14 @@ TableFooter.displayName = 'TableFooter';
 
 const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
   ({ className, ...props }, ref) => (
-    <tr ref={ref} className={cn('border-b border-border/60 transition-all hover:bg-muted/40 hover:shadow-sm data-[state=selected]:bg-muted', className)} {...props} />
+    <tr
+      ref={ref}
+      className={cn(
+        'border-b border-border/60 transition-all hover:bg-muted/40 hover:shadow-sm data-[state=selected]:bg-muted',
+        className
+      )}
+      {...props}
+    />
   )
 );
 TableRow.displayName = 'TableRow';
@@ -71,7 +78,10 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-    className={cn('px-5 py-4 align-middle text-sm font-medium [&:has([role=checkbox])]:pr-0', className)}
+    className={cn(
+      'px-5 py-4 align-middle text-sm font-medium [&:has([role=checkbox])]:pr-0',
+      className
+    )}
     {...props}
   />
 ));

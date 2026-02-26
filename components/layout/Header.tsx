@@ -65,7 +65,10 @@ export const Header: React.FC = () => {
               {isLast ? (
                 <span className="font-semibold text-foreground">{formattedPath}</span>
               ) : (
-                <Link to={href} className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link
+                  to={href}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
                   {formattedPath}
                 </Link>
               )}

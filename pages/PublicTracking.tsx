@@ -8,7 +8,17 @@ import { Button } from '../components/ui/button';
 import { StatusBadge } from '../components/domain/StatusBadge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { BookingForm } from '../components/portal/BookingForm';
-import { Package, Search, MapPin, Truck, Plane, Clock, ArrowRight, UserCircle, Receipt } from 'lucide-react';
+import {
+  Package,
+  Search,
+  MapPin,
+  Truck,
+  Plane,
+  Clock,
+  ArrowRight,
+  UserCircle,
+  Receipt,
+} from 'lucide-react';
 
 interface ShipmentRecord {
   cn_number: string;
@@ -110,20 +120,32 @@ export function PublicTracking() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <Tabs defaultValue={awb ? "track" : "book"} className="w-full">
+        <Tabs defaultValue={awb ? 'track' : 'book'} className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8 bg-card/50 border border-border">
-            <TabsTrigger value="track" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger
+              value="track"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
               <Search className="w-4 h-4 mr-2" /> Track
             </TabsTrigger>
-            <TabsTrigger value="book" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger
+              value="book"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
               <Package className="w-4 h-4 mr-2" /> Book
             </TabsTrigger>
-            <TabsTrigger value="account" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger
+              value="account"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
               <UserCircle className="w-4 h-4 mr-2" /> Account
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="track" className="mt-0 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <TabsContent
+            value="track"
+            className="mt-0 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+          >
             {/* Search Form */}
             <Card className="p-6 bg-card/50 border-border">
               <form onSubmit={handleSearch} className="flex gap-4">
@@ -274,7 +296,9 @@ export function PublicTracking() {
                             <p className="font-semibold text-foreground">
                               {e.event_code.replace(/_/g, ' ')}
                             </p>
-                            <p className="text-sm text-muted-foreground">{e.hub?.name || 'System'}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {e.hub?.name || 'System'}
+                            </p>
                             <p className="text-xs text-muted-foreground/70">
                               {e.event_time ? new Date(e.event_time).toLocaleString() : 'N/A'}
                             </p>
@@ -293,8 +317,8 @@ export function PublicTracking() {
                 <Card className="p-6 bg-card/80 border-border">
                   <h3 className="text-lg font-semibold text-foreground mb-4">Need More Details?</h3>
                   <p className="text-muted-foreground mb-4">
-                    For complete shipment details including delivery contact information, please contact
-                    our support team with your CN Number.
+                    For complete shipment details including delivery contact information, please
+                    contact our support team with your CN Number.
                   </p>
                   <div className="flex items-center gap-2 text-status-info">
                     <Package className="w-4 h-4" />
@@ -305,25 +329,35 @@ export function PublicTracking() {
             )}
           </TabsContent>
 
-          <TabsContent value="book" className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <TabsContent
+            value="book"
+            className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500"
+          >
             <BookingForm />
           </TabsContent>
 
-          <TabsContent value="account" className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <TabsContent
+            value="account"
+            className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500"
+          >
             <Card className="p-12 text-center bg-card/50 border-border">
               <div className="w-16 h-16 rounded-none bg-primary/20 flex items-center justify-center mx-auto mb-4">
                 <Receipt className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-4">Customer Account Access</h3>
               <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                Sign in to view your invoice history, manage saved addresses, and download monthly statements.
+                Sign in to view your invoice history, manage saved addresses, and download monthly
+                statements.
               </p>
               <div className="max-w-xs mx-auto space-y-4">
                 <Input placeholder="Customer ID or Email" className="bg-background" />
                 <Input type="password" placeholder="Password" className="bg-background" />
                 <Button className="w-full">Sign In to Dashboard</Button>
                 <p className="text-xs text-muted-foreground mt-4">
-                  Need an account? <a href="#" className="text-primary hover:underline">Contact Sales</a>
+                  Need an account?{' '}
+                  <a href="#" className="text-primary hover:underline">
+                    Contact Sales
+                  </a>
                 </p>
               </div>
             </Card>

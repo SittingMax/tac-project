@@ -48,7 +48,7 @@ export function validateEnv(): Env | null {
 
     console.warn(
       `[WGS Portal] Environment validation warnings:\n${message}\n` +
-      'Some features may be unavailable in development.'
+        'Some features may be unavailable in development.'
     );
     return null;
   }

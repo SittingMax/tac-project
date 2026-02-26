@@ -17,11 +17,11 @@ const normalizeAddress = (address: unknown) => {
   return {
     line1: getAddressValue(
       record.line1 ??
-      record.line_1 ??
-      record.street ??
-      record.address ??
-      record.addr1 ??
-      record.address1
+        record.line_1 ??
+        record.street ??
+        record.address ??
+        record.addr1 ??
+        record.address1
     ),
     line2: getAddressValue(
       record.line2 ?? record.line_2 ?? record.street2 ?? record.address2 ?? record.addr2
@@ -106,7 +106,8 @@ const mapShipmentRowToShipment = (row: any): Shipment => {
       address: formatAddress(row.consignor_address),
       city: consignorAddressParts.city || row.consignor_city || row.consignorCity,
       state: consignorAddressParts.state || row.consignor_state || row.consignorState,
-      zip: consignorAddressParts.zip || row.consignor_zip || row.consignorZip || row.consignor_pincode,
+      zip:
+        consignorAddressParts.zip || row.consignor_zip || row.consignorZip || row.consignor_pincode,
     },
     consignee: {
       name: row.consignee_name || 'CONSIGNEE',
@@ -114,7 +115,8 @@ const mapShipmentRowToShipment = (row: any): Shipment => {
       address: formatAddress(row.consignee_address),
       city: consigneeAddressParts.city || row.consignee_city || row.consigneeCity,
       state: consigneeAddressParts.state || row.consignee_state || row.consigneeState,
-      zip: consigneeAddressParts.zip || row.consignee_zip || row.consigneeZip || row.consignee_pincode,
+      zip:
+        consigneeAddressParts.zip || row.consignee_zip || row.consigneeZip || row.consignee_pincode,
     },
     contentsDescription: row.contents || 'General Cargo',
     paymentMode: (row.payment_mode as PaymentMode) || 'TO_PAY',

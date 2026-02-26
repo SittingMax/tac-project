@@ -106,11 +106,11 @@ export const Management: React.FC = () => {
   // Form default values for editing
   const formDefaultValues: StaffFormValues = activeRow
     ? {
-      full_name: activeRow.full_name,
-      email: activeRow.email,
-      role: activeRow.role,
-      hub_id: activeRow.hub_id || GLOBAL_HUB_VALUE,
-    }
+        full_name: activeRow.full_name,
+        email: activeRow.email,
+        role: activeRow.role,
+        hub_id: activeRow.hub_id || GLOBAL_HUB_VALUE,
+      }
     : defaultFormValues;
 
   // Handlers
@@ -223,10 +223,7 @@ export const Management: React.FC = () => {
       />
 
       {/* Super Admin Create User Modal */}
-      <Dialog
-        open={createUserOpen}
-        onOpenChange={setCreateUserOpen}
-      >
+      <Dialog open={createUserOpen} onOpenChange={setCreateUserOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Super Admin: Create User</DialogTitle>
@@ -247,7 +244,9 @@ export const Management: React.FC = () => {
                 type="password"
                 required
                 value={createUserForm.password}
-                onChange={(e) => setCreateUserForm((prev) => ({ ...prev, password: e.target.value }))}
+                onChange={(e) =>
+                  setCreateUserForm((prev) => ({ ...prev, password: e.target.value }))
+                }
               />
             </div>
             <div className="space-y-2">
@@ -255,7 +254,9 @@ export const Management: React.FC = () => {
               <Input
                 required
                 value={createUserForm.fullName}
-                onChange={(e) => setCreateUserForm((prev) => ({ ...prev, fullName: e.target.value }))}
+                onChange={(e) =>
+                  setCreateUserForm((prev) => ({ ...prev, fullName: e.target.value }))
+                }
               />
             </div>
             <div className="grid grid-cols-2 gap-4">

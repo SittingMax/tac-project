@@ -45,11 +45,22 @@ interface Props {
 export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialData }: Props) {
   const invoiceState = useMultiStepInvoice(initialData);
   const {
-    form, currentStep, setCurrentStep, direction, setDirection,
-    mode, setMode,
-    selectedShipment, setSelectedShipment,
-    subtotal, tax, total, balance, computeGstSplit,
-    nextStep, prevStep
+    form,
+    currentStep,
+    setCurrentStep,
+    direction,
+    setDirection,
+    mode,
+    setMode,
+    selectedShipment,
+    setSelectedShipment,
+    subtotal,
+    tax,
+    total,
+    balance,
+    computeGstSplit,
+    nextStep,
+    prevStep,
   } = invoiceState;
   const { buildInvoiceFromRow } = useInvoiceActions();
 
@@ -100,7 +111,7 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
           destination_hub_id: destHubId,
           mode: data.transportMode as 'AIR' | 'TRUCK',
           service_level:
-            data.transportMode === 'AIR' ? 'EXPRESS' as const : 'STANDARD' as const,
+            data.transportMode === 'AIR' ? ('EXPRESS' as const) : ('STANDARD' as const),
           package_count: data.pieces,
           total_weight: data.chargedWeight,
           consignee_name: data.consigneeName,
@@ -204,8 +215,8 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
             dimL: data.dimL,
             dimB: data.dimB,
             dimH: data.dimH,
-          }
-        }
+          },
+        },
       };
 
       let resultInvoice;
@@ -243,7 +254,9 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
     form.setValue(`${prefix}Name` as keyof InvoiceFormData, customer.companyName || customer.name, {
       shouldValidate: true,
     });
-    form.setValue(`${prefix}Phone` as keyof InvoiceFormData, customer.phone, { shouldValidate: true });
+    form.setValue(`${prefix}Phone` as keyof InvoiceFormData, customer.phone, {
+      shouldValidate: true,
+    });
 
     if (customer.address) {
       const normalized = normalizeCustomerAddress(customer.address);
@@ -254,24 +267,41 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
           { shouldValidate: true }
         );
       if (normalized.city)
-        form.setValue(`${prefix}City` as keyof InvoiceFormData, normalized.city, { shouldValidate: true });
+        form.setValue(`${prefix}City` as keyof InvoiceFormData, normalized.city, {
+          shouldValidate: true,
+        });
       if (normalized.state)
-        form.setValue(`${prefix}State` as keyof InvoiceFormData, normalized.state, { shouldValidate: true });
+        form.setValue(`${prefix}State` as keyof InvoiceFormData, normalized.state, {
+          shouldValidate: true,
+        });
       if (normalized.zip)
-        form.setValue(`${prefix}Zip` as keyof InvoiceFormData, normalized.zip, { shouldValidate: true });
+        form.setValue(`${prefix}Zip` as keyof InvoiceFormData, normalized.zip, {
+          shouldValidate: true,
+        });
     }
   };
 
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
-        return <BasicsStep form={form} mode={mode} setMode={setMode} setSelectedShipment={setSelectedShipment} />;
+        return (
+          <BasicsStep
+            form={form}
+            mode={mode}
+            setMode={setMode}
+            setSelectedShipment={setSelectedShipment}
+          />
+        );
       case 1:
-        return <PartiesStep form={form} customers={customers} fillCustomerData={fillCustomerData} />;
+        return (
+          <PartiesStep form={form} customers={customers} fillCustomerData={fillCustomerData} />
+        );
       case 2:
         return <CargoStep form={form} setShowLabelPreview={setShowLabelPreview} />;
       case 3:
-        return <PaymentStep form={form} subtotal={subtotal} tax={tax} total={total} balance={balance} />;
+        return (
+          <PaymentStep form={form} subtotal={subtotal} tax={tax} total={total} balance={balance} />
+        );
       default:
         return null;
     }
@@ -415,7 +445,11 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
       <LabelPreviewDialog
         open={showLabelPreview}
         onOpenChange={setShowLabelPreview}
-        shipmentData={showLabelPreview ? generateLabelFromFormData(form.getValues() as InvoiceFormData) : undefined}
+        shipmentData={
+          showLabelPreview
+            ? generateLabelFromFormData(form.getValues() as InvoiceFormData)
+            : undefined
+        }
       />
     </Form>
   );

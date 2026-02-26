@@ -79,7 +79,9 @@ export function SystemCapabilities() {
                 <div className="w-14 h-14 rounded-none bg-foreground/5 border border-border flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-500">
                   <Globe className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-bold text-foreground mb-3 tracking-tight">Global Telemetry Mesh</h3>
+                <h3 className="text-2xl font-bold text-foreground mb-3 tracking-tight">
+                  Global Telemetry Mesh
+                </h3>
                 <p className="text-muted-foreground leading-relaxed max-w-sm">
                   Real-time tracking across 120+ countries with millisecond precision and satellite
                   backup. Currently processing 400k+ events/sec across the grid.
@@ -100,7 +102,9 @@ export function SystemCapabilities() {
                 <Zap className="w-6 h-6" />
               </div>
 
-              <h3 className="text-xl font-bold text-foreground mb-2 tracking-tight relative z-10">Predictive Routing</h3>
+              <h3 className="text-xl font-bold text-foreground mb-2 tracking-tight relative z-10">
+                Predictive Routing
+              </h3>
               <p className="text-sm text-muted-foreground mb-auto relative z-10">
                 AI-driven adjustments for weather, traffic, and geopolitical events in real-time.
               </p>
@@ -127,8 +131,12 @@ export function SystemCapabilities() {
                   AES-256
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-1 tracking-tight relative z-10">Secure Chain</h3>
-              <p className="text-xs text-muted-foreground relative z-10">Blockchain-verified custody logs.</p>
+              <h3 className="text-lg font-bold text-foreground mb-1 tracking-tight relative z-10">
+                Secure Chain
+              </h3>
+              <p className="text-xs text-muted-foreground relative z-10">
+                Blockchain-verified custody logs.
+              </p>
             </BentoCard>
           </FadeUp>
 
@@ -141,8 +149,12 @@ export function SystemCapabilities() {
                   AUTO
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-1 tracking-tight relative z-10">Instant Customs</h3>
-              <p className="text-xs text-muted-foreground relative z-10">Automated clearance docs.</p>
+              <h3 className="text-lg font-bold text-foreground mb-1 tracking-tight relative z-10">
+                Instant Customs
+              </h3>
+              <p className="text-xs text-muted-foreground relative z-10">
+                Automated clearance docs.
+              </p>
             </BentoCard>
           </FadeUp>
 
@@ -154,7 +166,9 @@ export function SystemCapabilities() {
                   <LineChart className="w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-foreground mb-1 tracking-tight">Deep Analytics</h3>
+                  <h3 className="text-2xl font-bold text-foreground mb-1 tracking-tight">
+                    Deep Analytics
+                  </h3>
                   <p className="text-muted-foreground max-w-lg">
                     Full visibility into supply chain performance, cost optimization, and vendor
                     reliability metrics.
