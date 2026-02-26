@@ -12,7 +12,6 @@ const isGstinFieldValid = (val?: string | null) => {
   const normalized = val.trim().toUpperCase();
   if (!normalized) return true;
 
-  if (normalized.length < 15) return true;
   if (normalized.length === 15) return GSTIN_PATTERN.test(normalized);
 
   return false;
@@ -169,7 +168,7 @@ export function useMultiStepInvoice(_initialData?: unknown) {
       setValue('chargedWeight', chargeable);
     }
 
-    if (ratePerKg && chargeable) {
+    if (chargeable) {
       const freight = Math.round(chargeable * safeNum(ratePerKg));
       if (Math.abs(freight - safeNum(formValues.baseFreight)) > 1) {
         setValue('baseFreight', freight);
@@ -189,7 +188,7 @@ export function useMultiStepInvoice(_initialData?: unknown) {
     safeNum,
   ]);
 
-  const subtotal =
+  const rawSubtotal =
     safeNum(formValues.baseFreight) +
     safeNum(formValues.docketCharge) +
     safeNum(formValues.pickupCharge) +
@@ -199,11 +198,13 @@ export function useMultiStepInvoice(_initialData?: unknown) {
     safeNum(formValues.insurance) -
     safeNum(formValues.discount);
 
+  const subtotal = Math.max(0, rawSubtotal);
+
   const tax = formValues.gstApplicable
     ? Math.round(subtotal * (safeNum(formValues.gstRate) / 100))
     : 0;
-  const total = subtotal + tax;
-  const balance = total - safeNum(formValues.advancePaid);
+  const total = Math.max(0, subtotal + tax);
+  const balance = Math.max(0, total - safeNum(formValues.advancePaid));
 
   const computeGstSplit = (taxAmount: number, consignorState: string, consigneeState: string) => {
     const originState = (consignorState || '').trim().toUpperCase();

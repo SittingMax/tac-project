@@ -21,7 +21,7 @@ export function useInvoiceActions() {
     const { data, error } = await supabase
       .from('shipments')
       .select(
-        `*, customer:customers(name), origin_hub:hubs!shipments_origin_hub_id_fkey(code), destination_hub:hubs!shipments_destination_hub_id_fkey(code)`
+        `*, customer:customers(name, email), origin_hub:hubs!shipments_origin_hub_id_fkey(code), destination_hub:hubs!shipments_destination_hub_id_fkey(code)`
       )
       .eq('cn_number', awb)
       .maybeSingle();
@@ -231,7 +231,11 @@ export function useInvoiceActions() {
   const handleShareWhatsapp = async (inv: Invoice) => {
     const shipment = inv.awb ? await getShipment(inv.awb) : null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const phone = (inv as any).consignee?.phone || (shipment as any)?.consignee?.phone || '';
+    const phone =
+      (inv as any).consignee?.phone ||
+      (inv as any).line_items?.consignee?.phone ||
+      (shipment as any)?.consignee_phone ||
+      '';
     if (!phone) {
       alert('No customer phone number found.');
       return;
@@ -248,7 +252,7 @@ Thank you for choosing TAC Cargo.`;
   const handleShareEmail = async (inv: Invoice) => {
     const shipment = inv.awb ? await getShipment(inv.awb) : null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const email = (shipment as any)?.customerEmail || '';
+    const email = (shipment as any)?.customer?.email || '';
     const subject = `Invoice ${inv.invoiceNumber} - TAC Cargo`;
     const body = `Dear Customer,%0D%0A%0D%0APlease find details for invoice ${inv.invoiceNumber} related to shipment ${inv.awb}.%0D%0A%0D%0AAmount: ${formatCurrency(inv.financials.totalAmount)}%0D%0A%0D%0AThank you,%0D%0ATAC Cargo Team`;
     window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');

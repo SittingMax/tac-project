@@ -103,7 +103,10 @@ export const ExpectedShipmentsList: React.FC<ExpectedShipmentsListProps> = ({ it
                   </div>
 
                   {item.status === 'PENDING' && (
-                    <button className="text-[10px] font-mono uppercase tracking-widest text-status-error opacity-50 hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => console.log(`Mark exception for ${item.shipment.cn_number}`)}
+                      className="text-[10px] font-mono uppercase tracking-widest text-status-error opacity-50 hover:opacity-100 transition-opacity"
+                    >
                       Mark Exception
                     </button>
                   )}

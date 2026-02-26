@@ -164,9 +164,10 @@ export const LiveActivityFeed: React.FC = () => {
             </div>
           ) : (
             filteredItems.map((item, index) => (
-              <div
+              <button
                 key={item.id}
-                className="relative pl-6 group cursor-pointer"
+                type="button"
+                className="w-full text-left relative pl-6 group cursor-pointer block"
                 onClick={() => navigate(item.link)}
               >
                 {/* Timeline line */}
@@ -205,7 +206,7 @@ export const LiveActivityFeed: React.FC = () => {
                     <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity translate-x-1 group-hover:translate-x-0" />
                   </div>
                 </div>
-              </div>
+              </button>
             ))
           )}
         </div>

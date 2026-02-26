@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const AnomalyDetectorWidget: React.FC = () => {
-  const { anomalies, isLoading, stats } = useAnomalyDetector();
+  const { anomalies, isLoading, error, refetch, stats } = useAnomalyDetector();
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -92,7 +92,20 @@ export const AnomalyDetectorWidget: React.FC = () => {
       </CardHeader>
 
       <CardContent className="relative z-10 flex-1 overflow-auto p-0">
-        {anomalies.length === 0 ? (
+        {error ? (
+          <div className="flex flex-col items-center justify-center p-8 text-center h-48">
+            <div className="w-12 h-12 rounded-none bg-destructive/10 flex items-center justify-center mb-3">
+              <AlertTriangle className="w-6 h-6 text-destructive" />
+            </div>
+            <p className="text-sm font-medium text-foreground">Analysis Failed</p>
+            <p className="text-xs text-muted-foreground mt-1 max-w-[250px] mb-3">
+              Failed to analyze shipments. Our neural net requires recalibration.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
+              Retry analysis
+            </Button>
+          </div>
+        ) : anomalies.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center h-48">
             <div className="w-12 h-12 rounded-none bg-status-success/20 flex items-center justify-center mb-3">
               <BrainCircuit className="w-6 h-6 text-status-success" />

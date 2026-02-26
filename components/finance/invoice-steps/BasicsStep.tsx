@@ -27,9 +27,16 @@ interface Props {
   setSelectedShipment: (shipment: unknown) => void;
 }
 
-const Label: React.FC<{ children: React.ReactNode; error?: string }> = ({ children, error }) => (
+const Label: React.FC<{ children: React.ReactNode; error?: string; htmlFor?: string }> = ({
+  children,
+  error,
+  htmlFor,
+}) => (
   <div className="flex justify-between items-end mb-2">
-    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+    <label
+      htmlFor={htmlFor}
+      className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5"
+    >
       {children}
     </label>
     {error && <span className="text-xs text-destructive font-medium">{error}</span>}
@@ -135,9 +142,12 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
 
       <div className="grid grid-cols-2 gap-5">
         <div className="space-y-2">
-          <Label error={errors.awb?.message}>CN Number</Label>
+          <Label htmlFor="awb" error={errors.awb?.message}>
+            CN Number
+          </Label>
           <div className="flex gap-2">
             <Input
+              id="awb"
               {...form.register('awb')}
               readOnly
               className="h-11 font-mono bg-muted/40 border-border/60 text-sm"
@@ -161,8 +171,9 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Invoice Ref</Label>
+          <Label htmlFor="invoiceNumber">Invoice Ref</Label>
           <Input
+            id="invoiceNumber"
             {...form.register('invoiceNumber')}
             readOnly
             className="h-11 font-mono bg-muted/40 border-border/60 text-sm"
@@ -170,7 +181,9 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
           />
         </div>
         <div className="space-y-2">
-          <Label error={errors.bookingDate?.message}>Booking Date</Label>
+          <Label htmlFor="bookingDate" error={errors.bookingDate?.message}>
+            Booking Date
+          </Label>
           <Controller
             control={form.control}
             name="bookingDate"
@@ -184,6 +197,7 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
+                      id="bookingDate"
                       variant="outline"
                       className={cn(
                         'w-full justify-start text-left font-normal h-11',
@@ -212,13 +226,13 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
           />
         </div>
         <div className="space-y-2">
-          <Label>Transport Mode</Label>
+          <Label htmlFor="transportMode">Transport Mode</Label>
           <Controller
             control={form.control}
             name="transportMode"
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger className="h-11 bg-background">
+                <SelectTrigger id="transportMode" className="h-11 bg-background">
                   <SelectValue placeholder="Select Mode" />
                 </SelectTrigger>
                 <SelectContent>
@@ -240,13 +254,13 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
           />
         </div>
         <div className="space-y-2">
-          <Label>Payment Mode</Label>
+          <Label htmlFor="paymentMode">Payment Mode</Label>
           <Controller
             control={form.control}
             name="paymentMode"
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger className="h-11 bg-background">
+                <SelectTrigger id="paymentMode" className="h-11 bg-background">
                   <SelectValue placeholder="Select Mode" />
                 </SelectTrigger>
                 <SelectContent>

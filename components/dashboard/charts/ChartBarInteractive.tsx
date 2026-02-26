@@ -95,7 +95,7 @@ const chartData = [
   { date: '2024-06-18', desktop: 107, mobile: 170 },
   { date: '2024-06-19', desktop: 341, mobile: 290 },
   { date: '2024-06-20', desktop: 408, mobile: 450 },
-  { date: '2024-06-21', line: 169, mobile: 210 },
+  { date: '2024-06-21', desktop: 169, mobile: 210 },
   { date: '2024-06-22', desktop: 317, mobile: 270 },
   { date: '2024-06-23', desktop: 480, mobile: 530 },
   { date: '2024-06-24', desktop: 132, mobile: 180 },

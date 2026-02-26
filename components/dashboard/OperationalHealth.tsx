@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Progress } from '../ui/progress';
 
 export const OperationalHealth = () => {
-  const { data } = useDashboardKPIs();
+  const { data, isLoading } = useDashboardKPIs();
 
   const healthData = useMemo(() => {
     // Mocking a composite score calculation based on the KPIs
@@ -19,7 +19,7 @@ export const OperationalHealth = () => {
     const compositeScore = Math.round(deliveryScore * 0.5 + speedScore * 0.5 - exceptionPenalty);
     const normalizedScore = Math.max(0, Math.min(100, compositeScore));
 
-    let status: 'healthy' | 'warning' | 'critical' = 'healthy';
+    let status: 'healthy' | 'warning' | 'critical' | 'loading' = 'healthy'; // Add 'loading' to type
     let color = 'text-status-success';
     let bgLayer = 'bg-status-success/10';
     let strokeColor = 'var(--status-success)';
@@ -55,12 +55,16 @@ export const OperationalHealth = () => {
         },
       ],
     };
-  }, [data]);
+  }, [data, isLoading]); // Add isLoading to dependencies
 
   // SVG Radial Math
   const radius = 60;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (healthData.score / 100) * circumference;
+  // Only calculate strokeDashoffset if score is available
+  const strokeDashoffset =
+    healthData.score !== null
+      ? circumference - (healthData.score / 100) * circumference
+      : circumference; // Default to full circle for loading or 0 score
 
   return (
     <Card className="h-[420px] border-border/50 flex flex-col p-6 bg-card relative overflow-hidden">
@@ -103,14 +107,18 @@ export const OperationalHealth = () => {
 
           {/* Center Value */}
           <div className="text-center z-10 flex flex-col items-center justify-center">
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.5, type: 'spring' }}
-              className={cn('text-5xl font-black font-mono tracking-tighter', healthData.color)}
-            >
-              {healthData.score}
-            </motion.div>
+            {isLoading ? (
+              <div className="w-24 h-12 bg-muted animate-pulse rounded-md" />
+            ) : (
+              <motion.div
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.5, type: 'spring' }}
+                className={cn('text-5xl font-black font-mono tracking-tighter', healthData.color)}
+              >
+                {healthData.score}
+              </motion.div>
+            )}
             <div className="text-sm font-medium text-muted-foreground uppercase tracking-widest mt-1">
               Score
             </div>
