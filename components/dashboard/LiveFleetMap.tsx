@@ -55,7 +55,7 @@ export const LiveFleetMap = () => {
             <div className="relative flex-1 w-full min-h-[350px]">
                 <svg className="absolute inset-0 w-full h-full" overflow="visible">
                     {/* Draw Routes */}
-                    {ROUTES.map((route) => {
+                    {ROUTES.map((route, index) => {
                         const h1 = HUBS.find((h) => h.code === route.from);
                         const h2 = HUBS.find((h) => h.code === route.to);
                         if (!h1 || !h2) return null;
@@ -92,7 +92,7 @@ export const LiveFleetMap = () => {
                                         duration: isAir ? 3 : 5,
                                         repeat: Infinity,
                                         ease: "linear",
-                                        delay: Math.random() * 2
+                                        delay: (index % 5) * 0.5
                                     }}
                                 />
                             </g>

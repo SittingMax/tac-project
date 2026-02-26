@@ -61,7 +61,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
             }
         });
 
-        const normalize = (val: number, max: number) => Math.min(100, Math.max(0, (val / (max || 1)) * 100));
+        const normalize = (val: number, max: number) => Math.min(100, Math.max(0, (val / (max === 0 ? 1 : max)) * 100));
 
         return [
             {

@@ -12,7 +12,7 @@ export const OperationalHealth = () => {
     const healthData = useMemo(() => {
         // Mocking a composite score calculation based on the KPIs
         // In a real app, this would be computed server-side or more rigorously
-        const deliveryScore = data?.slaCompliance || 85;
+        const deliveryScore = data?.slaCompliance ?? 0;
         const exceptionPenalty = Math.min((data?.exceptions || 0) * 2, 20);
         const speedScore = Math.max(100 - (data?.deliveryTime || 0) * 10, 50);
 
