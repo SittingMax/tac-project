@@ -1,0 +1,168 @@
+name: Dependabot Auto-Merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  # Run full verification suite
+  verify:
+    name: Verify Dependencies
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install --no-audit
+
+      - name: TypeScript Check
+        run: npm run typecheck
+
+      - name: Lint Check
+        run: npm run lint
+
+      - name: Unit Tests
+        run: npm run test:unit
+
+      - name: Security Audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+  # Auto-merge security patches
+  auto-merge:
+    name: Auto-Merge Security Patches
+    runs-on: ubuntu-latest
+    needs: verify
+    if: github.actor == 'dependabot[bot]'
+    
+    steps:
+      - name: Dependabot Metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@21025c705c08248db411dc16f3619e6b5f9ea21a # v2.5.0
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Auto-Merge Conditions Check
+        id: check
+        run: |
+          echo "Update type: ${{ steps.metadata.outputs.update-type }}"
+          echo "Dependency type: ${{ steps.metadata.outputs.dependency-type }}"
+          echo "Package ecosystem: ${{ steps.metadata.outputs.package-ecosystem }}"
+          
+          # Security-critical packages that require manual review
+          CRITICAL_PACKAGES="@supabase/supabase-js @supabase/auth-helpers-react"
+          
+          SHOULD_MERGE="false"
+          
+          # Auto-merge conditions:
+          # 1. Patch updates for any package
+          # 2. Minor updates for non-critical dev dependencies
+          if [[ "${{ steps.metadata.outputs.update-type }}" == "version-update:semver-patch" ]]; then
+            SHOULD_MERGE="true"
+            echo "✅ Patch update - eligible for auto-merge"
+          elif [[ "${{ steps.metadata.outputs.update-type }}" == "version-update:semver-minor" ]]; then
+            if [[ "${{ steps.metadata.outputs.dependency-type }}" == "direct:development" ]]; then
+              SHOULD_MERGE="true"
+              echo "✅ Minor dev dependency update - eligible for auto-merge"
+            fi
+          fi
+          
+          # Check if it's a security-critical package
+          for pkg in $CRITICAL_PACKAGES; do
+            if [[ "${{ steps.metadata.outputs.dependency-names }}" == *"$pkg"* ]]; then
+              SHOULD_MERGE="false"
+              echo "⚠️ Security-critical package detected - requires manual review"
+              break
+            fi
+          done
+          
+          echo "should_merge=$SHOULD_MERGE" >> $GITHUB_OUTPUT
+
+      - name: Enable Auto-Merge
+        if: steps.check.outputs.should_merge == 'true'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add Review Comment
+        if: steps.check.outputs.should_merge == 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr_number = context.payload.pull_request.number;
+            
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pr_number,
+              body: `## 🤖 Dependabot Auto-Merge Review
+              
+              | Check | Status |
+              |-------|--------|
+              | Update Type | \`${{ steps.metadata.outputs.update-type }}\` |
+              | Dependency Type | \`${{ steps.metadata.outputs.dependency-type }}\` |
+              | TypeScript | ✅ Pass |
+              | Lint | ✅ Pass |
+              | Unit Tests | ✅ Pass |
+              
+              **Decision:** Auto-merge enabled ✅
+              
+              This PR will be automatically merged once all status checks pass.
+              
+              ---
+              *Automated by [Dependency Security Policy](../docs/DEPENDENCY_SECURITY_POLICY.md)*`
+            });
+
+      - name: Request Manual Review
+        if: steps.check.outputs.should_merge == 'false'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr_number = context.payload.pull_request.number;
+            
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pr_number,
+              body: `## 🔍 Manual Review Required
+              
+              | Check | Status |
+              |-------|--------|
+              | Update Type | \`${{ steps.metadata.outputs.update-type }}\` |
+              | Dependency Type | \`${{ steps.metadata.outputs.dependency-type }}\` |
+              
+              **Reason:** This update requires manual review before merging.
+              
+              ### Review Checklist
+              - [ ] Changelog reviewed for breaking changes
+              - [ ] Security advisory reviewed (if applicable)
+              - [ ] Local testing completed
+              - [ ] E2E tests passed
+              
+              ---
+              *Automated by [Dependency Security Policy](../docs/DEPENDENCY_SECURITY_POLICY.md)*`
+            });
+            
+            // Add label for visibility
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: pr_number,
+              labels: ['needs-review', 'dependencies']
+            });

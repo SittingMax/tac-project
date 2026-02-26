@@ -1,0 +1,56 @@
+# Dependabot configuration
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+# Policy: docs/DEPENDENCY_SECURITY_POLICY.md
+
+version: 2
+updates:
+  # npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kolkata"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "npm"
+    reviewers:
+      - "oinam-labs"
+    # Group non-critical dependencies for batch updates
+    groups:
+      # Development dependencies - safe to batch
+      dev-dependencies:
+        dependency-type: "development"
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@supabase/*"
+      # Production utilities - safe to batch
+      production-utilities:
+        dependency-type: "production"
+        patterns:
+          - "lodash*"
+          - "date-fns*"
+          - "clsx"
+          - "@radix-ui/*"
+          - "lucide-react"
+    ignore:
+      # Ignore major version updates for stability (require manual review)
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "chore(actions)"
+    labels:
+      - "dependencies"
+      - "github-actions"

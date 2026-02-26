@@ -1,0 +1,45 @@
+# CodeQL Configuration for TAC Cargo
+# Excludes build artifacts and third-party code from security scanning
+# Reference: https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning
+
+name: "TAC Cargo CodeQL Config"
+
+# Paths to ignore during analysis
+paths-ignore:
+  # Build output directories
+  - dist
+  - dist/**
+  - build
+  - build/**
+  
+  # Dependencies (analyzed separately by Dependabot)
+  - node_modules
+  - node_modules/**
+  
+  # Minified files (unreadable, from dependencies)
+  - "**/*.min.js"
+  - "**/*.min.css"
+  - "**/*.min.mjs"
+  
+  # Test artifacts
+  - playwright-report
+  - playwright-report/**
+  - test-results
+  - test-results/**
+  - coverage
+  - coverage/**
+  
+  # Archive/backup directories
+  - .archive
+  - .archive/**
+  
+  # Generated type definitions (from Supabase CLI)
+  - "**/*.d.ts"
+  
+  # Vendor/third-party bundled code
+  - public/assets/generated/**
+
+# Query suites to run
+queries:
+  - uses: security-extended
+  - uses: security-and-quality

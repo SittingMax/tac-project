@@ -1,0 +1,49 @@
+name: CSS Lint Check
+
+on:
+  pull_request:
+    paths:
+      - '**/*.tsx'
+      - '**/*.ts'
+      - '**/*.jsx'
+      - '**/*.js'
+      - '**/*.css'
+
+jobs:
+  css-lint:
+    runs-on: ubuntu-latest
+    name: Check for hardcoded colors
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check for hardcoded slate/gray Tailwind classes
+        run: |
+          echo "Checking for hardcoded slate/gray Tailwind classes..."
+          
+          # Search for banned patterns in src files (excluding node_modules)
+          if grep -RInE "(text|bg|border|ring)-(slate|gray)-" \
+            --include="*.tsx" \
+            --include="*.ts" \
+            --include="*.jsx" \
+            --include="*.js" \
+            --exclude-dir=node_modules \
+            --exclude-dir=dist \
+            --exclude-dir=.git \
+            .; then
+            echo ""
+            echo "❌ Found hardcoded slate/gray Tailwind classes."
+            echo "Please use semantic tokens instead:"
+            echo "  - text-slate-* → text-muted-foreground or text-foreground"
+            echo "  - bg-slate-* → bg-muted or bg-card or bg-background"
+            echo "  - border-slate-* → border-border"
+            echo ""
+            echo "See docs/CSS_COLOR_AUDIT.md for migration guide."
+            exit 1
+          else
+            echo "✅ No hardcoded slate/gray classes found."
+          fi
+
+      - name: Success
+        run: echo "✅ CSS lint check passed!"
