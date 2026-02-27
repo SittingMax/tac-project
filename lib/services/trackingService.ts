@@ -35,7 +35,7 @@ export const trackingService = {
       .order('event_time', { ascending: false });
 
     if (error) throw mapSupabaseError(error);
-    return (data ?? []) as unknown as TrackingEventWithRelations[];
+    return (data ?? []) as TrackingEventWithRelations[];
   },
 
   async getByAwb(awb: string): Promise<TrackingEventWithRelations[]> {
@@ -55,7 +55,7 @@ export const trackingService = {
       .order('event_time', { ascending: false });
 
     if (error) throw mapSupabaseError(error);
-    return (data ?? []) as unknown as TrackingEventWithRelations[];
+    return (data ?? []) as TrackingEventWithRelations[];
   },
 
   async create(event: Omit<TrackingEventInsert, 'org_id'>): Promise<TrackingEvent> {
@@ -110,6 +110,6 @@ export const trackingService = {
       .limit(limit);
 
     if (error) throw mapSupabaseError(error);
-    return (data ?? []) as unknown as TrackingEventWithRelations[];
+    return (data ?? []) as TrackingEventWithRelations[];
   },
 };

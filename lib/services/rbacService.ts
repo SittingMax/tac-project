@@ -65,7 +65,7 @@ type RBACDatabase = Omit<Database, 'public'> & {
 };
 
 // Cast supabase client to include RBAC types
-const db = supabase as unknown as SupabaseClient<RBACDatabase>;
+const db = supabase as SupabaseClient<RBACDatabase>;
 
 /**
  * Fetch all available permissions

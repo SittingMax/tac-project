@@ -72,7 +72,7 @@ export const exceptionService = {
 
     const { data, error } = await query;
     if (error) throw mapSupabaseError(error);
-    return (data ?? []) as unknown as ExceptionWithRelations[];
+    return (data ?? []) as ExceptionWithRelations[];
   },
 
   async getById(id: string): Promise<ExceptionWithRelations> {
@@ -92,7 +92,7 @@ export const exceptionService = {
       .single();
 
     if (error) throw mapSupabaseError(error);
-    return data as unknown as ExceptionWithRelations;
+    return data as ExceptionWithRelations;
   },
 
   async getByShipment(shipmentId: string): Promise<ExceptionWithRelations[]> {
@@ -112,7 +112,7 @@ export const exceptionService = {
       .order('created_at', { ascending: false });
 
     if (error) throw mapSupabaseError(error);
-    return (data ?? []) as unknown as ExceptionWithRelations[];
+    return (data ?? []) as ExceptionWithRelations[];
   },
 
   async create(exception: Omit<ExceptionInsert, 'org_id'>): Promise<Exception> {

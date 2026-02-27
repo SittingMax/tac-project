@@ -230,7 +230,7 @@ export function useInvoiceActions() {
 
   const handleShareWhatsapp = async (inv: Invoice) => {
     const shipment = inv.awb ? await getShipment(inv.awb) : null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const phone =
       (inv as any).consignee?.phone ||
       (inv as any).line_items?.consignee?.phone ||

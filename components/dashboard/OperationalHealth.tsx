@@ -55,7 +55,7 @@ export const OperationalHealth = () => {
         },
       ],
     };
-  }, [data, isLoading]); // Add isLoading to dependencies
+  }, [data]);
 
   // SVG Radial Math
   const radius = 60;

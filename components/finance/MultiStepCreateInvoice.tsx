@@ -9,7 +9,13 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Check, ChevronRight, Loader2, Printer } from 'lucide-react';
 
-import { useCreateInvoice, useUpdateInvoice, InvoiceWithRelations } from '@/hooks/useInvoices';
+import {
+  useCreateInvoice,
+  useUpdateInvoice,
+  InvoiceWithRelations,
+  CreateInvoiceInput,
+  UpdateInvoiceInput,
+} from '@/hooks/useInvoices';
 import { useCreateShipment } from '@/hooks/useShipments';
 import { useCustomers, Customer as CustomerDB } from '@/hooks/useCustomers';
 import { useInvoiceActions } from '@/hooks/useInvoiceActions';
@@ -164,10 +170,9 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
 
       const fullTax = computeGstSplit(tax as number, data.consignorState, data.consigneeState);
 
-      const invoicePayload: Record<string, unknown> = {
-        invoice_number: data.invoiceNumber || `INV-${Date.now().toString().slice(-6)}`,
-        customer_id: data.customerId,
-        shipment_id: finalShipmentId || null,
+      const invoicePayload: Omit<UpdateInvoiceInput, 'id'> & CreateInvoiceInput = {
+        customer_id: data.customerId!,
+        shipment_id: finalShipmentId || undefined,
         subtotal: financials.subtotal,
         tax_amount: tax as number,
         total: financials.total,
@@ -224,10 +229,14 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
         resultInvoice = await updateInvoiceMutation.mutateAsync({
           id: initialData.id,
           ...invoicePayload,
-        } as any);
+        });
         toast.success('Invoice updated successfully!');
       } else {
-        resultInvoice = await createInvoiceMutation.mutateAsync(invoicePayload as any);
+        resultInvoice = await createInvoiceMutation.mutateAsync({
+          ...invoicePayload,
+          // Since CreateInvoiceInput doesn't need invoice_number directly inside the hook (it generates it inside), we can just cast it or safely pass
+          // However, invoice_number is generated in useCreateInvoice, and it doesn't take invoice_number into CreateInvoiceInput. Let's make sure it's shaped correctly:
+        } as CreateInvoiceInput);
         localStorage.removeItem('invoice_draft');
         toast.success('Invoice created securely!');
       }

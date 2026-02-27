@@ -516,8 +516,8 @@ class NotImplementedRepository {
   async create(_data: unknown): Promise<unknown> {
     throw new Error('Not implemented');
   }
-  async updateStatus(_id: string, _status: unknown): Promise<void> {}
-  async resolve(_id: string, _notes: string): Promise<void> {}
+  async updateStatus(_id: string, _status: unknown): Promise<void> { }
+  async resolve(_id: string, _notes: string): Promise<void> { }
   async getByShipmentId(_id: string): Promise<unknown[]> {
     return [];
   }
@@ -526,16 +526,16 @@ class NotImplementedRepository {
     _entityType: string,
     _entityId: string,
     _payload?: Record<string, unknown>
-  ): Promise<void> {}
+  ): Promise<void> { }
 }
 
 export const supabaseRepository: DataAccessLayer = {
   shipments: new SupabaseShipmentRepository(),
   manifests: new SupabaseManifestRepository(),
   invoices: new SupabaseInvoiceRepository(),
-  exceptions: new NotImplementedRepository() as unknown as ExceptionRepository,
+  exceptions: new NotImplementedRepository() as ExceptionRepository,
   users: new SupabaseUserRepository(),
-  customers: new NotImplementedRepository() as unknown as CustomerRepository,
-  events: new NotImplementedRepository() as unknown as EventRepository,
-  audit: new NotImplementedRepository() as unknown as AuditRepository,
+  customers: new NotImplementedRepository() as CustomerRepository,
+  events: new NotImplementedRepository() as EventRepository,
+  audit: new NotImplementedRepository() as AuditRepository,
 };

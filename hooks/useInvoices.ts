@@ -138,7 +138,7 @@ export function useInvoiceByAWB(awb: string | null) {
   });
 }
 
-interface CreateInvoiceInput {
+export interface CreateInvoiceInput {
   customer_id: string;
   shipment_id?: string;
   subtotal: number;

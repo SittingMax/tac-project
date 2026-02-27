@@ -1,0 +1,14 @@
+﻿
+C:\logi\tac-portal\components\audits\ExpectedShipmentsList.tsx
+  107:38  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+C:\logi\tac-portal\hooks\useInvoiceActions.ts
+  235:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  236:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  237:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\logi\tac-portal\lib\feedback.ts
+  13:18  error  Avoid `as unknown as` casts in domain code. Use proper type narrowing or generics instead  no-restricted-syntax
+
+Γ£û 5 problems (1 error, 4 warnings)
+

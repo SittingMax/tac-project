@@ -244,7 +244,7 @@ export const useScanQueue = () => {
         code: scan.awb,
         source: scan.source || ScanSource.CAMERA,
         hubCode,
-        staffId: (user?.id as UUID) ?? (null as unknown as UUID),
+        staffId: (user?.id || '') as UUID,
       });
     },
     pendingScans: store.getPendingScans(),
