@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "audit:hub-codes": "node scripts/audit-hub-codes.js",
+    "audit:types": "node scripts/type-coverage-report.mjs",
     "guard:no-mock-data": "node scripts/no-mock-data-guard.mjs",
     "dev": "vite",
     "build": "vite build",
@@ -24,6 +25,7 @@
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
     "test:report": "playwright show-report",
+    "test:scanner-stress": "playwright test tests/e2e/scanner-stress.spec.ts",
     "theme-audit": "powershell -ExecutionPolicy Bypass -File scripts/theme-audit.ps1",
     "theme-audit:ci": "grep -RInE \"(text|bg|border|ring)-(slate|gray)-\" components pages && exit 1 || exit 0"
   },

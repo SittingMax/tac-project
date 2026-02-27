@@ -85,4 +85,22 @@ export default tseslint.config(
             'no-console': ['warn', { allow: ['log', 'warn', 'error'] }],
         },
     },
+
+    // Strict rules for critical domain code (lib/ and store/)
+    // These directories contain business logic, Supabase queries, and state management
+    // that must meet higher type safety standards than UI components.
+    {
+        files: ['lib/**/*.{ts,tsx}', 'store/**/*.{ts,tsx}'],
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'error',
+            'no-restricted-syntax': [
+                'error',
+                {
+                    selector: 'TSAsExpression > TSUnknownKeyword',
+                    message:
+                        'Avoid `as unknown as` casts in domain code. Use proper type narrowing or generics instead.',
+                },
+            ],
+        },
+    },
 );
