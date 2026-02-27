@@ -120,38 +120,31 @@ export const Dashboard: React.FC = () => {
     <div data-testid="dashboard-page" className="space-y-4 animate-[fadeIn_0.2s_ease-out] pb-8">
       <PageHeader
         title="Mission Control"
-        description="Real-time logistics overview and operations."
+        description={`Good morning, ${user?.name?.split(' ')[0] || 'Team'} // ${user?.role === 'SUPER_ADMIN' ? 'Full Access' : 'Restricted'} // System Operational`}
       >
-        <Button data-testid="dashboard-refresh-button" variant="ghost" onClick={refreshData}>
-          <RefreshCw className="w-4 h-4 sm:mr-2" />
-          <span className="hidden sm:inline">Refresh</span>
-        </Button>
-        <DateRangeSelector />
-        <Button
-          data-testid="dashboard-download-button"
-          variant="secondary"
-          onClick={handleDownloadReport}
-        >
-          <span className="hidden sm:inline">Download Report</span>
-          <span className="sm:hidden">Report</span>
-        </Button>
+        <div className="flex flex-col items-end gap-3">
+          <div className="hidden lg:flex items-center gap-6 text-[10px] text-muted-foreground tracking-[0.2em] uppercase font-mono">
+            <span>System Load <strong className="text-foreground ml-1">98%</strong></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button data-testid="dashboard-refresh-button" variant="ghost" size="sm" onClick={refreshData} className="px-2 text-muted-foreground hover:text-foreground">
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+            <DateRangeSelector />
+            <Button
+              data-testid="dashboard-download-button"
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadReport}
+              className="font-mono tracking-widest text-[10px] uppercase rounded-none border-border/50 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+            >
+              <span className="hidden sm:inline">Download Report</span>
+              <span className="sm:hidden">Report</span>
+            </Button>
+          </div>
+        </div>
       </PageHeader>
-
-      {/* Minimalist Asymmetric Welcome */}
-      <div className="flex flex-col md:flex-row items-baseline justify-between py-6 border-t border-border/30">
-        <div>
-          <h2 className="text-xl font-medium tracking-tight text-foreground">
-            Good morning, {user?.name?.split(' ')[0] || 'Team'}.
-          </h2>
-          <p className="text-muted-foreground text-sm tracking-wide font-mono mt-1 uppercase">
-            {user?.role === 'SUPER_ADMIN' ? 'Full Access Granted' : 'Restricted Access'} // SYSTEM OPERATIONAL
-          </p>
-        </div>
-        <div className="hidden md:flex flex-col items-end">
-          <span className="text-xs text-muted-foreground tracking-widest uppercase">System Load</span>
-          <span className="text-2xl font-semibold tracking-tighter">98%</span>
-        </div>
-      </div>
 
       <ErrorBoundary fallback={<InlineError message="Failed to load quick actions" />}>
         <QuickActions />
