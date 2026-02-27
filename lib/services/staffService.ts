@@ -77,7 +77,7 @@ export const staffService = {
 
     const { data, error } = await query;
     if (error) throw mapSupabaseError(error);
-    return (data ?? []) as unknown as StaffWithRelations[];
+    return (data ?? []) as StaffWithRelations[];
   },
 
   async getById(id: string): Promise<StaffWithRelations> {
@@ -96,7 +96,7 @@ export const staffService = {
       .single();
 
     if (error) throw mapSupabaseError(error);
-    return data as unknown as StaffWithRelations;
+    return data as StaffWithRelations;
   },
 
   async getByAuthUserId(authUserId: string): Promise<StaffWithRelations | null> {
@@ -112,7 +112,7 @@ export const staffService = {
       .maybeSingle();
 
     if (error) throw mapSupabaseError(error);
-    return data as unknown as StaffWithRelations | null;
+    return data as StaffWithRelations | null;
   },
 
   async getByEmail(email: string): Promise<StaffWithRelations | null> {
@@ -131,7 +131,7 @@ export const staffService = {
       .maybeSingle();
 
     if (error) throw mapSupabaseError(error);
-    return data as unknown as StaffWithRelations | null;
+    return data as StaffWithRelations | null;
   },
 
   async create(staff: Omit<StaffInsert, 'org_id'>): Promise<Staff> {

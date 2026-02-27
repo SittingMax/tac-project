@@ -47,7 +47,7 @@ export const useManagementStore = create<ManagementState>((set) => ({
       }
 
       // Map to legacy User format for compatibility
-      const staffData = (data ?? []) as unknown as StaffRecord[];
+      const staffData = (data ?? []) as StaffRecord[];
       const mappedUsers: User[] = staffData.map((staff) => ({
         id: staff.id,
         name: staff.full_name,
@@ -98,7 +98,7 @@ export const useManagementStore = create<ManagementState>((set) => ({
 
       if (error) throw error;
 
-      const staffData = data as unknown as StaffRecord;
+      const staffData = data as StaffRecord;
       const newUser: User = {
         id: staffData.id,
         name: staffData.full_name,

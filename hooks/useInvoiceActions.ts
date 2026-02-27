@@ -173,20 +173,20 @@ export function useInvoiceActions() {
 
       const consignor = shipmentRow
         ? {
-            name: shipmentRow.consignor_name,
-            phone: shipmentRow.consignor_phone,
-            address: formatAddress(shipmentRow.consignor_address),
-          }
+          name: shipmentRow.consignor_name,
+          phone: shipmentRow.consignor_phone,
+          address: formatAddress(shipmentRow.consignor_address),
+        }
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          lineItems.consignor || (inv as any).consignor || {};
+        lineItems.consignor || (inv as any).consignor || {};
       const consignee = shipmentRow
         ? {
-            name: shipmentRow.consignee_name,
-            phone: shipmentRow.consignee_phone,
-            address: formatAddress(shipmentRow.consignee_address),
-          }
+          name: shipmentRow.consignee_name,
+          phone: shipmentRow.consignee_phone,
+          address: formatAddress(shipmentRow.consignee_address),
+        }
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          lineItems.consignee || (inv as any).consignee || {};
+        lineItems.consignee || (inv as any).consignee || {};
 
       const fullInvoice = { ...inv, consignor, consignee };
       const url = await generateEnterpriseInvoice(fullInvoice as Invoice);

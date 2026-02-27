@@ -88,8 +88,16 @@ export const QuickActions: React.FC = () => {
             <div
               key={action.label}
               data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
-              className="bg-background p-6 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10 cursor-pointer h-32"
+              role="button"
+              tabIndex={0}
+              className="bg-background p-6 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10 focus-visible:ring-2 focus-visible:ring-primary cursor-pointer h-32"
               onClick={action.onClick}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  action.onClick();
+                }
+              }}
             >
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
@@ -145,8 +153,16 @@ export const QuickActions: React.FC = () => {
                 {recentScans.map((awb, index) => (
                   <div
                     key={`${awb}-${index}`}
-                    className="flex items-center justify-between p-4 bg-background hover:bg-muted/10 cursor-pointer transition-colors group relative overflow-hidden"
+                    role="button"
+                    tabIndex={0}
+                    className="flex items-center justify-between p-4 bg-background hover:bg-muted/10 focus-visible:ring-2 focus-visible:ring-primary cursor-pointer transition-colors group relative overflow-hidden"
                     onClick={() => navigate(`/tracking?cn=${awb}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        navigate(`/tracking?cn=${awb}`);
+                      }
+                    }}
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <span className="text-xs font-mono font-medium tracking-widest group-hover:text-primary transition-colors">

@@ -1,5 +1,5 @@
-@import url('tailwindcss');
-@import url('tw-animate-css');
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @source "./**/*.{js,ts,jsx,tsx,html}";
 
@@ -318,12 +318,10 @@
   }
 
   .tracking-route-gradient {
-    background-image: linear-gradient(
-      90deg,
-      oklch(var(--status-info)),
-      oklch(var(--status-warning)),
-      oklch(var(--status-success))
-    );
+    background-image: linear-gradient(90deg,
+        oklch(var(--status-info)),
+        oklch(var(--status-warning)),
+        oklch(var(--status-success)));
   }
 
   /* --- NEW PREMIUM EFFECTS --- */
@@ -378,11 +376,9 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-      800px circle at var(--mouse-x) var(--mouse-y),
-      color-mix(in srgb, var(--primary) 15%, transparent),
-      transparent 40%
-    );
+    background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y),
+        color-mix(in srgb, var(--primary) 15%, transparent),
+        transparent 40%);
     opacity: 0;
     transition: opacity 0.5s;
     pointer-events: none;
@@ -398,11 +394,9 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(
-      600px circle at var(--mouse-x) var(--mouse-y),
-      color-mix(in srgb, var(--primary) 40%, transparent),
-      transparent 40%
-    );
+    background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y),
+        color-mix(in srgb, var(--primary) 40%, transparent),
+        transparent 40%);
     opacity: 0;
     z-index: 3;
     transition: opacity 0.5s;
@@ -456,6 +450,7 @@
 
 /* Reduced Motion - Respect user preferences */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -677,11 +672,11 @@
     align-items: flex-start;
   }
 
-  ul[data-type='taskList'] li > label {
+  ul[data-type='taskList'] li>label {
     margin-top: 0.25rem;
   }
 
-  ul[data-type='taskList'] li > div {
+  ul[data-type='taskList'] li>div {
     flex: 1;
   }
 

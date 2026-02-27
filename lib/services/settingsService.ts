@@ -53,7 +53,7 @@ export const settingsService = {
       .from('orgs')
       .update({
         name,
-        settings: settings as unknown as Json,
+        settings: settings as Json,
         updated_at: new Date().toISOString(),
       })
       .eq('id', orgId);
@@ -83,7 +83,7 @@ export const settingsService = {
     const { error } = await supabase
       .from('staff')
       .update({
-        settings: settings as unknown as Json,
+        settings: settings as Json,
         updated_at: new Date().toISOString(),
       })
       .eq('id', userId);

@@ -69,7 +69,7 @@ export const invoiceService = {
 
     const { data, error } = await query;
     if (error) throw mapSupabaseError(error);
-    return (data ?? []) as unknown as InvoiceWithRelations[];
+    return (data ?? []) as InvoiceWithRelations[];
   },
 
   async getById(id: string): Promise<InvoiceWithRelations> {
@@ -89,7 +89,7 @@ export const invoiceService = {
       .single();
 
     if (error) throw mapSupabaseError(error);
-    return data as unknown as InvoiceWithRelations;
+    return data as InvoiceWithRelations;
   },
 
   async getByInvoiceNo(invoiceNo: string): Promise<InvoiceWithRelations | null> {
@@ -109,7 +109,7 @@ export const invoiceService = {
       .maybeSingle();
 
     if (error) throw mapSupabaseError(error);
-    return data as unknown as InvoiceWithRelations | null;
+    return data as InvoiceWithRelations | null;
   },
 
   async create(invoice: Omit<InvoiceInsert, 'org_id' | 'invoice_no'>): Promise<Invoice> {

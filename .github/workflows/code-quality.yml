@@ -44,6 +44,52 @@ jobs:
             exit 1
           fi
 
+      - name: Check dangerouslySetInnerHTML usage
+        run: |
+          # Flag any dangerouslySetInnerHTML not paired with DOMPurify
+          FILES=$(grep -rl "dangerouslySetInnerHTML" --include="*.tsx" --include="*.ts" \
+            --exclude-dir=node_modules --exclude-dir=dist . 2>/dev/null || true)
+          if [ -n "$FILES" ]; then
+            FAIL=0
+            for f in $FILES; do
+              if ! grep -q "DOMPurify\|dompurify\|sanitize" "$f"; then
+                echo "❌ $f uses dangerouslySetInnerHTML without DOMPurify"
+                FAIL=1
+              fi
+            done
+            if [ "$FAIL" = "1" ]; then
+              exit 1
+            fi
+          fi
+          echo "✅ No unsanitized dangerouslySetInnerHTML found"
+
+      - name: Check for service role key leaks
+        run: |
+          if grep -rE "service_role|SUPABASE_SERVICE_ROLE" \
+            --include="*.ts" --include="*.tsx" --include="*.js" \
+            --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=supabase/functions \
+            --exclude="*.test.*" --exclude="*.spec.*" \
+            . 2>/dev/null; then
+            echo "❌ Service role key reference found in client code"
+            exit 1
+          fi
+          echo "✅ No service role key leaks detected"
+
+      - name: Check process.env in client code
+        run: |
+          # Allow process.env only in config/, vite.config, env.d.ts, and test files
+          VIOLATIONS=$(grep -rn "process\.env" --include="*.ts" --include="*.tsx" \
+            --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=config \
+            --exclude="vite.config.*" --exclude="vite-env.d.ts" --exclude="vitest.config.*" \
+            --exclude="playwright.config.*" --exclude="*.test.*" --exclude="*.spec.*" \
+            . 2>/dev/null | grep -v "import.meta.env" || true)
+          if [ -n "$VIOLATIONS" ]; then
+            echo "$VIOLATIONS"
+            echo ""
+            echo "⚠️ Warning: process.env used outside config files. Use import.meta.env instead."
+          fi
+          echo "✅ process.env check complete"
+
       - name: TypeScript strict mode check
         run: npm run typecheck
 
@@ -95,6 +141,22 @@ jobs:
             exit 1
           fi
           echo "✅ Any type usage within acceptable limits (target: <50)"
+
+      - name: Barcode compliance check
+        run: |
+          # Ensure no direct JsBarcode imports outside the UniversalBarcode wrapper
+          VIOLATIONS=$(grep -rn "from ['\"]jsbarcode['\"]\\|require(['\"]jsbarcode['\"])" \
+            --include="*.ts" --include="*.tsx" \
+            --exclude-dir=node_modules --exclude-dir=dist \
+            . 2>/dev/null | grep -v "UniversalBarcode\\|universal-barcode\\|universal_barcode" || true)
+          if [ -n "$VIOLATIONS" ]; then
+            echo "$VIOLATIONS"
+            echo ""
+            echo "❌ Direct JsBarcode import detected. Use UniversalBarcode component instead."
+            echo "See: docs/BARCODE_IMPLEMENTATION.md"
+            exit 1
+          fi
+          echo "✅ Barcode compliance: all imports use UniversalBarcode"
 
       - name: Format check
         run: npm run format:check
@@ -219,10 +281,15 @@ jobs:
         run: |
           # Check total dist size
           DIST_SIZE=$(du -sm dist 2>/dev/null | cut -f1 || echo "0")
+          echo "📦 Total bundle size: ${DIST_SIZE}MB"
           if [ "$DIST_SIZE" -gt 100 ]; then
             echo "❌ Bundle size exceeds 100MB limit"
             exit 1
           fi
+
+          # Report largest JS chunk
+          LARGEST=$(find dist -name '*.js' -exec du -sk {} + 2>/dev/null | sort -rn | head -1)
+          echo "📦 Largest JS chunk: $LARGEST"
           echo "✅ Bundle size within limits"
 
   # Accessibility Checks

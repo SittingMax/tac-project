@@ -69,7 +69,7 @@ export const auditService = {
 
     const { data, error } = await query;
     if (error) throw mapSupabaseError(error);
-    return (data ?? []) as unknown as AuditLogWithRelations[];
+    return (data ?? []) as AuditLogWithRelations[];
   },
 
   async getByEntity(entityType: string, entityId: string): Promise<AuditLogWithRelations[]> {

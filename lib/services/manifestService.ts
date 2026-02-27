@@ -183,7 +183,7 @@ export const manifestService = {
 
     const { data, error } = await query;
     if (error) throw mapSupabaseError(error);
-    return (data ?? []) as unknown as ManifestWithRelations[];
+    return (data ?? []) as ManifestWithRelations[];
   },
 
   async getById(id: string): Promise<ManifestWithRelations> {
@@ -204,7 +204,7 @@ export const manifestService = {
       .single();
 
     if (error) throw mapSupabaseError(error);
-    return data as unknown as ManifestWithRelations;
+    return data as ManifestWithRelations;
   },
 
   async getByManifestNo(manifestNo: string): Promise<ManifestWithRelations | null> {
@@ -225,7 +225,7 @@ export const manifestService = {
       .maybeSingle();
 
     if (error) throw mapSupabaseError(error);
-    return data as unknown as ManifestWithRelations | null;
+    return data as ManifestWithRelations | null;
   },
 
   async create(manifest: Omit<ManifestInsert, 'org_id' | 'manifest_no'>): Promise<Manifest> {
@@ -261,7 +261,7 @@ export const manifestService = {
       .eq('org_id', orgId);
 
     if (error) throw mapSupabaseError(error);
-    return (data ?? []) as unknown as ManifestItemWithShipment[];
+    return (data ?? []) as ManifestItemWithShipment[];
   },
 
   async addShipment(
@@ -611,7 +611,7 @@ export const manifestService = {
       throw mapSupabaseError(error);
     }
 
-    return data as unknown as ScanResponse;
+    return data as ScanResponse;
   },
 
   /**
@@ -798,7 +798,7 @@ export const manifestService = {
       throw mapSupabaseError(error);
     }
 
-    return data as unknown as { success: boolean; error?: string; message: string };
+    return data as { success: boolean; error?: string; message: string };
   },
 
   /**
@@ -809,7 +809,7 @@ export const manifestService = {
 
     // Use type assertion for table defined in migration 006
     const { data, error } = await (
-      supabase as unknown as { from: (table: string) => ReturnType<typeof supabase.from> }
+      supabase as { from: (table: string) => ReturnType<typeof supabase.from> }
     )
       .from('manifest_scan_logs')
       .select('*')
@@ -823,7 +823,7 @@ export const manifestService = {
       throw mapSupabaseError(error);
     }
 
-    return (data ?? []) as unknown as ManifestScanLog[];
+    return (data ?? []) as ManifestScanLog[];
   },
 
   // =========================================================================
@@ -886,7 +886,7 @@ export const manifestService = {
       .single();
 
     if (error) throw mapSupabaseError(error);
-    return data as unknown as ManifestWithRelations;
+    return data as ManifestWithRelations;
   },
 
   /**
@@ -952,7 +952,7 @@ export const manifestService = {
       .single();
 
     if (error) throw mapSupabaseError(error);
-    return data as unknown as ManifestWithRelations;
+    return data as ManifestWithRelations;
   },
 
   /**
