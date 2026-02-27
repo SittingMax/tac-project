@@ -36,7 +36,7 @@ export interface ShipmentWithRelations extends Shipment {
     invoice_no: string;
     status: string;
     total: number;
-  };
+  }[];
 }
 
 export interface ShipmentFilters {
@@ -90,7 +90,7 @@ export const shipmentService = {
 
     const { data, error } = await query;
     if (error) throw mapSupabaseError(error);
-    return (data ?? []) as ShipmentWithRelations[];
+    return (data ?? []) as unknown as ShipmentWithRelations[];
   },
 
   async getById(id: string): Promise<ShipmentWithRelations> {
@@ -112,7 +112,7 @@ export const shipmentService = {
       .single();
 
     if (error) throw mapSupabaseError(error);
-    return data as ShipmentWithRelations;
+    return data as unknown as ShipmentWithRelations;
   },
 
   async getByAwb(awb: string): Promise<ShipmentWithRelations | null> {
@@ -134,7 +134,7 @@ export const shipmentService = {
       .maybeSingle();
 
     if (error) throw mapSupabaseError(error);
-    return data as ShipmentWithRelations | null;
+    return data as unknown as ShipmentWithRelations | null;
   },
 
   async create(shipment: Omit<ShipmentInsert, 'org_id'>): Promise<Shipment> {
