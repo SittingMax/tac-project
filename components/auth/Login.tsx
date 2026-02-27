@@ -65,7 +65,7 @@ export const Login: React.FC = () => {
     }, cardRef);
 
     return () => ctx.revert();
-     
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Redirect if already authenticated

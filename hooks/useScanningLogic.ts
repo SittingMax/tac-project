@@ -123,7 +123,7 @@ export function useScanningLogic() {
         // eslint-disable-next-line no-console
         console.debug('[Scanning Context] Parsed result:', scanResult);
       } catch (e) {
-         
+        // eslint-disable-next-line no-console
         console.warn('[Scanning Context] Parser error (using raw fallthrough):', e);
         scanResult = { type: 'shipment' as const, awb: input.trim().toUpperCase(), raw: input };
       }
