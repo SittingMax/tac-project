@@ -86,6 +86,13 @@ const KPICard = React.memo(
     const isIncreasing = trend ? trend > 0 : false;
     const isDecreasing = trend ? trend < 0 : false;
 
+    const colorMap = {
+      primary: 'text-primary bg-primary/10 border-primary/20',
+      success: 'text-status-success bg-status-success/10 border-status-success/20',
+      warning: 'text-status-warning bg-status-warning/10 border-status-warning/20',
+      destructive: 'text-status-error bg-status-error/10 border-status-error/20',
+    };
+
     const strokeColorMap = {
       primary: 'var(--primary)',
       success: 'var(--status-success)',
@@ -114,18 +121,23 @@ const KPICard = React.memo(
           onClick={handleClick}
           data-testid={`kpi-card-${label.toLowerCase().replace(/\s+/g, '-')}`}
           className={cn(
-            'relative overflow-hidden h-full flex flex-col justify-between group transition-all duration-300 border-t border-border/40 rounded-none bg-background shadow-none',
-            path ? 'cursor-pointer hover:bg-muted/30' : ''
+            'relative overflow-hidden h-full flex flex-col justify-between group transition-all duration-300 border-border bg-card',
+            path ? 'cursor-pointer hover:shadow-md hover:border-primary/50' : ''
           )}
         >
+          {/* Background Icon */}
+          <div className="absolute -top-4 -right-4 p-4 opacity-[0.02] group-hover:opacity-[0.06] transition-opacity pointer-events-none transform group-hover:scale-110 duration-500">
+            <Icon className="w-32 h-32" />
+          </div>
+
           {/* Content */}
           <div className="p-5 flex-1 flex flex-col relative z-10">
             <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-3">
-                <div className={`p-0 bg-transparent text-muted-foreground group-hover:text-foreground transition-colors`}>
+                <div className={`p-2 rounded-none border ${colorMap[color]}`}>
                   <Icon className="w-4 h-4" />
                 </div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold line-clamp-1 pr-2">
+                <div className="text-sm text-muted-foreground font-medium line-clamp-1 pr-2">
                   {label}
                 </div>
               </div>
@@ -133,7 +145,7 @@ const KPICard = React.memo(
 
             <div className="flex items-end justify-between mt-auto">
               <div>
-                <div className="text-3xl font-medium text-foreground tracking-tighter mt-2">
+                <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono tracking-tight">
                   <AnimatedCounter
                     value={value}
                     displayValue={displayValue}
@@ -145,14 +157,14 @@ const KPICard = React.memo(
                   <div className="flex items-center gap-1 mt-2">
                     <span
                       className={cn(
-                        'flex items-center text-xs font-mono tracking-wide px-1.5 py-0.5 rounded-none',
+                        'flex items-center text-xs font-semibold px-1.5 py-0.5 rounded-none',
                         isIncreasing && color !== 'destructive'
-                          ? 'text-status-success'
+                          ? 'text-status-success bg-status-success/10'
                           : isDecreasing && color !== 'destructive'
-                            ? 'text-status-error'
+                            ? 'text-status-error bg-status-error/10'
                             : isDecreasing && color === 'destructive'
-                              ? 'text-status-success' // fewer exceptions = good
-                              : 'text-status-error'
+                              ? 'text-status-success bg-status-success/10' // fewer exceptions = good
+                              : 'text-status-error bg-status-error/10'
                       )}
                     >
                       {isIncreasing ? (

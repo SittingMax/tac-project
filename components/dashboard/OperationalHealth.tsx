@@ -68,6 +68,7 @@ export const OperationalHealth = () => {
 
   return (
     <Card className="h-[420px] border-border/50 flex flex-col p-6 bg-card relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-none blur-3xl -translate-y-12 translate-x-12 pointer-events-none" />
 
       <div className="flex items-center gap-2 mb-6">
         <Activity className="w-5 h-5 text-primary" />

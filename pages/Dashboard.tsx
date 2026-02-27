@@ -120,31 +120,47 @@ export const Dashboard: React.FC = () => {
     <div data-testid="dashboard-page" className="space-y-4 animate-[fadeIn_0.2s_ease-out] pb-8">
       <PageHeader
         title="Mission Control"
-        description={`Good morning, ${user?.name?.split(' ')[0] || 'Team'} // ${user?.role === 'SUPER_ADMIN' ? 'Full Access' : 'Restricted'} // System Operational`}
+        description="Real-time logistics overview and operations."
       >
-        <div className="flex flex-col items-end gap-3">
-          <div className="hidden lg:flex items-center gap-6 text-[10px] text-muted-foreground tracking-[0.2em] uppercase font-mono">
-            <span>System Load <strong className="text-foreground ml-1">98%</strong></span>
-            <span className="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+        <Button data-testid="dashboard-refresh-button" variant="ghost" onClick={refreshData}>
+          <RefreshCw className="w-4 h-4 sm:mr-2" />
+          <span className="hidden sm:inline">Refresh</span>
+        </Button>
+        <DateRangeSelector />
+        <Button
+          data-testid="dashboard-download-button"
+          variant="secondary"
+          onClick={handleDownloadReport}
+        >
+          <span className="hidden sm:inline">Download Report</span>
+          <span className="sm:hidden">Report</span>
+        </Button>
+      </PageHeader>
+
+      {/* Vibrant SaaS Welcome Hero */}
+      <div className="relative overflow-hidden rounded-none bg-gradient-to-br from-primary via-primary/90 to-primary/60 p-8 text-primary-foreground shadow-lg">
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight mb-2">
+              Good morning, {user?.name?.split(' ')[0] || 'Team'}
+            </h2>
+            <p className="text-primary-foreground/80 text-lg max-w-xl">
+              Here is what's happening with your logistics operations today. You have{' '}
+              {user?.role === 'SUPER_ADMIN' ? 'full access' : 'limited access'} to system features.
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button data-testid="dashboard-refresh-button" variant="ghost" size="sm" onClick={refreshData} className="px-2 text-muted-foreground hover:text-foreground">
-              <RefreshCw className="w-4 h-4" />
-            </Button>
-            <DateRangeSelector />
-            <Button
-              data-testid="dashboard-download-button"
-              variant="outline"
-              size="sm"
-              onClick={handleDownloadReport}
-              className="font-mono tracking-widest text-[10px] uppercase rounded-none border-border/50 text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
-            >
-              <span className="hidden sm:inline">Download Report</span>
-              <span className="sm:hidden">Report</span>
-            </Button>
+          <div className="mt-6 md:mt-0 hidden md:block">
+            {/* Decorative Element */}
+            <div className="flex gap-4">
+              <div className="h-16 w-32 rounded-none bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-inner">
+                <span className="text-2xl font-bold">98%</span>
+              </div>
+            </div>
           </div>
         </div>
-      </PageHeader>
+        {/* Abstract blur background effect */}
+        <div className="absolute -top-24 -right-24 h-64 w-64 rounded-none bg-white/20 blur-3xl pointer-events-none"></div>
+      </div>
 
       <ErrorBoundary fallback={<InlineError message="Failed to load quick actions" />}>
         <QuickActions />

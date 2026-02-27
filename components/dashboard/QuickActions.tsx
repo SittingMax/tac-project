@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Scan, Printer, FileText, ArrowRight } from 'lucide-react';
+import { Plus, Scan, Printer, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { UniversalBarcode } from '@/components/barcodes';
 import { useScanner } from '@/context/useScanner';
 import { ScanSource } from '@/types';
 
@@ -71,21 +73,24 @@ export const QuickActions: React.FC = () => {
   return (
     <>
       <div data-testid="quick-actions" className="flex flex-col gap-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-border/40 pb-4">
           <div>
-            <h3 className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+            <h3 className="text-xl font-bold uppercase tracking-tight text-foreground">
               Command Center
             </h3>
+            <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
+              High-frequency operations
+            </p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40 border border-border/40">
           {actions.map((action) => (
             <div
               key={action.label}
               data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
               role="button"
               tabIndex={0}
-              className="group relative flex flex-col gap-3 pb-4 cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-8"
+              className="bg-background p-6 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10 focus-visible:ring-2 focus-visible:ring-primary cursor-pointer h-32"
               onClick={action.onClick}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -94,70 +99,85 @@ export const QuickActions: React.FC = () => {
                 }
               }}
             >
-              <div className="flex items-center gap-3">
-                <action.icon className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" strokeWidth={1.5} />
-                <span className="text-sm font-medium tracking-widest text-foreground uppercase">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
                   {action.label}
                 </span>
+                <action.icon className="w-4 h-4 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
               </div>
-              <p className="text-xs font-mono tracking-wide text-muted-foreground group-hover:text-foreground/80 transition-colors">
+              <p className="text-sm font-medium tracking-tight group-hover:text-primary transition-colors pr-8">
                 {action.description}
               </p>
-              <div className="absolute top-0 right-0 text-[9px] font-mono text-muted-foreground/30 group-hover:text-muted-foreground transition-colors uppercase tracking-widest">
-                [{action.shortcut}]
+              <div className="absolute top-6 right-6 text-[10px] font-mono opacity-20 group-hover:opacity-100 transition-opacity border border-current px-1.5 py-0.5 pointer-events-none">
+                {action.shortcut}
               </div>
-              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-border/40"></div>
-              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-foreground transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
+              <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Quick Scan Section */}
-      <div className="mt-6 pt-6 flex flex-col md:flex-row gap-8 md:items-end border-t border-border/20">
-        <div className="flex-1 max-w-xl">
-          <h3 className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+      <div className="mt-8 border-t border-border/40 pt-8">
+        <div className="max-w-md">
+          <h3 className="text-xs font-mono text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
             <Scan className="w-3 h-3" />
             Direct Telemetry Query
           </h3>
 
-          <form onSubmit={handleQuickScan} className="relative flex items-center group">
+          <form onSubmit={handleQuickScan} className="flex gap-0 mb-6">
             <Input
               value={quickScanInput}
               onChange={(e) => setQuickScanInput(e.target.value)}
               placeholder="ENTER CN / TRACKING ID..."
-              className="w-full bg-transparent border-0 border-b border-border/40 rounded-none px-0 py-2 h-10 font-mono text-sm tracking-widest uppercase focus-visible:ring-0 focus-visible:border-foreground placeholder:text-muted-foreground/40 transition-colors"
+              className="flex-1 rounded-none border-r-0 font-mono text-xs uppercase"
               autoComplete="off"
             />
-            <button
+            <Button
               type="submit"
+              variant="default"
+              className="rounded-none font-mono text-xs uppercase tracking-widest px-8"
               disabled={!quickScanInput.trim()}
-              className="absolute right-0 p-2 text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors disabled:hover:text-muted-foreground outline-none focus-visible:text-foreground"
             >
-              <ArrowRight className="w-4 h-4" />
-            </button>
+              Execute
+            </Button>
           </form>
-        </div>
 
-        {/* Recent Scans Inline list */}
-        {recentScans.length > 0 && (
-          <div className="flex flex-col gap-2 pb-2">
-            <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-[0.2em]">
-              Recent Activity
-            </p>
-            <div className="flex flex-wrap gap-4">
-              {recentScans.map((awb, index) => (
-                <button
-                  key={`${awb}-${index}`}
-                  className="text-xs font-mono tracking-widest text-muted-foreground hover:text-foreground border-b border-transparent hover:border-foreground transition-all uppercase outline-none focus-visible:text-foreground focus-visible:border-foreground"
-                  onClick={() => navigate(`/tracking?cn=${awb}`)}
-                >
-                  {awb}
-                </button>
-              ))}
+          {/* Recent Scans */}
+          {recentScans.length > 0 && (
+            <div className="space-y-4">
+              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+                Recent Queries:
+              </p>
+              <div className="grid gap-px bg-border/40 border border-border/40">
+                {recentScans.map((awb, index) => (
+                  <div
+                    key={`${awb}-${index}`}
+                    role="button"
+                    tabIndex={0}
+                    className="flex items-center justify-between p-4 bg-background hover:bg-muted/10 focus-visible:ring-2 focus-visible:ring-primary cursor-pointer transition-colors group relative overflow-hidden"
+                    onClick={() => navigate(`/tracking?cn=${awb}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        navigate(`/tracking?cn=${awb}`);
+                      }
+                    }}
+                  >
+                    <div className="flex items-center gap-4 flex-1">
+                      <span className="text-xs font-mono font-medium tracking-widest group-hover:text-primary transition-colors">
+                        {awb}
+                      </span>
+                    </div>
+                    <div className="flex-shrink-0 opacity-50 group-hover:opacity-100 transition-opacity mix-blend-difference">
+                      <UniversalBarcode value={awb} mode="compact" width={2} height={30} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );
