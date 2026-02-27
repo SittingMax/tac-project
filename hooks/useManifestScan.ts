@@ -121,7 +121,7 @@ export function useManifestScan(options: ScanOptions) {
         return { success: false, error: 'EMPTY_SCAN', message: 'Empty scan token' };
       }
 
-      let parsedToken = trimmed;
+      let parsedToken: string;
       try {
         const parsed = parseScanInput(trimmed);
         if (parsed.type !== 'shipment' || !parsed.awb) {

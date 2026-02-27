@@ -1,6 +1,6 @@
 
 import { readFileSync } from 'fs';
-import { resolve, join } from 'path';
+import { join } from 'path';
 
 // Credentials for Management API
 const PROJECT_REF = process.env.SUPABASE_PROJECT_REF;
@@ -14,6 +14,8 @@ if (!PROJECT_REF || !ACCESS_TOKEN) {
 async function executeSQL(sql) {
     console.log(`Executing SQL migration via Management API (${sql.length} bytes)...`);
 
+    // codeql[js/file-data-in-outbound-network-request] - Intentional: Migration SQL
+    // lgtm[js/file-data-in-outbound-network-request]
     const response = await fetch(`https://api.supabase.com/v1/projects/${PROJECT_REF}/database/query`, {
         method: 'POST',
         headers: {

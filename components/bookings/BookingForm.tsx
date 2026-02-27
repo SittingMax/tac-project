@@ -357,6 +357,8 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
                   <div key={index} className="relative group border rounded-none p-2">
                     <div className="text-xs truncate w-full mb-1">{file.name}</div>
                     <div className="aspect-square bg-muted rounded-none overflow-hidden relative">
+                      {/* codeql[js/xss-through-dom] - Safe object URL from file input */}
+                      {/* lgtm[js/xss-through-dom] */}
                       <img
                         src={URL.createObjectURL(file)}
                         alt="preview"

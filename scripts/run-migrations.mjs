@@ -38,6 +38,8 @@ async function executeSQL(sql, description) {
     console.log(`   Executing SQL migration (${sql.length} bytes)`);
 
     // First try using the sql endpoint
+    // codeql[js/file-data-in-outbound-network-request] - Intentional: Sending SQL migration content to Supabase to be executed
+    // lgtm[js/file-data-in-outbound-network-request]
     const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
         method: 'POST',
         headers: {
@@ -46,14 +48,14 @@ async function executeSQL(sql, description) {
             'Content-Type': 'application/json',
             'Prefer': 'return=minimal'
         },
-        // codeql[js/file-data-in-outbound-network-request] - Intentional: Sending SQL migration content to Supabase to be executed
-        // lgtm[js/file-data-in-outbound-network-request]
         body: JSON.stringify({ query: sql }) // nosemgrep: file-data-in-outbound-network-request
     });
 
     // If that doesn't work, use pg_query via postgrest
     if (!response.ok) {
         // Use the management API instead
+        // codeql[js/file-data-in-outbound-network-request] - Intentional: Sending SQL migration content to Supabase to be executed
+        // lgtm[js/file-data-in-outbound-network-request]
         const mgmtResponse = await fetch(
             `https://api.supabase.com/v1/projects/${getProjectRef()}/database/query`,
             {
@@ -62,8 +64,6 @@ async function executeSQL(sql, description) {
                     'Authorization': `Bearer ${process.env.SUPABASE_ACCESS_TOKEN}`,
                     'Content-Type': 'application/json'
                 },
-                // codeql[js/file-data-in-outbound-network-request] - Intentional: Sending SQL migration content to Supabase to be executed
-                // lgtm[js/file-data-in-outbound-network-request]
                 body: JSON.stringify({ query: sql }) // nosemgrep: file-data-in-outbound-network-request
             }
         );

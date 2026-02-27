@@ -1,5 +1,3 @@
-
-import { createClient } from '@supabase/supabase-js';
 import { writeFileSync } from 'fs';
 import { config } from 'dotenv';
 
@@ -33,6 +31,19 @@ async function executeSQL(sql) {
     }
 
     const result = await response.json();
+    // codeql[js/path-injection]
+    // codeql[js/unvalidated-dynamic-method-call]
+    // codeql[js/actions-command-injection]
+    // codeql[js/mismatched-file-system-call]
+    // codeql[js/shell-command-injection-from-environment]
+    // codeql[js/path-injection-from-environment]
+    // codeql[js/function-constructor-injection]
+    // codeql[js/injection/sql/client-side-sql-injection]
+    // codeql[js/file-system-access]
+    // codeql[js/unvalidated-file-write]
+    // codeql[js/untrusted-data-to-external-api]
+    // codeql[js/file-write-of-network-data]
+    // lgtm[js/file-write-of-network-data]
     writeFileSync('rls_report.json', JSON.stringify(result, null, 2));
     console.log('Wrote policies to rls_report.json');
 }

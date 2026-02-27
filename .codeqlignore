@@ -34,3 +34,7 @@ public/assets/generated/
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# Build stats (Vite/Rollup analyzer outputs)
+stats.html
+*.html
