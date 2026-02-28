@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Scan, Printer, FileText } from 'lucide-react';
+import { PackagePlus, ScanLine, FileText, Printer, Scan } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UniversalBarcode } from '@/components/barcodes';
 import { useScanner } from '@/context/useScanner';
 import { ScanSource } from '@/types';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export const QuickActions: React.FC = () => {
   const navigate = useNavigate();
@@ -36,35 +38,26 @@ export const QuickActions: React.FC = () => {
     {
       label: 'New Shipment',
       description: 'Create & schedule orders',
-      icon: Plus,
-      color: 'text-primary',
+      icon: PackagePlus,
       onClick: () => navigate('/shipments?new=true'),
-      shortcut: 'N',
     },
-
     {
       label: 'Scan Package',
       description: 'Update status via barcode',
-      icon: Scan,
-      color: 'text-chart-5',
+      icon: ScanLine,
       onClick: () => navigate('/scanning'),
-      shortcut: 'S',
     },
     {
       label: 'Manifests',
       description: 'Review daily dispatches',
       icon: FileText,
-      color: 'text-status-warning',
       onClick: () => navigate('/manifests'),
-      shortcut: 'M',
     },
     {
       label: 'Print Labels',
       description: 'Batch print air waybills',
       icon: Printer,
-      color: 'text-status-success',
       onClick: () => navigate('/print/label/recent'),
-      shortcut: 'P',
     },
   ];
 
@@ -83,37 +76,41 @@ export const QuickActions: React.FC = () => {
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40 border border-border/40">
-          {actions.map((action) => (
-            <div
-              key={action.label}
-              data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
-              role="button"
-              tabIndex={0}
-              className="bg-background p-6 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10 focus-visible:ring-2 focus-visible:ring-primary cursor-pointer h-32"
-              onClick={action.onClick}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  action.onClick();
-                }
-              }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
-                  {action.label}
-                </span>
-                <action.icon className="w-4 h-4 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
-              </div>
-              <p className="text-sm font-medium tracking-tight group-hover:text-primary transition-colors pr-8">
-                {action.description}
-              </p>
-              <div className="absolute top-6 right-6 text-[10px] font-mono opacity-20 group-hover:opacity-100 transition-opacity border border-current px-1.5 py-0.5 pointer-events-none">
-                {action.shortcut}
-              </div>
-              <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
-            </div>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+          {actions.map((action) => {
+            const Icon = action.icon;
+
+            return (
+              <motion.button
+                key={action.label}
+                onClick={action.onClick}
+                whileHover={{ y: -3, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                className={cn(
+                  "flex items-center gap-5 p-5 text-left w-full relative overflow-hidden",
+                  "bg-white dark:bg-slate-900 rounded-xl",
+                  "border border-slate-200/60 dark:border-slate-800",
+                  "shadow-sm transition-colors duration-300",
+                  "hover:shadow-md hover:border-purple-200 dark:hover:border-purple-800/50",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+                )}
+              >
+                <div className="flex shrink-0 items-center justify-center w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/20">
+                  <Icon className="w-6 h-6 text-purple-600 dark:text-purple-400" strokeWidth={2} />
+                </div>
+
+                <div className="flex flex-col">
+                  <span className="text-base font-semibold text-slate-800 dark:text-slate-100">
+                    {action.label}
+                  </span>
+                  <span className="text-sm leading-tight text-slate-500 dark:text-slate-400 mt-1">
+                    {action.description}
+                  </span>
+                </div>
+              </motion.button>
+            );
+          })}
         </div>
       </div>
 
