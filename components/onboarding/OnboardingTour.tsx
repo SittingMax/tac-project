@@ -6,7 +6,7 @@ interface TourStep {
   title: string;
   content: string;
   target: string; // CSS selector or 'body' for centered modal
-  placement: 'center' | 'right' | 'bottom';
+  placement: 'center' | 'right' | 'bottom' | 'top';
 }
 
 const TOUR_STEPS: TourStep[] = [
@@ -26,7 +26,7 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     target: '[data-testid="kpi-grid"]',
-    placement: 'bottom',
+    placement: 'top',
     title: 'Dashboard KPIs',
     content: 'Tap on any KPI card to instantly drill down into the related data table view.',
   },
@@ -91,16 +91,27 @@ function computeTooltipStyle(
     const rawLeft = rect.right + GAP;
     return {
       position: 'fixed',
-      top: Math.min(Math.max(PADDING, rect.top), vh - PADDING * 10),
+      top: Math.min(Math.max(PADDING, rect.top), vh - 260),
       left: Math.max(PADDING, Math.min(rawLeft, vw - CARD_WIDTH - PADDING)),
       width: CARD_WIDTH,
     };
   }
+
+  if (placement === 'top') {
+    const rawLeft = rect.left + rect.width / 2 - CARD_WIDTH / 2;
+    return {
+      position: 'fixed',
+      bottom: vh - rect.top + GAP,
+      left: Math.max(PADDING, Math.min(rawLeft, vw - CARD_WIDTH - PADDING)),
+      width: CARD_WIDTH,
+    };
+  }
+
   // bottom
   const rawLeft = rect.left + rect.width / 2 - CARD_WIDTH / 2;
   return {
     position: 'fixed',
-    top: Math.min(rect.bottom + GAP, vh - PADDING * 10),
+    top: Math.min(rect.bottom + GAP, vh - 260),
     left: Math.max(PADDING, Math.min(rawLeft, vw - CARD_WIDTH - PADDING)),
     width: CARD_WIDTH,
   };
