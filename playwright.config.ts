@@ -25,9 +25,10 @@ export default defineConfig({
   reporter: [['html'], ['list']],
 
   use: {
-    // Use port 4173 (preview) in CI, port 3000 (dev) locally
+    // Use port 4173 (preview) in CI, port 5173 (dev) locally.
+    // Use 127.0.0.1 instead of localhost to prevent IPv6 mapping bugs in CI (ERR_CONNECTION_REFUSED).
     baseURL:
-      process.env.BASE_URL || (process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173'),
+      process.env.BASE_URL || (process.env.CI ? 'http://127.0.0.1:4173' : 'http://127.0.0.1:5173'),
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'on-first-retry',
@@ -66,15 +67,12 @@ export default defineConfig({
     },
   ],
 
-  // Only use webServer locally - CI workflow manages server separately
-  /*
   webServer: process.env.CI
     ? undefined
     : {
       command: 'npm run dev',
-      url: 'http://localhost:5173',
+      url: 'http://127.0.0.1:5173',
       reuseExistingServer: true,
       timeout: 120 * 1000,
     },
-  */
 });
