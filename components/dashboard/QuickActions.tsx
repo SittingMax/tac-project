@@ -89,24 +89,25 @@ export const QuickActions: React.FC = () => {
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 className={cn(
                   'flex items-center gap-5 p-5 text-left w-full relative overflow-hidden',
-                  'bg-white dark:bg-slate-900 rounded-xl',
-                  'border border-slate-200/60 dark:border-slate-800',
-                  'shadow-sm transition-colors duration-300',
-                  'hover:shadow-md hover:border-purple-200 dark:hover:border-purple-800/50',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2'
+                  'bg-background rounded-xl',
+                  'border border-border',
+                  // Hover state
+                  'hover:bg-muted/50 hover:border-accent hover:shadow-lg',
+                  // Active state
+                  'active:scale-[0.98]',
+                  'transition-all duration-300 ease-out group'
                 )}
               >
-                <div className="flex shrink-0 items-center justify-center w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/20">
-                  <Icon className="w-6 h-6 text-purple-600 dark:text-purple-400" strokeWidth={2} />
-                </div>
-
-                <div className="flex flex-col">
-                  <span className="text-base font-semibold text-slate-800 dark:text-slate-100">
-                    {action.label}
-                  </span>
-                  <span className="text-sm leading-tight text-slate-500 dark:text-slate-400 mt-1">
-                    {action.description}
-                  </span>
+                <div className="flex items-start gap-4 p-4">
+                  <div className="p-2.5 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="flex flex-col flex-1 items-start text-left">
+                    <span className="text-base font-semibold text-foreground">{action.label}</span>
+                    <span className="text-sm leading-tight text-muted-foreground mt-1">
+                      {action.description}
+                    </span>
+                  </div>
                 </div>
               </motion.button>
             );

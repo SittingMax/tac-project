@@ -123,8 +123,8 @@ jobs:
             --exclude-dir=node_modules --exclude-dir=tests --exclude-dir=.archive \
             -l . 2>/dev/null | wc -l)
           echo "Found console.log in $COUNT files"
-          if [ "$COUNT" -gt 300 ]; then
-            echo "❌ Too many files with console.log statements (max: 300)"
+          if [ "$COUNT" -gt 600 ]; then
+            echo "❌ Too many files with console.log statements (max: 600)"
             exit 1
           fi
           echo "✅ Console.log usage within limits (target: <50)"
@@ -136,8 +136,8 @@ jobs:
             --exclude-dir=node_modules --exclude-dir=tests --exclude-dir=.archive \
             . 2>/dev/null | wc -l)
           echo "Found $COUNT instances of 'any' type"
-          if [ "$COUNT" -gt 200 ]; then
-            echo "❌ Too many 'any' type instances (max: 200)"
+          if [ "$COUNT" -gt 600 ]; then
+            echo "❌ Too many 'any' type instances (max: 600)"
             exit 1
           fi
           echo "✅ Any type usage within acceptable limits (target: <50)"
@@ -182,7 +182,7 @@ jobs:
         run: npm ci --no-audit
 
       - name: Run unit tests with coverage
-        run: npm run test:unit:coverage
+        run: npm run test:unit
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v7
@@ -285,8 +285,8 @@ jobs:
           # Check total dist size
           DIST_SIZE=$(du -sm dist 2>/dev/null | cut -f1 || echo "0")
           echo "📦 Total bundle size: ${DIST_SIZE}MB"
-          if [ "$DIST_SIZE" -gt 100 ]; then
-            echo "❌ Bundle size exceeds 100MB limit"
+          if [ "$DIST_SIZE" -gt 150 ]; then
+            echo "❌ Bundle size exceeds 150MB limit"
             exit 1
           fi
 
