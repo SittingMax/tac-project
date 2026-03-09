@@ -88,12 +88,12 @@ export const QuickActions: React.FC = () => {
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 className={cn(
-                  "flex items-center gap-5 p-5 text-left w-full relative overflow-hidden",
-                  "bg-white dark:bg-slate-900 rounded-xl",
-                  "border border-slate-200/60 dark:border-slate-800",
-                  "shadow-sm transition-colors duration-300",
-                  "hover:shadow-md hover:border-purple-200 dark:hover:border-purple-800/50",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+                  'flex items-center gap-5 p-5 text-left w-full relative overflow-hidden',
+                  'bg-white dark:bg-slate-900 rounded-xl',
+                  'border border-slate-200/60 dark:border-slate-800',
+                  'shadow-sm transition-colors duration-300',
+                  'hover:shadow-md hover:border-purple-200 dark:hover:border-purple-800/50',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2'
                 )}
               >
                 <div className="flex shrink-0 items-center justify-center w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/20">

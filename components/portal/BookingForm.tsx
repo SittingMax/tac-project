@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Package, Send, Plus, MapPin, User, Phone } from 'lucide-react';
+import { bookingSchema } from '@/lib/schemas/booking.schema';
+import { bookingService } from '@/lib/services/bookingService';
 
 export const BookingForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -34,15 +35,36 @@ export const BookingForm: React.FC = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.from('bookings').insert({
-        consignor_details: sender,
-        consignee_details: receiver,
-        whatsapp_number: whatsapp,
-        volume_matrix: packages,
-        status: 'PENDING',
+      // Validate payload with Zod schema before submitting
+      const payload = bookingSchema.parse({
+        consignor: {
+          name: sender.name,
+          phone: sender.phone,
+          address: sender.address,
+          city: 'Unspecified', // default for public form
+          state: 'Unspecified',
+          zip: '000000',
+        },
+        consignee: {
+          name: receiver.name,
+          phone: receiver.phone,
+          address: receiver.address,
+          city: 'Unspecified',
+          state: 'Unspecified',
+          zip: '000000',
+        },
+        whatsappNumber: whatsapp,
+        volumeMatrix: packages.map((p) => ({
+          length: p.length,
+          width: p.width,
+          height: p.height,
+          weight: p.weight,
+          count: p.quantity,
+        })),
       });
 
-      if (error) throw error;
+      // Submit via the centralized service
+      await bookingService.createBooking(payload, []);
 
       setSuccess(true);
       toast.success('Booking request submitted successfully!');

@@ -7,8 +7,8 @@
  * Supports: Shipment (TAC...), Manifest (MAN...), Unknown format
  */
 
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -214,116 +214,97 @@ export function ScanPreviewDialog({
   scanType,
 }: ScanPreviewDialogProps) {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [invoice, setInvoice] = useState<InvoiceWithRelations | null>(null);
-  const [shipment, setShipment] = useState<ShipmentWithRelations | null>(null);
-  const [manifest, setManifest] = useState<ManifestWithRelations | null>(null);
 
-  // Fetch data when dialog opens — single atomic update, no intermediate renders
-  useEffect(() => {
-    if (!open || !scannedData) {
-      setInvoice(null);
-      setShipment(null);
-      setManifest(null);
-      setError(null);
-      return;
-    }
+  const {
+    data: previewData,
+    isLoading: loading,
+    error: queryError,
+  } = useQuery({
+    queryKey: ['scan-preview', scanType, scannedData],
+    queryFn: async () => {
+      if (!scannedData) return null;
 
-    let cancelled = false;
-
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      setInvoice(null);
-      setShipment(null);
-      setManifest(null);
-
-      try {
-        if (scanType === 'shipment') {
-          // Single-pass: get shipment + invoice data together (no intermediate renders)
-          const { data: shipmentRow, error: shipmentErr } = await supabase
-            .from('shipments')
-            .select(
-              `
-              id, cn_number, mode, status, package_count, total_weight,
-              consignor_name, consignee_name, consignee_phone,
-              customer:customers(name, phone, email),
-              origin_hub:hubs!shipments_origin_hub_id_fkey(code, name),
-              destination_hub:hubs!shipments_destination_hub_id_fkey(code, name)
+      if (scanType === 'shipment') {
+        const { data: shipmentRow, error: shipmentErr } = await supabase
+          .from('shipments')
+          .select(
             `
-            )
-            .eq('cn_number', scannedData)
-            .maybeSingle();
+            id, cn_number, mode, status, package_count, total_weight,
+            consignor_name, consignee_name, consignee_phone,
+            customer:customers(name, phone, email),
+            origin_hub:hubs!shipments_origin_hub_id_fkey(code, name),
+            destination_hub:hubs!shipments_destination_hub_id_fkey(code, name)
+          `
+          )
+          .eq('cn_number', scannedData)
+          .maybeSingle();
 
-          if (cancelled) return;
-          if (shipmentErr) throw shipmentErr;
-          if (!shipmentRow) {
-            setError(`Shipment not found: ${scannedData}`);
-            setLoading(false);
-            return;
-          }
-
-          // Fetch invoice using the shipment ID we just got
-          const { data: invoiceRow, error: invoiceErr } = await supabase
-            .from('invoices')
-            .select(
-              `
-              *,
-              customer:customers(name, phone, email),
-              shipment:shipments(cn_number)
-            `
-            )
-            .eq('shipment_id', shipmentRow.id)
-            .is('deleted_at', null)
-            .maybeSingle();
-
-          if (cancelled) return;
-          if (invoiceErr) throw invoiceErr;
-
-          // ── ATOMIC state update: set both at once, no intermediate flash ──
-          if (!invoiceRow) {
-            setError(`No invoice found for shipment ${scannedData}`);
-          } else {
-            setInvoice(invoiceRow as unknown as InvoiceWithRelations);
-          }
-          setShipment(shipmentRow as unknown as ShipmentWithRelations);
-        } else if (scanType === 'manifest') {
-          const { data, error: err } = await supabase
-            .from('manifests')
-            .select(
-              `
-              *,
-              from_hub:hubs!manifests_from_hub_id_fkey(code, name),
-              to_hub:hubs!manifests_to_hub_id_fkey(code, name),
-              creator:staff!manifests_created_by_staff_id_fkey(full_name)
-            `
-            )
-            .eq('manifest_no', scannedData)
-            .maybeSingle();
-
-          if (cancelled) return;
-          if (err) throw err;
-          if (!data) {
-            setError(`Manifest not found: ${scannedData}`);
-          } else {
-            setManifest(data as unknown as ManifestWithRelations);
-          }
+        if (shipmentErr) throw shipmentErr;
+        if (!shipmentRow) {
+          throw new Error(`Shipment not found: ${scannedData}`);
         }
-      } catch (e) {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : 'Failed to fetch details');
+
+        const { data: invoiceRow, error: invoiceErr } = await supabase
+          .from('invoices')
+          .select(
+            `
+            *,
+            customer:customers(name, phone, email),
+            shipment:shipments(cn_number)
+          `
+          )
+          .eq('shipment_id', shipmentRow.id)
+          .is('deleted_at', null)
+          .maybeSingle();
+
+        if (invoiceErr) throw invoiceErr;
+        if (!invoiceRow) {
+          throw new Error(`No invoice found for shipment ${scannedData}`);
         }
-      } finally {
-        if (!cancelled) setLoading(false);
+
+        return {
+          type: 'shipment' as const,
+          invoice: invoiceRow as unknown as InvoiceWithRelations,
+          shipment: shipmentRow as unknown as ShipmentWithRelations,
+        };
+      } else if (scanType === 'manifest') {
+        const { data, error: err } = await supabase
+          .from('manifests')
+          .select(
+            `
+            *,
+            from_hub:hubs!manifests_from_hub_id_fkey(code, name),
+            to_hub:hubs!manifests_to_hub_id_fkey(code, name),
+            creator:staff!manifests_created_by_staff_id_fkey(full_name)
+          `
+          )
+          .eq('manifest_no', scannedData)
+          .maybeSingle();
+
+        if (err) throw err;
+        if (!data) {
+          throw new Error(`Manifest not found: ${scannedData}`);
+        }
+
+        return {
+          type: 'manifest' as const,
+          manifest: data as unknown as ManifestWithRelations,
+        };
       }
-    };
+      return null;
+    },
+    enabled: open && !!scannedData && scanType !== 'unknown',
+    retry: false,
+  });
 
-    fetchData();
-    return () => {
-      cancelled = true;
-    };
-  }, [open, scannedData, scanType]);
+  const error = queryError
+    ? queryError instanceof Error
+      ? queryError.message
+      : 'Failed to fetch details'
+    : null;
+  const invoice = previewData?.type === 'shipment' ? previewData.invoice : null;
+  const shipment = previewData?.type === 'shipment' ? previewData.shipment : null;
+  const manifest = previewData?.type === 'manifest' ? previewData.manifest : null;
 
   const handleNavigate = () => {
     onOpenChange(false);

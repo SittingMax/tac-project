@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Trash2, Plus, Upload, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
+import { bookingService } from '@/lib/services/bookingService';
 
 interface BookingFormProps {
   onSuccess?: () => void;
@@ -111,20 +112,8 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
         }
       }
 
-      // Create booking
-      const bookingData = {
-        user_id: user?.id || null, // Optional user binding
-        consignor_details: data.consignor,
-        consignee_details: data.consignee,
-        volume_matrix: data.volumeMatrix,
-        images: imageUrls,
-        whatsapp_number: data.whatsappNumber,
-        status: 'PENDING',
-      };
-
-      const { error } = await supabase.from('bookings').insert(bookingData);
-
-      if (error) throw error;
+      // Create booking via centralized service
+      await bookingService.createBooking(data, imageUrls, user?.id);
 
       toast.success('Booking request sent successfully!');
 
