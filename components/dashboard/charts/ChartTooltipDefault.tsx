@@ -2,7 +2,7 @@
 
 import { Bar, BarChart, XAxis } from 'recharts';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ChartContainer,
   ChartTooltip,
@@ -37,10 +37,12 @@ const chartConfig = {
 
 export function ChartTooltipDefault() {
   return (
-    <Card className="border-border bg-card shadow-sm h-full w-full">
-      <CardHeader>
-        <CardTitle>Current Fleet Status</CardTitle>
-        <CardDescription>Active vs idle fleet composition trends</CardDescription>
+    <Card className="flex flex-col h-full rounded-none border border-border/40 bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300 w-full">
+      <CardHeader className="pb-4 border-b border-border/40 space-y-0">
+        <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Current Fleet Status</CardTitle>
+        <div className="text-xl font-bold tracking-tighter text-foreground mt-1">
+          Active vs Idle Composition
+        </div>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6 flex-1">
         <ChartContainer config={chartConfig} className="aspect-auto h-[200px] w-full">
@@ -56,12 +58,12 @@ export function ChartTooltipDefault() {
                 });
               }}
             />
-            <Bar dataKey="running" stackId="a" fill="var(--color-running)" radius={[0, 0, 4, 4]} />
+            <Bar dataKey="running" stackId="a" fill="var(--color-running)" radius={0} />
             <Bar
               dataKey="swimming"
               stackId="a"
               fill="var(--color-swimming)"
-              radius={[4, 4, 0, 0]}
+              radius={0}
             />
             <ChartTooltip content={<ChartTooltipContent />} cursor={false} defaultIndex={1} />
           </BarChart>

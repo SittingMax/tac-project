@@ -167,15 +167,21 @@ export const routes: AppRoute[] = [
   { path: '/shift-report', element: ShiftReport, protected: true, layout: true },
   { path: '/notifications', element: Notifications, protected: true, layout: true },
 
-  // Other Protected Routes
-  { path: '/print/label/:awb', element: PrintLabel, protected: false, layout: false },
-  {
-    path: '/dev/ui-kit',
-    element: DevUIKit,
-    protected: true,
-    layout: false,
-    allowedRoles: ['ADMIN'],
-  },
+  // Print label — protected to prevent PII exposure (consignor/consignee details)
+  { path: '/print/label/:awb', element: PrintLabel, protected: true, layout: false },
+
+  // Dev-only routes — excluded from production builds via tree-shaking
+  ...(import.meta.env.DEV
+    ? [
+        {
+          path: '/dev/ui-kit',
+          element: DevUIKit,
+          protected: true as const,
+          layout: false as const,
+          allowedRoles: ['ADMIN'] as UserRole[],
+        },
+      ]
+    : []),
 
   // 404
   { path: '*', element: NotFound, protected: false, layout: false },

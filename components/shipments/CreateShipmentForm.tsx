@@ -10,6 +10,7 @@ import { Package, Truck, Plane, Zap, Clock } from 'lucide-react';
 import { useCustomers } from '@/hooks/useCustomers';
 import { useCreateShipment } from '@/hooks/useShipments';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const schema = z
   .object({
@@ -111,7 +112,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
         onSuccess();
       }, 500);
     } catch (e) {
-      console.error(e);
+      logger.error('CreateShipmentForm', 'Error', { error: e });
       toast.error('Failed to create shipment', {
         description: e instanceof Error ? e.message : 'Please check your internet connection.',
       });
@@ -126,7 +127,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
           <label className="block text-xs font-mono text-muted-foreground mb-1">ORIGIN HUB</label>
           <select
             {...register('originHub')}
-            className="w-full bg-background border border-input rounded-none px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
+            className="w-full bg-background border border-input rounded-none px-4 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
           >
             <option value="">Select Hub</option>
             {Object.values(HUBS).map((hub) => (
@@ -142,7 +143,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
           </label>
           <select
             {...register('destinationHub')}
-            className="w-full bg-background border border-input rounded-none px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
+            className="w-full bg-background border border-input rounded-none px-4 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
           >
             <option value="">Select Hub</option>
             {Object.values(HUBS).map((hub) => (
@@ -162,7 +163,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
         <label className="block text-xs font-mono text-muted-foreground mb-1">CUSTOMER</label>
         <select
           {...register('customerId')}
-          className="w-full bg-background border border-input rounded-none px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
+          className="w-full bg-background border border-input rounded-none px-4 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
         >
           <option value="">Select Customer</option>
           {customers.map((c) => (
@@ -291,7 +292,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
         />
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t border-border">
+      <div className="flex justify-end gap-4 pt-4 border-t border-border">
         <Button type="button" variant="ghost" onClick={onCancel}>
           Cancel
         </Button>

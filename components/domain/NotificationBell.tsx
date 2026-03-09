@@ -70,11 +70,11 @@ const NotificationRow: React.FC<NotificationRowProps> = ({
     <button
       onClick={handleClick}
       className={cn(
-        'w-full text-left rounded-none p-3 mb-2 border transition-all hover:bg-accent/50',
+        'w-full text-left rounded-none p-4 mb-2 border transition-all hover:bg-accent/50',
         notification.is_read ? 'opacity-60 border-transparent' : 'bg-accent/20 border-accent/30'
       )}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-4">
         <div
           className={cn(
             'w-8 h-8 rounded-none flex items-center justify-center flex-shrink-0',
@@ -175,7 +175,7 @@ export const NotificationBell: React.FC = () => {
 
       <DropdownMenuContent className="w-[380px] p-0" align="end" sideOffset={8}>
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b">
+        <div className="flex items-center justify-between px-4 py-2 border-b">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-sm">Notifications</span>
             {count > 0 && (
@@ -198,7 +198,7 @@ export const NotificationBell: React.FC = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="unread" className="w-full">
-          <div className="px-3 py-2 border-b">
+          <div className="px-4 py-2 border-b">
             <TabsList className="w-full grid grid-cols-2">
               <TabsTrigger value="unread" className="text-xs">
                 Unread ({unreadNotifications.length})
@@ -211,7 +211,7 @@ export const NotificationBell: React.FC = () => {
 
           <TabsContent value="unread" className="m-0">
             <ScrollArea className="h-[350px]">
-              <div className="p-3">
+              <div className="p-4">
                 {unreadNotifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 text-center">
                     <div className="w-12 h-12 rounded-none bg-muted flex items-center justify-center mb-3">
@@ -236,7 +236,7 @@ export const NotificationBell: React.FC = () => {
 
           <TabsContent value="all" className="m-0">
             <ScrollArea className="h-[350px]">
-              <div className="p-3">
+              <div className="p-4">
                 {allNotifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 text-center">
                     <div className="w-12 h-12 rounded-none bg-muted flex items-center justify-center mb-3">

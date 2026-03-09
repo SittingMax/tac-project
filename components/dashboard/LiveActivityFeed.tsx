@@ -3,16 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import { ScrollArea } from '../ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 import { useShipments } from '@/hooks/useShipments';
 import { useBookings } from '@/hooks/useBookings';
 import { useExceptions } from '@/hooks/useExceptions';
 import { formatDistanceToNow } from 'date-fns';
-import { Activity, Box, PackagePlus, AlertTriangle, ChevronRight, CircleDot } from 'lucide-react';
+import { Activity, Box, PackagePlus, AlertTriangle, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { STATUS_COLORS } from '@/lib/design-tokens';
-import { Skeleton } from '../ui/skeleton';
+import { DataTable } from '@/components/ui/data-table';
+import { ColumnDef } from '@tanstack/react-table';
 
 type FeedType = 'ALL' | 'SHIPMENTS' | 'BOOKINGS' | 'EXCEPTIONS';
 
@@ -103,114 +103,175 @@ export const LiveActivityFeed: React.FC = () => {
     return feedItems;
   }, [feedItems, filter]);
 
+  const columns: ColumnDef<FeedItem>[] = useMemo(
+    () => [
+      {
+        accessorKey: 'title',
+        header: 'Stream',
+        enableSorting: false,
+        cell: ({ row }) => {
+          const item = row.original;
+          const Icon = item.icon;
+          return (
+            <div className="flex items-center gap-3">
+              <Icon className={cn('w-4 h-4 flex-shrink-0', item.colorClass)} />
+              <span className="font-medium text-sm text-foreground whitespace-nowrap">
+                {item.title}
+              </span>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: 'description',
+        header: 'Details',
+        enableSorting: false,
+        cell: ({ row }) => {
+          return (
+            <span className="text-xs text-muted-foreground line-clamp-1">
+              {row.original.description}
+            </span>
+          );
+        },
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        enableSorting: false,
+        cell: ({ row }) => {
+          const item = row.original;
+          return (
+            <Badge
+              variant="secondary"
+              className={cn(
+                'text-[10px] h-5 px-2.5 rounded-full border-transparent bg-muted/40 font-medium tracking-wide whitespace-nowrap',
+                item.colorClass
+              )}
+            >
+              {item.status.replace(/_/g, ' ')}
+            </Badge>
+          );
+        },
+      },
+      {
+        accessorKey: 'timestamp',
+        header: 'Time',
+        enableSorting: false,
+        cell: ({ row }) => {
+          return (
+            <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+              {formatDistanceToNow(new Date(row.original.timestamp), { addSuffix: true })}
+            </span>
+          );
+        },
+      },
+      {
+        id: 'actions',
+        enableSorting: false,
+        cell: ({ row }) => {
+          return (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors hover:bg-primary/10 rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(row.original.link);
+              }}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          );
+        },
+      },
+    ],
+    [navigate]
+  );
+
   return (
-    <Card className="col-span-1 border-border/50 flex flex-col h-[420px]">
-      <div className="p-5 pb-3 border-b border-border/50">
+    <Card className="col-span-1 border-border/50 flex flex-col h-[500px]">
+      <div className="p-4 pb-0 border-b border-border/50">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold text-foreground">Operations Stream</h3>
+            <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <Activity className="w-5 h-5 text-primary" />
+              Operations Stream
+            </h3>
             <span className="flex h-2 w-2 relative ml-1">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-status-success opacity-75"></span>
-              <span className="relative inline-flex rounded-none h-2 w-2 bg-status-success"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success"></span>
             </span>
           </div>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={() => navigate('/shipments')}
-            className="text-xs"
+            className="text-xs shadow-sm bg-background/50 hover:bg-background/80"
           >
             View Console
           </Button>
         </div>
 
         <Tabs defaultValue="ALL" onValueChange={(v) => setFilter(v as FeedType)}>
-          <TabsList className="grid grid-cols-4 w-full h-8">
-            <TabsTrigger value="ALL" className="text-xs">
+          <TabsList className="flex w-full h-auto bg-transparent p-0 gap-6 justify-start rounded-none">
+            <TabsTrigger
+              value="ALL"
+              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-none"
+            >
               All
             </TabsTrigger>
-            <TabsTrigger value="SHIPMENTS" className="text-xs hidden sm:block">
+            <TabsTrigger
+              value="SHIPMENTS"
+              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-none hidden sm:block"
+            >
               Shipments
             </TabsTrigger>
-            <TabsTrigger value="SHIPMENTS" className="text-xs sm:hidden">
+            <TabsTrigger
+              value="SHIPMENTS"
+              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-none sm:hidden"
+            >
               Ship
             </TabsTrigger>
-            <TabsTrigger value="BOOKINGS" className="text-xs">
+            <TabsTrigger
+              value="BOOKINGS"
+              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-none"
+            >
               Book
             </TabsTrigger>
-            <TabsTrigger value="EXCEPTIONS" className="text-xs">
+            <TabsTrigger
+              value="EXCEPTIONS"
+              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-none"
+            >
               Alerts
             </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
-      <ScrollArea className="flex-1 p-5">
-        <div className="space-y-6">
-          {isLoading ? (
-            Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex gap-4 items-start pl-6 relative">
-                <Skeleton className="w-4 h-4 rounded-full absolute left-0" />
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        {isLoading ? (
+          <div className="p-4 space-y-4 flex-1 overflow-auto">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex gap-4 items-center">
+                <div className="w-8 h-8 rounded-none bg-muted animate-pulse" />
                 <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-1/3" />
-                  <Skeleton className="h-3 w-2/3" />
+                  <div className="h-4 w-1/3 bg-muted animate-pulse rounded-none" />
+                  <div className="h-3 w-2/3 bg-muted animate-pulse rounded-none" />
                 </div>
               </div>
-            ))
-          ) : filteredItems.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              <Activity className="w-8 h-8 opacity-20 mx-auto mb-3" />
-              No recent activity found.
-            </div>
-          ) : (
-            filteredItems.map((item, index) => (
-              <button
-                key={item.id}
-                type="button"
-                className="w-full text-left relative pl-6 group cursor-pointer block"
-                onClick={() => navigate(item.link)}
-              >
-                {/* Timeline line */}
-                {index !== filteredItems.length - 1 && (
-                  <div className="absolute left-[7px] top-6 bottom-[-24px] w-px bg-border group-hover:bg-primary/30 transition-colors" />
-                )}
-
-                {/* Timeline node */}
-                <div className="absolute left-0 top-1">
-                  <CircleDot className={cn('w-4 h-4 bg-background', item.colorClass)} />
-                </div>
-
-                {/* Content block */}
-                <div className="flex justify-between items-start gap-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
-                        {item.title}
-                      </span>
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          'text-[10px] h-4 px-1 border-current opacity-70',
-                          item.colorClass
-                        )}
-                      >
-                        {item.status.replace(/_/g, ' ')}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-1">{item.description}</p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                    <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                      {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
-                    </span>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity translate-x-1 group-hover:translate-x-0" />
-                  </div>
-                </div>
-              </button>
-            ))
-          )}
-        </div>
-      </ScrollArea>
+            ))}
+          </div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={filteredItems}
+            enableSelection={false}
+            enableRowDrag={false}
+            pageSize={10}
+            className="flex-1 flex flex-col min-h-0 border-none shadow-none bg-transparent pt-2 px-4"
+          />
+        )}
+      </div>
     </Card>
   );
 };

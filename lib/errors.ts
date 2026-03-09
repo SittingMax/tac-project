@@ -4,6 +4,7 @@
  */
 
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // ERROR TYPES
@@ -220,7 +221,7 @@ export const showInfoToast = (message: string, title?: string) => {
 // ============================================================================
 
 export const handleMutationError = (error: unknown, context?: string) => {
-  console.error(`[Mutation Error${context ? ` - ${context}` : ''}]:`, error);
+  logger.error('MutationError', context || 'Unhandled mutation error', { error });
 
   const appError =
     error instanceof Error

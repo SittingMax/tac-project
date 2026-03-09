@@ -202,7 +202,7 @@ export default function VerticalTabs() {
                   </motion.div>
                 </AnimatePresence>
 
-                <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 flex gap-2 md:gap-3 z-20">
+                <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 flex gap-2 md:gap-4 z-20">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

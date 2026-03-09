@@ -5,8 +5,9 @@ import { useCallback, useRef, useState, useEffect } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useAutoResizeTextarea } from '@/hooks/use-auto-resize-textarea';
-// import { useChat } from '@ai-sdk/react'; // Removed for UI-only mock
 import Markdown from 'react-markdown';
+import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
@@ -18,8 +19,8 @@ type Message = {
   parts: { type: 'text'; text: string }[];
 };
 
-// Mock useChat hook
-function useMockChat({ onFinish }: { onFinish?: (opts: { message: Message }) => void } = {}) {
+// Real Supabase AI Chat hook
+function useAIChat({ onFinish }: { onFinish?: (opts: { message: Message }) => void } = {}) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -33,6 +34,7 @@ function useMockChat({ onFinish }: { onFinish?: (opts: { message: Message }) => 
     },
   ]);
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming'>('ready');
+  const [error, setError] = useState<Error | undefined>(undefined);
 
   const sendMessage = async ({ parts }: { parts: { type: 'text'; text: string }[] }) => {
     const userText = parts.map((p) => p.text).join('');
@@ -42,59 +44,41 @@ function useMockChat({ onFinish }: { onFinish?: (opts: { message: Message }) => 
       parts: [{ type: 'text', text: userText }],
     };
 
+    const historyForAi = messages.map((m) => ({
+      role: m.role,
+      content: m.parts.map((p) => p.text).join(''),
+    }));
+    historyForAi.push({ role: 'user', content: userText });
+
     setMessages((prev) => [...prev, userMsg]);
-    setStatus('submitted');
+    setStatus('streaming');
+    setError(undefined);
 
-    // Simulate network delay and streaming
-    setTimeout(async () => {
-      setStatus('streaming');
-      const botMsgId = (Date.now() + 1).toString();
-      // Determine response based on keywords for a bit more realism in the UI demo
-      let responseText =
-        'Thagatchari for your message! I am a simulated UI demo. In the real app, I would connect to the TAC AI backend to track shipments (e.g., TAC-12345) or answer service queries. How else can I assist?';
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('tac-bot', {
+        body: { messages: historyForAi },
+      });
 
-      if (
-        userText.toLowerCase().includes('track') ||
-        userText.toLowerCase().includes('CN Number')
-      ) {
-        responseText =
-          'I can help with tracking! Please provide your **CN Number**, **Full Name**, and **Phone Number** so I can check the status.';
-      } else if (
-        userText.toLowerCase().includes('price') ||
-        userText.toLowerCase().includes('rate')
-      ) {
-        responseText =
-          'For accurate pricing, I need the **weight**, **dimensions**, and **destination** of your shipment. We offer Air Cargo and Surface Transport.';
-      }
+      if (fnError) throw fnError;
 
-      // Streaming simulation
-      let currentText = '';
-      const words = responseText.split(' ');
-
+      const responseText = data.content || '';
       const botMsg: Message = {
-        id: botMsgId,
+        id: (Date.now() + 1).toString(),
         role: 'assistant',
-        parts: [{ type: 'text', text: '' }],
+        parts: [{ type: 'text', text: responseText }],
       };
+
       setMessages((prev) => [...prev, botMsg]);
-
-      for (let i = 0; i < words.length; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 50)); // typing speed
-        currentText += (i === 0 ? '' : ' ') + words[i];
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === botMsgId ? { ...m, parts: [{ type: 'text', text: currentText }] } : m
-          )
-        );
-      }
-
       setStatus('ready');
-      if (onFinish)
-        onFinish({ message: { ...botMsg, parts: [{ type: 'text', text: currentText }] } });
-    }, 1000);
+      if (onFinish) onFinish({ message: botMsg });
+    } catch (err: unknown) {
+      logger.error('TacBot', 'AI Error', { error: err });
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+      setStatus('ready');
+    }
   };
 
-  return { messages, status, error: undefined, sendMessage };
+  return { messages, status, error, sendMessage };
 }
 
 function AiInput({
@@ -160,7 +144,7 @@ export function TacBot() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
 
-  const { messages, status, error, sendMessage } = useMockChat({
+  const { messages, status, error, sendMessage } = useAIChat({
     onFinish: ({ message }) => {
       const duration = (Date.now() - startTimeRef.current) / 1000;
       setResponseTimes((prev) => ({ ...prev, [message.id]: duration }));
@@ -214,7 +198,7 @@ export function TacBot() {
       <DialogContent className="sm:max-w-[450px] w-[95vw] h-[600px] max-h-[85vh] p-0 gap-0 border-border/50 bg-background/95 backdrop-blur-lg shadow-2xl flex flex-col overflow-hidden data-[state=closed]:slide-out-to-bottom-[48%] data-[state=open]:slide-in-from-bottom-[48%] duration-500 rounded-none">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border/40 p-4 bg-muted/20">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-none bg-primary/10 ring-1 ring-primary/20">
               <Bot className="h-6 w-6 text-primary" />
             </div>
@@ -239,7 +223,7 @@ export function TacBot() {
               >
                 <div
                   className={cn(
-                    'flex w-max max-w-[85%] rounded-none px-5 py-3 text-sm shadow-sm',
+                    'flex w-max max-w-[85%] rounded-none px-4 py-2 text-sm shadow-sm',
                     m.role === 'user'
                       ? 'ml-auto bg-primary text-primary-foreground rounded-none'
                       : 'bg-muted/80 backdrop-blur-md text-foreground rounded-none border border-border/50'
@@ -284,7 +268,7 @@ export function TacBot() {
           )}
 
           {error && (
-            <div className="rounded-none bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20">
+            <div className="rounded-none bg-destructive/10 p-4 text-sm text-destructive border border-destructive/20">
               Something went wrong. Please try again.
             </div>
           )}

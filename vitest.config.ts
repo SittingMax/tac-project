@@ -9,6 +9,18 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./tests/unit/setup.ts'],
     include: ['tests/unit/**/*.{test,spec}.{ts,tsx}'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov', 'json-summary'],
+      include: ['lib/**', 'hooks/**', 'store/**', 'components/**', 'pages/**'],
+      exclude: ['**/*.d.ts', '**/database.types.ts', '**/index.ts'],
+      thresholds: {
+        statements: 30,
+        branches: 25,
+        functions: 25,
+        lines: 30,
+      },
+    },
   },
   resolve: {
     alias: {

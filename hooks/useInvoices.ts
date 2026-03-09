@@ -5,6 +5,7 @@ import { getOrCreateDefaultOrg } from '../lib/org-helper';
 import { InvoiceStatus } from '../types';
 
 import type { Database } from '../lib/database.types';
+import { useAuthStore } from '../store/authStore';
 
 type Json = Database['public']['Tables']['invoices']['Row']['line_items'];
 
@@ -104,14 +105,16 @@ export function useInvoice(id: string | null) {
  * Used when navigating from scanned shipment to invoice page.
  */
 export function useInvoiceByAWB(awb: string | null) {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useQuery({
-    queryKey: ['invoice', 'CN Number', awb],
+    queryKey: ['invoice', 'CN Number', awb, orgId],
     queryFn: async () => {
       // First get the shipment ID from AWB
       const { data: shipment, error: shipmentError } = await supabase
         .from('shipments')
         .select('id')
         .eq('cn_number', awb!)
+        .eq('org_id', orgId!)
         .maybeSingle();
 
       if (shipmentError) throw shipmentError;

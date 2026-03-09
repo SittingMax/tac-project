@@ -1,12 +1,13 @@
 import React from 'react';
-import { Shipment } from '../../types';
+import { Shipment } from '@/types';
 import { useNavigate } from 'react-router-dom';
-import { useTrackingEvents } from '../../hooks/useTrackingEvents';
-import { useAuthStore } from '../../store/authStore';
-import { Button } from '../ui/button';
-import { Card } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { STATUS_COLORS } from '../../lib/design-tokens';
+import { useTrackingEvents } from '@/hooks/useTrackingEvents';
+import { useAuthStore } from '@/store/authStore';
+import { logger } from '@/lib/logger';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { STATUS_COLORS } from '@/lib/design-tokens';
 import {
   Printer,
   X,
@@ -23,10 +24,10 @@ import {
   ArrowRight,
   Activity,
 } from 'lucide-react';
-import { HUBS } from '../../lib/constants';
+import { HUBS } from '@/lib/constants';
 import { toast } from 'sonner';
-import { NotesPanel } from '../domain/NotesPanel';
-import { UniversalBarcodePreset } from '../barcodes';
+import { NotesPanel } from '@/components/domain/NotesPanel';
+import { UniversalBarcodePreset } from '@/components/barcodes';
 import { ShipmentStepper } from './ShipmentStepper';
 
 interface Props {
@@ -66,7 +67,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
       }
       setTimeout(() => localStorage.removeItem(storageKey), 30000);
     } catch (error) {
-      console.error('Label error:', error);
+      logger.error('ShipmentDetails', 'Label error', { error });
       toast.error('Failed to open label');
     }
   };
@@ -80,7 +81,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card border border-border p-6 rounded-none shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-primary/10 rounded-none">
+          <div className="p-4 bg-primary/10 rounded-none">
             {shipment.mode === 'AIR' ? (
               <Plane className="w-8 h-8 text-primary" />
             ) : (
@@ -88,11 +89,11 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
             )}
           </div>
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <h2 className="text-3xl font-black tracking-tight font-mono text-foreground">
                 {shipment.awb}
               </h2>
-              <Badge className={`${STATUS_COLORS[shipment.status]} px-3 py-1 text-xs shadow-sm`}>
+              <Badge className={`${STATUS_COLORS[shipment.status]} px-2 py-1 text-xs shadow-sm`}>
                 {shipment.status}
               </Badge>
             </div>
@@ -108,7 +109,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap gap-3 w-full md:w-auto">
+        <div className="flex flex-wrap gap-2 w-full md:w-auto">
           <Button
             onClick={() => navigate(`/tracking?cn=${shipment.awb}`)}
             variant="default"
@@ -172,7 +173,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
 
                 {/* Mode Icon (Center) */}
                 <div className="relative z-10 bg-card px-2">
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-none bg-muted border border-border text-xs font-medium text-foreground shadow-sm">
+                  <div className="flex items-center gap-2 px-2 py-1.5 rounded-none bg-muted border border-border text-xs font-medium text-foreground shadow-sm">
                     {shipment.mode === 'AIR' ? (
                       <Plane className="w-3.5 h-3.5" />
                     ) : (
@@ -265,7 +266,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
                   ))
                 ) : (
                   <div className="text-center py-8 text-muted-foreground bg-muted/20 rounded-none">
-                    <Clock className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                    <Clock className="w-10 h-10 mx-auto mb-2 opacity-20" />
                     <p>No tracking events recorded yet.</p>
                   </div>
                 )}
@@ -278,12 +279,12 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
         <div className="space-y-6 overflow-hidden min-w-0">
           {/* Customer Info */}
           <Card className="border-border/60 shadow-sm">
-            <div className="p-5 border-b border-border bg-muted/20">
+            <div className="p-6 border-b border-border bg-muted/20">
               <h3 className="font-semibold flex items-center gap-2">
                 <User className="w-4 h-4 text-primary" /> Customer Details
               </h3>
             </div>
-            <div className="p-5 space-y-4">
+            <div className="p-6 space-y-4">
               <div>
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">Name</span>
                 <div className="font-medium text-lg text-foreground">{shipment.customerName}</div>
@@ -311,7 +312,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
                 </div>
               </div>
             </div>
-            <div className="p-3 bg-muted/30 border-t border-border">
+            <div className="p-4 bg-muted/30 border-t border-border">
               <Button variant="ghost" size="sm" className="w-full text-xs h-8">
                 View Full Profile <ArrowRight className="w-3 h-3 ml-1" />
               </Button>

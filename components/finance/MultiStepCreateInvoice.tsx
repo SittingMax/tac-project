@@ -23,6 +23,7 @@ import { Invoice, Shipment } from '@/types';
 import { LabelPreviewDialog } from '@/components/domain/LabelPreviewDialog';
 import { generateLabelFromFormData } from '@/lib/utils/label-utils';
 import { HUBS } from '@/lib/constants';
+import { logger } from '@/lib/logger';
 import { normalizeCustomerAddress } from '@/lib/utils/address-utils';
 
 import { useMultiStepInvoice, steps, InvoiceFormData } from '@/hooks/useMultiStepInvoice';
@@ -245,7 +246,7 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
 
       onSuccess(invoiceForDialog, (selectedShipment as Shipment) || undefined);
     } catch (error) {
-      console.error('Submission error:', error);
+      logger.error('MultiStepCreateInvoice', 'Submission error', { error });
       toast.error('Failed to create invoice.');
       throw error;
     }
@@ -328,14 +329,14 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
         <div className="flex flex-col h-full max-w-4xl mx-auto w-full min-h-[70vh]">
           {/* Progress Header */}
           <div className="mb-6">
-            <div className="flex flex-wrap items-end justify-between gap-3 mb-2">
+            <div className="flex flex-wrap items-end justify-between gap-4 mb-2">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">
                   {steps[currentStep].title}
                 </h2>
                 <p className="text-muted-foreground text-sm">{steps[currentStep].description}</p>
               </div>
-              <div className="text-xs font-semibold tracking-wide uppercase text-muted-foreground border border-border/60 bg-muted/40 px-3 py-1 rounded-none">
+              <div className="text-xs font-semibold tracking-wide uppercase text-muted-foreground border border-border/60 bg-muted/40 px-4 py-1 rounded-none">
                 Step {currentStep + 1} of {steps.length}
               </div>
             </div>

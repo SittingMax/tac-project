@@ -102,7 +102,7 @@ export const FlightCard = React.forwardRef<HTMLDivElement, FlightCardProps>(
 
               {/* Center Graphic */}
               <div className="flex-1 flex flex-col items-center justify-center pb-4 px-4">
-                <div className="w-full flex items-center gap-3 opacity-80">
+                <div className="w-full flex items-center gap-4 opacity-80">
                   <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-foreground/50 to-transparent" />
                   <Plane className="h-6 w-6 text-foreground rotate-90 mx-auto" />
                   <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-foreground/50 to-transparent" />

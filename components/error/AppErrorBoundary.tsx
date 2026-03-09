@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/logger';
 import {
   Card,
   CardContent,
@@ -48,8 +49,7 @@ export class AppErrorBoundary extends Component<Props, State> {
 
     // Log to console in development
     if (import.meta.env.DEV) {
-      console.error('Error caught by boundary:', error);
-      console.error('Component stack:', errorInfo.componentStack);
+      logger.captureError('AppErrorBoundary', error, { componentStack: errorInfo.componentStack });
     }
 
     // Call custom error handler if provided
@@ -100,7 +100,7 @@ export class AppErrorBoundary extends Component<Props, State> {
               )}
             </CardContent>
 
-            <CardFooter className="flex gap-3 justify-center">
+            <CardFooter className="flex gap-4 justify-center">
               <Button variant="outline" onClick={this.handleGoHome}>
                 <Home className="mr-2 h-4 w-4" />
                 Go Home

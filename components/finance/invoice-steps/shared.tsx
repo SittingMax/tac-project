@@ -12,7 +12,7 @@ export const SectionHeader: React.FC<{
   title: string;
   action?: React.ReactNode;
 }> = ({ icon: Icon, title, action }) => (
-  <div className="flex items-center justify-between pb-3 mb-4 border-b border-border/40">
+  <div className="flex items-center justify-between pb-2 mb-4 border-b border-border/40">
     <div className="flex items-center gap-2.5">
       <div className="p-1.5 rounded-none bg-primary/10 text-primary border border-primary/20">
         <Icon className="w-4 h-4" />
@@ -107,7 +107,7 @@ export const CustomerSearch: React.FC<{
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="flex items-center border-b border-border px-3">
+        <div className="flex items-center border-b border-border px-2">
           <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
           <Input
             ref={inputRef}
@@ -127,7 +127,7 @@ export const CustomerSearch: React.FC<{
                   key={c.id}
                   type="button"
                   onClick={() => handleSelect(c)}
-                  className="w-full text-left flex flex-col items-start gap-0.5 cursor-pointer rounded-none px-3 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground transition-colors"
+                  className="w-full text-left flex flex-col items-start gap-0.5 cursor-pointer rounded-none px-2 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
                   <div className="text-xs font-bold text-foreground flex items-center justify-between w-full">
                     <span>{c.companyName || c.name}</span>

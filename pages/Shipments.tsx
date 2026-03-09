@@ -31,7 +31,7 @@ import { ShipmentDetails } from '@/components/shipments/ShipmentDetails';
 import { useShipments, useHardDeleteShipment, ShipmentWithRelations } from '@/hooks/useShipments';
 import { getShipmentsColumns } from '@/components/shipments/shipments.columns';
 import { useAuthStore } from '@/store/authStore';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 
 // Types
 import { adaptToShipment } from '@/lib/utils/shipment-adapter';
@@ -204,7 +204,7 @@ export const Shipments: React.FC = () => {
           );
         }}
         toolbar={
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <Button
               variant="ghost"
               onClick={() => {

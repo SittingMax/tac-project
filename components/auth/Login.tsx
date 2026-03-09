@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '../../store/authStore';
 import { useStore } from '../../store';
@@ -11,12 +11,13 @@ import {
   Mail,
   Lock,
   Shield,
-  Clock,
   LogIn,
-  Box,
   Wifi,
   Loader2,
+  AlertCircle,
+  Check,
 } from 'lucide-react';
+import { TacLogo } from '@/components/shared/tac-logo';
 import { AnimatedThemeToggler } from '../../components/ui/animated-theme-toggler';
 import { gsap } from '@/lib/gsap';
 
@@ -27,6 +28,8 @@ export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [focusedField, setFocusedField] = useState<'email' | 'password' | null>(null);
 
   // Animation refs
   const cardRef = useRef<HTMLDivElement>(null);
@@ -36,36 +39,35 @@ export const Login: React.FC = () => {
   // Entrance animation
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      const tl = gsap.timeline({ defaults: { ease: 'power4.inOut' } });
 
-      // Card entrance
+      // Card entrance (sharp reveal)
       tl.fromTo(
         cardRef.current,
-        { opacity: 0, y: 24, scale: 0.96 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.7 }
+        { opacity: 0, y: 40, clipPath: 'inset(100% 0% 0% 0%)' },
+        { opacity: 1, y: 0, clipPath: 'inset(0% 0% 0% 0%)', duration: 0.8 }
       );
 
-      // Image panel
+      // Image panel (sharp left-to-right reveal)
       tl.fromTo(
         imageRef.current,
-        { opacity: 0, scale: 1.05 },
-        { opacity: 1, scale: 1, duration: 0.8 },
-        '-=0.5'
+        { opacity: 0, x: -20, clipPath: 'inset(0% 100% 0% 0%)' },
+        { opacity: 1, x: 0, clipPath: 'inset(0% 0% 0% 0%)', duration: 0.8 },
+        '-=0.6'
       );
 
-      // Form items stagger
+      // Form items stagger (sharp right-to-left slide)
       if (formItemsRef.current) {
         tl.fromTo(
           formItemsRef.current.children,
-          { opacity: 0, y: 12 },
-          { opacity: 1, y: 0, duration: 0.5, stagger: 0.08 },
-          '-=0.4'
+          { opacity: 0, x: 20 },
+          { opacity: 1, x: 0, duration: 0.6, stagger: 0.1 },
+          '-=0.6'
         );
       }
     }, cardRef);
 
     return () => ctx.revert();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Redirect if already authenticated
@@ -103,10 +105,28 @@ export const Login: React.FC = () => {
     if (result.success) {
       const currentUser = useAuthStore.getState().user;
       if (currentUser) {
-        toast.success(`Welcome back, ${currentUser.fullName} !`);
+        toast(
+          <div className="flex items-center gap-3">
+            <div className="relative w-10 h-10 rounded-none bg-status-success/20 border border-status-success/30 flex items-center justify-center shrink-0 overflow-hidden">
+              <span className="absolute inset-0 inline-flex h-full w-full rounded-none bg-status-success/40 opacity-75 animate-ping"></span>
+              <img src="/lottie/login-success.gif" alt="Success" className="w-8 h-8 relative z-10 object-contain" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-mono font-bold uppercase tracking-widest text-xs text-foreground">Login Successful</span>
+              <span className="text-[10px] font-mono text-muted-foreground">Welcome back, {currentUser.fullName}!</span>
+            </div>
+          </div>,
+          {
+            className: 'rounded-none border border-border/50 bg-background shadow-xl p-4',
+            duration: 4000,
+          }
+        );
       }
     } else {
-      toast.error(result.error || 'Login failed');
+      toast.error(result.error || 'Login failed', {
+        className:
+          'rounded-none border border-destructive/50 bg-background shadow-xl font-mono uppercase tracking-widest text-xs',
+      });
     }
   };
 
@@ -122,10 +142,10 @@ export const Login: React.FC = () => {
       </div>
 
       {/* Top Controls */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-5 sm:p-6">
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 sm:p-6">
         <button
           onClick={() => navigate('/')}
-          className="group flex items-center gap-2 rounded-none border border-border/40 bg-background/50 backdrop-blur-md px-3 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-background/80 hover:border-border transition-all"
+          className="group flex items-center gap-2 rounded-none border border-border/40 bg-background/50 backdrop-blur-md px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-background/80 hover:border-border transition-all"
           aria-label="Back to home"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -156,7 +176,7 @@ export const Login: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-tr from-black/60 via-black/30 to-transparent" />
 
                 {/* Overlay badge */}
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-none border border-white/10 bg-black/30 px-3 py-2 backdrop-blur-md">
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-none border border-white/10 bg-black/30 px-4 py-2 backdrop-blur-md">
                   <div className="flex items-center gap-2 text-xs text-white/80">
                     <div className="flex h-5 w-5 items-center justify-center rounded-none bg-primary/30 text-primary">
                       <Wifi className="h-3 w-3" />
@@ -168,23 +188,11 @@ export const Login: React.FC = () => {
               </div>
 
               {/* Form (Right) */}
-              <div className="p-5 sm:p-8 w-full sm:w-1/2">
+              <div className="p-4 sm:p-8 w-full sm:w-1/2">
                 <div ref={formItemsRef}>
                   {/* Logo */}
                   <div className="mb-6 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-3 group/logo">
-                      <div className="grid h-10 w-10 place-items-center text-foreground/80 bg-foreground/5 border border-foreground/10 rounded-none shadow-sm group-hover/logo:bg-foreground/10 transition-colors">
-                        <Box className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-mono tracking-widest text-muted-foreground uppercase">
-                          TAC
-                        </div>
-                        <div className="text-[22px] tracking-tight font-semibold leading-tight text-foreground">
-                          Cargo
-                        </div>
-                      </div>
-                    </Link>
+                    <TacLogo size="lg" showSubtitle />
                     <div className="text-[10px] font-mono text-muted-foreground/60 tracking-wider">
                       v4.1
                     </div>
@@ -192,81 +200,125 @@ export const Login: React.FC = () => {
 
                   {/* Heading */}
                   <div className="mb-7">
-                    <h1 className="text-[26px] font-semibold tracking-tight text-foreground">
+                    <h1 className="text-[26px] font-bold tracking-tight text-foreground uppercase">
                       Welcome back
                     </h1>
-                    <p className="mt-1.5 text-sm text-muted-foreground">
+                    <p className="mt-1.5 text-xs font-mono uppercase tracking-widest text-muted-foreground">
                       Sign in to your logistics dashboard.
                     </p>
                   </div>
 
-                  {/* Error */}
+                  {/* Error Message - Enhanced Design */}
                   {error && (
                     <div
                       data-testid="login-error-message"
                       role="alert"
                       aria-live="polite"
-                      className="mb-5 p-3 rounded-none border border-destructive/30 bg-destructive/10 text-destructive dark:text-red-300 text-sm backdrop-blur-sm"
+                      className="mb-5 flex items-start gap-3 p-4 rounded-none border border-destructive/30 bg-destructive/10 text-destructive dark:text-destructive text-sm backdrop-blur-sm animate-in fade-in slide-in-from-top-2"
                     >
-                      {error}
+                      <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-mono uppercase tracking-widest text-xs font-bold">
+                          Authentication failed
+                        </p>
+                        <p className="text-destructive/80 text-[10px] font-mono mt-0.5">{error}</p>
+                      </div>
                     </div>
                   )}
 
                   {/* Form */}
-                  <form onSubmit={handleLogin} className="space-y-5">
-                    {/* Email */}
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    {/* Email Field - Enhanced */}
                     <div className="space-y-2">
                       <label
                         htmlFor="login-email"
-                        className="block text-xs font-mono uppercase tracking-wider text-muted-foreground"
+                        className="block text-xs font-mono font-bold uppercase tracking-widest text-foreground"
                       >
-                        Email
+                        Email address
                       </label>
-                      <div className="group/input relative flex items-center rounded-none border border-border bg-foreground/[0.03] px-3 py-3 transition-all hover:border-border/80 focus-within:border-primary/40 focus-within:bg-foreground/[0.05] focus-within:shadow-[0_0_0_3px] focus-within:shadow-primary/10">
-                        <Mail className="mr-2.5 h-4 w-4 text-muted-foreground shrink-0" />
+                      <div
+                        className={`group/input relative flex items-center rounded-none border bg-background px-4 h-12 transition-all duration-200 ${
+                          focusedField === 'email'
+                            ? 'border-primary ring-2 ring-primary/10'
+                            : 'border-border hover:border-border/80'
+                        } ${error ? 'border-destructive/50 ring-1 ring-destructive/20' : ''}`}
+                      >
+                        <Mail
+                          className={`mr-3 h-5 w-5 shrink-0 transition-colors ${
+                            focusedField === 'email' ? 'text-primary' : 'text-muted-foreground'
+                          }`}
+                        />
                         <input
                           id="login-email"
                           type="email"
                           inputMode="email"
                           autoComplete="email"
-                          placeholder="you@company.com"
+                          placeholder="name@company.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
+                          onFocus={() => setFocusedField('email')}
+                          onBlur={() => setFocusedField(null)}
                           disabled={isLoading}
                           data-testid="login-email-input"
                           aria-describedby={error ? 'login-error-message' : undefined}
-                          className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none disabled:opacity-50"
+                          className="w-full bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none disabled:opacity-50"
                         />
+                        {email && <Check className="ml-2 h-4 w-4 text-status-success shrink-0" />}
                       </div>
                     </div>
 
-                    {/* Password */}
+                    {/* Password Field - Enhanced */}
                     <div className="space-y-2">
-                      <label
-                        htmlFor="login-password"
-                        className="block text-xs font-mono uppercase tracking-wider text-muted-foreground"
+                      <div className="flex items-center justify-between">
+                        <label
+                          htmlFor="login-password"
+                          className="block text-xs font-mono font-bold uppercase tracking-widest text-foreground"
+                        >
+                          Password
+                        </label>
+                        <a
+                          href="#"
+                          className="text-xs font-mono uppercase tracking-widest text-primary hover:text-primary/80 hover:underline transition-colors"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            toast.info('Password reset coming soon');
+                          }}
+                        >
+                          Forgot password?
+                        </a>
+                      </div>
+                      <div
+                        className={`group/input relative flex items-center rounded-none border bg-background px-4 h-12 transition-all duration-200 ${
+                          focusedField === 'password'
+                            ? 'border-primary ring-2 ring-primary/10'
+                            : 'border-border hover:border-border/80'
+                        } ${error ? 'border-destructive/50 ring-1 ring-destructive/20' : ''}`}
                       >
-                        Password
-                      </label>
-                      <div className="group/input relative flex items-center rounded-none border border-border bg-foreground/[0.03] px-3 py-3 transition-all hover:border-border/80 focus-within:border-primary/40 focus-within:bg-foreground/[0.05] focus-within:shadow-[0_0_0_3px] focus-within:shadow-primary/10">
-                        <Lock className="mr-2.5 h-4 w-4 text-muted-foreground shrink-0" />
+                        <Lock
+                          className={`mr-3 h-5 w-5 shrink-0 transition-colors ${
+                            focusedField === 'password' ? 'text-primary' : 'text-muted-foreground'
+                          }`}
+                        />
                         <input
                           id="login-password"
                           type={showPassword ? 'text' : 'password'}
                           autoComplete="current-password"
-                          placeholder="••••••••"
+                          placeholder="Enter your password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
+                          onFocus={() => setFocusedField('password')}
+                          onBlur={() => setFocusedField(null)}
                           disabled={isLoading}
                           data-testid="login-password-input"
                           aria-describedby={error ? 'login-error-message' : undefined}
-                          className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none disabled:opacity-50"
+                          className="w-full bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none disabled:opacity-50"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="ml-2 grid h-8 w-8 shrink-0 place-items-center rounded-none text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
-                          aria-label="Toggle password visibility"
+                          className="ml-2 grid h-8 w-8 shrink-0 place-items-center rounded-none text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          title={showPassword ? 'Hide password' : 'Show password'}
                         >
                           {showPassword ? (
                             <EyeOff className="h-4 w-4" />
@@ -277,26 +329,50 @@ export const Login: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Submit */}
-                    <div className="pt-1">
+                    {/* Remember Me & Submit */}
+                    <div className="space-y-4">
+                      {/* Remember Me Checkbox */}
+                      <label className="flex items-center gap-2 cursor-pointer group">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                            disabled={isLoading}
+                            className="peer sr-only"
+                          />
+                          <div className="w-5 h-5 rounded-none border border-border bg-background flex items-center justify-center transition-colors peer-checked:bg-primary peer-checked:border-primary peer-disabled:opacity-50 group-hover:border-primary/50">
+                            {rememberMe && (
+                              <Check className="w-3.5 h-3.5 text-primary-foreground" />
+                            )}
+                          </div>
+                        </div>
+                        <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors">
+                          Remember me for 30 days
+                        </span>
+                      </label>
+
+                      {/* Submit Button - Enhanced */}
                       <button
                         type="submit"
                         disabled={isLoading}
                         data-testid="login-submit-button"
-                        className="group/btn relative w-full inline-flex items-center justify-center rounded-none bg-primary h-12 px-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 outline-none ring-1 ring-primary/30 transition-all hover:shadow-xl hover:shadow-primary/35 hover:brightness-110 hover:-translate-y-px active:translate-y-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+                        className="group/btn relative w-full inline-flex items-center justify-center rounded-none bg-primary h-12 px-4 text-xs font-mono font-bold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 outline-none transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 overflow-hidden"
                       >
-                        <span className="absolute inset-0 -z-10 rounded-none bg-primary/20 opacity-0 blur-xl transition-opacity group-hover/btn:opacity-100" />
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Signing in...
-                          </>
-                        ) : (
-                          <>
-                            <LogIn className="mr-2 h-4 w-4" />
-                            Sign in
-                          </>
-                        )}
+                        <div className="absolute inset-0 h-full w-full scale-0 rounded-none transition-all duration-300 ease-out group-hover/btn:scale-100 group-hover/btn:bg-primary-foreground/10"></div>
+                        <span className="relative z-10 flex items-center">
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Authenticating...
+                            </>
+                          ) : (
+                            <>
+                              <LogIn className="mr-2 h-4 w-4" />
+                              Sign in to Dashboard
+                            </>
+                          )}
+                        </span>
                       </button>
                     </div>
                   </form>
@@ -304,15 +380,20 @@ export const Login: React.FC = () => {
               </div>
             </div>
 
-            {/* Bottom footer */}
-            <div className="flex items-center justify-between rounded-none border-t border-black/5 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.04] px-6 py-3 text-[11px] text-muted-foreground dark:text-white/55">
+            {/* Bottom footer - Enhanced */}
+            <div className="flex items-center justify-between rounded-none border-t border-border/50 bg-muted/30 px-6 py-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
               <div className="flex items-center gap-2">
-                <Shield className="h-3.5 w-3.5" />
-                <span>Secured access</span>
+                <Shield className="h-4 w-4 text-status-success" />
+                <span>256-bit SSL encrypted</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-3.5 w-3.5" />
-                <span>Contact admin for access</span>
+              <div className="flex items-center gap-4">
+                <span className="hidden sm:inline">Need help?</span>
+                <a
+                  href="mailto:support@tac-cargo.com"
+                  className="hover:text-foreground hover:underline transition-colors"
+                >
+                  Contact support
+                </a>
               </div>
             </div>
           </div>

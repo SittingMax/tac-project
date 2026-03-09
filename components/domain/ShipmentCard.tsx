@@ -47,7 +47,7 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
       <div
         onClick={onClick}
         className={cn(
-          'flex items-center gap-4 p-3 rounded-none border border-white/5 bg-card/50 hover:bg-card hover:border-primary/30 transition-all cursor-pointer group',
+          'flex items-center gap-4 p-4 rounded-none border border-white/5 bg-card/50 hover:bg-card hover:border-primary/30 transition-all cursor-pointer group',
           className
         )}
       >
@@ -78,7 +78,7 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
     <div
       onClick={onClick}
       className={cn(
-        'relative overflow-hidden rounded-none border border-white/10 bg-card/80 backdrop-blur-sm p-5 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 cursor-pointer group',
+        'relative overflow-hidden rounded-none border border-white/10 bg-card/80 backdrop-blur-sm p-4 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 cursor-pointer group',
         className
       )}
     >
@@ -92,7 +92,7 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
 
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <div
             className={cn(
               'p-2.5 rounded-none',
@@ -117,7 +117,7 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
       </div>
 
       {/* Route */}
-      <div className="flex items-center justify-between bg-card/50 rounded-none p-3 mb-4">
+      <div className="flex items-center justify-between bg-card/50 rounded-none p-4 mb-4">
         <div className="text-center">
           <p className="text-2xl font-bold text-foreground">{origin.code}</p>
           <p className="text-xs text-muted-foreground">{origin.name}</p>

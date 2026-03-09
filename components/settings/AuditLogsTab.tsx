@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Activity, Search } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Activity, Search, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -11,8 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useAuthStore } from '@/store/authStore';
 import { SectionHeader } from './SettingsComponents';
+import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 export interface AuditLog {
   id: string;
@@ -21,48 +22,56 @@ export interface AuditLog {
   action: string;
   entityType?: string;
   entityId?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload?: any;
+  payload?: Record<string, unknown>;
 }
 
 export const AuditLogsTab = () => {
-  const { user } = useAuthStore();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [auditSearch, setAuditSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchAuditLogs = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // NOTE: generated database.types.ts is out of sync — audit_logs.actor_id
+      // exists in the real schema but not in the generated types. Cast to any
+      // until `npx supabase gen types typescript` is re-run.
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .select('id, created_at, actor_id, action, entity_type, entity_id, payload')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (error) {
+        logger.error('AuditLogsTab', 'Failed to fetch audit logs', { error: error.message });
+        setLogs([]);
+        return;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const rows = (data ?? []) as any[];
+      const mapped: AuditLog[] = rows.map((row) => ({
+        id: row.id,
+        timestamp: row.created_at,
+        actorId: row.actor_id ?? 'system',
+        action: row.action ?? 'UNKNOWN',
+        entityType: row.entity_type ?? undefined,
+        entityId: row.entity_id ?? undefined,
+        payload: row.payload as Record<string, unknown> | undefined,
+      }));
+
+      setLogs(mapped);
+    } catch (err) {
+      logger.error('AuditLogsTab', 'Unexpected error', { error: err });
+      setLogs([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchAuditLogs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchAuditLogs = async () => {
-    // Mock simulation or Supabase fetch
-    const mockLogs: AuditLog[] = [
-      {
-        id: '1',
-        timestamp: new Date().toISOString(),
-        actorId: user?.email || 'admin@tapancargo.com',
-        action: 'SETTINGS_UPDATE',
-        entityType: 'SYSTEM',
-        payload: { terminal: 'Hub-01' },
-      },
-      {
-        id: '2',
-        timestamp: new Date(Date.now() - 3600000).toISOString(),
-        actorId: 'system',
-        action: 'BACKUP_COMPLETED',
-        entityType: 'DATABASE',
-      },
-      {
-        id: '3',
-        timestamp: new Date(Date.now() - 7200000).toISOString(),
-        actorId: user?.email || 'admin@tapancargo.com',
-        action: 'USER_LOGIN',
-        entityType: 'AUTH',
-      },
-    ];
-    setLogs(mockLogs);
-  };
+  }, [fetchAuditLogs]);
 
   const filteredLogs = logs.filter((log) => {
     if (!auditSearch) return true;
@@ -114,7 +123,17 @@ export const AuditLogsTab = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredLogs.length === 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center py-20 text-muted-foreground font-mono text-[10px] uppercase tracking-widest"
+                  >
+                    <Loader2 className="w-4 h-4 animate-spin inline-block mr-2" />
+                    LOADING AUDIT STREAM...
+                  </TableCell>
+                </TableRow>
+              ) : filteredLogs.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={5}

@@ -4,7 +4,7 @@ import { ShipmentWithRelations } from '@/hooks/useShipments';
 import { InvoiceWithRelations } from '@/hooks/useInvoices';
 import { KPIGrid } from '../components/dashboard/KPIGrid';
 
-// Dynamically import heavy charting components to reduce initial bundle size
+// Dynamically import heavy charting components
 const DashboardCharts = lazy(() =>
   import('../components/dashboard/Charts').then((m) => ({ default: m.DashboardCharts }))
 );
@@ -36,12 +36,15 @@ import { ErrorBoundary, InlineError } from '../components/ui/error-boundary';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '../lib/queryKeys';
 import { useRealtimeDashboard } from '../hooks/useRealtime';
+import { logger } from '@/lib/logger';
+import { cn } from '@/lib/utils';
 
 export const Dashboard: React.FC = () => {
   const queryClient = useQueryClient();
-  const { user } = useStore();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Store type inference
+  const { user } = useStore() as any;
 
-  // Enable realtime subscriptions for live dashboard updates
+  // Enable realtime subscriptions
   useRealtimeDashboard();
 
   // Global refresh handler — invalidate all data powering dashboard components
@@ -73,6 +76,7 @@ export const Dashboard: React.FC = () => {
             destination_hub:hubs!destination_hub_id(code, name)
           `
           )
+          .eq('org_id', user?.orgId)
           .order('created_at', { ascending: false })
           .limit(500),
         supabase
@@ -84,6 +88,7 @@ export const Dashboard: React.FC = () => {
             shipment:shipments(cn_number)
           `
           )
+          .eq('org_id', user?.orgId)
           .is('deleted_at', null)
           .order('created_at', { ascending: false })
           .limit(500),
@@ -110,19 +115,25 @@ export const Dashboard: React.FC = () => {
 
       toast.success('Report downloaded successfully');
     } catch (error) {
-      console.error('Report generation failed:', error);
+      logger.error('Dashboard', 'Report generation failed', { error });
       const { toast } = await import('sonner');
       toast.error('Failed to generate report');
     }
   };
 
   return (
-    <div data-testid="dashboard-page" className="space-y-4 animate-[fadeIn_0.2s_ease-out] pb-8">
+    <div data-testid="dashboard-page" className="space-y-4 animate-in fade-in duration-300 pb-8">
+      {/* Header with actions */}
       <PageHeader
         title="Mission Control"
         description="Real-time logistics overview and operations."
       >
-        <Button data-testid="dashboard-refresh-button" variant="ghost" onClick={refreshData}>
+        <Button
+          data-testid="dashboard-refresh-button"
+          variant="ghost"
+          onClick={refreshData}
+          className="hover:bg-primary/5"
+        >
           <RefreshCw className="w-4 h-4 sm:mr-2" />
           <span className="hidden sm:inline">Refresh</span>
         </Button>
@@ -132,8 +143,8 @@ export const Dashboard: React.FC = () => {
           variant="secondary"
           onClick={handleDownloadReport}
         >
-          <span className="hidden sm:inline">Download Report</span>
-          <span className="sm:hidden">Report</span>
+          <span className="hidden sm:inline">Export Report</span>
+          <span className="sm:hidden">Export</span>
         </Button>
       </PageHeader>
 
@@ -173,48 +184,24 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
         <div className="flex flex-col gap-4">
           <ErrorBoundary fallback={<InlineError message="Failed to load map" />}>
-            <Suspense
-              fallback={
-                <div className="h-[300px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">
-                  Loading Map...
-                </div>
-              }
-            >
+            <Suspense fallback={<ChartSkeleton height={400} title="Corridor Activity" />}>
               <RealtimeCorridorActivity />
             </Suspense>
           </ErrorBoundary>
           <ErrorBoundary fallback={<InlineError message="Failed to load shipments chart" />}>
-            <Suspense
-              fallback={
-                <div className="h-[300px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">
-                  Loading Charts...
-                </div>
-              }
-            >
+            <Suspense fallback={<ChartSkeleton height={300} title="Shipment Analytics" />}>
               <ChartBarInteractive />
             </Suspense>
           </ErrorBoundary>
           <ErrorBoundary fallback={<InlineError message="Failed to load efficiency index" />}>
-            <Suspense
-              fallback={
-                <div className="h-[300px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">
-                  Loading Indexes...
-                </div>
-              }
-            >
+            <Suspense fallback={<ChartSkeleton height={300} title="Efficiency Metrics" />}>
               <ChartRadialGrid />
             </Suspense>
           </ErrorBoundary>
         </div>
 
         <ErrorBoundary fallback={<InlineError message="Failed to load charts" />}>
-          <Suspense
-            fallback={
-              <div className="h-[full] min-h-[500px] bg-muted/20 animate-pulse rounded-lg flex items-center justify-center text-muted-foreground">
-                Loading Dashboard Charts...
-              </div>
-            }
-          >
+          <Suspense fallback={<ChartSkeleton height={500} title="Dashboard Overview" fullHeight />}>
             <DashboardCharts />
           </Suspense>
         </ErrorBoundary>
@@ -235,3 +222,30 @@ export const Dashboard: React.FC = () => {
     </div>
   );
 };
+
+// Chart Skeleton Component
+function ChartSkeleton({
+  height,
+  title,
+  fullHeight,
+}: {
+  height: number;
+  title: string;
+  fullHeight?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        'bg-muted/10 border border-border/40 rounded-none flex flex-col items-center justify-center gap-3 p-6 transition-colors duration-300',
+        fullHeight && 'h-full min-h-[500px]'
+      )}
+      style={!fullHeight ? { height } : undefined}
+    >
+      <div className="w-12 h-12 bg-muted/50 rounded-none animate-pulse border border-border/40" />
+      <p className="text-sm font-medium text-muted-foreground">{title}</p>
+      <p className="text-xs text-muted-foreground/60">Loading visualization...</p>
+    </div>
+  );
+}
+
+export default Dashboard;

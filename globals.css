@@ -134,6 +134,8 @@
   --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: var(--accent);
   --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border-soft);
+  --sidebar-ring: var(--ring);
 
   /* Status Colors */
   --status-success: oklch(62% 0.19 145deg);

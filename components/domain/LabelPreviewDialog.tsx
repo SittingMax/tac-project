@@ -21,6 +21,7 @@ import {
 import { Printer, Download, Eye } from 'lucide-react';
 import { LabelGenerator, LabelData, ServiceLevel, TransportMode } from './LabelGenerator';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import { sanitizeString } from '../../lib/utils/sanitize';
 import { generateLabelPDF } from '@/lib/pdf-generator';
 
@@ -120,7 +121,7 @@ export const LabelPreviewDialog: React.FC<LabelPreviewDialogProps> = ({
 
       toast.success('Label downloaded as PDF');
     } catch (error) {
-      console.error('[LabelPreview] PDF generation failed:', error);
+      logger.error('LabelPreviewDialog', 'PDF generation failed', { error });
       toast.error('Failed to generate label PDF');
     }
   };

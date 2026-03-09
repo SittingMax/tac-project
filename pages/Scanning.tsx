@@ -167,16 +167,16 @@ export const Scanning: React.FC = () => {
           </div>
 
           {/* KPIs */}
-          <div className="hidden md:flex items-center gap-3">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 border border-border">
+          <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-muted/50 border border-border">
               <Activity className="w-3 h-3 text-muted-foreground" />
               <span className="text-xs font-mono text-muted-foreground">{totalScans}</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-status-success/10 border border-status-success/20">
+            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-status-success/10 border border-status-success/20">
               <Check className="w-3 h-3 text-status-success" />
               <span className="text-xs font-mono text-status-success">{scanCount.success}</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-status-error/10 border border-status-error/20">
+            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-status-error/10 border border-status-error/20">
               <X className="w-3 h-3 text-status-error" />
               <span className="text-xs font-mono text-status-error">{scanCount.error}</span>
             </div>
@@ -198,7 +198,7 @@ export const Scanning: React.FC = () => {
                   key={mode}
                   onClick={() => handleModeSwitch(mode)}
                   className={`
-                    relative flex items-center gap-1.5 px-3 py-2.5 font-mono uppercase tracking-widest text-[10px]
+                    relative flex items-center gap-1.5 px-2 py-2.5 font-mono uppercase tracking-widest text-[10px]
                     transition-all duration-200 border-b-2
                     ${
                       isActive
@@ -227,7 +227,7 @@ export const Scanning: React.FC = () => {
               : 'bg-status-warning/5 border-b-border border-l-status-warning'
           }`}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Truck
               className={`w-4 h-4 ${
                 scanMode === 'LOAD_MANIFEST' ? 'text-status-info' : 'text-status-warning'
@@ -237,7 +237,7 @@ export const Scanning: React.FC = () => {
               <span className="text-sm font-bold font-mono text-foreground">
                 {activeManifest.manifest_no}
               </span>
-              <span className="text-xs text-muted-foreground ml-3">
+              <span className="text-xs text-muted-foreground ml-2">
                 {activeManifest.from_hub_id} → {activeManifest.to_hub_id}
               </span>
             </div>
@@ -253,7 +253,7 @@ export const Scanning: React.FC = () => {
         {/* Scanner Viewport */}
         <div className="relative bg-muted/20 border-r border-border overflow-hidden flex flex-col min-h-0">
           {/* Top overlay bar */}
-          <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-background/80 to-transparent">
+          <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-2 bg-gradient-to-b from-background/80 to-transparent">
             {/* Camera / Manual toggle */}
             <div className="flex gap-1 bg-background/90 border border-border backdrop-blur-sm">
               <button
@@ -383,7 +383,7 @@ export const Scanning: React.FC = () => {
 
           {/* Scan Feed */}
           <div className="flex-1 overflow-y-auto min-h-0">
-            <div className="px-4 py-3 border-b border-border bg-muted/20 sticky top-0 z-10">
+            <div className="px-4 py-2 border-b border-border bg-muted/20 sticky top-0 z-10">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
                   <Activity className="w-3 h-3" />
@@ -399,7 +399,7 @@ export const Scanning: React.FC = () => {
               {scannedItems.length === 0 ? (
                 <div className="p-6 space-y-6">
                   <div className="text-center py-8">
-                    <ScanLine className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
+                    <ScanLine className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">No scans this session</p>
                     <p className="text-[10px] text-muted-foreground/60 mt-1">
                       Point your scanner or type a code above
@@ -422,7 +422,7 @@ export const Scanning: React.FC = () => {
                       )}
                     </button>
                     {showDiagnostics && (
-                      <div className="mt-3 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                      <div className="mt-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
                         <p className="text-[10px] text-muted-foreground">
                           Scan the barcode below to test your scanner connection:
                         </p>
@@ -446,7 +446,7 @@ export const Scanning: React.FC = () => {
                   <div
                     key={idx}
                     className={`
-                      flex items-center gap-3 px-4 py-3 border-l-3
+                      flex items-center gap-2 px-4 py-2 border-l-3
                       animate-in slide-in-from-right-4 duration-300
                       ${
                         item.status === 'SUCCESS'

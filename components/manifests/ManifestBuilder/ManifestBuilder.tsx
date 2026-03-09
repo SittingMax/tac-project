@@ -156,7 +156,7 @@ export function ManifestBuilder({
                   </Button>
                 )}
                 <div>
-                  <DialogTitle className="text-xl font-bold tracking-tight flex items-center gap-3">
+                  <DialogTitle className="text-xl font-bold tracking-tight flex items-center gap-4">
                     {phase === 'settings' ? 'Build Manifest' : 'Scan Manifest'}
                     {builder.manifest && (
                       <Badge variant="outline" className="font-mono text-sm">
@@ -206,7 +206,7 @@ export function ManifestBuilder({
                 />
 
                 {builder.manifest && (
-                  <div className="rounded-none border p-4 space-y-3">
+                  <div className="rounded-none border p-4 space-y-4">
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase">
                       Manifest Details
                     </h3>

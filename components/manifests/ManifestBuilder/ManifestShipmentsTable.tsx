@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import type { ManifestItemWithShipment } from '@/lib/services/manifestService';
-import { ScreenBarcode } from '@/components/barcodes';
+import { TableBarcode } from '@/components/barcodes';
 
 interface ManifestShipmentsTableProps {
   items: ManifestItemWithShipment[];
@@ -82,7 +82,7 @@ export function ManifestShipmentsTable({
               onClick={() => onViewShipment?.(row.original.shipment_id)}
               title="Click to view shipment details"
             >
-              <ScreenBarcode value={awb} className="scale-75 origin-left" />
+              <TableBarcode value={awb} className="scale-75 origin-left" />
             </div>
           );
         },
@@ -254,7 +254,7 @@ export function ManifestShipmentsTable({
 
       {/* Summary Footer */}
       {showSummary && (
-        <div className="mt-4 flex items-center justify-between p-3 rounded-none bg-muted/50 border">
+        <div className="mt-4 flex items-center justify-between p-4 rounded-none bg-muted/50 border">
           <div className="text-sm text-muted-foreground">
             Showing {filteredItems.length} of {items.length} shipments
           </div>

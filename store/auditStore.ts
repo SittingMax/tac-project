@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { AuditLog } from '../types';
 import { supabase } from '../lib/supabase';
+import { logger } from '@/lib/logger';
 import type { Database } from '../lib/database.types';
 
 // Properly typed Supabase rows
@@ -36,7 +37,7 @@ export const useAuditStore = create<AuditState>((set) => ({
         .limit(100);
 
       if (error) {
-        console.error('Failed to fetch audit logs:', error);
+        logger.error('AuditStore', 'Failed to fetch audit logs', { error });
         set({ isLoading: false });
         return;
       }
@@ -58,7 +59,7 @@ export const useAuditStore = create<AuditState>((set) => ({
 
       set({ logs: mappedLogs, isLoading: false });
     } catch (error) {
-      console.error('Failed to fetch audit logs:', error);
+      logger.error('AuditStore', 'Failed to fetch audit logs', { error });
       set({ isLoading: false });
     }
   },

@@ -131,9 +131,9 @@ export function StepManifestSetup({
   const toHub = hubs.find((h) => h.id === form.watch('toHubId'));
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       {/* Section 1: Route & Transport */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         {/* Route Selection */}
         <Card className="border-border bg-card/50 xl:col-span-7">
           <CardHeader className="pb-4">
@@ -227,7 +227,7 @@ export function StepManifestSetup({
                     shouldTouch: true,
                   });
               }}
-              className="flex gap-3"
+              className="flex gap-4"
             >
               <ToggleGroupItem
                 value="AIR"
@@ -257,7 +257,7 @@ export function StepManifestSetup({
       </div>
 
       {/* Section 2: Details */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* Schedule (Only for TRUCK) */}
         {transportType === 'TRUCK' && (
           <Card className="border-border bg-card/50">

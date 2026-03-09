@@ -52,7 +52,7 @@ export function KPICard({
           {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
         </div>
 
-        {icon && <div className="p-3 rounded-none bg-primary/10 text-primary">{icon}</div>}
+        {icon && <div className="p-4 rounded-none bg-primary/10 text-primary">{icon}</div>}
       </div>
 
       {change !== undefined && (

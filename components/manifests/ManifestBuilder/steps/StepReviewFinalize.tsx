@@ -104,10 +104,10 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
               Schedule
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             {setupData.type === 'AIR' ? (
               <>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-10 h-10 rounded-none bg-primary/10 border border-primary/20">
                     <CalendarDays className="h-5 w-5 text-primary" />
                   </div>
@@ -120,7 +120,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
                     <p className="text-xs text-muted-foreground">Flight Date</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-10 h-10 rounded-none bg-primary/10 border border-primary/20">
                     <Clock className="h-5 w-5 text-primary" />
                   </div>
@@ -134,7 +134,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
               </>
             ) : (
               <>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-10 h-10 rounded-none bg-primary/10 border border-primary/20">
                     <CalendarDays className="h-5 w-5 text-primary" />
                   </div>
@@ -147,7 +147,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
                     <p className="text-xs text-muted-foreground">Dispatch Date</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-10 h-10 rounded-none bg-primary/10 border border-primary/20">
                     <Clock className="h-5 w-5 text-primary" />
                   </div>
@@ -209,7 +209,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
         <CardContent>
           {setupData.type === 'AIR' ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-none bg-status-info/10 border border-status-info/20">
                   <Plane className="h-5 w-5 text-status-info" />
                 </div>
@@ -220,7 +220,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
                   <p className="text-xs text-muted-foreground">Flight</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-none bg-secondary border border-border">
                   <Clock className="h-5 w-5 text-muted-foreground" />
                 </div>
@@ -231,7 +231,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
                   <p className="text-xs text-muted-foreground">ETD</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-none bg-secondary border border-border">
                   <Clock className="h-5 w-5 text-muted-foreground" />
                 </div>
@@ -245,7 +245,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-none bg-status-warning/10 border border-status-warning/20">
                   <Hash className="h-5 w-5 text-status-warning" />
                 </div>
@@ -254,7 +254,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
                   <p className="text-xs text-muted-foreground">Vehicle</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-none bg-secondary border border-border">
                   <User className="h-5 w-5 text-muted-foreground" />
                 </div>
@@ -263,7 +263,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
                   <p className="text-xs text-muted-foreground">Driver</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-none bg-secondary border border-border">
                   <Phone className="h-5 w-5 text-muted-foreground" />
                 </div>
@@ -279,7 +279,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
 
       {/* Ready State Notice */}
       <div className="rounded-none bg-primary/10 border border-primary/20 p-4">
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-4">
           <Package className="h-5 w-5 text-primary mt-0.5" />
           <div>
             <p className="text-sm font-medium text-primary">Ready to Create Manifest</p>

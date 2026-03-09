@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Package, Send, Plus, MapPin, User, Phone } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export const BookingForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -48,7 +49,7 @@ export const BookingForm: React.FC = () => {
       toast.success('Booking request submitted successfully!');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      console.error('Error submitting booking:', err);
+      logger.error('PortalBookingForm', 'Error submitting booking', { error: err });
       toast.error(err.message || 'Failed to submit booking');
     } finally {
       setLoading(false);
@@ -160,7 +161,7 @@ export const BookingForm: React.FC = () => {
 
         <div className="space-y-4">
           {packages.map((pkg, idx) => (
-            <div key={idx} className="grid grid-cols-5 gap-3 p-4 bg-muted/30 rounded-none">
+            <div key={idx} className="grid grid-cols-5 gap-4 p-4 bg-muted/30 rounded-none">
               <div className="space-y-1">
                 <label className="text-xs text-muted-foreground">Qty</label>
                 <Input

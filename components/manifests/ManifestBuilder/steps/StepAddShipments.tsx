@@ -96,7 +96,7 @@ export function StepAddShipments({
     <div className="space-y-4">
       {/* Route Banner */}
       {fromHub && toHub && (
-        <div className="flex items-center gap-3 px-4 py-3 rounded-none bg-primary/10 border border-primary/20">
+        <div className="flex items-center gap-4 px-4 py-2 rounded-none bg-primary/10 border border-primary/20">
           <span className="text-xs font-semibold uppercase text-muted-foreground">Route</span>
           <div className="flex items-center gap-2 text-sm font-bold">
             <span className="font-mono">{fromHub.code}</span>
@@ -215,7 +215,7 @@ export function StepAddShipments({
               )}
             >
               <CardContent className="p-4">
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-4">
                   {getResultIcon(scanner.lastResult)}
                   <div className="space-y-1 flex-1">
                     <p
@@ -258,25 +258,25 @@ export function StepAddShipments({
           {/* Stats */}
           <div className="grid grid-cols-4 gap-2 shrink-0">
             <Card className="border-border bg-card/50">
-              <CardContent className="p-3 text-center">
+              <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-primary">{scanner.successCount}</p>
                 <p className="text-xs text-muted-foreground">Added</p>
               </CardContent>
             </Card>
             <Card className="border-border bg-card/50">
-              <CardContent className="p-3 text-center">
+              <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-status-warning">{scanner.duplicateCount}</p>
                 <p className="text-xs text-muted-foreground">Dups</p>
               </CardContent>
             </Card>
             <Card className="border-border bg-card/50">
-              <CardContent className="p-3 text-center">
+              <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-status-error">{scanner.errorCount}</p>
                 <p className="text-xs text-muted-foreground">Errors</p>
               </CardContent>
             </Card>
             <Card className="border-border bg-card/50">
-              <CardContent className="p-3 text-center">
+              <CardContent className="p-4 text-center">
                 <p className="text-lg font-bold truncate" title={totalWeight.toFixed(1)}>
                   {totalWeight.toFixed(1)}
                 </p>

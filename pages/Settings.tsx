@@ -98,7 +98,7 @@ export const Settings = () => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onClick={() => setActiveTab(tab.id as any)}
                 className={cn(
-                  'px-8 py-3 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 border-l first:border-l-0 border-border/40',
+                  'px-8 py-2 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 border-l first:border-l-0 border-border/40',
                   activeTab === tab.id
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-background text-muted-foreground hover:bg-muted/10'
@@ -366,8 +366,8 @@ export const Settings = () => {
                   <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 opacity-50">
                     Session Identity
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center bg-muted/5 p-2 px-3 border border-border/20">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center bg-muted/5 p-2 px-4 border border-border/20">
                       <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                         Last Active Request
                       </span>
@@ -377,7 +377,7 @@ export const Settings = () => {
                           : '—'}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center bg-muted/5 p-2 px-3 border border-border/20">
+                    <div className="flex justify-between items-center bg-muted/5 p-2 px-4 border border-border/20">
                       <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                         Cryptographic ID
                       </span>

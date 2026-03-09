@@ -91,13 +91,13 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <h2 className="text-2xl font-bold font-mono text-foreground">
                 {invoice.invoiceNumber}
               </h2>
               <Badge className={STATUS_STYLES[invoice.status]}>{invoice.status}</Badge>
             </div>
-            <div className="flex items-center gap-3 mt-1">
+            <div className="flex items-center gap-2 mt-1">
               <p className="text-sm text-muted-foreground">
                 awb: <span className="font-mono">{invoice.awb || '—'}</span>
               </p>

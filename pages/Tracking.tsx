@@ -174,7 +174,7 @@ export const Tracking: React.FC = () => {
 
               {/* Moving vehicle indicator */}
               {result.shipment.status === 'IN_TRANSIT' && (
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-card border-2 border-primary p-3 rounded-none shadow-lg animate-pulse">
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-card border-2 border-primary p-4 rounded-none shadow-lg animate-pulse">
                   <div className="flex items-center gap-2">
                     {result.shipment.mode === 'AIR' ? (
                       <Plane className="w-5 h-5 text-status-info" />
@@ -194,7 +194,7 @@ export const Tracking: React.FC = () => {
 
             {/* ETA Badge */}
             <div className="absolute top-4 right-4 text-right">
-              <div className="bg-background/70 backdrop-blur px-3 py-2 rounded-none border border-border">
+              <div className="bg-background/70 backdrop-blur px-4 py-2 rounded-none border border-border">
                 <div className="text-xs text-muted-foreground">Estimated Arrival</div>
                 <div className="text-lg font-bold text-foreground font-mono">
                   {result.shipment.eta}

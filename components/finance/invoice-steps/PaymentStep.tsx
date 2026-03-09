@@ -90,14 +90,14 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
       {/* Summary Panel */}
       <div className="bg-gradient-to-br from-muted/60 to-muted/30 p-6 rounded-none border border-border shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-border/50">
               <span className="text-sm text-muted-foreground">Subtotal</span>
               <span className="font-semibold text-foreground">{formatCurrency(subtotal)}</span>
             </div>
 
             <div className="flex justify-between items-center py-2">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <Controller
                     control={form.control}
@@ -139,7 +139,7 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
             </div>
 
             {balance > 0 && balance !== total && (
-              <div className="flex justify-between items-center py-2 bg-status-warning/10 px-3 rounded-none border border-status-warning/20">
+              <div className="flex justify-between items-center py-2 bg-status-warning/10 px-2 rounded-none border border-status-warning/20">
                 <span className="text-sm font-medium text-status-warning">Balance Due</span>
                 <span className="font-bold text-status-warning">{formatCurrency(balance)}</span>
               </div>

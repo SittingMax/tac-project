@@ -19,7 +19,7 @@ export function WizardStepper({ steps, currentStep }: WizardStepperProps) {
       <ol className="flex items-center justify-between">
         {steps.map((step, stepIdx) => (
           <li key={step.name} className="flex items-center flex-1">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <span
                 className={cn(
                   'flex h-8 w-8 shrink-0 items-center justify-center rounded-none text-sm font-medium transition-colors',

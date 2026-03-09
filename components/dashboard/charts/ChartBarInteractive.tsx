@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ChartContainer,
   ChartTooltip,
@@ -133,13 +133,13 @@ export function ChartBarInteractive() {
   );
 
   return (
-    <Card className="py-0 border-border bg-card shadow-sm w-full">
-      <CardHeader className="flex flex-col items-stretch border-b border-border !p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:!py-0">
-          <CardTitle>Inbound vs Outbound Flow</CardTitle>
-          <CardDescription>
-            Showing total shipment handling volume for the last 3 months
-          </CardDescription>
+    <Card className="flex flex-col rounded-none py-0 border border-border/40 bg-transparent shadow-none w-full hover:bg-muted/5 transition-colors duration-300">
+      <CardHeader className="flex flex-col items-stretch border-b border-border/40 !p-0 sm:flex-row">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-6 pb-4 sm:!py-6">
+          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Inbound vs Outbound Flow</CardTitle>
+          <div className="text-2xl font-bold tracking-tighter text-foreground mt-1">
+            Historical Shipment Volume
+          </div>
         </div>
         <div className="flex">
           {['desktop', 'mobile'].map((key) => {
@@ -148,13 +148,13 @@ export function ChartBarInteractive() {
               <button
                 key={chart}
                 data-active={activeChart === chart}
-                className="data-[active=true]:bg-muted/50 data-[active=true]:text-foreground relative z-30 flex flex-1 flex-col justify-center gap-1 border-t border-border px-6 py-4 text-left even:border-l sm:border-t-0 sm:border-l sm:px-8 sm:py-6 outline-none hover:bg-muted/30 transition-colors"
+                className="data-[active=true]:bg-muted/10 data-[active=true]:text-foreground relative z-30 flex flex-1 flex-col justify-center gap-1 border-t border-border/40 px-6 py-4 text-left even:border-l sm:border-t-0 sm:border-l sm:px-8 sm:py-6 outline-none hover:bg-muted/5 transition-colors"
                 onClick={() => setActiveChart(chart)}
               >
-                <span className="text-muted-foreground text-xs uppercase tracking-wider font-semibold">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
                   {chartConfig[chart].label}
                 </span>
-                <span className="text-lg leading-none font-bold sm:text-3xl">
+                <span className="text-xl font-bold tracking-tighter sm:text-3xl text-foreground mt-1">
                   {total[key as keyof typeof total].toLocaleString()}
                 </span>
               </button>
@@ -172,7 +172,7 @@ export function ChartBarInteractive() {
               right: 12,
             }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
             <XAxis
               dataKey="date"
               tickLine={false}
@@ -202,7 +202,7 @@ export function ChartBarInteractive() {
                 />
               }
             />
-            <Bar dataKey={activeChart} fill={`var(--color-${activeChart})`} radius={[4, 4, 0, 0]} />
+            <Bar dataKey={activeChart} fill={`var(--color-${activeChart})`} radius={0} />
           </BarChart>
         </ChartContainer>
       </CardContent>

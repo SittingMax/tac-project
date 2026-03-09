@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 
 /**
  * GlobalNotificationListener
@@ -91,7 +92,7 @@ export const GlobalNotificationListener = () => {
       )
       .subscribe((status) => {
         if (status === 'CHANNEL_ERROR') {
-          console.warn('[Realtime] Failed to subscribe to global notifications');
+          logger.warn('GlobalNotificationListener', 'Failed to subscribe to global notifications');
         }
       });
 

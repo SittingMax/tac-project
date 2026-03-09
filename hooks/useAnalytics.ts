@@ -73,7 +73,6 @@ export function useAnalyticsSummary(options?: { orgId?: string }) {
     queryFn: async () => {
       if (!orgId) throw new Error('Organization ID is required');
 
-      // @ts-expect-error Supabase RPC typing issue
       const { data, error } = await supabase.rpc('get_analytics_summary', {
         p_org_id: orgId,
       });

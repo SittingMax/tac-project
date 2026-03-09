@@ -1,37 +1,26 @@
-import React, { useMemo, useEffect, useState, useCallback } from 'react';
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import {
-  Box,
-  Activity,
-  CheckCircle,
-  AlertTriangle,
-  Percent,
-  LucideIcon,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Clock,
-} from 'lucide-react';
-import { Card } from '../ui/card';
-import { KPIGridSkeleton } from '../ui/skeleton';
-import { useDashboardKPIs } from '@/hooks/useDashboardKPIs';
-import { useNavigate } from 'react-router-dom';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
-import { cn } from '@/lib/utils';
+import React, { useMemo, useEffect, useState, useCallback } from "react"
+import { motion, useMotionValue, useTransform, animate } from "framer-motion"
+import { Box, Activity, CheckCircle, AlertTriangle, Percent, LucideIcon, DollarSign, Clock } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import { KPIGridSkeleton } from "../ui/skeleton"
+import { useDashboardKPIs } from "@/hooks/useDashboardKPIs"
+import { useNavigate } from "react-router-dom"
+import { LineChart, Line, ResponsiveContainer } from "recharts"
+import { cn } from "@/lib/utils"
 
 interface KPICardProps {
-  label: string;
-  value: number;
-  displayValue: string;
-  icon: LucideIcon;
-  color: 'primary' | 'success' | 'warning' | 'destructive';
-  trend?: number;
-  trendLabel?: string;
-  sparklineData?: { date: string; value: number }[];
-  path?: string;
-  onNavigate?: (path: string) => void;
-  isCurrency?: boolean;
-  index: number;
+  label: string
+  value: number
+  displayValue: string
+  icon: LucideIcon
+  color: "primary" | "success" | "warning" | "destructive"
+  trend?: number
+  trendLabel?: string
+  sparklineData?: { date: string; value: number }[]
+  path?: string
+  onNavigate?: (path: string) => void
+  isCurrency?: boolean
+  index: number
 }
 
 /**
@@ -42,31 +31,31 @@ const AnimatedCounter = ({
   displayValue,
   isCurrency,
 }: {
-  value: number;
-  displayValue: string;
-  isCurrency?: boolean;
+  value: number
+  displayValue: string
+  isCurrency?: boolean
 }) => {
-  const count = useMotionValue(0);
+  const count = useMotionValue(0)
   const rounded = useTransform(count, (latest) => {
-    if (isCurrency) return `$${(latest / 1000).toFixed(1)}k`;
-    if (displayValue.includes('%')) return `${Math.round(latest)}%`;
-    if (displayValue.includes('d')) return `${latest.toFixed(1)}d`;
-    return Math.round(latest).toLocaleString();
-  });
+    if (isCurrency) return `$${(latest / 1000).toFixed(1)}k`
+    if (displayValue.includes("%")) return `${Math.round(latest)}%`
+    if (displayValue.includes("d")) return `${latest.toFixed(1)}d`
+    return Math.round(latest).toLocaleString()
+  })
 
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false)
 
   useEffect(() => {
-    const controls = animate(count, value, { duration: 1, delay: 0.1 });
-    controls.then(() => setHasAnimated(true));
-    return controls.stop;
-  }, [value, count]);
+    const controls = animate(count, value, { duration: 1, delay: 0.1 })
+    controls.then(() => setHasAnimated(true))
+    return controls.stop
+  }, [value, count])
 
-  return <motion.span>{hasAnimated ? displayValue : rounded}</motion.span>;
-};
+  return <motion.span>{hasAnimated ? displayValue : rounded}</motion.span>
+}
 
 /**
- * Enhanced KPI Card with animations, sparklines, and transitions
+ * Enhanced KPI Card matching Shadcn Blocks metrics card style
  */
 const KPICard = React.memo(
   ({
@@ -83,250 +72,210 @@ const KPICard = React.memo(
     onNavigate,
     index,
   }: KPICardProps) => {
-    const isIncreasing = trend ? trend > 0 : false;
-    const isDecreasing = trend ? trend < 0 : false;
+    const isIncreasing = trend ? trend > 0 : false
+    const isDecreasing = trend ? trend < 0 : false
 
-    const colorMap = {
-      primary: 'text-primary bg-primary/10 border-primary/20',
-      success: 'text-status-success bg-status-success/10 border-status-success/20',
-      warning: 'text-status-warning bg-status-warning/10 border-status-warning/20',
-      destructive: 'text-status-error bg-status-error/10 border-status-error/20',
-    };
-
-    const strokeColorMap = {
-      primary: 'var(--primary)',
-      success: 'var(--status-success)',
-      warning: 'var(--status-warning)',
-      destructive: 'var(--status-error)',
-    };
+    const strokeColorMap: Record<string, string> = {
+      primary: "hsl(var(--primary))",
+      success: "hsl(var(--chart-2))",
+      warning: "hsl(var(--chart-3))",
+      destructive: "hsl(var(--chart-4))",
+    }
 
     const handleClick = useCallback(() => {
       if (path && onNavigate) {
-        onNavigate(path);
+        onNavigate(path)
       }
-    }, [path, onNavigate]);
+    }, [path, onNavigate])
 
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{
-          delay: index * 0.05,
-          duration: 0.4,
-          ease: [0.25, 0.1, 0.25, 1],
-        }}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.04, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         className="h-full"
       >
         <Card
           onClick={handleClick}
-          data-testid={`kpi-card-${label.toLowerCase().replace(/\s+/g, '-')}`}
+          data-testid={`kpi-card-${label.toLowerCase().replace(/\s+/g, "-")}`}
           className={cn(
-            'relative overflow-hidden h-full flex flex-col justify-between group transition-all duration-300 border-border bg-card',
-            path ? 'cursor-pointer hover:shadow-md hover:border-primary/50' : ''
+            "relative overflow-hidden h-full flex flex-col justify-between group transition-colors duration-300",
+            "rounded-none border-none bg-background shadow-none hover:bg-muted/5",
+            path ? "cursor-pointer" : ""
           )}
         >
-          {/* Background Icon */}
-          <div className="absolute -top-4 -right-4 p-4 opacity-[0.02] group-hover:opacity-[0.06] transition-opacity pointer-events-none transform group-hover:scale-110 duration-500">
-            <Icon className="w-32 h-32" />
-          </div>
-
-          {/* Content */}
-          <div className="p-5 flex-1 flex flex-col relative z-10">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-none border ${colorMap[color]}`}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                <div className="text-sm text-muted-foreground font-medium line-clamp-1 pr-2">
-                  {label}
-                </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 z-10">
+            <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+              {label}
+            </CardTitle>
+            <Icon className="h-3.5 w-3.5 text-muted-foreground/30 transition-colors group-hover:text-foreground/50" />
+          </CardHeader>
+          
+          <CardContent className="z-10 p-4 pt-0 pb-6">
+            <div className="flex flex-col gap-1">
+              <div className="text-2xl lg:text-3xl font-black tracking-tighter text-foreground">
+                <AnimatedCounter value={value} displayValue={displayValue} isCurrency={isCurrency} />
               </div>
-            </div>
-
-            <div className="flex items-end justify-between mt-auto">
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono tracking-tight">
-                  <AnimatedCounter
-                    value={value}
-                    displayValue={displayValue}
-                    isCurrency={isCurrency}
-                  />
-                </div>
-
-                {trend !== undefined && (
-                  <div className="flex items-center gap-1 mt-2">
-                    <span
-                      className={cn(
-                        'flex items-center text-xs font-semibold px-1.5 py-0.5 rounded-none',
-                        isIncreasing && color !== 'destructive'
-                          ? 'text-status-success bg-status-success/10'
-                          : isDecreasing && color !== 'destructive'
-                            ? 'text-status-error bg-status-error/10'
-                            : isDecreasing && color === 'destructive'
-                              ? 'text-status-success bg-status-success/10' // fewer exceptions = good
-                              : 'text-status-error bg-status-error/10'
-                      )}
-                    >
-                      {isIncreasing ? (
-                        <TrendingUp className="w-3 h-3 mr-1" />
-                      ) : (
-                        <TrendingDown className="w-3 h-3 mr-1" />
-                      )}
-                      {Math.abs(trend)}%
-                    </span>
-                    <span className="text-xs text-muted-foreground ml-1">{trendLabel}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Sparkline */}
-              {sparklineData && (
-                <div className="w-16 h-10 opacity-70 group-hover:opacity-100 transition-opacity translate-y-1">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={sparklineData}>
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke={strokeColorMap[color]}
-                        strokeWidth={2}
-                        dot={false}
-                        isAnimationActive={true}
-                        animationDuration={1500}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
+              
+              {trend !== undefined && (
+                <div className="flex items-center gap-2 mt-1">
+                  <span
+                    className={cn(
+                      "text-[11px] font-mono tracking-wider px-1.5 py-0.5 rounded-sm leading-none",
+                      isIncreasing && color !== "destructive"
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : isDecreasing && color !== "destructive"
+                          ? "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                          : isDecreasing && color === "destructive"
+                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                            : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                    )}
+                  >
+                    {isIncreasing ? "+" : ""}{trend}%
+                  </span>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                    {trendLabel}
+                  </span>
                 </div>
               )}
             </div>
-          </div>
+          </CardContent>
+
+          {/* Minimalist Sparkline Background Layer */}
+          {sparklineData && (
+            <div className="absolute bottom-0 left-0 right-0 h-16 opacity-10 pointer-events-none group-hover:opacity-30 transition-opacity duration-500 mask-image:linear-gradient(to_bottom,transparent,black)">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={sparklineData}>
+                  <Line
+                    type="step"
+                    dataKey="value"
+                    stroke={strokeColorMap[color]}
+                    strokeWidth={2}
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </Card>
       </motion.div>
-    );
+    )
   }
-);
+)
 
 // Props interface for the KPIGrid
 interface KPIGridProps {
-  isLoading?: boolean;
+  isLoading?: boolean
 }
 
 /**
  * Enhanced Dashboard KPI Grid with animated cards and loading states
  */
 export const KPIGrid: React.FC<KPIGridProps> = ({ isLoading: externalLoading = false }) => {
-  const { data, isLoading: dataLoading } = useDashboardKPIs();
-  const navigate = useNavigate();
+  const { data, isLoading: dataLoading } = useDashboardKPIs()
+  const navigate = useNavigate()
 
-  const isLoading = externalLoading || dataLoading;
+  const isLoading = externalLoading || dataLoading
 
   const handleNavigate = useCallback(
     (path: string) => {
-      navigate(path);
+      navigate(path)
     },
     [navigate]
-  );
+  )
 
-  const kpis: Omit<KPICardProps, 'index' | 'onNavigate'>[] = useMemo(() => {
-    if (!data) return [];
+  const kpis: Omit<KPICardProps, "index" | "onNavigate">[] = useMemo(() => {
+    if (!data) return []
 
     return [
       {
-        label: 'Total Shipments',
+        label: "Total Shipments",
         value: data.total,
         displayValue: data.total.toLocaleString(),
         icon: Box,
-        color: 'primary',
+        color: "primary",
         trend: 12.5,
-        trendLabel: 'vs last week',
+        trendLabel: "vs last week",
         sparklineData: data.sparklineData,
-        path: '/shipments',
+        path: "/shipments",
       },
       {
-        label: 'Active Transit',
+        label: "Active Transit",
         value: data.active,
         displayValue: data.active.toLocaleString(),
         icon: Activity,
-        color: 'success',
+        color: "success",
         trend: 4.2,
-        trendLabel: 'vs last week',
+        trendLabel: "vs last week",
         sparklineData: data.sparklineData,
-        path: '/shipments?status=IN_TRANSIT',
+        path: "/shipments?status=IN_TRANSIT",
       },
       {
-        label: 'Delivered',
+        label: "Delivered",
         value: data.delivered,
         displayValue: data.delivered.toLocaleString(),
         icon: CheckCircle,
-        color: 'success',
+        color: "success",
         trend: 8.1,
-        trendLabel: 'vs last week',
+        trendLabel: "vs last week",
         sparklineData: data.sparklineData,
-        path: '/shipments?status=DELIVERED',
+        path: "/shipments?status=DELIVERED",
       },
       {
-        label: 'Exceptions',
+        label: "Exceptions",
         value: data.exceptions,
         displayValue: data.exceptions.toString(),
         icon: AlertTriangle,
-        color: data.exceptions > 0 ? 'destructive' : 'warning',
+        color: data.exceptions > 0 ? "destructive" : "warning",
         trend: data.exceptions > 0 ? 15.0 : -2.5,
-        trendLabel: 'vs last week',
-        path: '/exceptions',
+        trendLabel: "vs last week",
+        path: "/exceptions",
       },
       {
-        label: 'SLA Compliance',
+        label: "SLA Compliance",
         value: data.slaCompliance,
         displayValue: `${data.slaCompliance}%`,
         icon: Percent,
-        color: 'success',
+        color: "success",
         trend: 2.1,
-        trendLabel: 'vs last month',
+        trendLabel: "vs last month",
       },
       {
-        label: 'Revenue (Today)',
+        label: "Revenue (Today)",
         value: data.revenue,
         displayValue: `$${(data.revenue / 1000).toFixed(1)}k`,
         icon: DollarSign,
-        color: 'primary',
+        color: "primary",
         trend: 4.5,
-        trendLabel: 'vs yesterday',
+        trendLabel: "vs yesterday",
         isCurrency: true,
       },
       {
-        label: 'Avg Delivery',
+        label: "Avg Delivery",
         value: data.deliveryTime,
         displayValue: `${data.deliveryTime}d`,
         icon: Clock,
-        color: 'primary',
+        color: "primary",
         trend: -0.2, // Faster delivery is negative trend, we handle this visually
-        trendLabel: 'vs last week',
+        trendLabel: "vs last week",
       },
-    ];
-  }, [data]);
+    ]
+  }, [data])
 
   if (isLoading) {
-    return <KPIGridSkeleton />;
+    return <KPIGridSkeleton />
   }
 
-  // To create an uneven grid that looks good (e.g. 7 items)
-  // 4 items on top row, 3 items on bottom row spanning evenly
   return (
-    <div
-      data-testid="kpi-grid"
-      className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-7 gap-4 auto-rows-fr"
-    >
-      {kpis.slice(0, 4).map((kpi, index) => (
-        <div key={kpi.label} className="col-span-1 xl:col-span-1 md:col-span-2 lg:col-span-1">
-          <KPICard {...kpi} onNavigate={handleNavigate} index={index} />
-        </div>
-      ))}
-      {kpis.slice(4).map((kpi, index) => (
-        <div key={kpi.label} className="col-span-1 xl:col-span-1 md:col-span-2 lg:col-span-1">
-          <KPICard {...kpi} onNavigate={handleNavigate} index={index + 4} />
-        </div>
-      ))}
+    <div data-testid="kpi-grid" className="w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-px bg-border/40 border border-border/40">
+        {kpis.map((kpi, index) => (
+          <KPICard key={kpi.label} {...kpi} onNavigate={handleNavigate} index={index} />
+        ))}
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default KPIGrid;
+export default KPIGrid

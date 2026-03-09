@@ -143,7 +143,7 @@ export const Inventory: React.FC = () => {
       <Card className="grid grid-cols-2 gap-px bg-border/40 border-y border-border/40 rounded-none shadow-none my-8">
         {/* Stats are strictly for current page now, which is a trade-off until we implement aggregate API */}
         <div className="p-6 flex items-center gap-4 bg-background">
-          <div className="p-3 bg-primary/10 text-primary rounded-none">
+          <div className="p-4 bg-primary/10 text-primary rounded-none">
             <Package className="w-6 h-6" />
           </div>
           <div>
@@ -156,7 +156,7 @@ export const Inventory: React.FC = () => {
           </div>
         </div>
         <div className="p-6 flex items-center gap-4 bg-background">
-          <div className="p-3 bg-status-error/10 text-status-error rounded-none">
+          <div className="p-4 bg-status-error/10 text-status-error rounded-none">
             <Warehouse className="w-6 h-6" />
           </div>
           <div>

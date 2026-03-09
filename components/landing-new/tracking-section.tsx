@@ -1,16 +1,12 @@
 import { useState } from 'react';
-import { MapPin, FileText, Search, Loader2, Satellite } from 'lucide-react';
+import { MapPin, FileText, Search, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { TrackingResultCard } from '@/components/landing-new/tracking-result-card';
 import { toast } from 'sonner';
 import { getTrackingInfo, TrackingData } from '@/lib/tracking-service';
-import { FadeUp } from '@/components/motion/FadeUp';
-
-// --- Components ---
+import { logger } from '@/lib/logger';
 
 export function TrackingSection() {
   const [trackingMode, setTrackingMode] = useState<'gps' | 'custody'>('gps');
@@ -27,7 +23,6 @@ export function TrackingSection() {
 
     try {
       const result = await getTrackingInfo(trackingNumber.trim());
-
       if (result.success && result.data) {
         setTrackingData(result.data);
         setShowResult(true);
@@ -36,145 +31,106 @@ export function TrackingSection() {
       }
     } catch (error) {
       toast.error('An unexpected error occurred. Please try again.');
-      console.error('Tracking search error:', error);
+      logger.error('TrackingSection', 'Tracking search error', { error });
     } finally {
       setIsSearching(false);
     }
   };
 
   return (
-    <section id="tracking" className="relative w-full py-24 lg:py-32 overflow-hidden">
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="flex flex-col items-center justify-center max-w-5xl mx-auto text-center">
-          {/* Badge */}
-          <FadeUp delay={0.1} className="mb-8">
-            <Badge variant="secondary" className="gap-2 px-4 py-2 rounded-none backdrop-blur-sm">
-              <Satellite className="w-4 h-4 text-secondary-foreground animate-pulse" />
-              <span className="text-xs font-mono font-bold tracking-[0.2em] uppercase">
-                Live Satellite Uplink
-              </span>
-            </Badge>
-          </FadeUp>
-
-          {/* Heading */}
-          <div className="mb-6 space-y-4">
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-foreground">
-              Global Tracking Protocol
-            </h2>
-            <FadeUp delay={0.2}>
-              <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground font-light leading-relaxed">
-                Real-time visibility into your supply chain with millisecond precision telemetry and
-                blockchain-verified custody logs.
-              </p>
-            </FadeUp>
+    <section id="tracking" className="py-24 lg:py-32">
+      <div className="max-w-4xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-muted/50 border border-border/50 text-xs font-mono font-bold text-primary mb-6 uppercase tracking-widest">
+            Manual Tracking
           </div>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6 tracking-tight">
+            Track Your Shipment
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-mono text-sm leading-relaxed">
+            Easily monitor your cargo status between Imphal and New Delhi. Enter your CN number for
+            instant custody updates.
+          </p>
+        </div>
 
-          {/* Tracking Interface */}
-          <FadeUp delay={0.3} className="w-full max-w-xl mt-12">
-            <div className="relative p-2 rounded-none bg-background/50 backdrop-blur-lg border border-border/50 shadow-2xl shadow-primary/5">
-              {/* Tabs */}
-              <div className="flex justify-center mb-6 pt-4">
-                <Tabs
-                  defaultValue="gps"
-                  value={trackingMode}
-                  onValueChange={(v: string) => setTrackingMode(v as 'gps' | 'custody')}
-                  className="w-auto"
+        <div className="max-w-2xl mx-auto p-8 rounded-none bg-card border border-border/50 shadow-xl shadow-black/5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-none blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+          <div className="relative z-10">
+            <Tabs
+              defaultValue="gps"
+              value={trackingMode}
+              onValueChange={(v: string) => setTrackingMode(v as 'gps' | 'custody')}
+              className="w-full mb-8"
+            >
+              <TabsList className="grid w-full grid-cols-2 p-1 bg-muted/50 rounded-none border border-border/50">
+                <TabsTrigger
+                  value="gps"
+                  className="flex items-center gap-2 rounded-none py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border/50 uppercase tracking-widest text-[10px] font-mono font-bold"
                 >
-                  <TabsList className="bg-transparent border-b border-border/10 p-0 h-auto gap-8">
-                    <TabsTrigger
-                      value="gps"
-                      className="rounded-none border-b-2 border-transparent px-4 py-2 text-sm font-medium text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent transition-all"
-                    >
-                      <MapPin className="mr-2 h-4 w-4" />
-                      GPS Telemetry
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="custody"
-                      className="rounded-none border-b-2 border-transparent px-4 py-2 text-sm font-medium text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent transition-all"
-                    >
-                      <FileText className="mr-2 h-4 w-4" />
-                      Chain of Custody
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-
-              {/* Input Area */}
-              <div className="flex flex-col sm:flex-row items-center gap-3 p-2 bg-background rounded-none border border-border/50 shadow-inner group focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                <div className="flex-1 w-full relative">
-                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input
-                    placeholder={trackingMode === 'gps' ? 'ENTER CN / HAWB ID' : 'ENTER CUSTODY ID'}
-                    className="w-full h-12 pl-14 pr-4 bg-transparent border-none text-base font-mono placeholder:text-muted-foreground/50 focus-visible:ring-0 shadow-none"
-                    value={trackingNumber}
-                    onChange={(e) => setTrackingNumber(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSearch();
-                    }}
-                  />
-                </div>
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto h-12 px-8 rounded-none bg-primary text-primary-foreground font-bold tracking-wide shadow-glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all"
-                  onClick={handleSearch}
-                  disabled={isSearching || !trackingNumber}
+                  <MapPin className="h-3 w-3" />
+                  Track by CN
+                </TabsTrigger>
+                <TabsTrigger
+                  value="custody"
+                  className="flex items-center gap-2 rounded-none py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-border/50 uppercase tracking-widest text-[10px] font-mono font-bold"
                 >
-                  {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : 'TRACE'}
-                </Button>
-              </div>
+                  <FileText className="h-3 w-3" />
+                  Custody Log
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
 
-              {/* Recent Traces */}
-              <div className="mt-8 mb-4 px-6">
-                <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-4 text-center">
-                  Recent Traces
-                </p>
-                <div className="flex flex-wrap justify-center gap-3">
-                  {['WGS882190', 'WGS-02531', 'DEL-98234', 'IMP-45621'].map((example) => (
-                    <button
-                      key={example}
-                      type="button"
-                      onClick={() => setTrackingNumber(example)}
-                      className="px-4 py-2 rounded-none bg-secondary/5 border border-border/50 text-xs font-mono text-muted-foreground hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-colors"
-                    >
-                      {example}
-                    </button>
-                  ))}
-                </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  placeholder={trackingMode === 'gps' ? 'Enter CN Number' : 'Enter Custody ID'}
+                  className="h-14 pl-12 rounded-none border border-border/50 bg-background text-sm shadow-sm focus-visible:ring-primary/20 focus-visible:border-primary font-mono uppercase tracking-wider"
+                  value={trackingNumber}
+                  onChange={(e) => setTrackingNumber(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSearch();
+                  }}
+                />
+              </div>
+              <button
+                onClick={handleSearch}
+                disabled={isSearching || !trackingNumber}
+                className="h-14 px-8 bg-primary text-primary-foreground rounded-none font-bold uppercase tracking-widest text-xs hover:scale-[1.02] transition-all duration-300 shadow-[0_0_20px_-5px_var(--primary)] disabled:opacity-50 flex items-center justify-center gap-2 w-full sm:w-auto relative overflow-hidden group border border-primary"
+              >
+                <span className="relative z-10">
+                  {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Track'}
+                </span>
+                <div className="absolute inset-0 h-full w-full scale-0 rounded-none transition-all duration-300 ease-out group-hover:scale-100 group-hover:bg-primary-foreground/10"></div>
+              </button>
+            </div>
+
+            <div className="mt-8 text-center border-t border-border/40 pt-8">
+              <p className="text-[10px] font-bold text-muted-foreground mb-4 uppercase tracking-widest font-mono">
+                Example tracking numbers
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {['WGS882190', 'DEL-98234', 'IMP-45621'].map((example) => (
+                  <button
+                    key={example}
+                    onClick={() => setTrackingNumber(example)}
+                    className="px-4 py-2 text-xs font-mono font-medium border border-border/50 rounded-none bg-muted/20 text-muted-foreground hover:text-foreground hover:border-primary hover:bg-primary/5 transition-all"
+                  >
+                    {example}
+                  </button>
+                ))}
               </div>
             </div>
-          </FadeUp>
-
-          {/* System Status */}
-          <FadeUp delay={0.4} className="mt-12">
-            <Badge
-              variant="outline"
-              className="gap-2 px-4 py-1.5 rounded-none border-primary/10 bg-primary/5 backdrop-blur-sm"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-none bg-primary opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-none bg-primary" />
-              </span>
-              <span className="font-mono text-[10px] font-bold tracking-widest text-primary uppercase">
-                System Operational • 99.9% Uptime
-              </span>
-            </Badge>
-          </FadeUp>
+          </div>
         </div>
       </div>
 
       {/* Tracking Result Modal */}
       <Dialog open={showResult && !!trackingData} onOpenChange={setShowResult}>
-        <DialogContent
-          className="border-none bg-transparent p-0 shadow-none sm:max-w-md w-full [&>button[class*='absolute']]:hidden"
-          aria-describedby={undefined}
-        >
-          <DialogTitle className="sr-only">
-            Tracking Information for {trackingData?.shipment.reference}
-          </DialogTitle>
+        <DialogContent className="sm:max-w-md">
+          <DialogTitle className="sr-only">Tracking Information</DialogTitle>
           {trackingData && (
-            <div className="p-4">
-              <TrackingResultCard data={trackingData} onClose={() => setShowResult(false)} />
-            </div>
+            <TrackingResultCard data={trackingData} onClose={() => setShowResult(false)} />
           )}
         </DialogContent>
       </Dialog>

@@ -80,7 +80,7 @@ function InfoRow({
 }) {
   if (!value && value !== 0) return null;
   return (
-    <div className="flex items-center gap-3 text-sm">
+    <div className="flex items-center gap-4 text-sm">
       <Icon className="w-4 h-4 text-muted-foreground shrink-0" />
       <span className="text-muted-foreground min-w-[80px]">{label}</span>
       <span className="font-medium text-foreground truncate">{value}</span>
@@ -111,9 +111,9 @@ function InvoicePreview({
 
       <Separator />
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {/* Invoice Amount - Most Important */}
-        <div className="flex items-center justify-between p-3 rounded-none bg-primary/5 border border-primary/20">
+        <div className="flex items-center justify-between p-4 rounded-none bg-primary/5 border border-primary/20">
           <div className="flex items-center gap-2">
             <DollarSign className="w-4 h-4 text-primary" />
             <span className="text-sm font-medium text-muted-foreground">Total Amount</span>
@@ -178,7 +178,7 @@ function ManifestPreview({ data }: { data: ManifestWithRelations }) {
 
       <Separator />
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         <div className="flex items-center gap-2 text-sm">
           <MapPin className="w-4 h-4 text-muted-foreground" />
           <span className="font-medium">{data.from_hub?.name || data.from_hub?.code || '—'}</span>
@@ -352,7 +352,7 @@ export function ScanPreviewDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[80vh] flex-col sm:max-w-md animate-in fade-in-0 zoom-in-95 duration-200">
-        <DialogHeader className="space-y-3">
+        <DialogHeader className="space-y-4">
           <DialogTitle className="flex items-center gap-2.5 text-lg">
             {scanType === 'shipment' ? (
               <div className="p-2 rounded-none bg-primary/10">
@@ -378,7 +378,7 @@ export function ScanPreviewDialog({
           {/* Loading — show scanned code immediately while fetching */}
           {loading && (
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 rounded-none bg-muted/50 border border-border">
+              <div className="flex items-center gap-4 p-4 rounded-none bg-muted/50 border border-border">
                 <Package className="w-5 h-5 text-primary animate-pulse" />
                 <div>
                   <p className="font-mono text-sm font-bold tracking-wide">{scannedData}</p>
@@ -402,7 +402,7 @@ export function ScanPreviewDialog({
 
           {/* Error */}
           {error && !loading && (
-            <div className="flex items-start gap-3 p-4 rounded-none bg-destructive/10 text-destructive">
+            <div className="flex items-start gap-4 p-4 rounded-none bg-destructive/10 text-destructive">
               <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium text-sm">{error}</p>
@@ -421,7 +421,7 @@ export function ScanPreviewDialog({
 
           {/* Unknown format */}
           {!loading && scanType === 'unknown' && scannedData && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="p-4 rounded-none bg-muted">
                 <p className="text-xs text-muted-foreground mb-1">Scanned Value</p>
                 <p className="font-mono text-lg font-bold break-all">{scannedData}</p>

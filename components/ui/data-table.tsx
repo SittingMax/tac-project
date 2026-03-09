@@ -120,10 +120,10 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('flex flex-col gap-4', className)}>
       {/* Search */}
       {searchKey && (
-        <div className="flex items-center gap-2">
+        <div className="flex flex-shrink-0 items-center gap-2">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -137,8 +137,8 @@ export function DataTable<TData, TValue>({
       )}
 
       {/* Table */}
-      <div className="border-t border-b border-border bg-background text-foreground overflow-x-auto">
-        <Table className="w-full">
+      <div className="border-t border-b border-border bg-background text-foreground flex-1 overflow-auto min-h-0 relative">
+        <Table className="w-full relative">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -150,7 +150,7 @@ export function DataTable<TData, TValue>({
                           className={cn(
                             'flex items-center gap-1 font-mono uppercase text-[10px] tracking-widest text-muted-foreground',
                             header.column.getCanSort() &&
-                              'cursor-pointer select-none hover:text-foreground transition-colors'
+                            'cursor-pointer select-none hover:text-foreground transition-colors'
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                         >
@@ -202,8 +202,8 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
+      <div className="flex items-center justify-between flex-shrink-0">
+        <p className="text-sm text-muted-foreground hidden sm:block">
           Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}{' '}
           to{' '}
           {Math.min(

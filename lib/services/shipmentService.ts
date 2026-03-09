@@ -2,7 +2,6 @@
  * Shipment Service
  * All shipment CRUD operations
  */
-/* eslint-disable @typescript-eslint/no-explicit-any -- Supabase client requires any for complex insert/update operations */
 
 import { supabase } from '@/lib/supabase';
 import { mapSupabaseError, ValidationError } from '@/lib/errors';
@@ -90,6 +89,7 @@ export const shipmentService = {
 
     const { data, error } = await query;
     if (error) throw mapSupabaseError(error);
+    // eslint-disable-next-line no-restricted-syntax -- Supabase query result type casting
     return (data ?? []) as unknown as ShipmentWithRelations[];
   },
 
@@ -112,6 +112,7 @@ export const shipmentService = {
       .single();
 
     if (error) throw mapSupabaseError(error);
+    // eslint-disable-next-line no-restricted-syntax -- Supabase query result type casting
     return data as unknown as ShipmentWithRelations;
   },
 
@@ -134,6 +135,7 @@ export const shipmentService = {
       .maybeSingle();
 
     if (error) throw mapSupabaseError(error);
+    // eslint-disable-next-line no-restricted-syntax -- Supabase query result type casting
     return data as unknown as ShipmentWithRelations | null;
   },
 
@@ -143,7 +145,7 @@ export const shipmentService = {
     // Generate AWB if not provided
     let awbNumber = shipment.cn_number;
     if (!awbNumber) {
-      const { data: awbData, error: awbError } = await (supabase.rpc as any)('generate_cn_number', {
+      const { data: awbData, error: awbError } = await supabase.rpc('generate_cn_number', {
         p_org_id: orgId,
       });
       if (awbError) throw mapSupabaseError(awbError);
@@ -153,7 +155,8 @@ export const shipmentService = {
       awbNumber = awbData;
     }
 
-    const { data, error } = await (supabase.from('shipments') as any)
+    const { data, error } = await supabase
+      .from('shipments')
       .insert({
         ...shipment,
         org_id: orgId,
@@ -170,7 +173,8 @@ export const shipmentService = {
   async update(id: string, updates: ShipmentUpdate): Promise<Shipment> {
     const orgId = orgService.getCurrentOrgId();
 
-    const { data, error } = await (supabase.from('shipments') as any)
+    const { data, error } = await supabase
+      .from('shipments')
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
@@ -213,7 +217,8 @@ export const shipmentService = {
       });
     }
 
-    const { data, error } = await (supabase.from('shipments') as any)
+    const { data, error } = await supabase
+      .from('shipments')
       .update({
         status,
         updated_at: new Date().toISOString(),
@@ -226,7 +231,7 @@ export const shipmentService = {
     if (error) throw mapSupabaseError(error);
 
     // Create tracking event for audit trail
-    await (supabase.from('tracking_events') as any).insert({
+    await supabase.from('tracking_events').insert({
       org_id: orgId,
       shipment_id: id,
       cn_number: current.cn_number,
@@ -245,7 +250,8 @@ export const shipmentService = {
   async delete(id: string): Promise<void> {
     const orgId = orgService.getCurrentOrgId();
 
-    const { error } = await (supabase.from('shipments') as any)
+    const { error } = await supabase
+      .from('shipments')
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)
       .eq('org_id', orgId);
@@ -261,7 +267,8 @@ export const shipmentService = {
   }> {
     const orgId = orgService.getCurrentOrgId();
 
-    const { data, error } = await (supabase.from('shipments') as any)
+    const { data, error } = await supabase
+      .from('shipments')
       .select('status')
       .eq('org_id', orgId)
       .is('deleted_at', null);

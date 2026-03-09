@@ -46,7 +46,7 @@ export function LoadingCarousel({ tips, autoplayInterval = 5000 }: LoadingCarous
     <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 min-h-[600px] border border-dashed border-border rounded-none overflow-hidden bg-background/50 backdrop-blur-sm">
       {/* Left: Content & Navigation */}
       <div className="flex flex-col justify-center p-8 lg:p-16 border-b lg:border-b-0 lg:border-r border-dashed border-border">
-        <div className="mb-8 flex items-center gap-3">
+        <div className="mb-8 flex items-center gap-4">
           <div className="h-px w-8 bg-primary/50" />
           <span className="text-primary font-mono text-xs tracking-[0.2em] uppercase font-bold">
             SYSTEM CAPABILITY // 0{current + 1}
@@ -79,7 +79,7 @@ export function LoadingCarousel({ tips, autoplayInterval = 5000 }: LoadingCarous
               key={index}
               onClick={() => handleDotClick(index)}
               className={cn(
-                'relative group text-left px-5 py-4 rounded-none border border-transparent transition-all duration-300 isolate overflow-hidden',
+                'relative group text-left px-4 py-4 rounded-none border border-transparent transition-all duration-300 isolate overflow-hidden',
                 current === index
                   ? 'bg-foreground/5 border-primary/30'
                   : 'hover:bg-foreground/5 hover:border-border'

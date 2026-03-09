@@ -63,7 +63,7 @@ export default function ShiftReport() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Select value={shiftHours} onValueChange={(v) => setShiftHours(v as ShiftDuration)}>
             <SelectTrigger className="w-[140px] rounded-none font-mono text-xs uppercase tracking-widest h-10 border-border bg-background">
               <SelectValue placeholder="DURATION" />
@@ -200,7 +200,7 @@ export default function ShiftReport() {
                 <CardDescription>Distribution of shipment statuses</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {Object.entries(report.shipments.byStatus).map(([status, count]) => (
                     <div key={status} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -226,8 +226,8 @@ export default function ShiftReport() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-none">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-none">
+                    <div className="flex items-center gap-2">
                       <AlertCircle className="h-5 w-5 text-status-warning" />
                       <span>Open Manifests</span>
                     </div>
@@ -240,8 +240,8 @@ export default function ShiftReport() {
                     </Badge>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-none">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-none">
+                    <div className="flex items-center gap-2">
                       <XCircle className="h-5 w-5 text-status-error" />
                       <span>Unresolved Exceptions</span>
                     </div>
@@ -254,8 +254,8 @@ export default function ShiftReport() {
                     </Badge>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-none">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-none">
+                    <div className="flex items-center gap-2">
                       <Package className="h-5 w-5 text-status-info" />
                       <span>Awaiting Pickup</span>
                     </div>
@@ -312,9 +312,9 @@ export default function ShiftReport() {
                 <CardDescription>Latest operations during shift</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                <div className="space-y-4 max-h-[300px] overflow-y-auto">
                   {report.recentActivity.map((activity, i) => (
-                    <div key={i} className="flex items-start gap-3 text-sm">
+                    <div key={i} className="flex items-start gap-2 text-sm">
                       <span className="text-muted-foreground whitespace-nowrap">
                         {format(new Date(activity.time), 'HH:mm')}
                       </span>
@@ -346,7 +346,7 @@ export default function ShiftReport() {
                   {Object.entries(report.scans.bySource).map(([source, count]) => (
                     <div
                       key={source}
-                      className="flex items-center gap-2 p-3 bg-muted/50 rounded-none"
+                      className="flex items-center gap-2 p-4 bg-muted/50 rounded-none"
                     >
                       <ScanLine className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">{source}</span>

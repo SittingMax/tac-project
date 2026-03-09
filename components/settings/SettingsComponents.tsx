@@ -23,7 +23,7 @@ export const SectionHeader = ({
   title: string;
   color?: string;
 }) => (
-  <div className="flex items-center gap-3 mb-8 pb-4 border-b border-border/40">
+  <div className="flex items-center gap-4 mb-8 pb-4 border-b border-border/40">
     <Icon className={`w-4 h-4 ${color} opacity-70`} />
     <h3 className="text-xs font-mono font-black border border-border px-2 py-0.5 uppercase tracking-widest text-foreground">
       {title}
@@ -54,7 +54,7 @@ export const SelectField = ({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
-      className="flex h-10 w-full rounded-none border border-border bg-background px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest text-foreground transition-colors focus:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 appearance-none pr-8 hover:bg-muted/10 cursor-pointer"
+      className="flex h-10 w-full rounded-none border border-border bg-background px-4 py-1.5 text-[10px] font-mono uppercase tracking-widest text-foreground transition-colors focus:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 appearance-none pr-8 hover:bg-muted/10 cursor-pointer"
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value} className="bg-background">

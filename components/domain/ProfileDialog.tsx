@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Moon, Sun, Monitor } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 interface ProfileDialogProps {
   open: boolean;
@@ -63,7 +64,7 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
       setAvatarUrl(publicUrl);
       toast.success('Image uploaded successfully');
     } catch (error) {
-      console.error('Upload error:', error);
+      logger.error('ProfileDialog', 'Upload error', { error });
       toast.error('Failed to upload image');
     } finally {
       setIsUploading(false);
@@ -178,21 +179,21 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
               <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={() => setTheme('light')}
-                  className={`flex flex-col items-center justify-center p-3 rounded-none border-2 transition-all ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
+                  className={`flex flex-col items-center justify-center p-4 rounded-none border-2 transition-all ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
                 >
                   <Sun className="w-5 h-5 mb-2" />
                   <span className="text-xs">Light</span>
                 </button>
                 <button
                   onClick={() => setTheme('dark')}
-                  className={`flex flex-col items-center justify-center p-3 rounded-none border-2 transition-all ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
+                  className={`flex flex-col items-center justify-center p-4 rounded-none border-2 transition-all ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
                 >
                   <Moon className="w-5 h-5 mb-2" />
                   <span className="text-xs">Dark</span>
                 </button>
                 <button
                   onClick={() => setTheme('system')}
-                  className={`flex flex-col items-center justify-center p-3 rounded-none border-2 transition-all ${theme === 'system' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
+                  className={`flex flex-col items-center justify-center p-4 rounded-none border-2 transition-all ${theme === 'system' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
                 >
                   <Monitor className="w-5 h-5 mb-2" />
                   <span className="text-xs">System</span>

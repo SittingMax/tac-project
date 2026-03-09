@@ -13,15 +13,14 @@ export const useGlobalSearch = (query: string) => {
       if (!query || query.length < 2) return [];
       if (!orgId) throw new Error('Organization ID requires for search');
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any).rpc('search_global', {
+      const { data, error } = await supabase.rpc('search_global', {
         p_query: query,
         p_org_id: orgId,
         p_limit: 50,
       });
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as SearchResult[];
     },
     enabled: !!query && query.length >= 2 && !!orgId,
     staleTime: 1000 * 60 * 1, // 1 minute

@@ -73,6 +73,7 @@ function combineDateTimeWithPeriod(
 }
 
 import { useHubs } from '@/hooks/useHubs';
+import { logger } from '@/lib/logger';
 
 export function ManifestBuilderWizard({
   open,
@@ -272,7 +273,7 @@ export function ManifestBuilderWizard({
       }, PORTAL_CLEANUP_DELAY_MS);
     } catch (error) {
       toast.error('Failed to close manifest');
-      console.error('Error closing manifest:', error);
+      logger.error('ManifestBuilderWizard', 'Error closing manifest', { error });
       setIsSaving(false);
     }
   };
@@ -323,7 +324,7 @@ export function ManifestBuilderWizard({
 
           {/* Content - Use CSS visibility instead of conditional rendering to prevent portal destruction */}
           <div className="flex-1 min-h-0 overflow-y-auto bg-background/50">
-            <div className="p-4 sm:p-5 md:p-6 lg:p-8">
+            <div className="p-4 sm:p-4 md:p-6 lg:p-8">
               {/* Step 1: Manifest Setup - Always mounted, hidden via CSS */}
               <div
                 className={currentStep === 1 ? 'block' : 'hidden'}

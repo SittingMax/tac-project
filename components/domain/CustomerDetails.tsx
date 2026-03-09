@@ -39,7 +39,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onCl
             )}
           </div>
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <h2 className="text-2xl font-bold text-foreground">
                 {customer.companyName || customer.name}
               </h2>

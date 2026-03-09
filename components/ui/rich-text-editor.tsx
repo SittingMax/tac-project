@@ -113,7 +113,7 @@ const ToolbarButton = memo(
           <TooltipPrimitive.Portal>
             <TooltipPrimitive.Content
               side="bottom"
-              className="z-50 overflow-hidden rounded-none bg-popover px-3 py-1.5 text-xs font-medium text-popover-foreground shadow-lg border border-border/50 animate-in fade-in-0 zoom-in-95"
+              className="z-50 overflow-hidden rounded-none bg-popover px-4 py-1.5 text-xs font-medium text-popover-foreground shadow-lg border border-border/50 animate-in fade-in-0 zoom-in-95"
               sideOffset={6}
             >
               {tooltip}
@@ -184,7 +184,7 @@ const LinkPopover = memo<{ editor: Editor }>(({ editor }) => {
           side="bottom"
           align="start"
           sideOffset={8}
-          className="z-50 w-72 rounded-none bg-popover border border-border/60 shadow-xl p-3 animate-in fade-in-0 zoom-in-95"
+          className="z-50 w-72 rounded-none bg-popover border border-border/60 shadow-xl p-4 animate-in fade-in-0 zoom-in-95"
         >
           <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1.5 block">
             URL
@@ -198,7 +198,7 @@ const LinkPopover = memo<{ editor: Editor }>(({ editor }) => {
               className="h-8 text-sm bg-background"
               onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
             />
-            <Button size="sm" className="h-8 px-3 text-xs" onClick={handleSubmit}>
+            <Button size="sm" className="h-8 px-4 text-xs" onClick={handleSubmit}>
               Set
             </Button>
           </div>
@@ -248,7 +248,7 @@ const ImagePopover = memo<{ editor: Editor }>(({ editor }) => {
           side="bottom"
           align="start"
           sideOffset={8}
-          className="z-50 w-72 rounded-none bg-popover border border-border/60 shadow-xl p-3 animate-in fade-in-0 zoom-in-95"
+          className="z-50 w-72 rounded-none bg-popover border border-border/60 shadow-xl p-4 animate-in fade-in-0 zoom-in-95"
         >
           <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1.5 block">
             Image URL
@@ -262,7 +262,7 @@ const ImagePopover = memo<{ editor: Editor }>(({ editor }) => {
               className="h-8 text-sm bg-background"
               onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
             />
-            <Button size="sm" className="h-8 px-3 text-xs" onClick={handleSubmit}>
+            <Button size="sm" className="h-8 px-4 text-xs" onClick={handleSubmit}>
               Add
             </Button>
           </div>
@@ -505,8 +505,8 @@ const EditorFooter = memo<{ editor: Editor }>(({ editor }) => {
   const readingTime = Math.max(1, Math.ceil(words / 200));
 
   return (
-    <div className="flex items-center justify-between border-t border-border/50 bg-muted/10 px-3 py-1.5">
-      <div className="flex items-center gap-3">
+    <div className="flex items-center justify-between border-t border-border/50 bg-muted/10 px-4 py-1.5">
+      <div className="flex items-center gap-4">
         <div className="flex items-center gap-1.5">
           <Type className="h-3 w-3 text-muted-foreground/50" />
           <span className="text-[10px] font-mono text-muted-foreground/70">
@@ -578,7 +578,7 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
       editorProps: {
         attributes: {
           class: cn(
-            'prose prose-sm dark:prose-invert max-w-none focus:outline-none px-4 py-3',
+            'prose prose-sm dark:prose-invert max-w-none focus:outline-none px-4 py-2',
             'prose-headings:font-semibold prose-headings:text-foreground prose-headings:tracking-tight',
             'prose-p:text-foreground prose-p:leading-relaxed',
             'prose-a:text-primary prose-a:no-underline hover:prose-a:underline',

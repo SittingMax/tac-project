@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from './button';
+import { logger } from '@/lib/logger';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -36,7 +37,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Log to console in development
-    console.error('[ErrorBoundary] Caught error:', error, errorInfo);
+    logger.captureError('ErrorBoundary', error, { componentStack: errorInfo.componentStack });
 
     // Call custom error handler if provided
     this.props.onError?.(error, errorInfo);
@@ -89,12 +90,12 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
 
       <p className="text-sm text-muted-foreground max-w-md mb-4">{description}</p>
 
-      {error && process.env.NODE_ENV === 'development' && (
+      {error && import.meta.env.DEV && (
         <details className="mb-4 text-left w-full max-w-md">
           <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
             Technical Details
           </summary>
-          <pre className="mt-2 p-3 bg-muted rounded-none text-xs overflow-auto">
+          <pre className="mt-2 p-4 bg-muted rounded-none text-xs overflow-auto">
             {error.message}
             {error.stack && (
               <>
@@ -124,7 +125,7 @@ export const InlineError: React.FC<{
   onRetry?: () => void;
 }> = ({ message, onRetry }) => {
   return (
-    <div className="flex items-center gap-2 p-3 bg-destructive/5 border border-destructive/20 rounded-none text-sm">
+    <div className="flex items-center gap-2 p-4 bg-destructive/5 border border-destructive/20 rounded-none text-sm">
       <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
       <span className="text-destructive flex-1">{message}</span>
       {onRetry && (

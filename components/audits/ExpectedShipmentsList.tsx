@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Box, AlertTriangle, Filter } from 'lucide-react';
 import type { AuditItem, ScannedItemStatus } from '@/hooks/useArrivalAudit';
+import { useCreateException } from '@/hooks/useExceptions';
+import { showErrorToast, showSuccessToast } from '@/lib/errors';
 
 interface ExpectedShipmentsListProps {
   items: AuditItem[];
@@ -13,6 +15,25 @@ type FilterType = 'ALL' | ScannedItemStatus;
 
 export const ExpectedShipmentsList: React.FC<ExpectedShipmentsListProps> = ({ items }) => {
   const [filter, setFilter] = useState<FilterType>('ALL');
+  const createException = useCreateException();
+
+  const handleMarkException = useCallback(
+    async (cnNumber: string, shipmentId: string) => {
+      try {
+        await createException.mutateAsync({
+          shipment_id: shipmentId,
+          cn_number: cnNumber,
+          type: 'SHORTAGE',
+          severity: 'HIGH',
+          description: `Missing from manifest during arrival audit. CN: ${cnNumber}`,
+        });
+        showSuccessToast(`Exception raised for ${cnNumber}`);
+      } catch (err) {
+        showErrorToast(err instanceof Error ? err : 'Failed to create exception');
+      }
+    },
+    [createException]
+  );
 
   const filteredItems = items.filter((i) => filter === 'ALL' || i.status === filter);
 
@@ -27,19 +48,19 @@ export const ExpectedShipmentsList: React.FC<ExpectedShipmentsListProps> = ({ it
         <div className="flex bg-muted/20 border border-border p-1">
           <button
             onClick={() => setFilter('ALL')}
-            className={`px-3 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${filter === 'ALL' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
+            className={`px-4 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${filter === 'ALL' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
           >
             All
           </button>
           <button
             onClick={() => setFilter('PENDING')}
-            className={`px-3 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${filter === 'PENDING' ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
+            className={`px-4 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${filter === 'PENDING' ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
           >
             Pending
           </button>
           <button
             onClick={() => setFilter('SCANNED')}
-            className={`px-3 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${filter === 'SCANNED' ? 'bg-status-success/20 text-status-success' : 'text-muted-foreground hover:bg-muted/50'}`}
+            className={`px-4 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${filter === 'SCANNED' ? 'bg-status-success/20 text-status-success' : 'text-muted-foreground hover:bg-muted/50'}`}
           >
             Scanned
           </button>
@@ -104,10 +125,11 @@ export const ExpectedShipmentsList: React.FC<ExpectedShipmentsListProps> = ({ it
 
                   {item.status === 'PENDING' && (
                     <button
-                      onClick={() => console.log(`Mark exception for ${item.shipment.cn_number}`)}
-                      className="text-[10px] font-mono uppercase tracking-widest text-status-error opacity-50 hover:opacity-100 transition-opacity"
+                      onClick={() => handleMarkException(item.shipment.cn_number, item.shipment.id)}
+                      disabled={createException.isPending}
+                      className="text-[10px] font-mono uppercase tracking-widest text-status-error opacity-50 hover:opacity-100 transition-opacity disabled:opacity-30"
                     >
-                      Mark Exception
+                      {createException.isPending ? 'Creating...' : 'Mark Exception'}
                     </button>
                   )}
                   {item.status === 'SCANNED' && (

@@ -43,11 +43,11 @@ export function validateEnv(): Env | null {
       .join('\n');
 
     if (import.meta.env.PROD) {
-      throw new Error(`[WGS Portal] Invalid environment configuration:\n${message}`);
+      throw new Error(`[TAC Portal] Invalid environment configuration:\n${message}`);
     }
 
     console.warn(
-      `[WGS Portal] Environment validation warnings:\n${message}\n` +
+      `[TAC Portal] Environment validation warnings:\n${message}\n` +
         'Some features may be unavailable in development.'
     );
     return null;

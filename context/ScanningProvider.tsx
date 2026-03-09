@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { X, ScanBarcode, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import { ScanSource } from '@/types';
 import {
   ScanningContext,
@@ -46,6 +47,7 @@ export function ScanningProvider({ children }: ScanningProviderProps) {
   const lastKeyTimeRef = useRef<number>(0);
   const keyTimingsRef = useRef<number[]>([]); // Inter-key delays for speed detection
   const autoSubmitTimerRef = useRef<NodeJS.Timeout | null>(null); // Auto-submit timer for scanners without Enter
+  const recentSubmissionsRef = useRef<Map<string, number>>(new Map()); // Debounce duplicates
 
   // Keep the ref in sync with state
   useEffect(() => {
@@ -88,11 +90,11 @@ export function ScanningProvider({ children }: ScanningProviderProps) {
         try {
           cb(data, source);
         } catch (e) {
-          console.error('[ScanningProvider] Error in listener:', e);
+          logger.error('ScanningProvider', 'Error in listener', { error: e });
         }
       });
     } else {
-      console.warn('[ScanningProvider] No listeners registered for this scan.');
+      logger.warn('ScanningProvider', 'No listeners registered for this scan');
       if (source === ScanSource.BARCODE_SCANNER) {
         toast.success(`Scanned: ${data}`);
       }
@@ -146,6 +148,16 @@ export function ScanningProvider({ children }: ScanningProviderProps) {
         : buffer && buffer.length >= MIN_SCAN_LENGTH && isScannerSpeed(timings);
 
       if (scannerDetected) {
+        const now = Date.now();
+        const lastTime = recentSubmissionsRef.current.get(buffer);
+        if (lastTime && now - lastTime < 500) {
+          // Debounce duplicate submissions
+          bufferRef.current = '';
+          keyTimingsRef.current = [];
+          return;
+        }
+        recentSubmissionsRef.current.set(buffer, now);
+
         // eslint-disable-next-line no-console
         console.debug('[ScanningProvider] Scanner detected - submitting:', buffer);
 

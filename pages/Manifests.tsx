@@ -203,7 +203,7 @@ export const Manifests: React.FC = () => {
           <Skeleton className="h-24" />
         </div>
         <Card className="p-6">
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Skeleton className="h-10 w-64" />
             <Skeleton className="h-64" />
           </div>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { BrowserMultiFormatReader } from '@zxing/library';
+import { BrowserMultiFormatReader, BrowserCodeReader } from '@zxing/browser';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 import {
   CameraOff,
   RefreshCw,
@@ -87,7 +88,7 @@ export function BarcodeScanner({
         audioContext.close();
       }, 100);
     } catch (e) {
-      console.error('Audio playback failed', e);
+      logger.error('BarcodeScanner', 'Audio playback failed', { error: e });
     }
   }, []);
 
@@ -96,9 +97,6 @@ export function BarcodeScanner({
     if (controlsRef.current) {
       controlsRef.current.stop();
       controlsRef.current = null;
-    }
-    if (readerRef.current) {
-      readerRef.current.reset();
     }
     setIsScanning(false);
   }, []);
@@ -109,12 +107,9 @@ export function BarcodeScanner({
 
     // eslint-disable-next-line no-console
     console.debug('[BarcodeScanner] Initializing camera...', { active });
-    const reader = new BrowserMultiFormatReader();
-    readerRef.current = reader;
 
-    // Get available cameras
-    reader
-      .listVideoInputDevices()
+    // Get available cameras via static method (@zxing/browser API)
+    BrowserCodeReader.listVideoInputDevices()
       .then((devices) => {
         // eslint-disable-next-line no-console
         console.debug('[BarcodeScanner] Cameras found:', devices);
@@ -133,7 +128,7 @@ export function BarcodeScanner({
         }
       })
       .catch((err) => {
-        console.error('Camera access error:', err);
+        logger.error('BarcodeScanner', 'Camera access error', { error: err });
         setHasCamera(false);
         onErrorRef.current?.(err);
       });
@@ -145,9 +140,10 @@ export function BarcodeScanner({
 
   // Start scanning when camera is selected
   useEffect(() => {
-    if (!selectedCamera || !videoRef.current || !readerRef.current || !active) return;
+    if (!selectedCamera || !videoRef.current || !active) return;
 
-    const reader = readerRef.current;
+    const reader = new BrowserMultiFormatReader();
+    readerRef.current = reader;
 
     // Stop previous scan if any
     if (controlsRef.current) {
@@ -159,29 +155,25 @@ export function BarcodeScanner({
     const constraints: MediaStreamConstraints = {
       video: {
         deviceId: selectedCamera,
-        facingMode: 'environment', // Prefer back camera
+        facingMode: 'environment',
         width: { ideal: 1280 },
         height: { ideal: 720 },
-        // Advanced constraints for zoom/torch (non-standard but widely supported)
         advanced: [{ zoom: zoomLevel, torch: torchEnabled } as unknown as MediaTrackConstraintSet],
       },
     };
 
     reader
-      .decodeFromConstraints(constraints, videoRef.current, (result, _error) => {
+      .decodeFromConstraints(constraints, videoRef.current!, (result, _error) => {
         if (result) {
           const text = result.getText();
           // eslint-disable-next-line no-console
           console.debug('[BarcodeScanner] Decoded text:', text);
-          // Debounce: skip if same barcode scanned within 2s
           if (text !== lastScannedRef.current) {
             // eslint-disable-next-line no-console
             console.debug('[BarcodeScanner] Valid new scan (not debounced):', text);
             lastScannedRef.current = text;
             setLastScanned(text);
-            // Audio feedback is handled by the business-logic layer
             onScanRef.current(text);
-            // Reset debounce after 2s
             if (lastScannedTimerRef.current) clearTimeout(lastScannedTimerRef.current);
             lastScannedTimerRef.current = setTimeout(() => {
               lastScannedRef.current = null;
@@ -190,11 +182,9 @@ export function BarcodeScanner({
           }
         }
       })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .then((controls: any) => {
+      .then((controls) => {
         controlsRef.current = controls;
 
-        // Get capabilities for zoom/torch
         const track =
           videoRef.current?.srcObject instanceof MediaStream
             ? videoRef.current.srcObject.getVideoTracks()[0]
@@ -205,7 +195,7 @@ export function BarcodeScanner({
         }
       })
       .catch((err) => {
-        console.error('Decode error', err);
+        logger.error('BarcodeScanner', 'Decode error', { error: err });
         setIsScanning(false);
         onErrorRef.current?.(err);
       });
@@ -235,9 +225,9 @@ export function BarcodeScanner({
               } as unknown as MediaTrackConstraintSet,
             ],
           })
-          .catch((e) => console.warn('Failed to apply constraints', e));
+          .catch((e) => logger.warn('BarcodeScanner', 'Failed to apply constraints', { error: e }));
       } catch (e) {
-        console.warn('Constraints error', e);
+        logger.warn('BarcodeScanner', 'Constraints error', { error: e });
       }
     }
   }, [torchEnabled, zoomLevel, isScanning]);
@@ -263,9 +253,7 @@ export function BarcodeScanner({
     if (!file) return;
 
     try {
-      // Need a separate reader instance or ensure current is clean
-      // We'll use the existing readerRef if available, or create new
-      const reader = readerRef.current || new BrowserMultiFormatReader();
+      const reader = new BrowserMultiFormatReader();
       const url = URL.createObjectURL(file);
 
       // eslint-disable-next-line no-console
@@ -281,7 +269,7 @@ export function BarcodeScanner({
         onScanRef.current(text);
       }
     } catch (err) {
-      console.error('[BarcodeScanner] Failed to decode image:', err);
+      logger.error('BarcodeScanner', 'Failed to decode image', { error: err });
       onErrorRef.current?.(err as Error);
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -357,7 +345,7 @@ export function BarcodeScanner({
       <div className="absolute bottom-6 inset-x-0 flex flex-col items-center gap-4 pointer-events-auto px-4">
         {/* Zoom Slider */}
         {supportsZoom && (
-          <div className="w-full max-w-xs flex items-center gap-2 bg-background/40 backdrop-blur rounded-none px-3 py-1">
+          <div className="w-full max-w-xs flex items-center gap-2 bg-background/40 backdrop-blur rounded-none px-4 py-1">
             <ZoomOut className="w-4 h-4 text-foreground" />
             <Slider
               value={[zoomLevel]}
@@ -371,7 +359,7 @@ export function BarcodeScanner({
           </div>
         )}
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {/* File Upload for Image Scan */}
           <Button
             size="icon"

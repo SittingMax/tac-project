@@ -81,26 +81,19 @@ export const Analytics: React.FC = () => {
   }
 
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none">
-          Telemetry<span className="text-primary">.</span>
-        </h1>
-        <p className="text-muted-foreground font-mono text-sm tracking-widest uppercase">
-          Live operations matrix / Realtime sync active
-        </p>
-      </div>
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
+      <PageHeader title="Telemetry" description="Live operations matrix / Realtime sync active" />
 
       {/* Avant-Garde KPI Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-px bg-border/40 border-y border-border/40">
         <div className="bg-background p-8 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10">
           <div className="flex items-center justify-between mb-8">
-            <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
+            <span className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-widest">
               Gross Volume
             </span>
             <Package className="w-4 h-4 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
           </div>
-          <div className="text-5xl font-black tracking-tighter">
+          <div className="text-4xl md:text-5xl font-black tracking-tighter text-foreground">
             {summary.total_shipments.toLocaleString()}
           </div>
           <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
@@ -108,14 +101,14 @@ export const Analytics: React.FC = () => {
 
         <div className="bg-background p-8 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10">
           <div className="flex items-center justify-between mb-8">
-            <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
+            <span className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-widest">
               Delivery Rate
             </span>
             <TrendingUp className="w-4 h-4 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
           </div>
           <div
             className={cn(
-              'text-5xl font-black tracking-tighter',
+              'text-4xl md:text-5xl font-black tracking-tighter',
               Number(deliveryRate) > 95 ? 'text-primary' : 'text-status-warning'
             )}
           >
@@ -127,12 +120,12 @@ export const Analytics: React.FC = () => {
 
         <div className="bg-background p-8 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10">
           <div className="flex items-center justify-between mb-8">
-            <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
+            <span className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-widest">
               On Track
             </span>
             <CheckCircle className="w-4 h-4 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
           </div>
-          <div className="text-5xl font-black tracking-tighter">
+          <div className="text-4xl md:text-5xl font-black tracking-tighter text-foreground">
             {summary.on_track.toLocaleString()}
           </div>
           <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
@@ -140,12 +133,12 @@ export const Analytics: React.FC = () => {
 
         <div className="bg-background p-8 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10">
           <div className="flex items-center justify-between mb-8">
-            <span className="text-xs font-mono text-destructive uppercase tracking-widest">
+            <span className="text-[10px] font-mono text-destructive/80 uppercase tracking-widest">
               Anomalies
             </span>
             <AlertTriangle className="w-4 h-4 text-destructive opacity-50 group-hover:opacity-100 transition-opacity" />
           </div>
-          <div className="text-5xl font-black tracking-tighter text-destructive">
+          <div className="text-4xl md:text-5xl font-black tracking-tighter text-destructive">
             {summary.exceptions.toLocaleString()}
           </div>
           <div className="absolute bottom-0 left-0 w-full h-[2px] bg-destructive transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
@@ -154,12 +147,12 @@ export const Analytics: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
         {/* Trajectory */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="flex items-end justify-between border-b border-border/40 pb-4">
             <div>
-              <h3 className="text-xl font-bold uppercase tracking-tight">Flow Trajectory</h3>
-              <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
-                6-Month historical macro-view
+              <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Flow Trajectory</h3>
+              <p className="text-2xl font-bold tracking-tighter text-foreground mt-1">
+                6-Month Macro-View
               </p>
             </div>
           </div>
@@ -225,12 +218,12 @@ export const Analytics: React.FC = () => {
         </div>
 
         {/* State Distribution */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="flex items-end justify-between border-b border-border/40 pb-4">
             <div>
-              <h3 className="text-xl font-bold uppercase tracking-tight">Status Distribution</h3>
-              <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
-                Current state architecture
+              <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Status Distribution</h3>
+              <p className="text-2xl font-bold tracking-tighter text-foreground mt-1">
+                Current State Architecture
               </p>
             </div>
           </div>

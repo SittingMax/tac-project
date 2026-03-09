@@ -96,7 +96,7 @@ const MagnifiedBento = () => {
                     return (
                       <div
                         key={`${item.id}-${idx}`}
-                        className="flex gap-2 bg-background/50 backdrop-blur-sm whitespace-nowrap w-fit text-muted-foreground p-2 px-3 items-center border border-border/50 rounded-none text-xs"
+                        className="flex gap-2 bg-background/50 backdrop-blur-sm whitespace-nowrap w-fit text-muted-foreground p-2 px-4 items-center border border-border/50 rounded-none text-xs"
                       >
                         <IconComponent size={14} />
                         <span>{item.label}</span>
@@ -132,7 +132,7 @@ const MagnifiedBento = () => {
                     return (
                       <div
                         key={`${item.id}-${idx}-reveal`}
-                        className="flex gap-2 bg-background whitespace-nowrap w-fit text-foreground p-2 px-3 items-center border border-primary/20 shadow-sm rounded-none text-xs scale-125 ml-6"
+                        className="flex gap-2 bg-background whitespace-nowrap w-fit text-foreground p-2 px-4 items-center border border-primary/20 shadow-sm rounded-none text-xs scale-125 ml-6"
                       >
                         <IconComponent size={14} className="text-primary" />
                         <span className="font-medium text-primary">{item.label}</span>

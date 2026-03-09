@@ -3,7 +3,6 @@
  * Handles scanning operations with automatic sync retry
  * Critical for warehouse reliability with weak connections
  */
-/* eslint-disable @typescript-eslint/no-explicit-any -- Supabase client requires any for complex operations */
 
 import { useEffect } from 'react';
 import { create } from 'zustand';
@@ -98,7 +97,7 @@ export const useScanQueueStore = create<ScanQueueState>()(
             const { orgId, shipmentId, hubId, staffId } = await resolveScanContext(scan);
 
             // Create tracking event in Supabase
-            const { error } = await (supabase.from('tracking_events') as any).insert({
+            const { error } = await supabase.from('tracking_events').insert({
               org_id: orgId,
               shipment_id: shipmentId,
               cn_number: scan.code,
@@ -118,7 +117,7 @@ export const useScanQueueStore = create<ScanQueueState>()(
             get().markSynced(scan.id);
             successCount++;
           } catch (error) {
-            console.error(`Failed to sync scan ${scan.id}:`, error);
+            logger.error('ScanQueue', `Failed to sync scan ${scan.id}`, { error });
             get().markFailed(scan.id, error instanceof Error ? error.message : 'Sync failed');
             failCount++;
           }
@@ -190,18 +189,18 @@ const initScanQueueAutoSync = () => {
     const pendingCount = store.getPendingScans().length;
 
     if (pendingCount > 0 && navigator.onLine) {
-      logger.debug('[ScanQueue] Auto-retry', { pendingCount });
+      logger.debug('ScanQueue', 'Auto-retry', { pendingCount });
       store.retrySync();
     }
   }, 30000);
 
   window.addEventListener('online', () => {
-    logger.debug('[ScanQueue] Connection restored, syncing...');
+    logger.debug('ScanQueue', 'Connection restored, syncing...');
     useScanQueueStore.getState().retrySync();
   });
 
   window.addEventListener('offline', () => {
-    logger.debug('[ScanQueue] Connection lost, scans will queue');
+    logger.debug('ScanQueue', 'Connection lost, scans will queue');
     toast.warning('Offline Mode', {
       description: 'Scans will sync when connection is restored',
     });
@@ -260,7 +259,8 @@ const resolveScanContext = async (scan: ScanEvent) => {
   const orgId = orgService.getCurrentOrgId();
   const staffId = scan.staffId ?? useAuthStore.getState().user?.id ?? null;
 
-  const { data: shipment, error: shipmentError } = await (supabase.from('shipments') as any)
+  const { data: shipment, error: shipmentError } = await supabase
+    .from('shipments')
     .select('id')
     .eq('org_id', orgId)
     .eq('cn_number', scan.code)
@@ -271,7 +271,8 @@ const resolveScanContext = async (scan: ScanEvent) => {
   }
 
   const dbHubCode = mapEnumToDbHub(scan.hubCode);
-  const { data: hub, error: hubError } = await (supabase.from('hubs') as any)
+  const { data: hub, error: hubError } = await supabase
+    .from('hubs')
     .select('id')
     .eq('org_id', orgId)
     .eq('code', dbHubCode)

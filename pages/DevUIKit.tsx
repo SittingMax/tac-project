@@ -191,7 +191,7 @@ const CardsSection: React.FC = () => (
 
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Card>
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-4 mb-4">
           <div className="p-2 rounded-none bg-primary/10">
             <Package className="w-5 h-5 text-primary" />
           </div>
@@ -201,7 +201,7 @@ const CardsSection: React.FC = () => (
         <p className="text-sm text-muted-foreground">Active this month</p>
       </Card>
       <Card>
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-4 mb-4">
           <div className="p-2 rounded-none bg-chart-2/10">
             <Truck className="w-5 h-5 text-chart-2" />
           </div>
@@ -211,7 +211,7 @@ const CardsSection: React.FC = () => (
         <p className="text-sm text-muted-foreground">Currently moving</p>
       </Card>
       <Card>
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-4 mb-4">
           <div className="p-2 rounded-none bg-destructive/10">
             <AlertTriangle className="w-5 h-5 text-destructive" />
           </div>
@@ -364,7 +364,7 @@ const ColorsSection: React.FC = () => {
             {'slate-400"'}
           </code>
           <p className="text-muted-foreground mt-4">// ✅ Preferred semantic tokens</p>
-          <code className="text-green-500 block">{'className="text-muted-foreground"'}</code>
+          <code className="text-muted-foreground block">{'className="text-muted-foreground"'}</code>
         </div>
       </Card>
     </div>
@@ -491,7 +491,7 @@ const ScannerDebugSection: React.FC = () => {
                   {Math.floor(log.time % 1000)}
                 </div>
                 <div
-                  className={`col-span-3 ${log.diff < 100 ? 'text-green-500 font-bold' : 'text-yellow-500'}`}
+                  className={`col-span-3 ${log.diff < 100 ? 'text-muted-foreground font-bold' : 'text-muted-foreground'}`}
                 >
                   {log.diff}ms
                 </div>
@@ -499,7 +499,7 @@ const ScannerDebugSection: React.FC = () => {
                   {log.isScanner ? (
                     <Badge
                       variant="default"
-                      className="bg-green-500/20 text-green-500 hover:bg-green-500/30 border-0"
+                      className="text-muted-foreground/20 text-muted-foreground hover:text-muted-foreground/30 border-0"
                     >
                       YES
                     </Badge>

@@ -36,15 +36,7 @@ import {
 } from '../../ui/chart';
 import { ChartSkeleton } from '../../ui/skeleton';
 import { useShipments } from '../../../hooks/useShipments';
-import {
-  TrendingUp,
-  BarChart2,
-  LineChart as LineChartIcon,
-  PieChart as PieChartIcon,
-  Activity,
-  Baseline,
-  Target,
-} from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 
 const chartConfig = {
@@ -161,7 +153,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
               vertical={false}
               strokeDasharray="3 3"
               stroke="var(--border)"
-              opacity={0.5}
+              opacity={0.3}
             />
             <XAxis
               dataKey="metric"
@@ -173,14 +165,14 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
             <YAxis tickLine={false} axisLine={false} tickMargin={8} className="text-xs" />
             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
             <Area
-              type="monotone"
+              type="step"
               dataKey="delhi"
               stroke="var(--color-delhi)"
               fillOpacity={1}
               fill="url(#fillDelhi)"
             />
             <Area
-              type="monotone"
+              type="step"
               dataKey="imphal"
               stroke="var(--color-imphal)"
               fillOpacity={1}
@@ -195,7 +187,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
               vertical={false}
               strokeDasharray="3 3"
               stroke="var(--border)"
-              opacity={0.5}
+              opacity={0.3}
             />
             <XAxis
               dataKey="metric"
@@ -217,7 +209,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
               vertical={false}
               strokeDasharray="3 3"
               stroke="var(--border)"
-              opacity={0.5}
+              opacity={0.3}
             />
             <XAxis
               dataKey="metric"
@@ -229,7 +221,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
             <YAxis tickLine={false} axisLine={false} tickMargin={8} className="text-xs" />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Line
-              type="monotone"
+              type="step"
               dataKey="delhi"
               stroke="var(--color-delhi)"
               strokeWidth={2}
@@ -237,7 +229,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
               activeDot={{ r: 6 }}
             />
             <Line
-              type="monotone"
+              type="step"
               dataKey="imphal"
               stroke="var(--color-imphal)"
               strokeWidth={2}
@@ -290,21 +282,22 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
           <RadarChart data={chartData}>
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <PolarAngleAxis dataKey="metric" className="text-xs" />
-            <PolarGrid stroke="var(--border)" opacity={0.5} />
+            <PolarGrid stroke="var(--border)" opacity={0.3} />
             <Radar
               dataKey="delhi"
               fill="var(--color-delhi)"
-              fillOpacity={0.6}
+              fillOpacity={0.1}
               stroke="var(--color-delhi)"
               strokeWidth={2}
-              dot={{ r: 4, fillOpacity: 1 }}
+              dot={{ r: 0, fillOpacity: 1 }}
             />
             <Radar
               dataKey="imphal"
               fill="var(--color-imphal)"
-              fillOpacity={0.6}
+              fillOpacity={0.1}
               stroke="var(--color-imphal)"
               strokeWidth={2}
+              dot={{ r: 0 }}
             />
           </RadarChart>
         );
@@ -312,48 +305,36 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
   };
 
   return (
-    <Card className="flex flex-col h-full border-border bg-card shadow-sm">
-      <CardHeader className="flex flex-row items-start justify-between pb-4 border-b space-y-0">
+    <Card className="flex flex-col h-full rounded-none border border-border/40 bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300">
+      <CardHeader className="flex flex-row items-start justify-between pb-4 border-b border-border/40 space-y-0">
         <div>
-          <CardTitle className="text-base">Hub Performance Profile</CardTitle>
-          <CardDescription className="text-xs mt-1">
-            Comparative metrics between Delhi & Imphal
-          </CardDescription>
+          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Hub Performance Profile</CardTitle>
+          <div className="text-xl font-bold tracking-tighter text-foreground mt-1">
+            DEL vs IMF Metrics
+          </div>
         </div>
         <Select value={chartType} onValueChange={(v) => setChartType(v as ChartType)}>
-          <SelectTrigger className="w-[120px] h-8 text-xs border-border bg-muted/20">
+          <SelectTrigger className="w-[110px] h-8 text-[10px] font-mono uppercase tracking-widest border-border/40 bg-transparent shadow-none rounded-none">
             <SelectValue placeholder="Chart Type" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="radar">
-              <div className="flex items-center gap-2">
-                <Target className="w-3 h-3" /> Radar
-              </div>
+          <SelectContent className="rounded-none">
+            <SelectItem value="radar" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+              Radar
             </SelectItem>
-            <SelectItem value="area">
-              <div className="flex items-center gap-2">
-                <Baseline className="w-3 h-3" /> Area
-              </div>
+            <SelectItem value="area" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+              Area
             </SelectItem>
-            <SelectItem value="bar">
-              <div className="flex items-center gap-2">
-                <BarChart2 className="w-3 h-3" /> Bar
-              </div>
+            <SelectItem value="bar" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+              Bar
             </SelectItem>
-            <SelectItem value="line">
-              <div className="flex items-center gap-2">
-                <LineChartIcon className="w-3 h-3" /> Line
-              </div>
+            <SelectItem value="line" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+              Line
             </SelectItem>
-            <SelectItem value="pie">
-              <div className="flex items-center gap-2">
-                <PieChartIcon className="w-3 h-3" /> Pie
-              </div>
+            <SelectItem value="pie" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+              Pie
             </SelectItem>
-            <SelectItem value="radial">
-              <div className="flex items-center gap-2">
-                <Activity className="w-3 h-3" /> Radial
-              </div>
+            <SelectItem value="radial" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+              Radial
             </SelectItem>
           </SelectContent>
         </Select>
@@ -363,12 +344,12 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
           {renderChart()}
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm pt-4 border-t mt-4">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Delhi showing +5.2% efficiency <TrendingUp className="h-4 w-4 text-status-success" />
+      <CardFooter className="flex-col gap-2 pt-4 border-t border-border/40 mt-4">
+        <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-foreground">
+          Delhi showing +5.2% efficiency <TrendingUp className="h-3 w-3 text-emerald-500" />
         </div>
-        <div className="flex items-center gap-2 leading-none text-muted-foreground">
-          January - June 2024 Profile
+        <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground/50">
+          Jan - Jun 2024 Profile
         </div>
       </CardFooter>
     </Card>

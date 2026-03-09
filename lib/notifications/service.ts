@@ -99,7 +99,7 @@ export function toastPromise<T>(
 const getCurrentUserId = (): string => {
   // In a real app, this would read from auth context/store
   // For now, return a placeholder that should be overridden by callers
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.warn(
       'getCurrentUserId: Using fallback "system" user ID. Pass userId parameter to notification helpers.'
     );

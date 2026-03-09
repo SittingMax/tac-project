@@ -168,7 +168,7 @@ export function CrudTable<TData>({
   return (
     <div className={cn('space-y-4', className)}>
       {/* Toolbar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {searchKey && (
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -230,15 +230,15 @@ export function CrudTable<TData>({
       ) : (
         <>
           {/* Table */}
-          <div className="rounded-none border-t border-b border-border/50 overflow-x-auto bg-background text-foreground shadow-none">
-            <table className="w-full">
-              <thead className="bg-muted/30">
+          <div className="rounded-none border border-border/40 overflow-x-auto bg-transparent text-foreground shadow-none">
+            <table className="w-full text-sm">
+              <thead className="bg-transparent border-b border-border/40">
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id} className="border-b border-border">
+                  <tr key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
                       <th
                         key={header.id}
-                        className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground relative group"
+                        className="px-4 py-3 text-left text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70 relative group align-middle"
                         style={{ width: header.getSize() }}
                       >
                         {header.isPlaceholder ? null : (
@@ -270,12 +270,12 @@ export function CrudTable<TData>({
                   </tr>
                 ))}
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-border/40">
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <tr key={row.id} className="hover:bg-muted/60 transition-all hover:shadow-sm">
+                    <tr key={row.id} className="hover:bg-muted/10 transition-colors">
                       {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="px-4 py-3 text-sm text-foreground">
+                        <td key={cell.id} className="px-4 py-3 align-middle">
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </td>
                       ))}

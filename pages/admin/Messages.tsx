@@ -23,6 +23,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
@@ -59,7 +60,7 @@ export function Messages() {
 
     if (error) {
       toast.error('Failed to fetch messages');
-      console.error(error);
+      logger.error('Messages', 'Error', { error });
     } else {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setMessages((data as any) || []);

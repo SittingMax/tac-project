@@ -7,6 +7,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '@/lib/supabase';
 import { orgService } from '@/lib/services/orgService';
+import { logger } from '@/lib/logger';
 import type { Session } from '@supabase/supabase-js';
 import type { UserRole } from '@/types';
 
@@ -73,7 +74,7 @@ export const useAuthStore = create<AuthState>()(
             if (error) throw error;
           }
         } catch (error) {
-          console.error('[Auth] Update profile error:', error);
+          logger.error('AuthStore', 'Update profile error', { error });
           // Revert on error
           set({ user: currentUser });
           throw error;
@@ -100,7 +101,7 @@ export const useAuthStore = create<AuthState>()(
             // Safety timeout to prevent infinite loading
             const timeoutId = setTimeout(() => {
               if (get().isLoading && !signal.aborted) {
-                console.error('[Auth] Initialization timed out');
+                logger.error('AuthStore', 'Initialization timed out');
                 set({
                   isLoading: false,
                   isAuthenticated: false,
@@ -136,7 +137,7 @@ export const useAuthStore = create<AuthState>()(
                 clearTimeout(timeoutId);
                 return () => {};
               }
-              console.error('[Auth] Session error:', sessionError);
+              logger.error('AuthStore', 'Session error', { error: sessionError });
               clearTimeout(timeoutId);
               set({ isLoading: false, isAuthenticated: false, session: null, user: null });
               return () => {};
@@ -164,14 +165,16 @@ export const useAuthStore = create<AuthState>()(
             }
 
             if (!staffUser) {
-              console.warn('[Auth] No staff record found for user:', session.user.email);
+              logger.warn('AuthStore', 'No staff record found for user', {
+                email: session.user.email,
+              });
               clearTimeout(timeoutId);
               set({ isLoading: false, isAuthenticated: false, session: null, user: null });
               return () => {};
             }
 
             if (!staffUser.isActive) {
-              console.warn('[Auth] Staff account is deactivated:', staffUser.email);
+              logger.warn('AuthStore', 'Staff account is deactivated', { email: staffUser.email });
               await supabase.auth.signOut();
               clearTimeout(timeoutId);
               set({
@@ -202,7 +205,7 @@ export const useAuthStore = create<AuthState>()(
             } = supabase.auth.onAuthStateChange(async (event, newSession) => {
               try {
                 if (event === 'SIGNED_OUT' || !newSession) {
-                  console.warn('[AuthStore] onAuthStateChange: SIGNED_OUT or no session', {
+                  logger.warn('AuthStore', 'onAuthStateChange: SIGNED_OUT or no session', {
                     event,
                   });
                   orgService.clearCurrentOrg();
@@ -229,7 +232,7 @@ export const useAuthStore = create<AuthState>()(
                 ) {
                   return;
                 }
-                console.error('[Auth] Error in auth state change handler:', error);
+                logger.error('AuthStore', 'Error in auth state change handler', { error });
               }
             });
 
@@ -245,7 +248,7 @@ export const useAuthStore = create<AuthState>()(
             ) {
               return () => {};
             }
-            console.error('[Auth] Initialize error:', error);
+            logger.error('AuthStore', 'Initialize error', { error });
             set({
               isLoading: false,
               isAuthenticated: false,
@@ -272,7 +275,7 @@ export const useAuthStore = create<AuthState>()(
           });
 
           if (authError) {
-            console.error('[Auth] Sign in error:', authError);
+            logger.error('AuthStore', 'Sign in error', { error: authError });
             set({
               isLoading: false,
               error:
@@ -329,7 +332,7 @@ export const useAuthStore = create<AuthState>()(
 
           return { success: true };
         } catch (error) {
-          console.error('[Auth] Sign in error:', error);
+          logger.error('AuthStore', 'Sign in error', { error });
           const message = error instanceof Error ? error.message : 'Sign in failed';
           set({ isLoading: false, error: message });
           return { success: false, error: message };
@@ -349,7 +352,7 @@ export const useAuthStore = create<AuthState>()(
           });
 
           await supabase.auth.signOut();
-          console.warn('[AuthStore] Signed out by user action');
+          logger.warn('AuthStore', 'Signed out by user action');
           orgService.clearCurrentOrg();
           set({
             session: null,
@@ -359,7 +362,7 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           });
         } catch (error) {
-          console.error('[Auth] Sign out error:', error);
+          logger.error('AuthStore', 'Sign out error', { error });
           orgService.clearCurrentOrg();
           // Force clear state even on error - also clear localStorage
           Object.keys(localStorage).forEach((key) => {
@@ -444,7 +447,7 @@ async function fetchStaffByAuthId(
       if (error && (error.message?.includes('AbortError') || error.message?.includes('aborted'))) {
         return null;
       }
-      console.error('[Auth] Failed to fetch staff:', error);
+      logger.error('AuthStore', 'Failed to fetch staff', { error });
       return null;
     }
 
@@ -468,7 +471,7 @@ async function fetchStaffByAuthId(
     ) {
       return null;
     }
-    console.error('[Auth] fetchStaffByAuthId error:', error);
+    logger.error('AuthStore', 'fetchStaffByAuthId error', { error });
     return null;
   }
 }

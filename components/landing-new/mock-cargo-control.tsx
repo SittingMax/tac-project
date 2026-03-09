@@ -49,7 +49,7 @@ export function MockCargoControlCenter() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-none px-3 py-1">
+            <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-none px-4 py-1">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-none h-2 w-2 bg-primary"></span>

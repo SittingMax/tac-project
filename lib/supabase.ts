@@ -7,7 +7,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 if (!supabaseUrl || !supabaseAnonKey) {
   if (import.meta.env.PROD) {
     throw new Error(
-      '[WGS Portal] Missing required environment variables: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY. ' +
+      '[TAC Portal] Missing required environment variables: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY. ' +
         'The application cannot start without Supabase credentials in production.'
     );
   }

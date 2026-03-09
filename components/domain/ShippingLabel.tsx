@@ -45,7 +45,7 @@ export function ShippingLabel({ shipment, packageIndex = 1 }: ShippingLabelProps
       </div>
 
       {/* Route Display */}
-      <div className="flex items-center justify-between bg-foreground text-background rounded-none p-3 mb-3">
+      <div className="flex items-center justify-between bg-foreground text-background rounded-none p-4 mb-3">
         <div className="text-center flex-1">
           <p className="text-3xl font-black">{origin.code}</p>
           <p className="text-[10px] opacity-70">{origin.name}</p>
@@ -82,7 +82,7 @@ export function ShippingLabel({ shipment, packageIndex = 1 }: ShippingLabelProps
       </div>
 
       {/* QR Code & Consignee */}
-      <div className="flex gap-3">
+      <div className="flex gap-4">
         <div className="flex-shrink-0">
           <QRCodeSVG value={qrData} size={80} level="M" />
         </div>

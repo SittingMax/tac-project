@@ -21,7 +21,7 @@ export function getCustomersColumns(params: CustomersColumnsParams): ColumnDef<C
       accessorKey: 'name',
       header: 'Customer',
       cell: ({ row }) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <div className="w-8 h-8 rounded-none bg-muted flex items-center justify-center text-primary">
             {row.original.type === 'BUSINESS' ? (
               <Building className="w-4 h-4" />
@@ -46,7 +46,7 @@ export function getCustomersColumns(params: CustomersColumnsParams): ColumnDef<C
       cell: ({ row }) => (
         <div>
           <div className="text-sm text-muted-foreground">{row.original.name}</div>
-          <div className="flex gap-3 mt-1 text-xs">
+          <div className="flex gap-4 mt-1 text-xs">
             {row.original.email && (
               <a
                 href={`mailto:${row.original.email}`}

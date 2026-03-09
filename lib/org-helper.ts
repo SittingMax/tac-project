@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { logger } from '@/lib/logger';
 
 // Direct supabase usage - types from database.types.ts
 
@@ -64,13 +65,13 @@ export async function getOrCreateDefaultOrg(): Promise<string> {
       .single();
 
     if (error) {
-      console.error('Failed to create default org:', error);
+      logger.error('OrgHelper', 'Failed to create default org', { error });
       throw error;
     }
 
     return newOrg.id;
   } catch (error) {
-    console.error('Error in getOrCreateDefaultOrg:', error);
+    logger.error('OrgHelper', 'Error in getOrCreateDefaultOrg', { error });
     // If everything fails, try to query one last time
     const { data: fallbackOrgs, error: fallbackError } = await supabase
       .from('orgs')

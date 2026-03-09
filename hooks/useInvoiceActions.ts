@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
+import { getOrCreateDefaultOrg } from '@/lib/org-helper';
 import { generateEnterpriseInvoice } from '@/lib/pdf-generator';
 import { generateLabelFromShipment } from '@/lib/utils/label-utils';
 import { formatCurrency } from '@/lib/utils';
@@ -9,6 +10,7 @@ import { HUBS } from '@/lib/constants';
 import { logger } from '@/lib/logger';
 import { HubLocation, Invoice, Shipment, ShipmentMode, ServiceLevel, PaymentMode } from '@/types';
 import { LabelData } from '@/components/domain/LabelGenerator';
+import { ShipmentWithRelations } from './useShipments';
 
 export function useInvoiceActions() {
   const [labelDownloading, setLabelDownloading] = useState(false);
@@ -18,24 +20,24 @@ export function useInvoiceActions() {
   );
 
   const getShipment = async (awb: string) => {
+    const orgId = await getOrCreateDefaultOrg();
     const { data, error } = await supabase
       .from('shipments')
       .select(
         `*, customer:customers(name, email), origin_hub:hubs!shipments_origin_hub_id_fkey(code), destination_hub:hubs!shipments_destination_hub_id_fkey(code)`
       )
       .eq('cn_number', awb)
+      .eq('org_id', orgId)
       .maybeSingle();
 
     if (error) {
-      console.warn('Shipment fetch error:', error);
+      logger.warn('useInvoiceActions', 'Shipment fetch error', { error });
       return null;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return data as any;
+    return data as unknown as ShipmentWithRelations;
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const formatAddress = (address: any) => {
+  const formatAddress = (address: unknown) => {
     if (!address) return '';
     if (typeof address === 'string') return address;
     const { line1, line2, city, state, zip } = address as Record<string, string | undefined>;
@@ -48,8 +50,13 @@ export function useInvoiceActions() {
     return safeDate.toISOString().slice(0, 10).replace(/-/g, '');
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const buildInvoiceFilename = (inv: Invoice, consignor: any, consignee: any) => {
+  const buildInvoiceFilename = (
+    inv: Invoice,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic DB data
+    consignor: Record<string, any> | undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic DB data
+    consignee: Record<string, any> | undefined
+  ) => {
     const rawName = sanitizeString(
       inv.customerName || consignee?.name || consignor?.name || 'Customer'
     );
@@ -61,8 +68,11 @@ export function useInvoiceActions() {
     return `INVOICE-${safeName || 'customer'}-${dateTag}.pdf`;
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const resolveHubLocation = (row: any, type: 'origin' | 'destination'): HubLocation => {
+  const resolveHubLocation = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Extended row type
+    row: ShipmentWithRelations & Record<string, any>,
+    type: 'origin' | 'destination'
+  ): HubLocation => {
     const hubId = type === 'origin' ? row.origin_hub_id : row.destination_hub_id;
     const hubCode = type === 'origin' ? row.origin_hub?.code : row.destination_hub?.code;
     const byUuid = Object.values(HUBS).find((hub) => hub.uuid === hubId)?.id;
@@ -84,8 +94,8 @@ export function useInvoiceActions() {
     return 'STANDARD';
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapShipmentForLabel = (row: any): Shipment => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Extended row type
+  const mapShipmentForLabel = (row: ShipmentWithRelations & Record<string, any>): Shipment => {
     const originHub = resolveHubLocation(row, 'origin');
     const destinationHub = resolveHubLocation(row, 'destination');
     const weight = Number(row.total_weight ?? 0);
@@ -101,7 +111,8 @@ export function useInvoiceActions() {
       serviceLevel: resolveServiceLevel(row.service_level),
       totalPackageCount: row.total_packages ?? 1,
       totalWeight: { dead: weight, volumetric: 0, chargeable: weight },
-      status: row.status ?? 'CREATED',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Status type flexibility
+      status: (row.status as any) || 'CREATED',
       createdAt: row.created_at || new Date().toISOString(),
       updatedAt: row.updated_at || row.created_at || new Date().toISOString(),
       eta: 'TBD',
@@ -121,13 +132,23 @@ export function useInvoiceActions() {
   };
 
   const buildShipmentFromInvoice = (inv: Invoice): Shipment => {
-    logger.debug('[Label] Building shipment from invoice', { id: inv.id, awb: inv.awb });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const lineItems = (inv as any).line_items || (inv as any).financials || {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const consignor = lineItems.consignor || (inv as any).consignor || {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const consignee = lineItems.consignee || (inv as any).consignee || {};
+    logger.debug('useInvoiceActions', 'Building shipment from invoice', {
+      id: inv.id,
+      awb: inv.awb,
+    });
+    const invData = inv as Invoice & {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic invoice data
+      line_items?: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic invoice data
+      financials?: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic invoice data
+      consignor?: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic invoice data
+      consignee?: any;
+    };
+    const lineItems = invData.line_items || invData.financials || {};
+    const consignor = lineItems.consignor || invData.consignor || {};
+    const consignee = lineItems.consignee || invData.consignee || {};
 
     return {
       id: inv.id,
@@ -168,25 +189,32 @@ export function useInvoiceActions() {
     try {
       toast.info('Generating invoice PDF...');
       const shipmentRow = inv.awb ? await getShipment(inv.awb) : null;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const lineItems = (inv as any).line_items || (inv as any).financials || {};
+      const invData = inv as Invoice & {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic invoice data
+        line_items?: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic invoice data
+        financials?: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic invoice data
+        consignor?: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic invoice data
+        consignee?: any;
+      };
+      const lineItems = invData.line_items || invData.financials || {};
 
       const consignor = shipmentRow
         ? {
-          name: shipmentRow.consignor_name,
-          phone: shipmentRow.consignor_phone,
-          address: formatAddress(shipmentRow.consignor_address),
-        }
-        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        lineItems.consignor || (inv as any).consignor || {};
+            name: shipmentRow.consignor_name,
+            phone: shipmentRow.consignor_phone,
+            address: formatAddress(shipmentRow.consignor_address),
+          }
+        : lineItems.consignor || invData.consignor || {};
       const consignee = shipmentRow
         ? {
-          name: shipmentRow.consignee_name,
-          phone: shipmentRow.consignee_phone,
-          address: formatAddress(shipmentRow.consignee_address),
-        }
-        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        lineItems.consignee || (inv as any).consignee || {};
+            name: shipmentRow.consignee_name,
+            phone: shipmentRow.consignee_phone,
+            address: formatAddress(shipmentRow.consignee_address),
+          }
+        : lineItems.consignee || invData.consignee || {};
 
       const fullInvoice = { ...inv, consignor, consignee };
       const url = await generateEnterpriseInvoice(fullInvoice as Invoice);
@@ -199,7 +227,7 @@ export function useInvoiceActions() {
       document.body.removeChild(link);
       toast.success('Invoice downloaded!');
     } catch (error) {
-      console.error('[Invoice] Invoice generation error:', error);
+      logger.error('useInvoiceActions', 'Invoice generation error', { error });
       toast.error('Failed to generate invoice PDF');
     }
   };
@@ -221,7 +249,7 @@ export function useInvoiceActions() {
       setLabelPreviewData(labelData);
       setLabelPreviewOpen(true);
     } catch (error) {
-      console.error('Label error:', error);
+      logger.error('useInvoiceActions', 'Label generation error', { error });
       toast.error('Failed to generate label');
     } finally {
       setTimeout(() => setLabelDownloading(false), 1000);
@@ -230,11 +258,15 @@ export function useInvoiceActions() {
 
   const handleShareWhatsapp = async (inv: Invoice) => {
     const shipment = inv.awb ? await getShipment(inv.awb) : null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const invData = inv as Invoice & {
+      consignee?: { phone?: string };
+      line_items?: { consignee?: { phone?: string } };
+    };
+    const shipData = shipment as (Shipment & { consignee_phone?: string }) | null;
     const phone =
-      (inv as any).consignee?.phone ||
-      (inv as any).line_items?.consignee?.phone ||
-      (shipment as any)?.consignee_phone ||
+      invData.consignee?.phone ||
+      invData.line_items?.consignee?.phone ||
+      shipData?.consignee_phone ||
       '';
     if (!phone) {
       alert('No customer phone number found.');
@@ -251,16 +283,16 @@ Thank you for choosing TAC Cargo.`;
 
   const handleShareEmail = async (inv: Invoice) => {
     const shipment = inv.awb ? await getShipment(inv.awb) : null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const email = (shipment as any)?.customer?.email || '';
+    const shipData = shipment as (Shipment & { customer?: { email?: string } }) | null;
+    const email = shipData?.customer?.email || '';
     const subject = `Invoice ${inv.invoiceNumber} - TAC Cargo`;
     const body = `Dear Customer,%0D%0A%0D%0APlease find details for invoice ${inv.invoiceNumber} related to shipment ${inv.awb}.%0D%0A%0D%0AAmount: ${formatCurrency(inv.financials.totalAmount)}%0D%0A%0D%0AThank you,%0D%0ATAC Cargo Team`;
     window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
   };
 
   // Helper to build Invoice object from DB row
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const buildInvoiceFromRow = (row: any): Invoice => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- DB row type is dynamic
+  const buildInvoiceFromRow = (row: Record<string, any>): Invoice => {
     const lineItems = row.line_items || {};
     const awb = row.shipment?.cn_number || lineItems.awb || '';
     const tax = lineItems.tax ?? { cgst: 0, sgst: 0, igst: 0, total: row.tax_amount ?? 0 };

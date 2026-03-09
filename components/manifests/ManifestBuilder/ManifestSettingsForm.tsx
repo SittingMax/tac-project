@@ -226,7 +226,7 @@ export function ManifestSettingsForm({
           <Separator />
 
           {/* Transport Type Toggle */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Label>Transport Type</Label>
             <div className="grid grid-cols-2 gap-2 bg-muted p-1 rounded-none">
               <Button
@@ -257,8 +257,8 @@ export function ManifestSettingsForm({
 
             {/* AIR Transport Fields */}
             {transportType === 'AIR' && (
-              <div className="space-y-3 pt-2">
-                <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-4 pt-2">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Airline Code
@@ -304,7 +304,7 @@ export function ManifestSettingsForm({
                 </div>
 
                 {/* ETD / ETA Time Inputs */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       ETD
@@ -329,7 +329,7 @@ export function ManifestSettingsForm({
 
             {/* TRUCK Transport Fields */}
             {transportType === 'TRUCK' && (
-              <div className="space-y-3 pt-2">
+              <div className="space-y-4 pt-2">
                 <div className="space-y-2">
                   <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Vehicle No <span className="text-destructive">*</span>
@@ -349,7 +349,7 @@ export function ManifestSettingsForm({
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Driver Name

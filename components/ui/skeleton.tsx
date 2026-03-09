@@ -66,10 +66,10 @@ function ChartSkeleton({ height = 300 }: { height?: number }) {
  */
 function TableRowSkeleton({ columns = 5 }: { columns?: number }) {
   return (
-    <tr className="border-b border-border/50">
+    <tr className="border-b border-border/40">
       {Array.from({ length: columns }).map((_, i) => (
         <td key={i} className="p-4">
-          <Skeleton className="h-4 w-full max-w-[150px]" />
+          <Skeleton className="h-3 w-full max-w-[150px] rounded-none bg-muted/50" />
         </td>
       ))}
     </tr>
@@ -81,21 +81,21 @@ function TableRowSkeleton({ columns = 5 }: { columns?: number }) {
  */
 function TableSkeleton({ rows = 5, columns = 5 }: { rows?: number; columns?: number }) {
   return (
-    <div className="bg-card border border-border rounded-none overflow-hidden">
-      <div className="p-4 border-b border-border">
-        <Skeleton className="h-6 w-40" />
+    <div className="rounded-none border border-border/40 overflow-hidden bg-transparent">
+      <div className="p-4 border-b border-border/40">
+        <Skeleton className="h-4 w-40 rounded-none bg-muted/50" />
       </div>
       <table className="w-full">
         <thead>
-          <tr className="border-b border-border">
+          <tr className="border-b border-border/40">
             {Array.from({ length: columns }).map((_, i) => (
               <th key={i} className="p-4 text-left">
-                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-3 w-20 rounded-none bg-muted/50" />
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-border/40">
           {Array.from({ length: rows }).map((_, i) => (
             <TableRowSkeleton key={i} columns={columns} />
           ))}

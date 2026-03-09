@@ -36,6 +36,7 @@ import {
 } from '@/hooks/useStaff';
 import { getStaffColumns } from '@/components/management/staff.columns';
 import { HUBS } from '@/lib/constants';
+import { logger } from '@/lib/logger';
 
 // Schema
 const staffFormSchema = z.object({
@@ -181,7 +182,7 @@ export const Management: React.FC = () => {
       // Refresh list
       queryClient.invalidateQueries({ queryKey: ['staff'] });
     } catch (error) {
-      console.error('Create user failed:', error);
+      logger.error('Management', 'Create user failed', { error });
       toast.error(error instanceof Error ? error.message : 'Failed to create user');
     }
   };

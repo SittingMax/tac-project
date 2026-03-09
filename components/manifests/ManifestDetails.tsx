@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { ManifestPrintView } from '@/components/manifests/ManifestPrintView';
 import { useReactToPrint } from 'react-to-print';
 import { StatusBadge } from '../domain/StatusBadge';
+import { logger } from '@/lib/logger';
 
 export const ManifestDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,7 +38,7 @@ export const ManifestDetails: React.FC = () => {
     try {
       await updateStatus.mutateAsync({ id: manifest.id, status });
     } catch (e) {
-      console.error(e);
+      logger.error('ManifestDetails', 'Error', { error: e });
     }
   };
 
@@ -49,7 +50,7 @@ export const ManifestDetails: React.FC = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-3">
+            <h2 className="text-2xl font-bold flex items-center gap-4">
               <span className="font-mono text-primary">{manifest.manifest_no}</span>
               <StatusBadge status={manifest.status} />
             </h2>
@@ -125,7 +126,7 @@ export const ManifestDetails: React.FC = () => {
             <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3">
               Transport Details
             </h3>
-            <div className="bg-muted p-4 rounded-none space-y-3">
+            <div className="bg-muted p-4 rounded-none space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Mode</span>
                 <span className="font-bold flex items-center gap-2">

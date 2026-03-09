@@ -43,7 +43,7 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
             </div>
           }
         />
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="space-y-1">
             <Input placeholder="Company / Full Name" {...form.register('consignorName')} />
             {errors.consignorName && (
@@ -52,7 +52,7 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
           </div>
           <Input {...form.register('consignorPhone')} placeholder="Phone Number" />
           <Input placeholder="Address Line" {...form.register('consignorAddress')} />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <Select
               value={
                 POPULAR_CITIES.includes(watch('consignorCity')) ? watch('consignorCity') : 'OTHER'
@@ -103,7 +103,7 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
             </div>
           }
         />
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="space-y-1">
             <Input placeholder="Company / Full Name" {...form.register('consigneeName')} />
             {errors.consigneeName && (
@@ -112,7 +112,7 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
           </div>
           <Input {...form.register('consigneePhone')} placeholder="Phone Number" />
           <Input placeholder="Address Line" {...form.register('consigneeAddress')} />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <Select
               value={
                 POPULAR_CITIES.includes(watch('consigneeCity')) ? watch('consigneeCity') : 'OTHER'

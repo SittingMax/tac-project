@@ -139,7 +139,7 @@ export const Notifications: React.FC = () => {
             Invoices, Shipments, and Event Streams
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <span className="text-[10px] font-mono border border-border px-2 py-0.5">
             {count} UNREAD
           </span>
@@ -200,7 +200,7 @@ export const Notifications: React.FC = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="border rounded-none px-3 py-2 text-sm bg-background"
+            className="border rounded-none px-4 py-2 text-sm bg-background"
           >
             <option value="all">All Categories</option>
             <option value="invoice">Invoice</option>
@@ -214,7 +214,7 @@ export const Notifications: React.FC = () => {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="border rounded-none px-3 py-2 text-sm bg-background"
+            className="border rounded-none px-4 py-2 text-sm bg-background"
           >
             <option value="all">All Types</option>
             <option value="success">Success</option>
@@ -286,7 +286,7 @@ export const Notifications: React.FC = () => {
                           </div>
 
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start justify-between gap-4">
                               <div>
                                 <div className="flex items-center gap-2">
                                   <span
@@ -313,7 +313,7 @@ export const Notifications: React.FC = () => {
                                   </p>
                                 )}
 
-                                <div className="flex items-center gap-3 mt-2">
+                                <div className="flex items-center gap-4 mt-2">
                                   <span className="text-xs text-muted-foreground">{timeAgo}</span>
                                   <Badge variant="outline" className="text-[10px]">
                                     {notification.category}

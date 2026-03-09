@@ -24,8 +24,8 @@ export const BookingDialog: React.FC<BookingDialogProps> = ({ open, onOpenChange
           </DialogDescription>
         </DialogHeader>
         <BookingForm onSuccess={() => onOpenChange(false)} onCancel={() => onOpenChange(false)} />
-        {/* <div className="p-10 text-center border-2 border-dashed border-yellow-500 bg-yellow-500/10 rounded-none">
-                    <h3 className="text-xl font-bold text-yellow-500">Debug Mode</h3>
+        {/* <div className="p-10 text-center border-2 border-dashed text-muted-foreground text-muted-foreground/10 rounded-none">
+                    <h3 className="text-xl font-bold text-muted-foreground">Debug Mode</h3>
                     <p className="text-muted-foreground">Booking form is temporarily disabled to isolate the redirect issue.</p>
                     <button type="button" className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-none" onClick={() => onOpenChange(false)}>Close Dialog</button>
                 </div> */}

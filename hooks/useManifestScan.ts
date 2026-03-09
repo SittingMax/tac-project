@@ -81,8 +81,9 @@ export function useManifestScan(options: ScanOptions) {
 
       try {
         if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- WebKit AudioContext fallback
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+          audioCtxRef.current = new AudioContextClass();
         }
         const audioContext = audioCtxRef.current;
         const oscillator = audioContext.createOscillator();

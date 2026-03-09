@@ -61,7 +61,7 @@ const NoteItem = memo<NoteItemProps>(({ note, currentUserId, onEdit, onDelete, o
     <>
       <div
         className={cn(
-          'group relative rounded-none border bg-card p-3 transition-all hover:shadow-sm',
+          'group relative rounded-none border bg-card p-4 transition-all hover:shadow-sm',
           note.isPinned && 'border-primary/50 bg-primary/5'
         )}
       >
@@ -235,7 +235,7 @@ export const NotesPanel = memo<NotesPanelProps>(
         {/* Header */}
         <div
           className={cn(
-            'flex items-center justify-between border-b px-4 py-3',
+            'flex items-center justify-between border-b px-4 py-2',
             collapsible && 'cursor-pointer hover:bg-muted/50'
           )}
           onClick={collapsible ? () => setIsCollapsed(!isCollapsed) : undefined}
@@ -287,7 +287,7 @@ export const NotesPanel = memo<NotesPanelProps>(
         {/* Notes List */}
         {!isCollapsed && (
           <div className="p-4">
-            <div className="space-y-3 overflow-y-auto pr-1" style={{ maxHeight }}>
+            <div className="space-y-4 overflow-y-auto pr-1" style={{ maxHeight }}>
               {notes.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
                   <MessageSquare className="mb-2 h-8 w-8 text-muted-foreground/50" />

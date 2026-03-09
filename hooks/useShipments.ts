@@ -78,12 +78,11 @@ export function useShipments(options?: {
 
       if (options?.search) {
         // Use RPC for search
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        query = (supabase as any)
+        query = supabase
           .rpc('search_shipments', {
-            p_search_text: options.search,
+            p_search_text: options.search || '',
             p_org_id: orgId || '',
-            p_status: options.status || null,
+            p_status: options.status || undefined,
             p_limit: pageSize,
             p_offset: offset,
           })
@@ -131,8 +130,7 @@ export function useShipments(options?: {
         }
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (query as any);
+      const { data, error } = await query;
       if (error) throw error;
       return (data ?? []) as unknown as ShipmentWithRelations[];
     },
@@ -140,8 +138,9 @@ export function useShipments(options?: {
 }
 
 export function useShipmentByAWB(awb: string | null) {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useQuery({
-    queryKey: ['shipment', 'CN Number', awb],
+    queryKey: ['shipment', 'CN Number', awb, orgId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('shipments')
@@ -154,6 +153,7 @@ export function useShipmentByAWB(awb: string | null) {
         `
         )
         .eq('cn_number', awb!)
+        .eq('org_id', orgId!)
         .single();
 
       if (error) throw error;
@@ -232,7 +232,7 @@ export function useCreateShipment() {
       });
 
       if (awbError) {
-        console.error('AWB Generation Error:', awbError);
+        logger.error('useShipments', 'AWB Generation Error', { error: awbError });
         throw awbError;
       }
       // eslint-disable-next-line no-console
@@ -244,9 +244,9 @@ export function useCreateShipment() {
 
       const insertPayload = {
         ...shipment,
-        // Coerce empty-string UUIDs to null — safety net for any caller
-        customer_id: shipment.customer_id || null,
-        org_id: orgId,
+        // Ensure customer_id is a string (checked below)
+        customer_id: shipment.customer_id as string,
+        org_id: orgId as string,
         cn_number: awbResult,
         status: 'CREATED' as const,
       };
@@ -258,14 +258,14 @@ export function useCreateShipment() {
       // eslint-disable-next-line no-console
       console.debug('Inserting shipment payload:', insertPayload);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase.from('shipments') as any)
+      const { data, error } = await supabase
+        .from('shipments')
         .insert(insertPayload)
         .select()
         .single();
 
       if (error) {
-        console.error('Shipment Insert Error:', error);
+        logger.error('useShipments', 'Shipment Insert Error', { error });
         throw error;
       }
       // eslint-disable-next-line no-console
@@ -277,7 +277,7 @@ export function useCreateShipment() {
       toast.success(`Shipment ${data.cn_number} created successfully`);
     },
     onError: (error: Error) => {
-      logger.error('Shipment create failed', {
+      logger.error('useShipments', 'Shipment create failed', {
         env: import.meta.env.MODE,
         org_id: staffUser?.orgId || null,
         user_id: staffUser?.id || null,
@@ -375,10 +375,12 @@ export interface ShipmentScanResult {
 export function useFindShipmentByCN() {
   return useMutation({
     mutationFn: async (awb: string): Promise<ShipmentScanResult | null> => {
+      const orgId = await getOrCreateDefaultOrg();
       const { data, error } = await supabase
         .from('shipments')
         .select('id, cn_number, status, origin_hub_id, destination_hub_id')
         .eq('cn_number', awb)
+        .eq('org_id', orgId)
         .maybeSingle();
 
       if (error) throw error;

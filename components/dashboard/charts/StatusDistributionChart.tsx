@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Label, Pie, PieChart, Sector } from 'recharts';
-import { type PieSectorDataItem } from 'recharts/types/polar/Pie';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../ui/card';
 import {
@@ -105,15 +104,17 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
   }
 
   return (
-    <Card data-chart={id} className="flex flex-col h-full border-border bg-card shadow-sm">
+    <Card data-chart={id} className="flex flex-col h-full rounded-none border-border bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300">
       <CardHeader className="flex-row items-start space-y-0 pb-0">
         <div className="grid gap-1">
-          <CardTitle>Status Distribution</CardTitle>
-          <CardDescription>Current shipment breakdown</CardDescription>
+          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Status Distribution</CardTitle>
+          <div className="text-2xl font-bold tracking-tighter text-foreground">
+            Current Breakdown
+          </div>
         </div>
         <Select value={activeStatus} onValueChange={setActiveStatus}>
           <SelectTrigger
-            className="ml-auto h-7 w-[130px] rounded-none pl-2.5"
+            className="ml-auto h-8 w-[130px] rounded-none border-border bg-transparent shadow-none pl-2.5 text-xs font-mono uppercase tracking-wider"
             aria-label="Select a status"
           >
             <SelectValue placeholder="Select status" />
@@ -155,13 +156,13 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
               innerRadius={60}
               strokeWidth={5}
               activeIndex={activeIndex !== -1 ? activeIndex : undefined}
-              activeShape={({ outerRadius = 0, ...props }: PieSectorDataItem) => (
+              activeShape={({ outerRadius = 0, ...props }: any) => (
                 <g>
-                  <Sector {...props} outerRadius={outerRadius + 10} />
+                  <Sector {...props} outerRadius={outerRadius + 8} />
                   <Sector
                     {...props}
-                    outerRadius={outerRadius + 25}
-                    innerRadius={outerRadius + 12}
+                    outerRadius={outerRadius + 16}
+                    innerRadius={outerRadius + 10}
                   />
                 </g>
               )}
@@ -180,14 +181,14 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
                           <tspan
                             x={viewBox.cx}
                             y={viewBox.cy}
-                            className="fill-foreground text-3xl font-bold"
+                            className="fill-foreground text-4xl font-bold tracking-tighter"
                           >
                             {statusChartData[activeIndex].count.toLocaleString()}
                           </tspan>
                           <tspan
                             x={viewBox.cx}
                             y={(viewBox.cy || 0) + 24}
-                            className="fill-muted-foreground text-xs"
+                            className="fill-muted-foreground text-[10px] font-mono uppercase tracking-widest"
                           >
                             {chartConfig[activeStatus as keyof typeof chartConfig]?.label ||
                               'Shipments'}

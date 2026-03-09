@@ -131,7 +131,7 @@ export function ScannerDebug() {
           </button>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 text-xs font-mono">
+      <CardContent className="space-y-4 text-xs font-mono">
         {/* Keystrokes Display */}
         <div>
           <div className="text-muted-foreground mb-1">Keystrokes:</div>
@@ -142,8 +142,8 @@ export function ScannerDebug() {
                   key={i}
                   className={`px-1 rounded-none ${
                     k.delay > 0 && k.delay < 150
-                      ? 'bg-green-500/20 text-green-700 dark:text-green-300'
-                      : 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300'
+                      ? 'text-muted-foreground/20 text-muted-foreground dark:text-muted-foreground'
+                      : 'text-muted-foreground/20 text-muted-foreground dark:text-muted-foreground'
                   }`}
                   title={`${k.delay}ms`}
                 >
@@ -174,12 +174,12 @@ export function ScannerDebug() {
                   {avgTiming.toFixed(0)}ms avg
                 </Badge>
                 {scannerDetected ? (
-                  <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                  <span className="flex items-center gap-1 text-muted-foreground dark:text-muted-foreground">
                     <Activity className="w-3 h-3" />
                     Scanner detected
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-yellow-600 dark:text-yellow-400">
+                  <span className="flex items-center gap-1 text-muted-foreground dark:text-muted-foreground">
                     <Activity className="w-3 h-3" />
                     Manual input
                   </span>
@@ -199,9 +199,9 @@ export function ScannerDebug() {
               <div className="flex items-center justify-between">
                 <span className="truncate flex-1">{lastScan.code}</span>
                 {lastScan.success ? (
-                  <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 ml-2 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-muted-foreground dark:text-muted-foreground ml-2 flex-shrink-0" />
                 ) : (
-                  <XCircle className="w-4 h-4 text-red-600 dark:text-red-400 ml-2 flex-shrink-0" />
+                  <XCircle className="w-4 h-4 text-muted-foreground dark:text-muted-foreground ml-2 flex-shrink-0" />
                 )}
               </div>
             ) : (

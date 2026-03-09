@@ -48,7 +48,7 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
             <AlertTriangle className="w-7 h-7 text-status-error" />
           </div>
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <h2 className="text-2xl font-bold text-foreground">{exception.type} Exception</h2>
               <StatusBadge status={exception.status} />
             </div>
@@ -105,7 +105,7 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
               <Clock className="w-3 h-3" /> Timeline
             </h3>
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-none bg-status-error/10 flex items-center justify-center flex-shrink-0">
                   <AlertTriangle className="w-4 h-4 text-status-error" />
                 </div>
@@ -119,7 +119,7 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
               </div>
 
               {exception.assignedTo && (
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-4">
                   <div className="w-8 h-8 rounded-none bg-status-info/10 flex items-center justify-center flex-shrink-0">
                     <User className="w-4 h-4 text-status-info" />
                   </div>
@@ -133,7 +133,7 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
               )}
 
               {exception.resolvedAt && (
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-4">
                   <div className="w-8 h-8 rounded-none bg-status-success/10 flex items-center justify-center flex-shrink-0">
                     <CheckCircle className="w-4 h-4 text-status-success" />
                   </div>

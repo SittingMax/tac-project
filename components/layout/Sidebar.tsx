@@ -271,27 +271,19 @@ export const Sidebar: React.FC = () => {
                       <div key={item.label}>
                         <ItemWrapper
                           className={cn(
-                            'flex items-center px-3 py-2 text-sm transition-all duration-200 group relative rounded-none',
+                            'flex items-center px-4 py-3 text-[11px] font-mono uppercase tracking-widest transition-all duration-200 group relative rounded-none',
                             isActive
-                              ? 'bg-primary/15 text-primary font-semibold shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)]'
-                              : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground font-medium'
+                              ? 'bg-muted/10 text-foreground font-black border-l-2 border-primary'
+                              : 'text-muted-foreground/70 hover:bg-muted/5 hover:text-foreground font-medium border-l-2 border-transparent'
                           )}
                         >
-                          {isActive && (
-                            <motion.div
-                              layoutId="active-nav-indicator"
-                              className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-none"
-                              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            />
-                          )}
-
                           <item.icon
                             className={cn(
                               'w-4 h-4 shrink-0 transition-colors duration-200',
                               sidebarCollapsed ? 'mx-auto' : 'mr-3',
                               isActive
-                                ? 'text-primary'
-                                : 'text-muted-foreground group-hover:text-foreground'
+                                ? 'text-foreground'
+                                : 'text-muted-foreground/70 group-hover:text-foreground'
                             )}
                             aria-hidden="true"
                           />
@@ -305,10 +297,10 @@ export const Sidebar: React.FC = () => {
                                 {badgeCount !== undefined && badgeCount > 0 && (
                                   <span
                                     className={cn(
-                                      'flex h-5 items-center justify-center rounded-none px-2 text-[10px] font-bold',
+                                      'flex h-4 items-center justify-center rounded-none px-1.5 text-[9px] font-black',
                                       isActive
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'bg-destructive/10 text-destructive'
+                                        ? 'bg-foreground text-background'
+                                        : 'bg-destructive/20 text-destructive'
                                     )}
                                   >
                                     {badgeCount > 99 ? '99+' : badgeCount}
@@ -319,7 +311,7 @@ export const Sidebar: React.FC = () => {
                                 {hasSubItems && (
                                   <ChevronRight
                                     className={cn(
-                                      'w-4 h-4 transition-transform duration-200',
+                                      'w-4 h-4 transition-transform duration-200 opacity-50 group-hover:opacity-100',
                                       isExpanded ? 'rotate-90' : ''
                                     )}
                                   />
@@ -344,7 +336,7 @@ export const Sidebar: React.FC = () => {
                                 exit={{ height: 0, opacity: 0 }}
                                 className="overflow-hidden"
                               >
-                                <div className="mt-1 space-y-1 relative before:absolute before:inset-y-0 before:left-5 before:w-px before:bg-border">
+                                <div className="mt-1 space-y-[1px]">
                                   {item.subItems!.map((subItem) => {
                                     const isSubActive = location.pathname === subItem.path;
                                     return (
@@ -352,20 +344,12 @@ export const Sidebar: React.FC = () => {
                                         key={subItem.label}
                                         to={subItem.path!}
                                         className={cn(
-                                          'flex items-center pl-10 pr-3 py-2 text-sm transition-colors rounded-none group relative',
+                                          'flex items-center pl-10 pr-3 py-2 text-[10px] font-mono uppercase tracking-widest transition-colors rounded-none group relative',
                                           isSubActive
-                                            ? 'text-foreground font-semibold bg-muted/30'
-                                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/20'
+                                            ? 'text-foreground font-bold bg-muted/10 border-l-2 border-primary'
+                                            : 'text-muted-foreground/70 hover:text-foreground hover:bg-muted/5 border-l-2 border-transparent'
                                         )}
                                       >
-                                        <div
-                                          className={cn(
-                                            'absolute left-[18px] w-1.5 h-1.5 rounded-none border border-current bg-background transition-colors',
-                                            isSubActive
-                                              ? 'border-primary bg-primary'
-                                              : 'border-muted-foreground group-hover:border-foreground'
-                                          )}
-                                        />
                                         {subItem.label}
                                       </NavLink>
                                     );

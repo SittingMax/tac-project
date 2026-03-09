@@ -143,7 +143,7 @@ export const LabelTemplateManager: React.FC = () => {
                 </CardHeader>
 
                 <CardContent>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Type</span>
                       <Badge variant="outline">{template.type}</Badge>

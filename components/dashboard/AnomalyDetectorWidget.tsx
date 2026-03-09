@@ -75,7 +75,7 @@ export const AnomalyDetectorWidget: React.FC = () => {
             heuristics.
           </CardDescription>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <div className="flex flex-col items-end">
             <span className="text-sm font-medium text-muted-foreground">Detected Issues</span>
             <span className="text-2xl font-bold leading-none mt-1">{stats.anomalyCount}</span>
@@ -94,11 +94,11 @@ export const AnomalyDetectorWidget: React.FC = () => {
       <CardContent className="relative z-10 flex-1 overflow-auto p-0">
         {error ? (
           <div className="flex flex-col items-center justify-center p-8 text-center h-48">
-            <div className="w-12 h-12 rounded-none bg-destructive/10 flex items-center justify-center mb-3">
+            <div className="w-12 h-12 rounded-none bg-destructive/10 flex items-center justify-center mb-4">
               <AlertTriangle className="w-6 h-6 text-destructive" />
             </div>
             <p className="text-sm font-medium text-foreground">Analysis Failed</p>
-            <p className="text-xs text-muted-foreground mt-1 max-w-[250px] mb-3">
+            <p className="text-xs text-muted-foreground mt-1 max-w-[250px] mb-4">
               Failed to analyze shipments. Our neural net requires recalibration.
             </p>
             <Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -107,7 +107,7 @@ export const AnomalyDetectorWidget: React.FC = () => {
           </div>
         ) : anomalies.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center h-48">
-            <div className="w-12 h-12 rounded-none bg-status-success/20 flex items-center justify-center mb-3">
+            <div className="w-12 h-12 rounded-none bg-status-success/20 flex items-center justify-center mb-4">
               <BrainCircuit className="w-6 h-6 text-status-success" />
             </div>
             <p className="text-sm font-medium text-foreground">All Clear</p>

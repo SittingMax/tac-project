@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
 import { format, startOfDay, subDays } from 'date-fns';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import {
   ChartContainer,
   ChartTooltip,
@@ -71,11 +71,13 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
 
   if (chartData.every((d) => d.revenue === 0)) {
     return (
-      <Card className="flex flex-col h-full border-border bg-card shadow-sm">
+      <Card className="flex flex-col h-full rounded-none border-border bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300">
         <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-          <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-            <CardTitle>Revenue & Costs</CardTitle>
-            <CardDescription>Daily financial performance</CardDescription>
+          <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-4 sm:py-6">
+            <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Revenue & Costs</CardTitle>
+            <div className="text-2xl font-bold tracking-tighter text-foreground">
+              Daily Performance
+            </div>
           </div>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-12">
@@ -90,40 +92,42 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
   const totalCost = chartData.reduce((sum, item) => sum + item.cost, 0);
 
   return (
-    <Card className="flex flex-col h-full border-border bg-card shadow-sm">
-      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle className="flex justify-between items-center">
+    <Card className="flex flex-col h-full rounded-none border-border bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300">
+      <CardHeader className="flex flex-col items-stretch space-y-0 border-b border-border/50 p-0 sm:flex-row">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-4 sm:py-6">
+          <CardTitle className="flex justify-between items-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
             <span>Revenue & Costs</span>
             <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-[130px] h-8 text-xs rounded-none">
+              <SelectTrigger className="w-[120px] h-8 text-[10px] font-mono tracking-widest uppercase rounded-none border-border bg-transparent shadow-none">
                 <SelectValue placeholder="Time range" />
               </SelectTrigger>
               <SelectContent className="rounded-none">
-                <SelectItem value="90d" className="rounded-none text-xs">
+                <SelectItem value="90d" className="rounded-none text-[10px] font-mono uppercase tracking-widest">
                   Last 90 days
                 </SelectItem>
-                <SelectItem value="30d" className="rounded-none text-xs">
+                <SelectItem value="30d" className="rounded-none text-[10px] font-mono uppercase tracking-widest">
                   Last 30 days
                 </SelectItem>
-                <SelectItem value="7d" className="rounded-none text-xs">
+                <SelectItem value="7d" className="rounded-none text-[10px] font-mono uppercase tracking-widest">
                   Last 7 days
                 </SelectItem>
               </SelectContent>
             </Select>
           </CardTitle>
-          <CardDescription>Daily financial performance</CardDescription>
+          <div className="text-2xl font-bold tracking-tighter text-foreground">
+            Financial Performance
+          </div>
         </div>
         <div className="flex">
-          <div className="flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left sm:border-t-0 sm:border-l sm:px-8 sm:py-6 relative z-30">
-            <span className="text-xs text-muted-foreground">{chartConfig.revenue.label}</span>
-            <span className="text-lg font-bold leading-none sm:text-2xl">
+          <div className="flex flex-1 flex-col justify-center gap-1 border-t border-border/50 px-6 py-4 text-left sm:border-t-0 sm:border-l sm:px-8 sm:py-6 relative z-30">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">{chartConfig.revenue.label}</span>
+            <span className="text-xl font-bold tracking-tighter sm:text-3xl text-foreground">
               ₹{(totalRevenue / 1000).toFixed(1)}k
             </span>
           </div>
-          <div className="flex flex-1 flex-col justify-center gap-1 border-t border-l px-6 py-4 text-left sm:border-t-0 sm:px-8 sm:py-6 relative z-30">
-            <span className="text-xs text-muted-foreground">{chartConfig.cost.label}</span>
-            <span className="text-lg font-bold leading-none sm:text-2xl">
+          <div className="flex flex-1 flex-col justify-center gap-1 border-t border-l border-border/50 px-6 py-4 text-left sm:border-t-0 sm:px-8 sm:py-6 relative z-30">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">{chartConfig.cost.label}</span>
+            <span className="text-xl font-bold tracking-tighter sm:text-3xl text-foreground">
               ₹{(totalCost / 1000).toFixed(1)}k
             </span>
           </div>
@@ -139,7 +143,7 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
               right: 12,
             }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} />
             <XAxis
               dataKey="date"
               tickLine={false}
@@ -156,14 +160,14 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Line
               dataKey="revenue"
-              type="monotone"
+              type="step"
               stroke="var(--color-revenue)"
               strokeWidth={2}
               dot={false}
             />
             <Line
               dataKey="cost"
-              type="monotone"
+              type="step"
               stroke="var(--color-cost)"
               strokeWidth={2}
               dot={false}

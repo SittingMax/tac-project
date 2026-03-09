@@ -171,7 +171,7 @@ export function ManifestScanPanel({
         {scanner.lastResult && (
           <div
             className={cn(
-              'rounded-none p-3 text-sm',
+              'rounded-none p-4 text-sm',
               scanner.lastResult.success &&
                 !scanner.lastResult.duplicate &&
                 'bg-status-success/10 text-status-success',
@@ -220,7 +220,7 @@ export function ManifestScanPanel({
         )}
 
         <div className="flex items-center justify-between pt-2 border-t">
-          <div className="flex gap-3 text-xs">
+          <div className="flex gap-4 text-xs">
             <div className="flex items-center gap-1.5">
               <div className="h-2 w-2 rounded-none bg-status-success" />
               <span className="text-muted-foreground">Added:</span>

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 import { format, subDays, startOfDay } from 'date-fns';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import {
   ChartContainer,
   ChartLegend,
@@ -81,15 +81,19 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
   if (isLoading) return <ChartSkeleton />;
 
   return (
-    <Card className="pt-0 h-full flex flex-col border-border bg-card shadow-sm">
-      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+    <Card className="pt-0 h-full flex flex-col rounded-none border-border bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300">
+      <CardHeader className="flex items-start gap-4 space-y-0 pb-4 sm:flex-row sm:items-center">
         <div className="grid flex-1 gap-1">
-          <CardTitle>Shipment Volume Trend</CardTitle>
-          <CardDescription>Showing inbound vs outbound shipments</CardDescription>
+          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+            Shipment Volume Trend
+          </CardTitle>
+          <div className="text-2xl font-bold tracking-tighter text-foreground">
+            Inbound / Outbound
+          </div>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger
-            className="hidden w-[160px] rounded-none sm:ml-auto sm:flex"
+            className="w-[120px] rounded-none border-border bg-transparent shadow-none text-xs font-mono uppercase tracking-wider"
             aria-label="Select a value"
           >
             <SelectValue placeholder="Last 3 months" />
@@ -130,7 +134,7 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
                   <stop offset="95%" stopColor="var(--color-inbound)" stopOpacity={0.1} />
                 </linearGradient>
               </defs>
-              <CartesianGrid vertical={false} />
+              <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} />
               <XAxis
                 dataKey="date"
                 tickLine={false}
@@ -161,16 +165,18 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
               />
               <Area
                 dataKey="inbound"
-                type="natural"
+                type="step"
                 fill="url(#fillInbound)"
                 stroke="var(--color-inbound)"
+                strokeWidth={2}
                 stackId="a"
               />
               <Area
                 dataKey="outbound"
-                type="natural"
+                type="step"
                 fill="url(#fillOutbound)"
                 stroke="var(--color-outbound)"
+                strokeWidth={2}
                 stackId="a"
               />
               <ChartLegend content={<ChartLegendContent />} />

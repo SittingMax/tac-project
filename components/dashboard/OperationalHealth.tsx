@@ -108,7 +108,7 @@ export const OperationalHealth = () => {
           {/* Center Value */}
           <div className="text-center z-10 flex flex-col items-center justify-center">
             {isLoading ? (
-              <div className="w-24 h-12 bg-muted animate-pulse rounded-md" />
+              <div className="w-24 h-12 bg-muted animate-pulse rounded-none" />
             ) : (
               <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}

@@ -15,6 +15,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
+import { logger } from '@/lib/logger';
 
 export interface CrudUpsertDialogProps<TSchema extends z.ZodTypeAny> {
   open: boolean;
@@ -90,7 +91,7 @@ export function CrudUpsertDialog<TSchema extends z.ZodTypeAny>({
       onOpenChange(false);
       form.reset();
     } catch (error) {
-      console.error('Submit operation failed:', error);
+      logger.error('CrudUpsertDialog', 'Submit operation failed', { error });
       // Error handling should be done in the onSubmit callback
     } finally {
       setIsLoading(false);

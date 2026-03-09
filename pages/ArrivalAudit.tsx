@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,22 +37,37 @@ export const ArrivalAudit: React.FC = () => {
     return () => setActiveContext('GLOBAL');
   }, [setActiveContext]);
 
+  // Use a local ref to synchronously prevent double-processing before state updates
+  const scanLockRef = useRef(false);
+
   // Subscribe to global scanner events
   useEffect(() => {
     const unsubscribe = subscribe((data, source) => {
+      if (isProcessingScan || scanLockRef.current) return;
+      scanLockRef.current = true;
       setErrorInput(null);
-      processScan(data, source).catch((err) => setErrorInput(err.message));
+      processScan(data, source)
+        .catch((err) => setErrorInput(err.message))
+        .finally(() => {
+          scanLockRef.current = false;
+        });
       setCurrentCode('');
     });
     return unsubscribe;
-  }, [subscribe, processScan]);
+  }, [subscribe, processScan, isProcessingScan]);
 
   const handleCameraScan = useCallback(
     (result: string) => {
+      if (isProcessingScan || scanLockRef.current) return;
+      scanLockRef.current = true;
       setErrorInput(null);
-      processScan(result, ScanSource.CAMERA).catch((err) => setErrorInput(err.message));
+      processScan(result, ScanSource.CAMERA)
+        .catch((err) => setErrorInput(err.message))
+        .finally(() => {
+          scanLockRef.current = false;
+        });
     },
-    [processScan]
+    [processScan, isProcessingScan]
   );
 
   const handleScanSubmit = (e: React.FormEvent) => {
