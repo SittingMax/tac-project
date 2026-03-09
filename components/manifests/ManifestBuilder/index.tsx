@@ -81,7 +81,6 @@ interface ManifestBuilderProps {
   className?: string;
 }
 
-
 export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilderProps) {
   const queryClient = useQueryClient();
   const [selectedShipments, setSelectedShipments] = React.useState<Set<string>>(new Set());
@@ -199,9 +198,11 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
         status: 'BUILDING',
         total_shipments: selectedShipments.size,
       };
-      const { data: newManifest, error: manifestError } = await (supabase
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Auto-generated fields handled by DB
-        .from('manifests') as any)
+      const { data: newManifest, error: manifestError } = await (
+        supabase
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Auto-generated fields handled by DB
+          .from('manifests') as any
+      )
         .insert(insertData)
         .select()
         .single();

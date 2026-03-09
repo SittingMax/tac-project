@@ -16,21 +16,21 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
         Skip to content
       </a>
       <TooltipProvider>
-      <SidebarProvider className="w-full">
-        <AppSidebar />
-        <SidebarInset className="flex flex-1 flex-col h-screen overflow-hidden">
-          <Header />
-          <motion.main
-            id="main-content"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.18 }}
-            className="flex-1 overflow-auto p-4 md:p-6 lg:p-8"
-          >
-            <div className="mx-auto max-w-screen-2xl">{children}</div>
-          </motion.main>
-        </SidebarInset>
-      </SidebarProvider>
+        <SidebarProvider className="w-full">
+          <AppSidebar />
+          <SidebarInset className="flex flex-1 flex-col h-screen overflow-hidden">
+            <Header />
+            <motion.main
+              id="main-content"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.18 }}
+              className="flex-1 overflow-auto p-4 md:p-6 lg:p-8"
+            >
+              <div className="mx-auto max-w-screen-2xl">{children}</div>
+            </motion.main>
+          </SidebarInset>
+        </SidebarProvider>
       </TooltipProvider>
 
       {/* Global Command Palette - ⌘K / Ctrl+K */}

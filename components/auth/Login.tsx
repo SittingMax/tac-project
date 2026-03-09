@@ -109,11 +109,19 @@ export const Login: React.FC = () => {
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-10 rounded-none bg-status-success/20 border border-status-success/30 flex items-center justify-center shrink-0 overflow-hidden">
               <span className="absolute inset-0 inline-flex h-full w-full rounded-none bg-status-success/40 opacity-75 animate-ping"></span>
-              <img src="/lottie/login-success.gif" alt="Success" className="w-8 h-8 relative z-10 object-contain" />
+              <img
+                src="/lottie/login-success.gif"
+                alt="Success"
+                className="w-8 h-8 relative z-10 object-contain"
+              />
             </div>
             <div className="flex flex-col">
-              <span className="font-mono font-bold uppercase tracking-widest text-xs text-foreground">Login Successful</span>
-              <span className="text-[10px] font-mono text-muted-foreground">Welcome back, {currentUser.fullName}!</span>
+              <span className="font-mono font-bold uppercase tracking-widest text-xs text-foreground">
+                Login Successful
+              </span>
+              <span className="text-[10px] font-mono text-muted-foreground">
+                Welcome back, {currentUser.fullName}!
+              </span>
             </div>
           </div>,
           {

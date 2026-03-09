@@ -177,7 +177,10 @@ export function ScanPanelSkeleton({ className }: SkeletonProps) {
         <Skeleton className="h-4 w-28" />
         <div className="space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 p-3 rounded-none bg-muted/10 border border-border/40">
+            <div
+              key={i}
+              className="flex items-center gap-3 p-3 rounded-none bg-muted/10 border border-border/40"
+            >
               <Skeleton className="size-8 rounded-none bg-muted/50" />
               <div className="flex-1 space-y-1">
                 <Skeleton className="h-4 w-24" />
@@ -241,7 +244,9 @@ export function FormSkeleton({ fields = 4, className }: SkeletonProps & { fields
 // List Item Skeleton
 export function ListItemSkeleton({ className }: SkeletonProps) {
   return (
-    <div className={cn('flex items-center gap-3 p-3 rounded-none border border-border/40', className)}>
+    <div
+      className={cn('flex items-center gap-3 p-3 rounded-none border border-border/40', className)}
+    >
       <Skeleton className="size-10 rounded-none shrink-0" />
       <div className="flex-1 space-y-2">
         <Skeleton className="h-4 w-1/3" />

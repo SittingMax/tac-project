@@ -308,7 +308,9 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
     <Card className="flex flex-col h-full rounded-none border border-border/40 bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300">
       <CardHeader className="flex flex-row items-start justify-between pb-4 border-b border-border/40 space-y-0">
         <div>
-          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Hub Performance Profile</CardTitle>
+          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+            Hub Performance Profile
+          </CardTitle>
           <div className="text-xl font-bold tracking-tighter text-foreground mt-1">
             DEL vs IMF Metrics
           </div>
@@ -318,22 +320,40 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
             <SelectValue placeholder="Chart Type" />
           </SelectTrigger>
           <SelectContent className="rounded-none">
-            <SelectItem value="radar" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+            <SelectItem
+              value="radar"
+              className="text-[10px] font-mono uppercase tracking-widest rounded-none"
+            >
               Radar
             </SelectItem>
-            <SelectItem value="area" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+            <SelectItem
+              value="area"
+              className="text-[10px] font-mono uppercase tracking-widest rounded-none"
+            >
               Area
             </SelectItem>
-            <SelectItem value="bar" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+            <SelectItem
+              value="bar"
+              className="text-[10px] font-mono uppercase tracking-widest rounded-none"
+            >
               Bar
             </SelectItem>
-            <SelectItem value="line" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+            <SelectItem
+              value="line"
+              className="text-[10px] font-mono uppercase tracking-widest rounded-none"
+            >
               Line
             </SelectItem>
-            <SelectItem value="pie" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+            <SelectItem
+              value="pie"
+              className="text-[10px] font-mono uppercase tracking-widest rounded-none"
+            >
               Pie
             </SelectItem>
-            <SelectItem value="radial" className="text-[10px] font-mono uppercase tracking-widest rounded-none">
+            <SelectItem
+              value="radial"
+              className="text-[10px] font-mono uppercase tracking-widest rounded-none"
+            >
               Radial
             </SelectItem>
           </SelectContent>

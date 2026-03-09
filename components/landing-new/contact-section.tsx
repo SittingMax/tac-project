@@ -44,7 +44,8 @@ export function ContactSection() {
         setIsSubmitted(false);
       }, 5000);
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to send message. Please try again.';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to send message. Please try again.';
       logger.error('ContactSection', 'Error submitting form', { error: err });
       setError(errorMessage);
       toast.error('Failed to send message.');

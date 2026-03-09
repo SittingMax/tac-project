@@ -39,7 +39,9 @@ export function ChartTooltipDefault() {
   return (
     <Card className="flex flex-col h-full rounded-none border border-border/40 bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300 w-full">
       <CardHeader className="pb-4 border-b border-border/40 space-y-0">
-        <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Current Fleet Status</CardTitle>
+        <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+          Current Fleet Status
+        </CardTitle>
         <div className="text-xl font-bold tracking-tighter text-foreground mt-1">
           Active vs Idle Composition
         </div>
@@ -59,12 +61,7 @@ export function ChartTooltipDefault() {
               }}
             />
             <Bar dataKey="running" stackId="a" fill="var(--color-running)" radius={0} />
-            <Bar
-              dataKey="swimming"
-              stackId="a"
-              fill="var(--color-swimming)"
-              radius={0}
-            />
+            <Bar dataKey="swimming" stackId="a" fill="var(--color-swimming)" radius={0} />
             <ChartTooltip content={<ChartTooltipContent />} cursor={false} defaultIndex={1} />
           </BarChart>
         </ChartContainer>

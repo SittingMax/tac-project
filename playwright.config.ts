@@ -70,9 +70,9 @@ export default defineConfig({
   webServer: process.env.CI
     ? undefined
     : {
-      command: 'npm run dev',
-      url: 'http://127.0.0.1:5173',
-      reuseExistingServer: true,
-      timeout: 120 * 1000,
-    },
+        command: 'npm run dev',
+        url: 'http://127.0.0.1:5173',
+        reuseExistingServer: true,
+        timeout: 120 * 1000,
+      },
 });

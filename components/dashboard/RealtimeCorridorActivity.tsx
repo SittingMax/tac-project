@@ -151,7 +151,9 @@ export function RealtimeCorridorActivity() {
     <Card className="flex flex-col rounded-none py-0 border border-border/40 bg-transparent shadow-none w-full hover:bg-muted/5 transition-colors duration-300">
       <CardHeader className="flex flex-col items-stretch border-b border-border/40 pb-4 sm:flex-row space-y-0">
         <div className="grid flex-1 gap-1">
-          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Real-time corridor activity</CardTitle>
+          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+            Real-time corridor activity
+          </CardTitle>
           <div className="text-xl font-bold tracking-tighter text-foreground mt-1">
             Corridor Visitors
           </div>
@@ -164,13 +166,22 @@ export function RealtimeCorridorActivity() {
             <SelectValue placeholder="Last 3 months" />
           </SelectTrigger>
           <SelectContent className="rounded-none border-border/40">
-            <SelectItem value="90d" className="rounded-none font-mono text-xs uppercase tracking-widest">
+            <SelectItem
+              value="90d"
+              className="rounded-none font-mono text-xs uppercase tracking-widest"
+            >
               Last 3 months
             </SelectItem>
-            <SelectItem value="30d" className="rounded-none font-mono text-xs uppercase tracking-widest">
+            <SelectItem
+              value="30d"
+              className="rounded-none font-mono text-xs uppercase tracking-widest"
+            >
               Last 30 days
             </SelectItem>
-            <SelectItem value="7d" className="rounded-none font-mono text-xs uppercase tracking-widest">
+            <SelectItem
+              value="7d"
+              className="rounded-none font-mono text-xs uppercase tracking-widest"
+            >
               Last 7 days
             </SelectItem>
           </SelectContent>
@@ -189,7 +200,12 @@ export function RealtimeCorridorActivity() {
                 <stop offset="95%" stopColor="var(--color-mobile)" stopOpacity={0.1} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+            <CartesianGrid
+              vertical={false}
+              strokeDasharray="3 3"
+              stroke="var(--border)"
+              opacity={0.3}
+            />
             <XAxis
               dataKey="date"
               tickLine={false}

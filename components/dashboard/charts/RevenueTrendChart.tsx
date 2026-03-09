@@ -74,7 +74,9 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
       <Card className="flex flex-col h-full rounded-none border-border bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300">
         <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
           <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-4 sm:py-6">
-            <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Revenue & Costs</CardTitle>
+            <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+              Revenue & Costs
+            </CardTitle>
             <div className="text-2xl font-bold tracking-tighter text-foreground">
               Daily Performance
             </div>
@@ -102,13 +104,22 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
                 <SelectValue placeholder="Time range" />
               </SelectTrigger>
               <SelectContent className="rounded-none">
-                <SelectItem value="90d" className="rounded-none text-[10px] font-mono uppercase tracking-widest">
+                <SelectItem
+                  value="90d"
+                  className="rounded-none text-[10px] font-mono uppercase tracking-widest"
+                >
                   Last 90 days
                 </SelectItem>
-                <SelectItem value="30d" className="rounded-none text-[10px] font-mono uppercase tracking-widest">
+                <SelectItem
+                  value="30d"
+                  className="rounded-none text-[10px] font-mono uppercase tracking-widest"
+                >
                   Last 30 days
                 </SelectItem>
-                <SelectItem value="7d" className="rounded-none text-[10px] font-mono uppercase tracking-widest">
+                <SelectItem
+                  value="7d"
+                  className="rounded-none text-[10px] font-mono uppercase tracking-widest"
+                >
                   Last 7 days
                 </SelectItem>
               </SelectContent>
@@ -120,13 +131,17 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
         </div>
         <div className="flex">
           <div className="flex flex-1 flex-col justify-center gap-1 border-t border-border/50 px-6 py-4 text-left sm:border-t-0 sm:border-l sm:px-8 sm:py-6 relative z-30">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">{chartConfig.revenue.label}</span>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+              {chartConfig.revenue.label}
+            </span>
             <span className="text-xl font-bold tracking-tighter sm:text-3xl text-foreground">
               ₹{(totalRevenue / 1000).toFixed(1)}k
             </span>
           </div>
           <div className="flex flex-1 flex-col justify-center gap-1 border-t border-l border-border/50 px-6 py-4 text-left sm:border-t-0 sm:px-8 sm:py-6 relative z-30">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">{chartConfig.cost.label}</span>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+              {chartConfig.cost.label}
+            </span>
             <span className="text-xl font-bold tracking-tighter sm:text-3xl text-foreground">
               ₹{(totalCost / 1000).toFixed(1)}k
             </span>
@@ -143,7 +158,12 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
               right: 12,
             }}
           >
-            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} />
+            <CartesianGrid
+              vertical={false}
+              strokeDasharray="3 3"
+              stroke="var(--border)"
+              opacity={0.5}
+            />
             <XAxis
               dataKey="date"
               tickLine={false}

@@ -93,7 +93,9 @@ export async function queueScan(
     const request = store.add(offlineScan);
 
     request.onsuccess = () => {
-      logger.info('OfflineScanning', 'Scan queued for offline sync', { cn_number: offlineScan.cn_number });
+      logger.info('OfflineScanning', 'Scan queued for offline sync', {
+        cn_number: offlineScan.cn_number,
+      });
       resolve(offlineScan);
     };
 
@@ -248,7 +250,7 @@ async function syncScanToServer(scan: OfflineScan): Promise<boolean> {
       hub_id: scan.hub_id,
       source: 'OFFLINE_SCAN',
       location: scan.hub_code,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic tracking event data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic tracking event data
     } as any);
 
     if (error) {

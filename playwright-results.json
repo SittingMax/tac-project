@@ -1,0 +1,792 @@
+{
+  "config": {
+    "configFile": "C:\\logi\\tac-portal\\playwright.config.ts",
+    "rootDir": "C:/logi/tac-portal/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/logi/tac-portal/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "C:/logi/tac-portal/tests/e2e",
+        "testIgnore": [],
+        "testMatch": ["/.*\\.setup\\.ts/"],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/logi/tac-portal/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/logi/tac-portal/tests/e2e",
+        "testIgnore": [],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/logi/tac-portal/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "C:/logi/tac-portal/tests/e2e",
+        "testIgnore": [],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [["json"]],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "runAgents": "none",
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.58.2",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "auth.setup.ts",
+      "file": "auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "setup",
+              "projectName": "setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 309,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "⚠️ E2E_TEST_EMAIL or E2E_TEST_PASSWORD not configured\n"
+                    },
+                    {
+                      "text": "   Creating empty auth state for unauthenticated tests (local dev only)...\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-03-09T20:59:27.343Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "17e3fe6f4d9d8bd79c6b-60f085b113a677673906",
+          "file": "auth.setup.ts",
+          "line": 27,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "visual-regression.spec.ts",
+      "file": "visual-regression.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Visual Regression Tests",
+          "file": "visual-regression.spec.ts",
+          "line": 24,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Login Page",
+              "file": "visual-regression.spec.ts",
+              "line": 25,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "login page matches snapshot",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 2876,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n    at C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts:30:18",
+                            "location": {
+                              "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                              "column": 18,
+                              "line": 30
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 28 |\u001b[39m\n \u001b[90m 29 |\u001b[39m     test(\u001b[32m'login page matches snapshot'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 30 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 31 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Wait for animations to complete\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                                "column": 18,
+                                "line": 30
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 28 |\u001b[39m\n \u001b[90m 29 |\u001b[39m     test(\u001b[32m'login page matches snapshot'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 30 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 31 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m       \u001b[90m// Wait for animations to complete\u001b[39m\u001b[0m\n\u001b[2m    at C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts:30:18\u001b[22m"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-03-09T20:59:30.668Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\logi\\tac-portal\\test-results\\visual-regression-Visual-R-06e6e-login-page-matches-snapshot-chromium\\test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                            "column": 18,
+                            "line": 30
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "78e23c5201ba1ea12e76-89955f6deb1040a99353",
+                  "file": "visual-regression.spec.ts",
+                  "line": 29,
+                  "column": 5
+                },
+                {
+                  "title": "login error state matches snapshot",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 1,
+                          "status": "failed",
+                          "duration": 3248,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n    at C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts:48:18",
+                            "location": {
+                              "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                              "column": 18,
+                              "line": 48
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 46 |\u001b[39m\n \u001b[90m 47 |\u001b[39m     test(\u001b[32m'login error state matches snapshot'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 48 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 49 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 50 |\u001b[39m\n \u001b[90m 51 |\u001b[39m       \u001b[90m// Use generic selectors that work with current login form\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                                "column": 18,
+                                "line": 48
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 46 |\u001b[39m\n \u001b[90m 47 |\u001b[39m     test(\u001b[32m'login error state matches snapshot'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 48 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 49 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 50 |\u001b[39m\n \u001b[90m 51 |\u001b[39m       \u001b[90m// Use generic selectors that work with current login form\u001b[39m\u001b[0m\n\u001b[2m    at C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts:48:18\u001b[22m"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-03-09T20:59:30.710Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\logi\\tac-portal\\test-results\\visual-regression-Visual-R-88e6a-rror-state-matches-snapshot-chromium\\test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                            "column": 18,
+                            "line": 48
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "78e23c5201ba1ea12e76-65f7432ac073a3bfd2b9",
+                  "file": "visual-regression.spec.ts",
+                  "line": 47,
+                  "column": 5
+                }
+              ]
+            },
+            {
+              "title": "Dashboard",
+              "file": "visual-regression.spec.ts",
+              "line": 72,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "dashboard page matches snapshot",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "Requires auth credentials",
+                          "location": {
+                            "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                            "line": 73,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": -1,
+                          "parallelIndex": -1,
+                          "status": "skipped",
+                          "duration": 0,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-03-09T20:59:28.016Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "Requires auth credentials",
+                              "location": {
+                                "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                                "line": 73,
+                                "column": 10
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "78e23c5201ba1ea12e76-84b7626bb8b3313e4bcd",
+                  "file": "visual-regression.spec.ts",
+                  "line": 76,
+                  "column": 5
+                },
+                {
+                  "title": "dashboard header matches snapshot",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "Requires auth credentials",
+                          "location": {
+                            "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                            "line": 73,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": -1,
+                          "parallelIndex": -1,
+                          "status": "skipped",
+                          "duration": 0,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-03-09T20:59:28.017Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "Requires auth credentials",
+                              "location": {
+                                "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                                "line": 73,
+                                "column": 10
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "78e23c5201ba1ea12e76-07723208848e914e92ac",
+                  "file": "visual-regression.spec.ts",
+                  "line": 94,
+                  "column": 5
+                },
+                {
+                  "title": "quick actions matches snapshot",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "Requires auth credentials",
+                          "location": {
+                            "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                            "line": 73,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": -1,
+                          "parallelIndex": -1,
+                          "status": "skipped",
+                          "duration": 0,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-03-09T20:59:28.018Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "Requires auth credentials",
+                              "location": {
+                                "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                                "line": 73,
+                                "column": 10
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "78e23c5201ba1ea12e76-34a09b2183095782308f",
+                  "file": "visual-regression.spec.ts",
+                  "line": 106,
+                  "column": 5
+                }
+              ]
+            },
+            {
+              "title": "Manifests Page",
+              "file": "visual-regression.spec.ts",
+              "line": 119,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "manifests page matches snapshot",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "Requires auth credentials",
+                          "location": {
+                            "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                            "line": 120,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": -1,
+                          "parallelIndex": -1,
+                          "status": "skipped",
+                          "duration": 0,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-03-09T20:59:28.019Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "Requires auth credentials",
+                              "location": {
+                                "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                                "line": 120,
+                                "column": 10
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "78e23c5201ba1ea12e76-2686b1d9db38b27691a5",
+                  "file": "visual-regression.spec.ts",
+                  "line": 123,
+                  "column": 5
+                }
+              ]
+            },
+            {
+              "title": "Shipments Page",
+              "file": "visual-regression.spec.ts",
+              "line": 145,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "shipments page matches snapshot",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "Requires auth credentials",
+                          "location": {
+                            "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                            "line": 146,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "expectedStatus": "skipped",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": -1,
+                          "parallelIndex": -1,
+                          "status": "skipped",
+                          "duration": 0,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-03-09T20:59:28.028Z",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "Requires auth credentials",
+                              "location": {
+                                "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                                "line": 146,
+                                "column": 10
+                              }
+                            }
+                          ],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "78e23c5201ba1ea12e76-5984057021b96588e507",
+                  "file": "visual-regression.spec.ts",
+                  "line": 149,
+                  "column": 5
+                }
+              ]
+            },
+            {
+              "title": "Responsive Design",
+              "file": "visual-regression.spec.ts",
+              "line": 165,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "login page mobile view",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 3,
+                          "status": "failed",
+                          "duration": 3117,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n    at C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts:170:18",
+                            "location": {
+                              "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                              "column": 18,
+                              "line": 170
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 168 |\u001b[39m     test(\u001b[32m'login page mobile view'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 169 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39msetViewportSize({ width\u001b[33m:\u001b[39m \u001b[35m375\u001b[39m\u001b[33m,\u001b[39m height\u001b[33m:\u001b[39m \u001b[35m667\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 170 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 171 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 172 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 173 |\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                                "column": 18,
+                                "line": 170
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 168 |\u001b[39m     test(\u001b[32m'login page mobile view'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 169 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39msetViewportSize({ width\u001b[33m:\u001b[39m \u001b[35m375\u001b[39m\u001b[33m,\u001b[39m height\u001b[33m:\u001b[39m \u001b[35m667\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 170 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 171 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 172 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 173 |\u001b[39m\u001b[0m\n\u001b[2m    at C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts:170:18\u001b[22m"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-03-09T20:59:30.728Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\logi\\tac-portal\\test-results\\visual-regression-Visual-R-cfb96-sign-login-page-mobile-view-chromium\\test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                            "column": 18,
+                            "line": 170
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "78e23c5201ba1ea12e76-9967d426f3e3a1c9a801",
+                  "file": "visual-regression.spec.ts",
+                  "line": 168,
+                  "column": 5
+                },
+                {
+                  "title": "login page tablet view",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 2,
+                          "status": "failed",
+                          "duration": 3215,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n    at C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts:182:18",
+                            "location": {
+                              "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                              "column": 18,
+                              "line": 182
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 180 |\u001b[39m     test(\u001b[32m'login page tablet view'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 181 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39msetViewportSize({ width\u001b[33m:\u001b[39m \u001b[35m768\u001b[39m\u001b[33m,\u001b[39m height\u001b[33m:\u001b[39m \u001b[35m1024\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 182 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 183 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 184 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 185 |\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                                "column": 18,
+                                "line": 182
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 180 |\u001b[39m     test(\u001b[32m'login page tablet view'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 181 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39msetViewportSize({ width\u001b[33m:\u001b[39m \u001b[35m768\u001b[39m\u001b[33m,\u001b[39m height\u001b[33m:\u001b[39m \u001b[35m1024\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 182 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 183 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 184 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 185 |\u001b[39m\u001b[0m\n\u001b[2m    at C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts:182:18\u001b[22m"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-03-09T20:59:30.684Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\logi\\tac-portal\\test-results\\visual-regression-Visual-R-a4d3d-sign-login-page-tablet-view-chromium\\test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                            "column": 18,
+                            "line": 182
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "78e23c5201ba1ea12e76-97087972a5467a1be62e",
+                  "file": "visual-regression.spec.ts",
+                  "line": 180,
+                  "column": 5
+                }
+              ]
+            },
+            {
+              "title": "Dark Mode",
+              "file": "visual-regression.spec.ts",
+              "line": 193,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "login page dark mode",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 5,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 2714,
+                          "error": {
+                            "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n",
+                            "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n    at C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts:198:18",
+                            "location": {
+                              "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                              "column": 18,
+                              "line": 198
+                            },
+                            "snippet": "\u001b[0m \u001b[90m 196 |\u001b[39m     test(\u001b[32m'login page dark mode'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 197 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39memulateMedia({ colorScheme\u001b[33m:\u001b[39m \u001b[32m'dark'\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 198 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 199 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 200 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 201 |\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                                "column": 18,
+                                "line": 198
+                              },
+                              "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/login\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 196 |\u001b[39m     test(\u001b[32m'login page dark mode'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 197 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39memulateMedia({ colorScheme\u001b[33m:\u001b[39m \u001b[32m'dark'\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 198 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/login'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 199 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 200 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m500\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 201 |\u001b[39m\u001b[0m\n\u001b[2m    at C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts:198:18\u001b[22m"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-03-09T20:59:36.409Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "C:\\logi\\tac-portal\\test-results\\visual-regression-Visual-R-ba1f9-k-Mode-login-page-dark-mode-chromium\\test-failed-1.png"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "C:\\logi\\tac-portal\\tests\\e2e\\visual-regression.spec.ts",
+                            "column": 18,
+                            "line": 198
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "78e23c5201ba1ea12e76-6a8ab759db445416f406",
+                  "file": "visual-regression.spec.ts",
+                  "line": 196,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-03-09T20:59:25.076Z",
+    "duration": 14382.96,
+    "expected": 1,
+    "skipped": 5,
+    "unexpected": 5,
+    "flaky": 0
+  }
+}

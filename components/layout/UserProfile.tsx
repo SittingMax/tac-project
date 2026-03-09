@@ -49,11 +49,19 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed, className }
         <div className="flex items-center gap-3">
           <div className="relative w-10 h-10 rounded-none bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden">
             <span className="absolute inset-0 inline-flex h-full w-full rounded-none bg-primary/40 opacity-75 animate-ping"></span>
-            <img src="/lottie/logout-success.gif" alt="Logout Success" className="w-8 h-8 relative z-10 object-contain" />
+            <img
+              src="/lottie/logout-success.gif"
+              alt="Logout Success"
+              className="w-8 h-8 relative z-10 object-contain"
+            />
           </div>
           <div className="flex flex-col">
-            <span className="font-mono font-bold uppercase tracking-widest text-xs text-foreground">Logged Out</span>
-            <span className="text-[10px] font-mono text-muted-foreground">You have been securely signed out.</span>
+            <span className="font-mono font-bold uppercase tracking-widest text-xs text-foreground">
+              Logged Out
+            </span>
+            <span className="text-[10px] font-mono text-muted-foreground">
+              You have been securely signed out.
+            </span>
           </div>
         </div>,
         {

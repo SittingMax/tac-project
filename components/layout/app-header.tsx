@@ -1,15 +1,13 @@
-import React from "react"
-import { useLocation, Link, useNavigate } from "react-router-dom"
-import { Search, ScanBarcode } from "lucide-react"
+import React from 'react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { Search, ScanBarcode } from 'lucide-react';
 
-import {
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { useStore } from "@/store"
-import { AnimatedThemeToggler } from "../ui/animated-theme-toggler"
-import { NotificationBell } from "../domain/NotificationBell"
-import { useScanner } from "@/context/useScanner"
-import { CommandPalette } from "../domain/CommandPalette"
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useStore } from '@/store';
+import { AnimatedThemeToggler } from '../ui/animated-theme-toggler';
+import { NotificationBell } from '../domain/NotificationBell';
+import { useScanner } from '@/context/useScanner';
+import { CommandPalette } from '../domain/CommandPalette';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,39 +15,39 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
 
 export const Header: React.FC = () => {
-  const { setTheme } = useStore()
-  const { scan } = useScanner()
-  const location = useLocation()
-  const navigate = useNavigate()
-  const [commandOpen, setCommandOpen] = React.useState(false)
+  const { setTheme } = useStore();
+  const { scan } = useScanner();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [commandOpen, setCommandOpen] = React.useState(false);
 
   const handleManualScan = async () => {
     try {
-      const result = await scan()
-      const cleanResult = result.trim().toUpperCase()
-      if (!cleanResult) return
+      const result = await scan();
+      const cleanResult = result.trim().toUpperCase();
+      if (!cleanResult) return;
 
-      if (cleanResult.startsWith("TAC")) {
-        navigate(`/finance?awb=${encodeURIComponent(cleanResult)}`)
-        return
+      if (cleanResult.startsWith('TAC')) {
+        navigate(`/finance?awb=${encodeURIComponent(cleanResult)}`);
+        return;
       }
 
-      if (cleanResult.startsWith("MAN")) {
-        navigate(`/manifests?search=${encodeURIComponent(cleanResult)}`)
-        return
+      if (cleanResult.startsWith('MAN')) {
+        navigate(`/manifests?search=${encodeURIComponent(cleanResult)}`);
+        return;
       }
 
-      navigate(`/search?q=${encodeURIComponent(cleanResult)}`)
+      navigate(`/search?q=${encodeURIComponent(cleanResult)}`);
     } catch {
       // Scan cancelled
     }
-  }
+  };
 
-  const paths = location.pathname.split("/").filter(Boolean)
+  const paths = location.pathname.split('/').filter(Boolean);
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b border-border/50 bg-background/80 backdrop-blur-md px-4">
@@ -60,9 +58,10 @@ export const Header: React.FC = () => {
           <Breadcrumb>
             <BreadcrumbList>
               {paths.map((path, index) => {
-                const isLast = index === paths.length - 1
-                const href = `/${paths.slice(0, index + 1).join("/")}`
-                const formattedPath = path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ")
+                const isLast = index === paths.length - 1;
+                const href = `/${paths.slice(0, index + 1).join('/')}`;
+                const formattedPath =
+                  path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
 
                 return (
                   <React.Fragment key={path}>
@@ -77,7 +76,7 @@ export const Header: React.FC = () => {
                     </BreadcrumbItem>
                     {!isLast && <BreadcrumbSeparator className="hidden md:block" />}
                   </React.Fragment>
-                )
+                );
               })}
             </BreadcrumbList>
           </Breadcrumb>
@@ -115,5 +114,5 @@ export const Header: React.FC = () => {
 
       <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
     </header>
-  )
-}
+  );
+};

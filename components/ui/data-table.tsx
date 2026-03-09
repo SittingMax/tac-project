@@ -150,7 +150,7 @@ export function DataTable<TData, TValue>({
                           className={cn(
                             'flex items-center gap-1 font-mono uppercase text-[10px] tracking-widest text-muted-foreground',
                             header.column.getCanSort() &&
-                            'cursor-pointer select-none hover:text-foreground transition-colors'
+                              'cursor-pointer select-none hover:text-foreground transition-colors'
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                         >

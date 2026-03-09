@@ -134,7 +134,12 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
                   <stop offset="95%" stopColor="var(--color-inbound)" stopOpacity={0.1} />
                 </linearGradient>
               </defs>
-              <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} />
+              <CartesianGrid
+                vertical={false}
+                strokeDasharray="3 3"
+                stroke="var(--border)"
+                opacity={0.5}
+              />
               <XAxis
                 dataKey="date"
                 tickLine={false}

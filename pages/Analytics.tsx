@@ -150,7 +150,9 @@ export const Analytics: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-end justify-between border-b border-border/40 pb-4">
             <div>
-              <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Flow Trajectory</h3>
+              <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+                Flow Trajectory
+              </h3>
               <p className="text-2xl font-bold tracking-tighter text-foreground mt-1">
                 6-Month Macro-View
               </p>
@@ -221,7 +223,9 @@ export const Analytics: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-end justify-between border-b border-border/40 pb-4">
             <div>
-              <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Status Distribution</h3>
+              <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+                Status Distribution
+              </h3>
               <p className="text-2xl font-bold tracking-tighter text-foreground mt-1">
                 Current State Architecture
               </p>

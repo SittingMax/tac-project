@@ -136,7 +136,9 @@ export function ChartBarInteractive() {
     <Card className="flex flex-col rounded-none py-0 border border-border/40 bg-transparent shadow-none w-full hover:bg-muted/5 transition-colors duration-300">
       <CardHeader className="flex flex-col items-stretch border-b border-border/40 !p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-6 pb-4 sm:!py-6">
-          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Inbound vs Outbound Flow</CardTitle>
+          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+            Inbound vs Outbound Flow
+          </CardTitle>
           <div className="text-2xl font-bold tracking-tighter text-foreground mt-1">
             Historical Shipment Volume
           </div>
@@ -172,7 +174,12 @@ export function ChartBarInteractive() {
               right: 12,
             }}
           >
-            <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+            <CartesianGrid
+              vertical={false}
+              strokeDasharray="3 3"
+              stroke="var(--border)"
+              opacity={0.3}
+            />
             <XAxis
               dataKey="date"
               tickLine={false}
