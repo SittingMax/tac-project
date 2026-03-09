@@ -196,9 +196,9 @@ jobs:
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
-    # Skip E2E tests if Supabase environment is not configured OR if triggered by Dependabot
+    # Skip E2E tests if triggered by Dependabot
     # (Dependabot PRs cannot access repository secrets for security reasons)
-    if: ${{ vars.VITE_SUPABASE_URL != '' && vars.VITE_SUPABASE_ANON_KEY != '' && github.actor != 'dependabot[bot]' }}
+    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -218,8 +218,8 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Start preview server and run E2E tests
         run: |
@@ -246,8 +246,8 @@ jobs:
           exit ${TEST_EXIT:-0}
         env:
           CI: true
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           # Test credentials for E2E tests (non-sensitive test account)
           E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
