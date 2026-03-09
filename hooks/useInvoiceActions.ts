@@ -173,20 +173,20 @@ export function useInvoiceActions() {
 
       const consignor = shipmentRow
         ? {
-          name: shipmentRow.consignor_name,
-          phone: shipmentRow.consignor_phone,
-          address: formatAddress(shipmentRow.consignor_address),
-        }
+            name: shipmentRow.consignor_name,
+            phone: shipmentRow.consignor_phone,
+            address: formatAddress(shipmentRow.consignor_address),
+          }
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        lineItems.consignor || (inv as any).consignor || {};
+          lineItems.consignor || (inv as any).consignor || {};
       const consignee = shipmentRow
         ? {
-          name: shipmentRow.consignee_name,
-          phone: shipmentRow.consignee_phone,
-          address: formatAddress(shipmentRow.consignee_address),
-        }
+            name: shipmentRow.consignee_name,
+            phone: shipmentRow.consignee_phone,
+            address: formatAddress(shipmentRow.consignee_address),
+          }
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        lineItems.consignee || (inv as any).consignee || {};
+          lineItems.consignee || (inv as any).consignee || {};
 
       const fullInvoice = { ...inv, consignor, consignee };
       const url = await generateEnterpriseInvoice(fullInvoice as Invoice);
@@ -230,11 +230,16 @@ export function useInvoiceActions() {
 
   const handleShareWhatsapp = async (inv: Invoice) => {
     const shipment = inv.awb ? await getShipment(inv.awb) : null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const invData = inv as unknown as {
+      consignee?: { phone?: string };
+      line_items?: { consignee?: { phone?: string } };
+    };
+    const shipData = shipment as unknown as { consignee_phone?: string };
+
     const phone =
-      (inv as any).consignee?.phone ||
-      (inv as any).line_items?.consignee?.phone ||
-      (shipment as any)?.consignee_phone ||
+      invData.consignee?.phone ||
+      invData.line_items?.consignee?.phone ||
+      shipData?.consignee_phone ||
       '';
     if (!phone) {
       alert('No customer phone number found.');

@@ -145,7 +145,6 @@ export function useArrivalAudit() {
     setIsScanning(true);
     // Auto-release after 15 seconds to prevent permanent lockout
     scanTimeoutRef.current = setTimeout(() => {
-      // eslint-disable-next-line no-console
       console.warn('[useArrivalAudit] Scan lock auto-released after 15s timeout');
       setIsScanning(false);
     }, 15_000);

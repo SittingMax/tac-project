@@ -104,10 +104,15 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
   }
 
   return (
-    <Card data-chart={id} className="flex flex-col h-full rounded-none border-border bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300">
+    <Card
+      data-chart={id}
+      className="flex flex-col h-full rounded-none border-border bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300"
+    >
       <CardHeader className="flex-row items-start space-y-0 pb-0">
         <div className="grid gap-1">
-          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">Status Distribution</CardTitle>
+          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+            Status Distribution
+          </CardTitle>
           <div className="text-2xl font-bold tracking-tighter text-foreground">
             Current Breakdown
           </div>
@@ -156,6 +161,7 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
               innerRadius={60}
               strokeWidth={5}
               activeIndex={activeIndex !== -1 ? activeIndex : undefined}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               activeShape={({ outerRadius = 0, ...props }: any) => (
                 <g>
                   <Sector {...props} outerRadius={outerRadius + 8} />

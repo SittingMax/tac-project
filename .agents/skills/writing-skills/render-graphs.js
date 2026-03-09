@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-console */
+
 /**
  * Render graphviz diagrams from a skill's SKILL.md to SVG files.
  *
