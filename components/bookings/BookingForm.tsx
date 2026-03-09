@@ -6,10 +6,12 @@ import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { Trash2, Plus, Upload, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
+import { bookingService } from '@/lib/services/bookingService';
 
 interface BookingFormProps {
   onSuccess?: () => void;
@@ -97,7 +99,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
             .upload(filePath, file);
 
           if (uploadError) {
-            logger.error('BookingForm', 'Upload error', { error: uploadError });
+            console.error('Upload error:', uploadError);
             toast.error(`Failed to upload ${file.name}`);
             continue;
           }
@@ -110,20 +112,8 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
         }
       }
 
-      // Create booking
-      const bookingData = {
-        user_id: user?.id || null, // Optional user binding
-        consignor_details: data.consignor,
-        consignee_details: data.consignee,
-        volume_matrix: data.volumeMatrix,
-        images: imageUrls,
-        whatsapp_number: data.whatsappNumber,
-        status: 'PENDING',
-      };
-
-      const { error } = await supabase.from('bookings').insert(bookingData);
-
-      if (error) throw error;
+      // Create booking via centralized service
+      await bookingService.createBooking(data, imageUrls, user?.id);
 
       toast.success('Booking request sent successfully!');
 
@@ -147,7 +137,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
           replied: false,
         });
       } catch (msgError) {
-        logger.error('BookingForm', 'Failed to create system message', { error: msgError });
+        console.error('Failed to create system message for booking:', msgError);
         // Don't block the success flow if this fails
       }
 
@@ -155,7 +145,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
       setSelectedFiles([]);
       onSuccess?.();
     } catch (error) {
-      logger.error('BookingForm', 'Booking error', { error });
+      console.error('Booking error:', error);
       toast.error('Failed to create booking. Please try again.');
     } finally {
       setUploading(false);
@@ -163,152 +153,154 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 pb-12">
-      {/* Contact Information */}
-      <div className="space-y-4">
-        <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70 border-b border-border/50 pb-2">
-          Contact Information
-        </h3>
-        <div className="space-y-1">
-          <Label className="text-[10px] font-mono uppercase tracking-widest">
-            WhatsApp Number <span className="text-destructive">*</span>
-          </Label>
-          <Input {...register('whatsappNumber')} placeholder="+91 9876543210" className="max-w-md bg-transparent" />
-          {errors.whatsappNumber && (
-            <p className="text-[10px] text-destructive">{errors.whatsappNumber.message}</p>
-          )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-        {/* Consignor Details */}
-        <div className="space-y-4">
-          <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70 border-b border-border/50 pb-2">
-            Consignor Details
-          </h3>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <Label className="text-[10px] font-mono uppercase tracking-widest">Name</Label>
-              <Input {...register('consignor.name')} placeholder="Sender Name" className="bg-transparent" />
-              {errors.consignor?.name && (
-                <p className="text-[10px] text-destructive">{errors.consignor.name.message}</p>
-              )}
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[10px] font-mono uppercase tracking-widest">Phone</Label>
-              <Input {...register('consignor.phone')} placeholder="Sender Phone" className="bg-transparent" />
-              {errors.consignor?.phone && (
-                <p className="text-[10px] text-destructive">{errors.consignor.phone.message}</p>
-              )}
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[10px] font-mono uppercase tracking-widest">Address</Label>
-              <Input {...register('consignor.address')} placeholder="Address Line 1" className="bg-transparent" />
-              {errors.consignor?.address && (
-                <p className="text-[10px] text-destructive">{errors.consignor.address.message}</p>
-              )}
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-1">
-                <Label className="text-[10px] font-mono uppercase tracking-widest">City</Label>
-                <Input {...register('consignor.city')} className="bg-transparent" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-[10px] font-mono uppercase tracking-widest">State</Label>
-                <Input {...register('consignor.state')} className="bg-transparent" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-[10px] font-mono uppercase tracking-widest">ZIP</Label>
-                <Input {...register('consignor.zip')} className="bg-transparent" />
-              </div>
-            </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base text-primary">Contact Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-1">
+            <Label>
+              WhatsApp Number <span className="text-destructive">*</span>
+            </Label>
+            <Input {...register('whatsappNumber')} placeholder="e.g. +91 9876543210" />
+            {errors.whatsappNumber && (
+              <p className="text-xs text-destructive">{errors.whatsappNumber.message}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              We will contact you on this number for shipment updates.
+            </p>
           </div>
-        </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Consignor Details */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Consignor</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="space-y-1">
+              <Label>Name</Label>
+              <Input {...register('consignor.name')} placeholder="Consignor Name" />
+              {errors.consignor?.name && (
+                <p className="text-xs text-destructive">{errors.consignor.name.message}</p>
+              )}
+            </div>
+            <div className="space-y-1">
+              <Label>Phone</Label>
+              <Input {...register('consignor.phone')} placeholder="Consignor Phone" />
+              {errors.consignor?.phone && (
+                <p className="text-xs text-destructive">{errors.consignor.phone.message}</p>
+              )}
+            </div>
+            <div className="space-y-1">
+              <Label>Address</Label>
+              <Input {...register('consignor.address')} placeholder="Address Line 1" />
+              {errors.consignor?.address && (
+                <p className="text-xs text-destructive">{errors.consignor.address.message}</p>
+              )}
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label>City</Label>
+                <Input {...register('consignor.city')} />
+              </div>
+              <div className="space-y-1">
+                <Label>State</Label>
+                <Input {...register('consignor.state')} />
+              </div>
+              <div className="space-y-1">
+                <Label>ZIP</Label>
+                <Input {...register('consignor.zip')} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Consignee Details */}
-        <div className="space-y-4">
-          <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70 border-b border-border/50 pb-2">
-            Consignee Details
-          </h3>
-          <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Consignee</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
             <div className="space-y-1">
-              <Label className="text-[10px] font-mono uppercase tracking-widest">Name</Label>
-              <Input {...register('consignee.name')} placeholder="Recipient Name" className="bg-transparent" />
+              <Label>Name</Label>
+              <Input {...register('consignee.name')} placeholder="Consignee Name" />
               {errors.consignee?.name && (
-                <p className="text-[10px] text-destructive">{errors.consignee.name.message}</p>
+                <p className="text-xs text-destructive">{errors.consignee.name.message}</p>
               )}
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-mono uppercase tracking-widest">Phone</Label>
-              <Input {...register('consignee.phone')} placeholder="Recipient Phone" className="bg-transparent" />
+              <Label>Phone</Label>
+              <Input {...register('consignee.phone')} placeholder="Consignee Phone" />
               {errors.consignee?.phone && (
-                <p className="text-[10px] text-destructive">{errors.consignee.phone.message}</p>
+                <p className="text-xs text-destructive">{errors.consignee.phone.message}</p>
               )}
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-mono uppercase tracking-widest">Address</Label>
-              <Input {...register('consignee.address')} placeholder="Address Line 1" className="bg-transparent" />
+              <Label>Address</Label>
+              <Input {...register('consignee.address')} placeholder="Address Line 1" />
               {errors.consignee?.address && (
-                <p className="text-[10px] text-destructive">{errors.consignee.address.message}</p>
+                <p className="text-xs text-destructive">{errors.consignee.address.message}</p>
               )}
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1">
-                <Label className="text-[10px] font-mono uppercase tracking-widest">City</Label>
-                <Input {...register('consignee.city')} className="bg-transparent" />
+                <Label>City</Label>
+                <Input {...register('consignee.city')} />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-mono uppercase tracking-widest">State</Label>
-                <Input {...register('consignee.state')} className="bg-transparent" />
+                <Label>State</Label>
+                <Input {...register('consignee.state')} />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-mono uppercase tracking-widest">ZIP</Label>
-                <Input {...register('consignee.zip')} className="bg-transparent" />
+                <Label>ZIP</Label>
+                <Input {...register('consignee.zip')} />
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
+      <Separator />
+
       {/* Volume Matrix */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between border-b border-border/50 pb-2">
-          <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
-            Volume Matrix
-          </h3>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base">Volume Matrix</CardTitle>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 text-[10px] font-mono uppercase tracking-widest bg-transparent"
             onClick={() => append({ length: 0, width: 0, height: 0, weight: 0, count: 1 })}
           >
-            <Plus className="w-3 h-3 mr-1.5" /> Add
+            <Plus className="w-4 h-4 mr-2" /> Add Item
           </Button>
-        </div>
-        
-        <div className="space-y-3">
+        </CardHeader>
+        <CardContent className="space-y-4">
           {fields.map((field, index) => (
             <div key={field.id} className="grid grid-cols-6 gap-3 items-end">
               <div className="space-y-1">
-                <Label className="text-[10px] font-mono uppercase tracking-widest">Len (cm)</Label>
-                <Input type="number" {...register(`volumeMatrix.${index}.length`)} className="bg-transparent" />
+                <Label className="text-xs">Len (cm)</Label>
+                <Input type="number" {...register(`volumeMatrix.${index}.length`)} />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-mono uppercase tracking-widest">Wid (cm)</Label>
-                <Input type="number" {...register(`volumeMatrix.${index}.width`)} className="bg-transparent" />
+                <Label className="text-xs">Wid (cm)</Label>
+                <Input type="number" {...register(`volumeMatrix.${index}.width`)} />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-mono uppercase tracking-widest">Hgt (cm)</Label>
-                <Input type="number" {...register(`volumeMatrix.${index}.height`)} className="bg-transparent" />
+                <Label className="text-xs">Hgt (cm)</Label>
+                <Input type="number" {...register(`volumeMatrix.${index}.height`)} />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-mono uppercase tracking-widest">Wgt (kg)</Label>
-                <Input type="number" {...register(`volumeMatrix.${index}.weight`)} className="bg-transparent" />
+                <Label className="text-xs">Wgt (kg)</Label>
+                <Input type="number" {...register(`volumeMatrix.${index}.weight`)} />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-mono uppercase tracking-widest">Count</Label>
-                <Input type="number" {...register(`volumeMatrix.${index}.count`)} className="bg-transparent" />
+                <Label className="text-xs">Count</Label>
+                <Input type="number" {...register(`volumeMatrix.${index}.count`)} />
               </div>
               <Button
                 type="button"
@@ -316,73 +308,75 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
                 size="icon"
                 onClick={() => remove(index)}
                 disabled={fields.length === 1}
-                className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-destructive" />
               </Button>
             </div>
           ))}
           {errors.volumeMatrix && (
-            <p className="text-[10px] text-destructive">{errors.volumeMatrix.message}</p>
+            <p className="text-xs text-destructive">{errors.volumeMatrix.message}</p>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
+
+      <Separator />
 
       {/* Image Upload */}
-      <div className="space-y-4">
-        <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70 border-b border-border/50 pb-2">
-          Documentation Images
-        </h3>
-        
-        <div className="flex flex-col gap-4">
-          <div className="border border-dashed border-border/60 bg-muted/5 p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/10 transition-colors relative">
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              className="absolute inset-0 opacity-0 cursor-pointer"
-              onChange={handleFileChange}
-            />
-            <Upload className="w-6 h-6 text-muted-foreground/50 mb-3" />
-            <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground/70">Click or Drag Files</p>
-          </div>
-
-          {selectedFiles.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
-              {selectedFiles.map((file, index) => (
-                <div key={index} className="relative group border border-border p-1 bg-muted/10">
-                  <div className="text-[10px] font-mono truncate w-full px-1 py-0.5 text-muted-foreground">{file.name}</div>
-                  <div className="aspect-square bg-transparent overflow-hidden relative">
-                    {/* codeql[js/xss-through-dom] - Safe object URL from file input */}
-                    {/* lgtm[js/xss-through-dom] */}
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt="preview"
-                      className="w-full h-full object-cover mix-blend-luminosity"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute -top-2 -right-2 h-5 w-5 rounded-none opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => removeFile(index)}
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </div>
-              ))}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Images</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col gap-4">
+            <div className="border-2 border-dashed border-input rounded-none p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-accent/50 transition-colors relative">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={handleFileChange}
+              />
+              <Upload className="w-8 h-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground">Click or drag images here to upload</p>
             </div>
-          )}
-        </div>
-      </div>
 
-      <div className="flex justify-end gap-3 pt-6 border-t border-border/50">
-        <Button type="button" variant="ghost" onClick={onCancel} className="font-mono text-xs uppercase tracking-widest">
-          Abort
+            {selectedFiles.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {selectedFiles.map((file, index) => (
+                  <div key={index} className="relative group border rounded-none p-2">
+                    <div className="text-xs truncate w-full mb-1">{file.name}</div>
+                    <div className="aspect-square bg-muted rounded-none overflow-hidden relative">
+                      {/* codeql[js/xss-through-dom] - Safe object URL from file input */}
+                      {/* lgtm[js/xss-through-dom] */}
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt="preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-none opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => removeFile(index)}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-end gap-3 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancel
         </Button>
-        <Button type="submit" disabled={isSubmitting || uploading} className="font-mono text-xs uppercase tracking-widest px-8">
-          {isSubmitting || uploading ? 'Processing...' : 'Confirm Request'}
+        <Button type="submit" disabled={isSubmitting || uploading}>
+          {isSubmitting || uploading ? 'Submitting...' : 'Book Shipment'}
         </Button>
       </div>
     </form>

@@ -14,8 +14,10 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useScanner } from '../../context/useScanner';
-import { useScanContext } from '../../context/ScanContext';
+import { useScanner } from '@/context/useScanner';
+import { useScanContext } from '@/context/ScanContext';
+import { ScanSource } from '@/types';
+import { parseScanInput } from '@/lib/scanParser';
 import { ScanPreviewDialog, type ScanPreviewType } from './ScanPreviewDialog';
 
 export const GlobalScanListener: React.FC = () => {
@@ -39,41 +41,61 @@ export const GlobalScanListener: React.FC = () => {
     pathnameRef.current = location.pathname;
   }, [canNavigate, activeContext, location.pathname]);
 
-  const handleScan = useCallback((data: string) => {
+  const handleScan = useCallback((data: string, source: ScanSource) => {
     const cleanData = data.trim().toUpperCase();
+    const currentContext = activeContextRef.current;
     const currentCanNavigate = canNavigateRef.current();
     const currentPath = pathnameRef.current;
 
+    // eslint-disable-next-line no-console
+    console.debug('[GlobalScanListener] Scan received:', {
+      data: cleanData,
+      source,
+      activeContext: currentContext,
+      canNavigate: currentCanNavigate,
+      pathname: pathnameRef.current,
+    });
+
     // Rule 1: Dedicated scanning page always handles scans locally
     if (currentPath?.startsWith('/scanning')) {
+      // eslint-disable-next-line no-console
+      console.debug('[GlobalScanListener] Skipping - /scanning handles locally');
       return;
     }
 
     // Rule 2: If a local handler owns scanning, skip entirely
     if (!currentCanNavigate) {
+      // eslint-disable-next-line no-console
+      console.debug(`[GlobalScanListener] Skipping - local context active: ${currentContext}`);
       return;
     }
 
-    // Rule 3: CN format → preview shipment
-    if (cleanData.startsWith('TAC')) {
-      setPreviewType('shipment');
+    // Use the canonical scan parser for type detection
+    try {
+      const parsed = parseScanInput(cleanData);
+
+      switch (parsed.type) {
+        case 'shipment':
+          setPreviewType('shipment');
+          break;
+        case 'manifest':
+          setPreviewType('manifest');
+          break;
+        case 'package':
+          setPreviewType('shipment'); // packages resolve to shipment preview
+          break;
+        default:
+          setPreviewType('unknown');
+      }
+
       setPreviewData(cleanData);
       setPreviewOpen(true);
-      return;
-    }
-
-    // Rule 4: Manifest format → preview manifest (MAN- legacy + MNF- current)
-    if (cleanData.startsWith('MAN') || cleanData.startsWith('MNF')) {
-      setPreviewType('manifest');
+    } catch {
+      // parseScanInput threw ValidationError — treat as unknown
+      setPreviewType('unknown');
       setPreviewData(cleanData);
       setPreviewOpen(true);
-      return;
     }
-
-    // Rule 5: Unknown format → preview with copy option
-    setPreviewType('unknown');
-    setPreviewData(cleanData);
-    setPreviewOpen(true);
   }, []);
 
   useEffect(() => {

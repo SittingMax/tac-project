@@ -158,6 +158,9 @@ jobs:
           fi
           echo "✅ Barcode compliance: all imports use UniversalBarcode"
 
+      - name: Type coverage report
+        run: npm run audit:types
+
       - name: Format check
         run: npm run format:check
 

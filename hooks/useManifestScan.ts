@@ -15,6 +15,7 @@ import { manifestService, type ScanResponse } from '@/lib/services/manifestServi
 import { ScanSource } from '@/types';
 import { parseScanInput } from '@/lib/scanParser';
 import { useScanner } from '@/context/useScanner';
+import { playSuccessFeedback, playWarningFeedback, playErrorFeedback } from '@/lib/feedback';
 
 export interface ScanOptions {
   manifestId: string;
@@ -73,42 +74,21 @@ export function useManifestScan(options: ScanOptions) {
   // Refs for debouncing and keyboard buffer
   const lastScanTimeRef = useRef<number>(0);
 
-  // Audio feedback — reuse a single AudioContext to avoid Mobile Safari limit (6 instances)
-  const audioCtxRef = useRef<AudioContext | null>(null);
+  // Audio/haptic feedback — delegates to the shared singleton in lib/feedback.ts
+  // to avoid Mobile Safari's 6-AudioContext limit.
   const playBeep = useCallback(
     (type: 'success' | 'error' | 'duplicate') => {
       if (!playSound) return;
-
-      try {
-        if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- WebKit AudioContext fallback
-        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-          audioCtxRef.current = new AudioContextClass();
-        }
-        const audioContext = audioCtxRef.current;
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        // Different frequencies for different results
-        const frequencies: Record<string, number> = {
-          success: 880, // High A
-          duplicate: 440, // Middle A
-          error: 220, // Low A
-        };
-
-        oscillator.frequency.value = frequencies[type];
-        oscillator.type = 'sine';
-
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.2);
-      } catch {
-        // Audio not available
+      switch (type) {
+        case 'success':
+          playSuccessFeedback();
+          break;
+        case 'duplicate':
+          playWarningFeedback();
+          break;
+        case 'error':
+          playErrorFeedback();
+          break;
       }
     },
     [playSound]

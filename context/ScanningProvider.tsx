@@ -18,17 +18,27 @@ interface ScanningProviderProps {
 }
 
 // --- Constants ---
+// Try to get configurable values from localStorage, fallback to defaults
+const getConfig = (key: string, defaultValue: number): number => {
+  try {
+    const val = localStorage.getItem(`TAC_SCANNER_${key}`);
+    return val ? parseInt(val, 10) : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
+
 // If keystrokes arrive faster than this average, they are from a scanner, not a human.
 // Increased from 100ms to 150ms to accommodate various scanner hardware
-const SCANNER_SPEED_THRESHOLD_MS = 150;
+const SCANNER_SPEED_THRESHOLD_MS = getConfig('SPEED_THRESHOLD_MS', 150);
 // Minimum number of characters for a valid scan sequence.
-const MIN_SCAN_LENGTH = 3;
+const MIN_SCAN_LENGTH = getConfig('MIN_SCAN_LENGTH', 3);
 // If no key arrives within this window, the buffer is considered stale and reset.
 // Increased from 500ms to 1000ms for more robust scanning
-const BUFFER_STALE_TIMEOUT_MS = 1000;
+const BUFFER_STALE_TIMEOUT_MS = getConfig('BUFFER_STALE_TIMEOUT_MS', 1000);
 // Auto-submit delay for scanners that don't send Enter key
 // If no key arrives within this window after scanner-speed input, auto-submit
-const AUTO_SUBMIT_DELAY_MS = 100;
+const AUTO_SUBMIT_DELAY_MS = getConfig('AUTO_SUBMIT_DELAY_MS', 100);
 // Debug mode: submit buffer regardless of timing detection
 const DEBUG_MODE = false; // Set to true to capture all input regardless of speed (DEBUG ONLY)
 
