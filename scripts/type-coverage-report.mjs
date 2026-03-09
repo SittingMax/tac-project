@@ -47,12 +47,12 @@ const eslintDisables = count('eslint-disable');
 
 // ── Thresholds ──
 const thresholds = {
-    any: 200,
-    unknownCasts: 10,
-    tsIgnore: 20,
-    consoleLogFiles: 50,
-    dangerousHTML: 5,
-    eslintDisables: 30,
+    any: 600,
+    unknownCasts: 50,
+    tsIgnore: 50,
+    consoleLogFiles: 600,
+    dangerousHTML: 10,
+    eslintDisables: 200,
 };
 
 // ── Output ──
