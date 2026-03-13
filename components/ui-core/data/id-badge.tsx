@@ -67,11 +67,11 @@ export function IdBadge({
     <>
       <span className={cn(href && 'hover:underline')}>{displayValue}</span>
       {copiable && (
-        <span title={copiable ? 'Click to copy' : undefined}>
+        <span title="Click to copy">
           <HugeiconsIcon
             icon={copied ? Tick02Icon : Copy01Icon}
             className={cn('size-3', copied && 'text-status-success')}
-            onClick={copiable ? handleCopy : undefined}
+            onClick={handleCopy}
           />
         </span>
       )}

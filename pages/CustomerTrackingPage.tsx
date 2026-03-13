@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,6 +64,7 @@ interface TrackingData {
 
 export function CustomerTrackingPage() {
   const { cnNumber } = useParams<{ cnNumber: string }>();
+  const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState(cnNumber || '');
   const [copied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
@@ -206,7 +207,7 @@ export function CustomerTrackingPage() {
               onSubmit={(e) => {
                 e.preventDefault();
                 if (searchInput.trim()) {
-                  window.location.href = `/track/${searchInput.trim()}`;
+                  navigate(`/track/${encodeURIComponent(searchInput.trim())}`);
                 }
               }}
               className="hidden sm:flex items-center gap-2"
@@ -271,7 +272,7 @@ export function CustomerTrackingPage() {
               <Button
                 onClick={() => {
                   if (searchInput.trim()) {
-                    window.location.href = `/track/${searchInput.trim()}`;
+                    navigate(`/track/${encodeURIComponent(searchInput.trim())}`);
                   }
                 }}
               >
@@ -293,7 +294,7 @@ export function CustomerTrackingPage() {
               onSubmit={(e) => {
                 e.preventDefault();
                 if (searchInput.trim()) {
-                  window.location.href = `/track/${searchInput.trim()}`;
+                  navigate(`/track/${encodeURIComponent(searchInput.trim())}`);
                 }
               }}
               className="flex flex-col sm:flex-row gap-2 justify-center max-w-md mx-auto"
