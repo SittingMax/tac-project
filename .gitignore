@@ -42,3 +42,6 @@ stats.html
 typecheck_output.txt
 
 debug_output_*.txt
+
+# Local MCP server configuration (may contain API keys)
+.mcp.json
