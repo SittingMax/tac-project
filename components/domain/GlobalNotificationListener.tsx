@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
+import { hasRoleAccess } from '@/lib/access-control';
+import { useNotificationStore } from '@/lib/notifications/store';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 
 /**
  * GlobalNotificationListener
@@ -15,10 +18,23 @@ import { useNavigate } from 'react-router-dom';
 export const GlobalNotificationListener = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const addNotification = useNotificationStore((state) => state.addNotification);
 
   useEffect(() => {
     // Only listen if user is authenticated
     if (!user) return;
+
+    const canSeeScopedRecord = (orgId: unknown, allowOrgless = false) => {
+      if (user.role === 'SUPER_ADMIN') {
+        return true;
+      }
+
+      if (typeof orgId !== 'string') {
+        return allowOrgless;
+      }
+
+      return orgId === user.orgId;
+    };
 
     // Create a single channel for all notifications
     const channel = supabase
@@ -30,10 +46,25 @@ export const GlobalNotificationListener = () => {
           schema: 'public',
           table: 'bookings',
         },
-        (_payload) => {
-          // Verify if the user has permission to see this (client-side check for UX)
-          // Admins, Managers, and Ops should likely see booking notifications
-          if (['ADMIN', 'MANAGER', 'OPS'].includes(user.role || '')) {
+        (payload) => {
+          const newBooking = payload.new as Record<string, string | null>;
+          if (!canSeeScopedRecord(newBooking.org_id)) {
+            return;
+          }
+
+          if (hasRoleAccess(user.role, ['ADMIN', 'MANAGER', 'OPS_STAFF'])) {
+            addNotification({
+              user_id: user.id,
+              type: 'success',
+              category: 'shipment',
+              title: 'New Booking Received',
+              message: 'A new shipment booking has been created.',
+              href: '/shipments',
+              metadata: {
+                bookingId: newBooking.id,
+                orgId: newBooking.org_id,
+              },
+            });
             toast.success(`New Booking Received!`, {
               description: `A new shipment booking has been created.`,
               action: {
@@ -53,9 +84,25 @@ export const GlobalNotificationListener = () => {
           table: 'contact_messages',
         },
         (payload) => {
-          // Contact messages are for Admins
-          if (['ADMIN'].includes(user.role || '')) {
-            const newMessage = payload.new as Record<string, string>;
+          if (hasRoleAccess(user.role, ['ADMIN'])) {
+            const newMessage = payload.new as Record<string, string | null>;
+            if (!canSeeScopedRecord(newMessage.org_id, true)) {
+              return;
+            }
+            addNotification({
+              user_id: user.id,
+              type: 'info',
+              category: 'system',
+              title: `New Message from ${newMessage.name ?? 'Contact Form'}`,
+              message: newMessage.message
+                ? newMessage.message.substring(0, 80)
+                : 'New contact message received.',
+              href: '/admin/messages',
+              metadata: {
+                messageId: newMessage.id,
+                orgId: newMessage.org_id,
+              },
+            });
             toast.info(`New Message from ${newMessage.name}`, {
               description: newMessage.message
                 ? newMessage.message.substring(0, 50) + '...'
@@ -76,8 +123,25 @@ export const GlobalNotificationListener = () => {
           schema: 'public',
           table: 'exceptions',
         },
-        (_payload) => {
-          if (['ADMIN', 'MANAGER', 'OPS'].includes(user.role || '')) {
+        (payload) => {
+          const newException = payload.new as Record<string, string | null>;
+          if (!canSeeScopedRecord(newException.org_id)) {
+            return;
+          }
+
+          if (hasRoleAccess(user.role, ['ADMIN', 'MANAGER', 'OPS_STAFF', 'WAREHOUSE_STAFF'])) {
+            addNotification({
+              user_id: user.id,
+              type: 'warning',
+              category: 'shipment',
+              title: 'Exception Detected',
+              message: 'A new shipment exception has been logged.',
+              href: '/exceptions',
+              metadata: {
+                exceptionId: newException.id,
+                orgId: newException.org_id,
+              },
+            });
             toast.warning(`Exception Detected!`, {
               description: `A new shipment exception has been logged.`,
               action: {
@@ -91,7 +155,7 @@ export const GlobalNotificationListener = () => {
       )
       .subscribe((status) => {
         if (status === 'CHANNEL_ERROR') {
-          console.warn('[Realtime] Failed to subscribe to global notifications');
+          logger.warn('GlobalNotificationListener', 'Failed to subscribe to global notifications');
         }
       });
 
@@ -99,7 +163,7 @@ export const GlobalNotificationListener = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, navigate]);
+  }, [addNotification, user, navigate]);
 
   return null; // This component renders nothing, it only handles side effects
 };

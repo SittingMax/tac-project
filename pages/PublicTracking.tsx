@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../lib/supabase';
-import { Card } from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { Button } from '../components/ui/button';
-import { StatusBadge } from '../components/domain/StatusBadge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
-import { BookingForm } from '../components/portal/BookingForm';
+import { supabase } from '@/lib/supabase';
+import { HUBS } from '@/lib/constants';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/domain/status-badge';
+import { ShipmentTimeline } from '@/components/domain/shipment-timeline';
+import { ShipmentStatus } from '@/types';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { BookingForm } from '@/components/portal/BookingForm';
 import {
   Package,
   Search,
@@ -25,6 +28,8 @@ interface ShipmentRecord {
   status: string;
   service_level: string;
   mode?: string;
+  origin_hub_id?: string | null;
+  destination_hub_id?: string | null;
   package_count: number;
   total_weight: number;
   // PII removed: consignee_name, consignee_phone are not exposed in public view
@@ -43,6 +48,21 @@ interface TrackingData {
   shipment: ShipmentRecord;
   events: TrackingEventRecord[];
 }
+
+const resolveHubCode = (hub?: { code: string; name: string } | null, hubId?: string | null) => {
+  if (hub?.code) {
+    return hub.code;
+  }
+
+  if (!hubId) {
+    return 'UNKNOWN';
+  }
+
+  const matchedHub = Object.values(HUBS).find(
+    (entry) => entry.uuid === hubId || entry.id === hubId
+  );
+  return matchedHub?.code ?? 'UNKNOWN';
+};
 
 export function PublicTracking() {
   const { awb } = useParams<{ awb?: string }>();
@@ -66,8 +86,9 @@ export function PublicTracking() {
         `
         )
         .eq('cn_number', awb)
+        .limit(1)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .single() as any);
+        .maybeSingle() as any);
 
       if (shipmentError) throw shipmentError;
 
@@ -107,13 +128,15 @@ export function PublicTracking() {
       {/* Header */}
       <header className="border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-none bg-gradient-to-br from-status-info to-status-success flex items-center justify-center">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-status-info to-status-success flex items-center justify-center">
               <Package className="w-6 h-6 text-foreground" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">TAC Cargo</h1>
-              <p className="text-xs text-muted-foreground">Track, Book, and Manage Shipments</p>
+              <p className="text-xs text-muted-foreground">
+                Track shipments, request bookings, and reach support
+              </p>
             </div>
           </div>
         </div>
@@ -167,7 +190,7 @@ export function PublicTracking() {
             {/* Loading State */}
             {isLoading && (
               <Card className="p-8 text-center bg-card/50 border-border">
-                <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-none mx-auto mb-4" />
+                <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4" />
                 <p className="text-muted-foreground">Loading tracking information...</p>
               </Card>
             )}
@@ -212,15 +235,15 @@ export function PublicTracking() {
                         {data.shipment.cn_number}
                       </h2>
                     </div>
-                    <StatusBadge status={data.shipment.status} />
+                    <StatusBadge status={data.shipment.status as ShipmentStatus} />
                   </div>
 
                   {/* Route */}
-                  <div className="flex items-center gap-4 p-4 rounded-none bg-muted/50 mb-6">
+                  <div className="flex items-center gap-4 p-4 rounded-md bg-muted/50 mb-6">
                     <div className="text-center">
                       <MapPin className="w-6 h-6 text-status-info mx-auto mb-1" />
                       <p className="text-lg font-bold text-foreground">
-                        {data.shipment.origin_hub?.code || 'IMPHAL'}
+                        {resolveHubCode(data.shipment.origin_hub, data.shipment.origin_hub_id)}
                       </p>
                       <p className="text-xs text-muted-foreground">Origin</p>
                     </div>
@@ -237,7 +260,10 @@ export function PublicTracking() {
                     <div className="text-center">
                       <MapPin className="w-6 h-6 text-status-success mx-auto mb-1" />
                       <p className="text-lg font-bold text-foreground">
-                        {data.shipment.destination_hub?.code || 'NEW_DELHI'}
+                        {resolveHubCode(
+                          data.shipment.destination_hub,
+                          data.shipment.destination_hub_id
+                        )}
                       </p>
                       <p className="text-xs text-muted-foreground">Destination</p>
                     </div>
@@ -245,26 +271,32 @@ export function PublicTracking() {
 
                   {/* Details Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-3 rounded-none bg-muted/50">
+                    <div className="p-4 rounded-md bg-muted/50">
                       <p className="text-xs text-muted-foreground mb-1">Packages</p>
                       <p className="text-lg font-semibold text-foreground">
                         {data.shipment.package_count}
                       </p>
                     </div>
-                    <div className="p-3 rounded-none bg-muted/50">
+                    <div className="p-4 rounded-md bg-muted/50">
                       <p className="text-xs text-muted-foreground mb-1">Weight</p>
                       <p className="text-lg font-semibold text-foreground">
                         {data.shipment.total_weight} kg
                       </p>
                     </div>
-                    <div className="p-3 rounded-none bg-muted/50">
+                    <div className="p-4 rounded-md bg-muted/50">
                       <p className="text-xs text-muted-foreground mb-1">Mode</p>
                       <p className="text-lg font-semibold text-foreground flex items-center gap-2">
-                        <Truck className="w-4 h-4" />
+                        {String(data.shipment.mode || '')
+                          .toUpperCase()
+                          .includes('AIR') ? (
+                          <Plane className="w-4 h-4" />
+                        ) : (
+                          <Truck className="w-4 h-4" />
+                        )}
                         {data.shipment.mode}
                       </p>
                     </div>
-                    <div className="p-3 rounded-none bg-muted/50">
+                    <div className="p-4 rounded-md bg-muted/50">
                       <p className="text-xs text-muted-foreground mb-1">Service</p>
                       <p className="text-lg font-semibold text-foreground">
                         {data.shipment.service_level}
@@ -280,37 +312,19 @@ export function PublicTracking() {
                     Tracking History
                   </h3>
 
-                  {data.events.length > 0 ? (
-                    <div className="space-y-4">
-                      {data.events.map((e, idx) => (
-                        <div key={e.id} className="flex gap-4">
-                          <div className="flex flex-col items-center">
-                            <div
-                              className={`w-3 h-3 rounded-none ${idx === 0 ? 'bg-primary' : 'bg-muted-foreground'}`}
-                            />
-                            {idx < data.events.length - 1 && (
-                              <div className="w-0.5 flex-1 bg-border mt-1" />
-                            )}
-                          </div>
-                          <div className="flex-1 pb-4">
-                            <p className="font-semibold text-foreground">
-                              {e.event_code.replace(/_/g, ' ')}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {e.hub?.name || 'System'}
-                            </p>
-                            <p className="text-xs text-muted-foreground/70">
-                              {e.event_time ? new Date(e.event_time).toLocaleString() : 'N/A'}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground text-center py-8">
-                      No tracking events recorded yet.
-                    </p>
-                  )}
+                  <ShipmentTimeline
+                    events={data.events.map((e) => ({
+                      id: e.id,
+                      event_code: e.event_code,
+                      event_time: e.event_time,
+                      location: e.hub?.name || null,
+                      notes: null,
+                      source: 'SCAN',
+                      created_at: e.event_time || new Date().toISOString(),
+                    }))}
+                    currentStatus={data.shipment.status as ShipmentStatus}
+                    compact={false}
+                  />
                 </Card>
 
                 {/* Support Card - No PII displayed */}
@@ -341,23 +355,29 @@ export function PublicTracking() {
             className="mt-0 animate-in fade-in slide-in-from-bottom-4 duration-500"
           >
             <Card className="p-12 text-center bg-card/50 border-border">
-              <div className="w-16 h-16 rounded-none bg-primary/20 flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 rounded-xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
                 <Receipt className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold text-foreground mb-4">Customer Account Access</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-4">Portal Access & Support</h3>
               <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                Sign in to view your invoice history, manage saved addresses, and download monthly
-                statements.
+                Dashboard sign-in is available for TAC operations staff. For invoice history,
+                statements, or account assistance, contact our team and share your CN Number.
               </p>
-              <div className="max-w-xs mx-auto space-y-4">
-                <Input placeholder="Customer ID or Email" className="bg-background" />
-                <Input type="password" placeholder="Password" className="bg-background" />
-                <Button className="w-full">Sign In to Dashboard</Button>
+              <div className="max-w-xs mx-auto space-y-3">
+                <Button className="w-full" onClick={() => navigate('/login')}>
+                  Sign In to Dashboard
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    window.location.assign('/#contact');
+                  }}
+                >
+                  Contact Sales
+                </Button>
                 <p className="text-xs text-muted-foreground mt-4">
-                  Need an account?{' '}
-                  <a href="#" className="text-primary hover:underline">
-                    Contact Sales
-                  </a>
+                  Use tracking and booking above for public self-service workflows.
                 </p>
               </div>
             </Card>

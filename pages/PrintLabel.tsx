@@ -3,11 +3,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { LabelData, LabelGenerator } from '../components/domain/LabelGenerator';
 import { generateLabelFromShipment } from '../lib/utils/label-utils';
-import { Shipment, HubLocation, ShipmentMode, ServiceLevel, PaymentMode } from '../types';
+import { Shipment, ShipmentMode, ServiceLevel, PaymentMode } from '../types';
 import { HUBS } from '../lib/constants';
 import { logger } from '../lib/logger';
 import { supabase } from '../lib/supabase';
 import { sanitizeString } from '../lib/utils/sanitize';
+
+type LabelShipmentPayload = Omit<Partial<Shipment>, 'originHub' | 'destinationHub'> & {
+  originHub?: string;
+  destinationHub?: string;
+};
 
 const getAddressValue = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
@@ -48,12 +53,20 @@ const resolveAddressParts = (address: unknown) => {
   return normalizeAddress(address);
 };
 
-const resolveHubLocation = (row: any, type: 'origin' | 'destination'): HubLocation => {
+const resolveHubCodeForLabel = (row: any, type: 'origin' | 'destination'): string => {
   const hubId = type === 'origin' ? row.origin_hub_id : row.destination_hub_id;
   const hubCode = type === 'origin' ? row.origin_hub?.code : row.destination_hub?.code;
-  const byUuid = Object.values(HUBS).find((hub) => hub.uuid === hubId)?.id;
-  const byCode = Object.values(HUBS).find((hub) => hub.code === hubCode)?.id;
-  return (byUuid || byCode || 'IMPHAL') as HubLocation;
+
+  if (typeof hubCode === 'string' && hubCode.trim()) {
+    return hubCode.trim();
+  }
+
+  if (typeof hubId === 'string' && hubId.trim()) {
+    const matchedHub = Object.values(HUBS).find((hub) => hub.uuid === hubId || hub.id === hubId);
+    return matchedHub?.code ?? '';
+  }
+
+  return '';
 };
 
 const resolveMode = (value?: string | null): ShipmentMode => {
@@ -70,9 +83,9 @@ const resolveServiceLevel = (value?: string | null): ServiceLevel => {
   return 'STANDARD';
 };
 
-const mapShipmentRowToShipment = (row: any): Shipment => {
-  const originHub = resolveHubLocation(row, 'origin');
-  const destinationHub = resolveHubLocation(row, 'destination');
+const mapShipmentRowToShipment = (row: any): LabelShipmentPayload => {
+  const originHub = resolveHubCodeForLabel(row, 'origin');
+  const destinationHub = resolveHubCodeForLabel(row, 'destination');
   const weight = Number(row.total_weight ?? row.totalWeight ?? 0);
   // Prioritize explicit mode field for transport mode, fallback to service type
   const modeValue = row.mode || row.transport_mode || row.service_level || row.service_type;
@@ -139,7 +152,7 @@ const fetchShipmentByAwb = async (awb?: string) => {
     .maybeSingle();
 
   if (error) {
-    logger.error('[PrintLabel] Shipment fetch error', { message: error.message });
+    logger.error('PrintLabel', 'Shipment fetch error', { message: error.message });
     return null;
   }
 
@@ -150,7 +163,15 @@ const fetchShipmentByAwb = async (awb?: string) => {
 const validateShipmentForLabel = (shipment: unknown): shipment is Shipment => {
   if (!shipment || typeof shipment !== 'object') return false;
   const s = shipment as Record<string, unknown>;
-  return !!(s.awb && typeof s.awb === 'string' && s.destinationHub && s.originHub && s.totalWeight);
+  return !!(
+    s.awb &&
+    typeof s.awb === 'string' &&
+    typeof s.originHub === 'string' &&
+    s.originHub.trim() &&
+    typeof s.destinationHub === 'string' &&
+    s.destinationHub.trim() &&
+    s.totalWeight
+  );
 };
 
 export const PrintLabel: React.FC = () => {
@@ -162,7 +183,7 @@ export const PrintLabel: React.FC = () => {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
-      const payload = event.data as { type?: string; shipment?: Shipment };
+      const payload = event.data as { type?: string; shipment?: LabelShipmentPayload };
       if (payload?.type !== 'TAC_LABEL_PAYLOAD' || !payload.shipment) return;
       if (!validateShipmentForLabel(payload.shipment)) return;
 
@@ -170,7 +191,7 @@ export const PrintLabel: React.FC = () => {
       sessionStorage.setItem(perAwbKey, JSON.stringify(payload.shipment));
       setError(null);
       setData(generateLabelFromShipment(payload.shipment));
-      logger.debug('[PrintLabel] Payload received via postMessage');
+      logger.debug('PrintLabel', 'Payload received via postMessage');
     };
 
     window.addEventListener('message', handleMessage);
@@ -189,7 +210,7 @@ export const PrintLabel: React.FC = () => {
         const perAwbKey = `print_shipping_label_${awb}`;
         const legacyKey = 'print_shipping_label';
 
-        logger.debug('[PrintLabel] Attempt', { attempt: retryCount + 1, awb });
+        logger.debug('PrintLabel', 'Attempt', { attempt: retryCount + 1, awb });
 
         // Prefer sessionStorage for this tab; fall back to localStorage (Firefox ETP may block localStorage)
         const sessionValue = sessionStorage.getItem(perAwbKey);
@@ -202,7 +223,7 @@ export const PrintLabel: React.FC = () => {
             ? 'localStorage'
             : 'sessionStorage';
 
-        logger.debug('[PrintLabel] Per-AWB key result', { found: !!stored, storage: usedStorage });
+        logger.debug('PrintLabel', 'Per-AWB key result', { found: !!stored, storage: usedStorage });
 
         if (!stored) {
           const legacySession = sessionStorage.getItem(legacyKey);
@@ -214,29 +235,32 @@ export const PrintLabel: React.FC = () => {
             : legacyLocal
               ? 'localStorage'
               : 'sessionStorage';
-          logger.debug('[PrintLabel] Legacy key result', { found: !!stored, storage: usedStorage });
+          logger.debug('PrintLabel', 'Legacy key result', {
+            found: !!stored,
+            storage: usedStorage,
+          });
         }
 
         // Debug: List all storage keys containing 'label'
         const localKeys = Object.keys(localStorage).filter((k) => k.includes('label'));
         const sessionKeys = Object.keys(sessionStorage).filter((k) => k.includes('label'));
-        logger.debug('[PrintLabel] Storage keys', { localKeys, sessionKeys });
+        logger.debug('PrintLabel', 'Storage keys', { localKeys, sessionKeys });
 
         if (!stored && typeof window.name === 'string' && window.name.startsWith('TAC_LABEL:')) {
           stored = window.name.replace('TAC_LABEL:', '');
           usedStorage = 'window.name' as typeof usedStorage;
-          logger.debug('[PrintLabel] window.name payload used', { storage: usedStorage });
+          logger.debug('PrintLabel', 'window.name payload used', { storage: usedStorage });
         }
 
         if (!stored) {
           // Retry briefly to handle storage race, then fall back to DB fetch.
           if (retryCount < 2) {
-            logger.debug('[PrintLabel] Data not found, retrying in 300ms');
+            logger.debug('PrintLabel', 'Data not found, retrying in 300ms');
             setTimeout(() => setRetryCount((c) => c + 1), 300);
             return;
           }
 
-          logger.debug('[PrintLabel] Falling back to DB fetch', { awb });
+          logger.debug('PrintLabel', 'Falling back to DB fetch', { awb });
           const fetched = await fetchShipmentByAwb(awb);
           if (fetched) {
             const shipment = mapShipmentRowToShipment(fetched);
@@ -254,14 +278,14 @@ export const PrintLabel: React.FC = () => {
         }
 
         const parsed = JSON.parse(stored);
-        logger.debug('[PrintLabel] Parsed data', { awb: parsed.awb });
+        logger.debug('PrintLabel', 'Parsed data', { awb: parsed.awb });
 
         // Persist payload in this tab's sessionStorage to survive StrictMode remounts
         sessionStorage.setItem(perAwbKey, stored);
 
         // Validate shipment data before processing
         if (!validateShipmentForLabel(parsed)) {
-          logger.warn('[PrintLabel] Validation failed', {
+          logger.warn('PrintLabel', 'Validation failed', {
             awb: parsed.awb,
             originHub: parsed.originHub,
             destinationHub: parsed.destinationHub,
@@ -271,12 +295,12 @@ export const PrintLabel: React.FC = () => {
           return;
         }
 
-        const shipment = parsed as Shipment;
+        const shipment = parsed as LabelShipmentPayload;
 
         // CRITICAL: If the CN in storage doesn't match the URL, don't use stale data.
         // Fall back to a fresh database fetch for the correct AWB.
         if (shipment.awb !== awb) {
-          logger.warn('[PrintLabel] AWB mismatch — storage has stale data', {
+          logger.warn('PrintLabel', 'AWB mismatch — storage has stale data', {
             urlCN: awb,
             storedCN: shipment.awb,
           });
@@ -305,7 +329,7 @@ export const PrintLabel: React.FC = () => {
         // Clean up localStorage after reading to prevent PII lingering
         localStorage.removeItem(usedKey);
       } catch (e) {
-        console.error('Failed to load shipment:', e);
+        logger.error('PrintLabel', 'Failed to load shipment', { error: e });
         if (isMounted) {
           setError('Failed to parse shipment data. Please try generating the label again.');
         }

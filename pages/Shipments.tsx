@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- Data mapping between Supabase and UI types */
 import React, { useState, useMemo, useEffect } from 'react';
+import { startOfDay } from 'date-fns';
 import { useSearchParams } from 'react-router-dom';
-import { Download, Plus, ChevronDown, Printer, MapPin, CheckCircle } from 'lucide-react';
+import { Download, Plus, ChevronDown, CheckCircle } from 'lucide-react';
 import { RowSelectionState } from '@tanstack/react-table';
 import { toast } from 'sonner';
 
@@ -13,6 +13,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -28,13 +33,21 @@ import { CreateShipmentForm } from '@/components/shipments/CreateShipmentForm';
 import { ShipmentDetails } from '@/components/shipments/ShipmentDetails';
 
 // Hooks & Data
-import { useShipments, useHardDeleteShipment, ShipmentWithRelations } from '@/hooks/useShipments';
+import {
+  useShipments,
+  useHardDeleteShipment,
+  useUpdateShipmentStatus,
+  ShipmentWithRelations,
+} from '@/hooks/useShipments';
 import { getShipmentsColumns } from '@/components/shipments/shipments.columns';
 import { useAuthStore } from '@/store/authStore';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 
 // Types
 import { adaptToShipment } from '@/lib/utils/shipment-adapter';
+import { VALID_STATUS_TRANSITIONS, type ShipmentStatusType } from '@/lib/schemas/shipment.schema';
+
+const formatStatusLabel = (status: ShipmentStatusType) => status.replaceAll('_', ' ');
 
 export const Shipments: React.FC = () => {
   const { user } = useAuthStore();
@@ -44,8 +57,13 @@ export const Shipments: React.FC = () => {
   // Search state synced with URL
   const [searchParams, setSearchParams] = useSearchParams();
   const querySearch = searchParams.get('search') || '';
+  const queryStatus = searchParams.get('status') || '';
+  const deliveredFilter = searchParams.get('delivered') || '';
+  const shouldOpenCreateModal = searchParams.get('new') === 'true';
   const [searchTerm, setSearchTerm] = useState(querySearch);
   const debouncedSearch = useDebounce(searchTerm, 500);
+  const deliveredSince =
+    deliveredFilter === 'today' ? startOfDay(new Date()).toISOString() : undefined;
 
   // Sync URL -> State (External navigation)
   useEffect(() => {
@@ -72,30 +90,87 @@ export const Shipments: React.FC = () => {
   }, [debouncedSearch]);
 
   // Data fetching
-  const { data: shipments, isLoading, error, refetch } = useShipments({ search: debouncedSearch }); // Pass search term
+  const {
+    data: shipments,
+    isLoading,
+    error,
+    refetch,
+  } = useShipments({
+    search: debouncedSearch,
+    status: queryStatus || undefined,
+    deliveredSince,
+  }); // Support status deep links
 
   // Only Super Admin can delete
   const hardDeleteMutation = useHardDeleteShipment();
+  const updateShipmentStatusMutation = useUpdateShipmentStatus();
 
   // Modal state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedShipment, setSelectedShipment] = useState<ShipmentWithRelations | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<ShipmentWithRelations | null>(null);
+  const [isBulkUpdating, setIsBulkUpdating] = useState(false);
 
   // Bulk selection state
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const handleBulkAction = (action: string, selectedRows: any[]) => {
-    if (action === 'print') {
-      toast.success(`Prepared ${selectedRows.length} labels for printing.`);
-    } else if (action === 'update_status') {
-      toast.success(`Successfully updated status for ${selectedRows.length} shipments.`);
-      refetch();
-    } else if (action === 'assign_manifest') {
-      toast.success(`Assigned ${selectedRows.length} shipments to a new manifest.`);
+  const getCommonNextStatuses = (selectedRows: Array<{ original: ShipmentWithRelations }>) => {
+    const sharedStatuses = selectedRows.reduce<ShipmentStatusType[] | null>((accumulator, row) => {
+      const currentStatus = row.original.status as ShipmentStatusType;
+      const allowedStatuses = VALID_STATUS_TRANSITIONS[currentStatus] ?? [];
+
+      if (accumulator === null) {
+        return [...allowedStatuses];
+      }
+
+      return accumulator.filter((status) => allowedStatuses.includes(status));
+    }, null);
+
+    return sharedStatuses ?? [];
+  };
+
+  const handleBulkStatusUpdate = async (
+    status: ShipmentStatusType,
+    selectedRows: Array<{ original: ShipmentWithRelations }>
+  ) => {
+    if (selectedRows.length === 0) return;
+
+    setIsBulkUpdating(true);
+
+    const results = await Promise.allSettled(
+      selectedRows.map((row) =>
+        updateShipmentStatusMutation.mutateAsync({
+          id: row.original.id,
+          status,
+          silent: true,
+        })
+      )
+    );
+
+    const successCount = results.filter((result) => result.status === 'fulfilled').length;
+    const failureCount = results.length - successCount;
+
+    if (successCount > 0) {
+      toast.success(
+        `${successCount} shipment${successCount === 1 ? '' : 's'} updated to ${formatStatusLabel(status)}`
+      );
     }
+
+    if (failureCount > 0) {
+      const firstFailure = results.find(
+        (result): result is PromiseRejectedResult => result.status === 'rejected'
+      );
+      const errorMessage =
+        firstFailure?.reason instanceof Error ? firstFailure.reason.message : 'Unknown error';
+
+      toast.error(
+        `Failed to update ${failureCount} shipment${failureCount === 1 ? '' : 's'}: ${errorMessage}`
+      );
+    }
+
     setRowSelection({});
+    setIsBulkUpdating(false);
   };
 
   // Table columns with callbacks
@@ -118,6 +193,22 @@ export const Shipments: React.FC = () => {
   );
 
   // Handlers
+  useEffect(() => {
+    if (shouldOpenCreateModal) {
+      setIsCreateModalOpen(true);
+    }
+  }, [shouldOpenCreateModal]);
+
+  const handleCreateModalChange = (open: boolean) => {
+    setIsCreateModalOpen(open);
+
+    if (!open && searchParams.get('new') === 'true') {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete('new');
+      setSearchParams(nextParams, { replace: true });
+    }
+  };
+
   const handleDelete = async () => {
     if (!rowToDelete) return;
 
@@ -131,11 +222,8 @@ export const Shipments: React.FC = () => {
   };
 
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
-      <PageHeader
-        title="Shipments"
-        description="Manage and track all logistics orders / Master Record"
-      />
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+      <PageHeader title="Shipments" description="Manage and track all consignment notes" />
 
       {/* Table with CRUD */}
       <CrudTable
@@ -174,6 +262,8 @@ export const Shipments: React.FC = () => {
         onRowSelectionChange={setRowSelection}
         bulkActions={(table) => {
           const selectedRows = table.getSelectedRowModel().rows;
+          const commonNextStatuses = getCommonNextStatuses(selectedRows);
+
           if (selectedRows.length === 0) return null;
           return (
             <div className="flex items-center gap-2 mr-4 border-r border-border pr-4">
@@ -182,29 +272,41 @@ export const Shipments: React.FC = () => {
               </span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="secondary" size="sm" className="h-8">
+                  <Button variant="secondary" size="sm" className="h-8" disabled={isBulkUpdating}>
                     Bulk Actions <ChevronDown className="w-4 h-4 ml-2" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => handleBulkAction('print', selectedRows)}>
-                    <Printer className="w-4 h-4 mr-2" /> Print Labels
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleBulkAction('update_status', selectedRows)}>
-                    <CheckCircle className="w-4 h-4 mr-2" /> Update Statuses
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleBulkAction('assign_manifest', selectedRows)}
-                  >
-                    <MapPin className="w-4 h-4 mr-2" /> Assign to Manifest
-                  </DropdownMenuItem>
+                  <DropdownMenuLabel>Shipment Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {commonNextStatuses.length > 0 ? (
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger disabled={isBulkUpdating}>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Update Status
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent>
+                        {commonNextStatuses.map((status) => (
+                          <DropdownMenuItem
+                            key={status}
+                            onClick={() => void handleBulkStatusUpdate(status, selectedRows)}
+                            disabled={isBulkUpdating}
+                          >
+                            {formatStatusLabel(status)}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                  ) : (
+                    <DropdownMenuItem disabled>No shared status transition</DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           );
         }}
         toolbar={
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <Button
               variant="ghost"
               onClick={() => {
@@ -243,7 +345,7 @@ export const Shipments: React.FC = () => {
       {/* Create Wizard Modal */}
       <Dialog
         open={isCreateModalOpen}
-        onOpenChange={setIsCreateModalOpen}
+        onOpenChange={handleCreateModalChange}
         data-testid="create-shipment-modal"
       >
         <DialogContent className="sm:max-w-[800px] w-[95vw]">

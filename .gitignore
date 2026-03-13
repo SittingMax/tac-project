@@ -42,3 +42,27 @@ stats.html
 typecheck_output.txt
 
 debug_output_*.txt
+
+# Build/lint/typecheck error logs
+build_err.txt
+build_err_utf8.txt
+compile_errors.txt
+errors.txt
+eslint-output.txt
+lint-results.json
+lint.json
+lint.txt
+playwright_results.txt
+tsc_out.txt
+tsc_errors.log
+tsc_fixed.log
+tsc_v2.log
+tsc.log
+typecheck_fixed.txt
+typecheck.log
+typecheck_errors.txt
+old_diff.txt
+old_diff_utf8.txt
+pr41_diff.txt
+production-ready-enhancement.md
+.mcp.json

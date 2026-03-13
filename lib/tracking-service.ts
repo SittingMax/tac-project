@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { logger } from '@/lib/logger';
 
 export interface TrackingData {
   shipment: {
@@ -62,7 +63,7 @@ export const getTrackingInfo = async (
 
     return { success: false, error: 'Shipment not found. Please check the CN Number.' };
   } catch (error) {
-    console.error('Tracking lookup error:', error);
+    logger.error('TrackingService', 'Tracking lookup error', { error });
     return { success: false, error: 'Failed to fetch tracking information. Please try again.' };
   }
 };

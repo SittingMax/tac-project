@@ -1,7 +1,6 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { Link } from 'react-router-dom';
 import { CrudRowActions } from '@/components/crud/CrudRowActions';
 import { StatusBadge } from '@/components/domain/StatusBadge';
 import { Plane, Truck, Eye } from 'lucide-react';
@@ -9,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { HUBS } from '@/lib/constants';
 import { ShipmentWithRelations } from '@/hooks/useShipments';
 import { TableBarcode } from '@/components/barcodes';
+import { IdBadge } from '@/components/ui-core/data/id-badge';
 
 export interface ShipmentsColumnsParams {
   onView: (row: ShipmentWithRelations) => void;
@@ -34,12 +34,12 @@ export function getShipmentsColumns(
           ) : (
             <Truck className="w-4 h-4 text-feature-ground" />
           )}
-          <Link
-            to={`/tracking?cn=${row.original.cn_number}`}
-            className="font-mono font-bold text-primary hover:underline hover:text-primary/80 transition-colors"
-          >
-            {row.original.cn_number}
-          </Link>
+          <IdBadge
+            entity="shipment"
+            idValue={row.original.id}
+            cnNumber={row.original.cn_number}
+            href={`/shipments/${row.original.id}`}
+          />
         </div>
       ),
     },
@@ -93,7 +93,7 @@ export function getShipmentsColumns(
       header: 'Service',
       cell: ({ row }) => (
         <span
-          className={`text-xs font-bold px-2 py-0.5 rounded-none ${
+          className={`text-xs font-bold px-2 py-0.5 rounded-md ${
             row.original.service_level === 'EXPRESS'
               ? 'bg-status-warning/20 text-status-warning'
               : 'bg-muted text-muted-foreground'
@@ -161,6 +161,7 @@ export function getShipmentsColumns(
 
           <CrudRowActions
             onEdit={() => params.onEdit(row.original)}
+            editLabel="View Details"
             // keep onDelete in dropdown too if desired, or remove it.
             // I will keep it for consistency with Invoices.
             onDelete={params.onDelete ? () => params.onDelete!(row.original) : undefined}

@@ -8,6 +8,7 @@ import {
   ManifestLookupResult,
 } from '@/hooks/useManifests';
 import { useCreateException } from '@/hooks/useExceptions';
+import { logger } from '@/lib/logger';
 import { manifestService } from '@/lib/services/manifestService';
 import {
   playSuccessFeedback,
@@ -105,6 +106,27 @@ export function useScanningLogic() {
 
   // Bug 4 fix: guard against concurrent async scan execution
   const isProcessingRef = useRef(false);
+  const processingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Safety: auto-release the processing lock after 10s to prevent permanent lockout
+  const acquireProcessingLock = useCallback(() => {
+    isProcessingRef.current = true;
+    if (processingTimeoutRef.current) clearTimeout(processingTimeoutRef.current);
+    processingTimeoutRef.current = setTimeout(() => {
+      if (isProcessingRef.current) {
+        logger.warn('ScanningLogic', 'Processing lock auto-released after 10s timeout');
+        isProcessingRef.current = false;
+      }
+    }, 10_000);
+  }, []);
+
+  const releaseProcessingLock = useCallback(() => {
+    isProcessingRef.current = false;
+    if (processingTimeoutRef.current) {
+      clearTimeout(processingTimeoutRef.current);
+      processingTimeoutRef.current = null;
+    }
+  }, []);
 
   const processScan = useCallback(
     async (input: string, source: ScanSource = ScanSource.MANUAL) => {
@@ -113,7 +135,7 @@ export function useScanningLogic() {
         addScanResult(input, 'ERROR', 'Scan in progress, try again');
         return;
       }
-      isProcessingRef.current = true;
+      acquireProcessingLock();
 
       let scanResult;
       // eslint-disable-next-line no-console
@@ -123,8 +145,7 @@ export function useScanningLogic() {
         // eslint-disable-next-line no-console
         console.debug('[Scanning Context] Parsed result:', scanResult);
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.warn('[Scanning Context] Parser error (using raw fallthrough):', e);
+        logger.warn('ScanningLogic', 'Parser error (using raw fallthrough)', { error: e });
         scanResult = { type: 'shipment' as const, awb: input.trim().toUpperCase(), raw: input };
       }
 
@@ -135,51 +156,53 @@ export function useScanningLogic() {
 
         // Handle Manifest scans
         if (scanResult.type === 'manifest') {
-          if (!currentActiveManifest) {
-            try {
-              const manifest = await findManifestRef.current.mutateAsync(
-                scanResult.manifestId || scanResult.manifestNo || input
-              );
+          if (currentActiveManifest) {
+            addScanResult(input, 'ERROR', 'A manifest is already active. Clear it first.');
+            return;
+          }
 
-              if (!manifest) {
-                addScanResult(input, 'ERROR', 'Manifest not found');
-                return;
-              }
+          try {
+            const manifest = await findManifestRef.current.mutateAsync(
+              scanResult.manifestId || scanResult.manifestNo || input
+            );
 
-              const m = manifest as ManifestLookupResult;
-              if (currentScanMode === 'LOAD_MANIFEST' && m.status !== 'OPEN') {
-                addScanResult(input, 'ERROR', `Manifest is ${m.status}, cannot load.`);
-                return;
-              }
-
-              if (currentScanMode === 'VERIFY_MANIFEST' && m.status !== 'DEPARTED') {
-                addScanResult(input, 'ERROR', `Manifest is ${m.status}, cannot verify.`);
-                return;
-              }
-
-              setActiveManifest(m);
-              const action =
-                currentScanMode === 'LOAD_MANIFEST' ? 'load packages' : 'verify arrival';
-              addScanResult(
-                m.manifest_no,
-                'SUCCESS',
-                `Manifest active. Ready to ${action}.`,
-                'manifest'
-              );
-            } catch (err) {
-              addScanResult(
-                input,
-                'ERROR',
-                err instanceof Error ? err.message : 'Failed to load manifest'
-              );
+            if (!manifest) {
+              addScanResult(input, 'ERROR', 'Manifest not found');
+              return;
             }
+
+            const m = manifest as ManifestLookupResult;
+            if (currentScanMode === 'LOAD_MANIFEST' && m.status !== 'OPEN') {
+              addScanResult(input, 'ERROR', `Manifest is ${m.status}, cannot load.`);
+              return;
+            }
+
+            if (currentScanMode === 'VERIFY_MANIFEST' && m.status !== 'DEPARTED') {
+              addScanResult(input, 'ERROR', `Manifest is ${m.status}, cannot verify.`);
+              return;
+            }
+
+            setActiveManifest(m);
+            const action = currentScanMode === 'LOAD_MANIFEST' ? 'load packages' : 'verify arrival';
+            addScanResult(
+              m.manifest_no,
+              'SUCCESS',
+              `Manifest active. Ready to ${action}.`,
+              'manifest'
+            );
+          } catch (err) {
+            addScanResult(
+              input,
+              'ERROR',
+              err instanceof Error ? err.message : 'Failed to load manifest'
+            );
           }
           return;
         }
 
         // Handle Shipment scans
-        const awb = scanResult.awb;
-        if (!awb) {
+        const awb = scanResult.awb || input;
+        if (!scanResult.awb) {
           addScanResult(input, 'ERROR', 'No AWB found in scan');
           return;
         }
@@ -205,6 +228,14 @@ export function useScanningLogic() {
           }
 
           if (currentScanMode === 'RECEIVE') {
+            if (shipment.status === 'DELIVERED') {
+              addScanResult(awb, 'SUCCESS', 'Shipment is already DELIVERED', 'duplicate');
+              return;
+            }
+            if (shipment.status === 'RECEIVED_AT_DEST') {
+              addScanResult(awb, 'SUCCESS', 'Already received at destination', 'duplicate');
+              return;
+            }
             const newStatus =
               shipment.status === 'CREATED' ? 'RECEIVED_AT_ORIGIN' : 'RECEIVED_AT_DEST';
             await updateStatusRef.current.mutateAsync({ id: shipment.id, status: newStatus });
@@ -265,10 +296,10 @@ export function useScanningLogic() {
           addScanResult(awb, 'ERROR', errorMessage);
         }
       } finally {
-        isProcessingRef.current = false;
+        releaseProcessingLock();
       }
     },
-    [addScanResult]
+    [addScanResult, acquireProcessingLock, releaseProcessingLock]
   );
 
   const clearManifest = () => {

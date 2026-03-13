@@ -64,11 +64,11 @@ const MagnifiedBento = () => {
 
   return (
     <div className="flex items-center justify-center p-4 sm:p-6 w-full not-prose">
-      <div className="group relative w-full max-w-[420px] overflow-hidden rounded-none sm:rounded-none.5rem] border bg-card p-1.5 sm:p-2 shadow-2xl shadow-primary/5 transition-all duration-500 hover:shadow-primary/10 hover:-translate-y-1">
+      <div className="group relative w-full max-w-[420px] overflow-hidden rounded-md border bg-card p-1.5 sm:p-2 shadow-2xl shadow-primary/5 transition-all duration-500 hover:shadow-primary/10 hover:-translate-y-1">
         <div
           ref={containerRef}
           className={cn(
-            'relative w-full overflow-hidden rounded-none.6rem] sm:rounded-none bg-muted/30',
+            'relative w-full overflow-hidden rounded-md bg-muted/30',
             CONFIG.containerHeight
           )}
         >
@@ -96,7 +96,7 @@ const MagnifiedBento = () => {
                     return (
                       <div
                         key={`${item.id}-${idx}`}
-                        className="flex gap-2 bg-background/50 backdrop-blur-sm whitespace-nowrap w-fit text-muted-foreground p-2 px-3 items-center border border-border/50 rounded-none text-xs"
+                        className="flex gap-2 bg-background/50 backdrop-blur-sm whitespace-nowrap w-fit text-muted-foreground p-2 px-4 items-center border border-border/50 rounded-md text-xs"
                       >
                         <IconComponent size={14} />
                         <span>{item.label}</span>
@@ -132,7 +132,7 @@ const MagnifiedBento = () => {
                     return (
                       <div
                         key={`${item.id}-${idx}-reveal`}
-                        className="flex gap-2 bg-background whitespace-nowrap w-fit text-foreground p-2 px-3 items-center border border-primary/20 shadow-sm rounded-none text-xs scale-125 ml-6"
+                        className="flex gap-2 bg-background whitespace-nowrap w-fit text-foreground p-2 px-4 items-center border border-primary/20 shadow-sm rounded-md text-xs scale-125 ml-6"
                       >
                         <IconComponent size={14} className="text-primary" />
                         <span className="font-medium text-primary">{item.label}</span>
@@ -153,7 +153,7 @@ const MagnifiedBento = () => {
             >
               <div className="relative">
                 <MagnifyingLens size={CONFIG.lensSize} />
-                <div className="absolute top-[6px] left-[6px] w-[60px] h-[60px] rounded-none bg-white/10 pointer-events-none" />
+                <div className="absolute top-[6px] left-[6px] w-[60px] h-[60px] rounded-full bg-white/10 pointer-events-none" />
               </div>
             </motion.div>
           </div>

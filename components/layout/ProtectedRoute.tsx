@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
+import { hasRoleAccess } from '@/lib/access-control';
 import { useAuthStore } from '../../store/authStore';
 import { UserRole } from '../../types';
 
@@ -15,7 +16,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-none animate-spin mx-auto mb-4"></div>
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-muted-foreground">Verifying credentials...</p>
         </div>
       </div>
@@ -27,31 +28,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Check if user has required role
-  const hasAccess = (() => {
-    // No role restriction = everyone can access
-    if (!allowedRoles || allowedRoles.length === 0) return true;
-
-    // SUPER_ADMIN has god mode
-    if (user.role === 'SUPER_ADMIN') return true;
-
-    // ADMIN and MANAGER have access to everything
-    if (user.role === 'ADMIN' || user.role === 'MANAGER') return true;
-
-    // Direct role match
-    if (allowedRoles.includes(user.role)) return true;
-
-    // Handle legacy role name mappings
-    if (allowedRoles.includes('FINANCE_STAFF') && user.role === 'INVOICE') return true;
-    if (allowedRoles.includes('OPS_STAFF') && user.role === 'OPS') return true;
-    if (
-      allowedRoles.includes('WAREHOUSE_STAFF') &&
-      (user.role === 'WAREHOUSE_IMPHAL' || user.role === 'WAREHOUSE_DELHI')
-    )
-      return true;
-
-    return false;
-  })();
+  const hasAccess = hasRoleAccess(user.role, allowedRoles);
 
   if (!hasAccess) {
     return (

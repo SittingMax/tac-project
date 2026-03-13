@@ -49,6 +49,14 @@ const WIZARD_STEPS = [
 // before closing the main dialog. Should stay in sync with dialog/portal
 // exit animation durations.
 const PORTAL_CLEANUP_DELAY_MS = 150;
+const EMPTY_SETUP_DATA: ManifestSettingsValues = {
+  fromHubId: '',
+  toHubId: '',
+  type: 'AIR',
+  onlyReady: true,
+  matchDestination: true,
+  excludeCod: false,
+};
 
 function combineDateTimeWithPeriod(
   date: Date,
@@ -73,6 +81,68 @@ function combineDateTimeWithPeriod(
 }
 
 import { useHubs } from '@/hooks/useHubs';
+import { logger } from '@/lib/logger';
+
+function parseManifestDate(value?: string | null): Date | undefined {
+  if (!value) return undefined;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+function getTimeParts(value?: string | null): {
+  hour?: string;
+  minute?: string;
+  period?: 'AM' | 'PM';
+} {
+  const parsed = parseManifestDate(value);
+  if (!parsed) return {};
+
+  const minutes = String(parsed.getMinutes()).padStart(2, '0');
+  const period: 'AM' | 'PM' = parsed.getHours() >= 12 ? 'PM' : 'AM';
+  const hour = parsed.getHours() % 12 || 12;
+
+  return {
+    hour: String(hour).padStart(2, '0'),
+    minute: minutes,
+    period,
+  };
+}
+
+function mapManifestToSetupData(
+  manifest: ReturnType<typeof useManifestBuilder>['manifest']
+): ManifestSettingsValues {
+  const etdParts = getTimeParts(manifest?.etd);
+  const etaParts = getTimeParts(manifest?.eta);
+  const dispatchParts = getTimeParts(manifest?.dispatch_at);
+
+  return {
+    fromHubId: manifest?.from_hub_id ?? '',
+    toHubId: manifest?.to_hub_id ?? '',
+    type: manifest?.type === 'TRUCK' ? 'TRUCK' : 'AIR',
+    airlineCode: manifest?.airline_code ?? undefined,
+    flightNumber: manifest?.flight_number ?? undefined,
+    flightDate: parseManifestDate(manifest?.flight_date),
+    etdHour: etdParts.hour,
+    etdMinute: etdParts.minute,
+    etdPeriod: etdParts.period,
+    etaHour: etaParts.hour,
+    etaMinute: etaParts.minute,
+    etaPeriod: etaParts.period,
+    vehicleNumber: manifest?.vehicle_number ?? undefined,
+    driverName: manifest?.driver_name ?? undefined,
+    driverPhone: manifest?.driver_phone ?? undefined,
+    dispatchDate: parseManifestDate(manifest?.dispatch_at),
+    dispatchHour: dispatchParts.hour,
+    dispatchMinute: dispatchParts.minute,
+    dispatchPeriod: dispatchParts.period,
+    truckEtaHour: undefined,
+    truckEtaMinute: undefined,
+    onlyReady: true,
+    matchDestination: true,
+    excludeCod: false,
+    notes: manifest?.notes ?? undefined,
+  };
+}
 
 export function ManifestBuilderWizard({
   open,
@@ -127,14 +197,7 @@ export function ManifestBuilderWizard({
   }, []);
 
   // Form Data State
-  const [setupData, setSetupData] = React.useState<ManifestSettingsValues>({
-    fromHubId: '',
-    toHubId: '',
-    type: 'AIR',
-    onlyReady: true,
-    matchDestination: true,
-    excludeCod: false,
-  });
+  const [setupData, setSetupData] = React.useState<ManifestSettingsValues>(EMPTY_SETUP_DATA);
 
   const { data: hubs = [] } = useHubs();
   const { data: staffList = [] } = useStaff();
@@ -164,17 +227,10 @@ export function ManifestBuilderWizard({
       // Dialog opening - reset state immediately
       if (initialManifestId) {
         setCurrentStep(2);
-        // TODO: Load manifest data into setupData if editing existing
+        setSetupData(EMPTY_SETUP_DATA);
       } else {
         setCurrentStep(1);
-        setSetupData({
-          fromHubId: '',
-          toHubId: '',
-          type: 'AIR',
-          onlyReady: true,
-          matchDestination: true,
-          excludeCod: false,
-        });
+        setSetupData(EMPTY_SETUP_DATA);
       }
     } else if (!open && wasOpen) {
       // Dialog closing - delay step reset until after portal cleanup
@@ -184,6 +240,11 @@ export function ManifestBuilderWizard({
       });
     }
   }, [open, initialManifestId]);
+
+  React.useEffect(() => {
+    if (!open || !initialManifestId || !builder.manifest) return;
+    setSetupData(mapManifestToSetupData(builder.manifest));
+  }, [builder.manifest, initialManifestId, open]);
 
   const handleStep1Submit = async () => {
     // Create manifest if not exists
@@ -272,7 +333,7 @@ export function ManifestBuilderWizard({
       }, PORTAL_CLEANUP_DELAY_MS);
     } catch (error) {
       toast.error('Failed to close manifest');
-      console.error('Error closing manifest:', error);
+      logger.error('ManifestBuilderWizard', 'Error closing manifest', { error });
       setIsSaving(false);
     }
   };
@@ -307,7 +368,7 @@ export function ManifestBuilderWizard({
   return (
     <TooltipProvider>
       <Dialog open={open} onOpenChange={handleCancel}>
-        <DialogContent className="w-[100vw] h-[100dvh] md:w-[min(1200px,92vw)] md:h-[min(88vh,900px)] md:max-h-[90vh] lg:w-[min(1320px,88vw)] md:rounded-none rounded-none flex flex-col gap-0 p-0 max-w-none overflow-hidden">
+        <DialogContent className="w-[100vw] h-[100dvh] md:w-[min(1200px,92vw)] md:h-[min(88vh,900px)] md:max-h-[90vh] lg:w-[min(1320px,88vw)] rounded-none md:rounded-lg flex flex-col gap-0 p-0 max-w-none overflow-hidden">
           {/* Header */}
           <DialogHeader className="px-6 py-4 border-b border-border text-left">
             <DialogTitle className="text-lg">Create Manifest</DialogTitle>
@@ -323,7 +384,7 @@ export function ManifestBuilderWizard({
 
           {/* Content - Use CSS visibility instead of conditional rendering to prevent portal destruction */}
           <div className="flex-1 min-h-0 overflow-y-auto bg-background/50">
-            <div className="p-4 sm:p-5 md:p-6 lg:p-8">
+            <div className="p-4 sm:p-4 md:p-6 lg:p-8">
               {/* Step 1: Manifest Setup - Always mounted, hidden via CSS */}
               <div
                 className={currentStep === 1 ? 'block' : 'hidden'}

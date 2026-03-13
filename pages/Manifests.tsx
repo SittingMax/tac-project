@@ -1,19 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- Data mapping between Supabase and UI types */
-import React, { useState, useMemo, useCallback } from 'react';
-import { Card } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { DataTable } from '../components/ui/data-table';
-import { StatusBadge } from '../components/domain/StatusBadge';
-import { KPICard } from '../components/domain/KPICard';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/ui/page-header';
+import { CrudTable } from '@/components/crud/CrudTable';
+import { StatusBadge } from '@/components/domain/StatusBadge';
+import { KPICard } from '@/components/domain/KPICard';
 import { ColumnDef } from '@tanstack/react-table';
 import {
   useManifests,
   useUpdateManifestStatus,
   useHardDeleteManifest,
   ManifestWithRelations,
-} from '../hooks/useManifests';
-import { useRealtimeManifests } from '../hooks/useRealtime';
-import { ManifestBuilderWizard } from '../components/manifests/ManifestBuilder/ManifestBuilderWizard';
+} from '@/hooks/useManifests';
+import { useRealtimeManifests } from '@/hooks/useRealtime';
+import { ManifestBuilderWizard } from '@/components/manifests/ManifestBuilder/ManifestBuilderWizard';
 import {
   Truck,
   Plane,
@@ -25,13 +27,15 @@ import {
   AlertCircle,
   Trash2,
 } from 'lucide-react';
-import { Skeleton } from '../components/ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/store/authStore';
 import { CrudDeleteDialog } from '@/components/crud/CrudDeleteDialog';
 
 export const Manifests: React.FC = () => {
   const { user } = useAuthStore();
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const [searchParams, setSearchParams] = useSearchParams();
+  const shouldOpenCreateWizard = searchParams.get('action') === 'create';
 
   const { data: manifests = [], isLoading, isError, error } = useManifests();
   const updateStatusMutation = useUpdateManifestStatus();
@@ -59,6 +63,27 @@ export const Manifests: React.FC = () => {
     setIsEnterpriseOpen(true);
   }, []);
 
+  const openCreateManifest = useCallback(() => {
+    setSelectedManifestId(null);
+    setIsEnterpriseOpen(true);
+  }, []);
+
+  const handleManifestWizardChange = useCallback(
+    (open: boolean) => {
+      setIsEnterpriseOpen(open);
+
+      if (!open) {
+        if (selectedManifestId === null && searchParams.get('action') === 'create') {
+          const nextParams = new URLSearchParams(searchParams);
+          nextParams.delete('action');
+          setSearchParams(nextParams, { replace: true });
+        }
+        setSelectedManifestId(null);
+      }
+    },
+    [searchParams, selectedManifestId, setSearchParams]
+  );
+
   const handleDeleteClick = useCallback((manifest: ManifestWithRelations) => {
     setManifestToDelete(manifest);
     setDeleteOpen(true);
@@ -70,6 +95,12 @@ export const Manifests: React.FC = () => {
     setManifestToDelete(null);
     setDeleteOpen(false);
   };
+
+  useEffect(() => {
+    if (shouldOpenCreateWizard) {
+      openCreateManifest();
+    }
+  }, [openCreateManifest, shouldOpenCreateWizard]);
 
   const columns: ColumnDef<ManifestWithRelations>[] = useMemo(
     () => [
@@ -189,21 +220,17 @@ export const Manifests: React.FC = () => {
   // Loading state
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Fleet Manifests</h1>
-            <p className="text-muted-foreground text-sm">Manage linehaul movements between hubs.</p>
-          </div>
+      <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+        <PageHeader title="Fleet Manifests" description="Manage linehaul movements between hubs">
           <Skeleton className="h-10 w-36" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
+        </PageHeader>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Skeleton className="h-24 rounded-lg" />
+          <Skeleton className="h-24 rounded-lg" />
+          <Skeleton className="h-24 rounded-lg" />
         </div>
         <Card className="p-6">
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             <Skeleton className="h-10 w-64" />
             <Skeleton className="h-64" />
           </div>
@@ -215,16 +242,11 @@ export const Manifests: React.FC = () => {
   // Error state
   if (isError) {
     return (
-      <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Fleet Manifests</h1>
-            <p className="text-muted-foreground text-sm">Manage linehaul movements between hubs.</p>
-          </div>
-        </div>
+      <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+        <PageHeader title="Fleet Manifests" description="Manage linehaul movements between hubs" />
         <Card className="p-6">
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+            <AlertCircle className="size-12 text-destructive mb-4" />
             <h3 className="text-lg font-medium text-foreground">Failed to load manifests</h3>
             <p className="text-sm text-muted-foreground mt-1">
               {error instanceof Error ? error.message : 'An unexpected error occurred'}
@@ -236,30 +258,14 @@ export const Manifests: React.FC = () => {
   }
 
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
-      <div className="flex justify-between items-end border-b border-border/40 pb-4">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
-            Fleet Manifests<span className="text-primary">.</span>
-          </h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
-            Manage linehaul movements between hubs
-          </p>
-        </div>
-        <Button
-          onClick={() => {
-            setSelectedManifestId(null);
-            setIsEnterpriseOpen(true);
-          }}
-          variant="default"
-          className="rounded-none font-mono text-xs uppercase tracking-widest px-8"
-          data-testid="create-manifest-button"
-        >
-          <Scan className="w-4 h-4 mr-2" /> Init Manifest
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+      <PageHeader title="Fleet Manifests" description="Manage linehaul movements between hubs">
+        <Button onClick={openCreateManifest} data-testid="create-manifest-button">
+          <Scan data-icon="inline-start" /> New Manifest
         </Button>
-      </div>
+      </PageHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border/40 border-y border-border/40">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <KPICard
           title="Open Manifests"
           value={openCount}
@@ -281,29 +287,18 @@ export const Manifests: React.FC = () => {
 
       {/* Empty state */}
       {manifests.length === 0 ? (
-        <Card className="p-12 rounded-none border-border bg-muted/5 flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-1 bg-primary/20 mb-8"></div>
-          <h3 className="text-xl font-black uppercase tracking-tighter text-foreground mb-2">
-            No manifests yet
-          </h3>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mb-8">
+        <Card className="p-12 flex flex-col items-center justify-center text-center">
+          <h3 className="text-lg font-medium text-foreground mb-2">No manifests yet</h3>
+          <p className="text-sm text-muted-foreground mb-6">
             Create your first manifest to start managing linehaul movements
           </p>
-          <Button
-            variant="default"
-            className="rounded-none font-mono text-xs uppercase tracking-widest px-8"
-            onClick={() => {
-              setSelectedManifestId(null);
-              setIsEnterpriseOpen(true);
-            }}
-            data-testid="create-manifest-button-empty"
-          >
-            <Scan className="w-4 h-4 mr-2" /> Init Manifest
+          <Button onClick={openCreateManifest} data-testid="create-manifest-button-empty">
+            <Scan data-icon="inline-start" /> New Manifest
           </Button>
         </Card>
       ) : (
-        <Card className="rounded-none border-0 shadow-none bg-transparent">
-          <DataTable
+        <Card className="border-0 shadow-none bg-transparent">
+          <CrudTable
             columns={columns}
             data={manifests}
             searchKey="manifest_no"
@@ -315,11 +310,10 @@ export const Manifests: React.FC = () => {
 
       <ManifestBuilderWizard
         open={isEnterpriseOpen}
-        onOpenChange={setIsEnterpriseOpen}
+        onOpenChange={handleManifestWizardChange}
         initialManifestId={selectedManifestId}
         onComplete={() => {
-          // Manifest creation complete - refresh handled by query invalidation
-          setIsEnterpriseOpen(false);
+          handleManifestWizardChange(false);
         }}
       />
 

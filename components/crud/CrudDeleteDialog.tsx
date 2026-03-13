@@ -11,6 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { logger } from '@/lib/logger';
 
 export interface CrudDeleteDialogProps {
   open: boolean;
@@ -43,7 +44,7 @@ export function CrudDeleteDialog({
       await onConfirm();
       onOpenChange(false);
     } catch (error) {
-      console.error('Delete operation failed:', error);
+      logger.error('CrudDeleteDialog', 'Delete operation failed', { error });
       // Error handling should be done in the onConfirm callback
     } finally {
       setIsLoading(false);

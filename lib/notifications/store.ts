@@ -8,15 +8,15 @@ interface NotificationState {
   error: string | null;
 
   // Computed
-  unreadCount: () => number;
+  unreadCount: (userId?: string) => number;
 
   // CRUD Operations
-  getNotifications: (filters?: NotificationFilters) => Notification[];
+  getNotifications: (filters?: NotificationFilters, userId?: string) => Notification[];
   addNotification: (payload: NotificationPayload) => Notification;
   markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
+  markAllAsRead: (userId?: string) => void;
   deleteNotification: (id: string) => void;
-  clearAll: () => void;
+  clearAll: (userId?: string) => void;
 
   // State management
   setNotifications: (notifications: Notification[]) => void;
@@ -33,10 +33,15 @@ export const useNotificationStore = create<NotificationState>()(
       isLoading: false,
       error: null,
 
-      unreadCount: () => get().notifications.filter((n) => !n.is_read).length,
+      unreadCount: (userId?: string) =>
+        get().notifications.filter((n) => (!userId || n.user_id === userId) && !n.is_read).length,
 
-      getNotifications: (filters?: NotificationFilters) => {
+      getNotifications: (filters?: NotificationFilters, userId?: string) => {
         let result = [...get().notifications];
+
+        if (userId) {
+          result = result.filter((n) => n.user_id === userId);
+        }
 
         if (filters?.is_read !== undefined) {
           result = result.filter((n) => n.is_read === filters.is_read);
@@ -87,9 +92,11 @@ export const useNotificationStore = create<NotificationState>()(
         }));
       },
 
-      markAllAsRead: () => {
+      markAllAsRead: (userId?: string) => {
         set((state) => ({
-          notifications: state.notifications.map((n) => ({ ...n, is_read: true })),
+          notifications: state.notifications.map((n) =>
+            !userId || n.user_id === userId ? { ...n, is_read: true } : n
+          ),
         }));
       },
 
@@ -99,8 +106,10 @@ export const useNotificationStore = create<NotificationState>()(
         }));
       },
 
-      clearAll: () => {
-        set({ notifications: [] });
+      clearAll: (userId?: string) => {
+        set((state) => ({
+          notifications: userId ? state.notifications.filter((n) => n.user_id !== userId) : [],
+        }));
       },
 
       setNotifications: (notifications: Notification[]) => {

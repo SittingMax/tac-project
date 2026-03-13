@@ -88,7 +88,7 @@ export const PackageTrackerCard = ({
       initial="hidden"
       animate="visible"
       className={cn(
-        'bg-card text-card-foreground w-full max-w-sm overflow-hidden rounded-none border shadow-lg relative',
+        'bg-card text-card-foreground w-full max-w-sm overflow-hidden rounded-md border shadow-lg relative',
         className
       )}
     >
@@ -97,7 +97,7 @@ export const PackageTrackerCard = ({
         <motion.button
           variants={itemVariants}
           onClick={onTrackClick}
-          className="bg-muted/50 text-muted-foreground hover:bg-muted flex w-full items-center justify-center gap-2 rounded-none px-4 py-2 text-sm transition-colors"
+          className="bg-muted/50 text-muted-foreground hover:bg-muted flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 text-sm transition-colors"
         >
           <CheckCircle2 className="h-4 w-4 text-status-success" />
           Show full tracking
@@ -141,7 +141,7 @@ export const PackageTrackerCard = ({
 
           <motion.div
             variants={itemVariants}
-            className="border-border/50 bg-background rounded-none border p-1"
+            className="border-border/50 bg-background rounded-md border p-1"
           >
             {qrCodeValue ? (
               <ThemeAwareQRCode value={qrCodeValue} size={64} />

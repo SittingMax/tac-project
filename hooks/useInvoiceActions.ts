@@ -121,7 +121,7 @@ export function useInvoiceActions() {
   };
 
   const buildShipmentFromInvoice = (inv: Invoice): Shipment => {
-    logger.debug('[Label] Building shipment from invoice', { id: inv.id, awb: inv.awb });
+    logger.debug('[Label]', 'Building shipment from invoice', { id: inv.id, awb: inv.awb });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const lineItems = (inv as any).line_items || (inv as any).financials || {};
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -173,20 +173,20 @@ export function useInvoiceActions() {
 
       const consignor = shipmentRow
         ? {
-          name: shipmentRow.consignor_name,
-          phone: shipmentRow.consignor_phone,
-          address: formatAddress(shipmentRow.consignor_address),
-        }
+            name: shipmentRow.consignor_name,
+            phone: shipmentRow.consignor_phone,
+            address: formatAddress(shipmentRow.consignor_address),
+          }
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        lineItems.consignor || (inv as any).consignor || {};
+          lineItems.consignor || (inv as any).consignor || {};
       const consignee = shipmentRow
         ? {
-          name: shipmentRow.consignee_name,
-          phone: shipmentRow.consignee_phone,
-          address: formatAddress(shipmentRow.consignee_address),
-        }
+            name: shipmentRow.consignee_name,
+            phone: shipmentRow.consignee_phone,
+            address: formatAddress(shipmentRow.consignee_address),
+          }
         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        lineItems.consignee || (inv as any).consignee || {};
+          lineItems.consignee || (inv as any).consignee || {};
 
       const fullInvoice = { ...inv, consignor, consignee };
       const url = await generateEnterpriseInvoice(fullInvoice as Invoice);
@@ -230,20 +230,26 @@ export function useInvoiceActions() {
 
   const handleShareWhatsapp = async (inv: Invoice) => {
     const shipment = inv.awb ? await getShipment(inv.awb) : null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const invData = inv as unknown as {
+      consignee?: { phone?: string };
+      line_items?: { consignee?: { phone?: string } };
+    };
+    const shipData = shipment as unknown as { consignee_phone?: string };
+
     const phone =
-      (inv as any).consignee?.phone ||
-      (inv as any).line_items?.consignee?.phone ||
-      (shipment as any)?.consignee_phone ||
+      invData.consignee?.phone ||
+      invData.line_items?.consignee?.phone ||
+      shipData?.consignee_phone ||
       '';
     if (!phone) {
-      alert('No customer phone number found.');
+      toast.error('No customer phone number found for this invoice.');
       return;
     }
+    const trackingUrl = `${window.location.origin}/track/${inv.awb}`;
     const text = `Hello, here is your invoice ${inv.invoiceNumber} for shipment CN ${inv.awb}.
 Amount: ${formatCurrency(inv.financials.totalAmount)}
 Status: ${inv.status}
-Track your shipment here: https://taccargo.com/track/${inv.awb}
+Track your shipment here: ${trackingUrl}
 Thank you for choosing TAC Cargo.`;
     const url = `https://wa.me/91${phone.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
@@ -253,9 +259,16 @@ Thank you for choosing TAC Cargo.`;
     const shipment = inv.awb ? await getShipment(inv.awb) : null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const email = (shipment as any)?.customer?.email || '';
+    if (!email) {
+      toast.error('No customer email found for this invoice.');
+      return;
+    }
     const subject = `Invoice ${inv.invoiceNumber} - TAC Cargo`;
-    const body = `Dear Customer,%0D%0A%0D%0APlease find details for invoice ${inv.invoiceNumber} related to shipment ${inv.awb}.%0D%0A%0D%0AAmount: ${formatCurrency(inv.financials.totalAmount)}%0D%0A%0D%0AThank you,%0D%0ATAC Cargo Team`;
-    window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+    const body = `Dear Customer,\n\nPlease find details for invoice ${inv.invoiceNumber} related to shipment ${inv.awb}.\n\nAmount: ${formatCurrency(inv.financials.totalAmount)}\nTrack: ${window.location.origin}/track/${inv.awb}\n\nThank you,\nTAC Cargo Team`;
+    window.open(
+      `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      '_blank'
+    );
   };
 
   // Helper to build Invoice object from DB row

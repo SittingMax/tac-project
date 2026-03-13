@@ -1,190 +1,547 @@
-'use client';
-
-import { Globe, Shield, Zap, LineChart, FileCheck, ArrowRight } from 'lucide-react';
+import { ArrowRight, Crosshair, Network, Map, Shield } from 'lucide-react';
+import { motion } from '@/lib/motion';
 import { FadeUp } from '@/components/motion/FadeUp';
-import { Button } from '@/components/ui/button';
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
-
-function BentoCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
-  }
-
-  return (
-    <div
-      className={`group relative h-full rounded-none border border-border bg-card/80 backdrop-blur-3xl overflow-hidden ${className || ''}`}
-      onMouseMove={handleMouseMove}
-    >
-      <motion.div
-        className="pointer-events-none absolute -inset-px rounded-none opacity-0 transition duration-300 group-hover:opacity-100"
-        style={{
-          background: useMotionTemplate`
-            radial-gradient(
-              600px circle at ${mouseX}px ${mouseY}px,
-              rgba(139, 92, 246, 0.1),
-              transparent 80%
-            )
-          `,
-        }}
-      />
-      {children}
-    </div>
-  );
-}
+import { StaggerChildren, staggerItemVariants } from '@/components/motion/StaggerChildren';
 
 export function SystemCapabilities() {
   return (
-    <section
-      id="system-capabilities"
-      className="relative w-full py-24 lg:py-32 overflow-hidden bg-background"
-    >
-      {/* Background Decor */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[20%] right-[10%] w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-none opacity-40 mix-blend-screen" />
-        <div className="absolute bottom-[20%] left-[10%] w-[500px] h-[500px] bg-secondary/5 blur-[100px] rounded-none opacity-40 mix-blend-screen" />
-      </div>
+    <section id="system-capabilities" className="py-16 lg:py-24 relative">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Header Section */}
+        <FadeUp className="flex flex-col gap-10 w-full mb-16">
+          {/* Top label row */}
+          <div className="flex items-center gap-6">
+            <span className="text-xs font-mono text-primary tracking-widest font-semibold uppercase">
+              01
+            </span>
+            <div className="h-[2px] flex-1 bg-border/60"></div>
+            <span className="uppercase text-xs font-mono tracking-widest text-muted-foreground">
+              System Capabilities
+            </span>
+          </div>
 
-      <div className="container mx-auto px-4 md:px-6 relative z-10 max-w-7xl">
-        {/* Header */}
-        <div className="mb-20 max-w-2xl">
-          <FadeUp delay={0.1}>
-            <div className="inline-flex items-center gap-2 rounded-none border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-mono text-primary mb-6">
-              02 // SYSTEM_CORE
+          {/* Main content */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
+            <div className="max-w-3xl flex flex-col gap-6">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.1] [text-wrap:balance]">
+                Powering Your <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70">
+                  Supply Chain.
+                </span>
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-xl leading-relaxed font-mono text-sm">
+                A reliable logistics foundation designed for secure, efficient, and long-term
+                operational excellence between Imphal and New Delhi.
+              </p>
             </div>
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tighter text-foreground mb-6 pb-1">
-              Neural Logistics <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-foreground to-muted-foreground">
-                Architecture
-              </span>
-            </h2>
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed font-light max-w-xl">
-              A unified protocol optimizing every millisecond of the logistics chain. Autonomous
-              routing, real-time telemetry, and zero-latency updates.
-            </p>
-          </FadeUp>
-        </div>
 
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 grid-rows-[auto] gap-6">
-          {/* 1. Global Telemetry (Large Feature) */}
-          <FadeUp delay={0.2} className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2">
-            <BentoCard className="min-h-[400px] p-8 flex flex-col justify-between">
-              {/* Content */}
-              <div className="relative z-10">
-                <div className="w-14 h-14 rounded-none bg-foreground/5 border border-border flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-500">
-                  <Globe className="w-7 h-7" />
-                </div>
-                <h3 className="text-2xl font-bold text-foreground mb-3 tracking-tight">
-                  Global Telemetry Mesh
-                </h3>
-                <p className="text-muted-foreground leading-relaxed max-w-sm">
-                  Real-time tracking across 120+ countries with millisecond precision and satellite
-                  backup. Currently processing 400k+ events/sec across the grid.
-                </p>
-              </div>
+            {/* Secondary CTA */}
+            <a
+              href="#global-fleet"
+              className="group flex items-center gap-2 px-6 py-4 border border-border bg-card/50 text-foreground text-sm font-semibold rounded-md hover:bg-muted transition-colors whitespace-nowrap shadow-sm"
+            >
+              <span>Explore Capabilities</span>
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </a>
+          </div>
+        </FadeUp>
 
-              {/* Technical Graphic Overlay */}
-              <div className="absolute bottom-0 right-0 w-3/4 h-3/4 opacity-20 pointer-events-none">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_100%_100%_at_100%_100%,black_60%,transparent_100%)]" />
-              </div>
-            </BentoCard>
-          </FadeUp>
+        {/* Features Grid */}
+        <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 w-full gap-6">
+          {/* Card 1: Live GPS Tracking */}
+          <motion.div
+            variants={staggerItemVariants}
+            className="group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 md:col-span-1 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-md"
+          >
+            {/* Visual */}
+            <div className="relative h-48 w-full flex items-center justify-center mb-6 overflow-visible">
+              <div className="absolute inset-0 bg-primary/5 rounded-full blur-3xl transform scale-75"></div>
+              <div
+                className="absolute w-16 h-16 rounded-full border border-primary/30 z-0"
+                style={{ animation: 'ripple-expand 4s cubic-bezier(0, 0, 0.2, 1) infinite' }}
+              ></div>
 
-          {/* 2. Predictive Routing (Tall) */}
-          <FadeUp delay={0.3} className="col-span-1 md:col-span-1 lg:col-span-1 row-span-2">
-            <BentoCard className="min-h-[400px] p-8 flex flex-col">
-              <div className="relative z-10 w-12 h-12 rounded-none bg-chart-2/10 border border-chart-2/20 flex items-center justify-center mb-6 text-chart-2 shrink-0 group-hover:scale-110 transition-transform duration-500">
-                <Zap className="w-6 h-6" />
-              </div>
-
-              <h3 className="text-xl font-bold text-foreground mb-2 tracking-tight relative z-10">
-                Predictive Routing
-              </h3>
-              <p className="text-sm text-muted-foreground mb-auto relative z-10">
-                AI-driven adjustments for weather, traffic, and geopolitical events in real-time.
-              </p>
-
-              {/* Stat Visualization */}
-              <div className="mt-8 pt-6 border-t border-border relative z-10">
-                <div className="flex justify-between text-[10px] uppercase font-mono text-muted-foreground mb-2">
-                  <span>Efficiency</span>
-                  <span className="text-primary">98.5%</span>
-                </div>
-                <div className="w-full h-1.5 bg-foreground/10 rounded-none overflow-hidden">
-                  <div className="h-full w-[98.5%] bg-primary shadow-[0_0_8px_var(--tw-shadow-color)] shadow-primary/50" />
-                </div>
-              </div>
-            </BentoCard>
-          </FadeUp>
-
-          {/* 3. Secure Chain (Square) */}
-          <FadeUp delay={0.4} className="col-span-1 md:col-span-1 lg:col-span-1 row-span-1">
-            <BentoCard className="min-h-[200px] p-6 group-hover:border-primary/50 transition-colors duration-500">
-              <div className="flex justify-between items-start mb-4 relative z-10">
-                <Shield className="w-6 h-6 text-primary" />
-                <span className="text-[10px] font-mono text-primary/80 border border-primary/20 bg-primary/10 px-2 py-0.5 rounded-none">
-                  AES-256
-                </span>
-              </div>
-              <h3 className="text-lg font-bold text-foreground mb-1 tracking-tight relative z-10">
-                Secure Chain
-              </h3>
-              <p className="text-xs text-muted-foreground relative z-10">
-                Blockchain-verified custody logs.
-              </p>
-            </BentoCard>
-          </FadeUp>
-
-          {/* 4. Instant Customs (Square) */}
-          <FadeUp delay={0.5} className="col-span-1 md:col-span-1 lg:col-span-1 row-span-1">
-            <BentoCard className="min-h-[200px] p-6 group-hover:border-secondary/50 transition-colors duration-500">
-              <div className="flex justify-between items-start mb-4 relative z-10">
-                <FileCheck className="w-6 h-6 text-chart-3" />
-                <span className="text-[10px] font-mono text-chart-3/80 border border-chart-3/20 bg-chart-3/10 px-2 py-0.5 rounded-none">
-                  AUTO
-                </span>
-              </div>
-              <h3 className="text-lg font-bold text-foreground mb-1 tracking-tight relative z-10">
-                Instant Customs
-              </h3>
-              <p className="text-xs text-muted-foreground relative z-10">
-                Automated clearance docs.
-              </p>
-            </BentoCard>
-          </FadeUp>
-
-          {/* 5. Advanced Analytics (Wide) */}
-          <FadeUp delay={0.6} className="col-span-1 md:col-span-3 lg:col-span-4 row-span-1">
-            <BentoCard className="min-h-[180px] p-8 flex flex-col md:flex-row items-center justify-between gap-6 group-hover:border-foreground/20 transition-colors duration-500">
-              <div className="flex items-center gap-6 relative z-10">
-                <div className="w-14 h-14 rounded-none bg-chart-4/10 border border-chart-4/20 flex items-center justify-center text-chart-4 shrink-0 group-hover:scale-110 transition-transform duration-500">
-                  <LineChart className="w-7 h-7" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-foreground mb-1 tracking-tight">
-                    Deep Analytics
-                  </h3>
-                  <p className="text-muted-foreground max-w-lg">
-                    Full visibility into supply chain performance, cost optimization, and vendor
-                    reliability metrics.
-                  </p>
-                </div>
-              </div>
-
-              <Button
-                variant="outline"
-                className="rounded-none px-8 h-12 border-border bg-transparent hover:bg-foreground/5 backdrop-blur-sm transition-all font-mono text-xs relative z-10"
+              <svg
+                className="w-full h-full text-primary/20 z-10"
+                viewBox="0 0 200 200"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                VIEW DASHBOARD_DEMO <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </BentoCard>
-          </FadeUp>
-        </div>
+                <g
+                  style={{
+                    transformOrigin: '100px 100px',
+                    animation: 'orbit-slow 12s linear infinite',
+                  }}
+                >
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="80"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeDasharray="6 6"
+                    className="opacity-30"
+                  ></circle>
+                  <circle
+                    cx="100"
+                    cy="20"
+                    r="3"
+                    fill="hsl(var(--primary))"
+                    className="drop-shadow-[0_0_8px_hsl(var(--primary)/0.8)]"
+                  ></circle>
+                  <circle
+                    cx="180"
+                    cy="100"
+                    r="2.5"
+                    fill="hsl(var(--primary))"
+                    className="opacity-60"
+                  ></circle>
+                  <circle
+                    cx="20"
+                    cy="100"
+                    r="2.5"
+                    fill="hsl(var(--primary))"
+                    className="opacity-60"
+                  ></circle>
+                </g>
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="50"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  className="opacity-40"
+                ></circle>
+                <circle
+                  cx="100"
+                  cy="50"
+                  r="2"
+                  fill="hsl(var(--primary))"
+                  style={{ animation: 'dot-handoff 3s ease-in-out infinite', animationDelay: '0s' }}
+                ></circle>
+                <circle
+                  cx="150"
+                  cy="100"
+                  r="2"
+                  fill="hsl(var(--primary))"
+                  style={{ animation: 'dot-handoff 3s ease-in-out infinite', animationDelay: '1s' }}
+                ></circle>
+                <circle
+                  cx="100"
+                  cy="150"
+                  r="2"
+                  fill="hsl(var(--primary))"
+                  style={{ animation: 'dot-handoff 3s ease-in-out infinite', animationDelay: '2s' }}
+                ></circle>
+                <circle
+                  cx="50"
+                  cy="100"
+                  r="2"
+                  fill="hsl(var(--primary))"
+                  style={{ animation: 'dot-handoff 3s ease-in-out infinite', animationDelay: '3s' }}
+                ></circle>
+              </svg>
+
+              <div
+                className="absolute flex items-center justify-center w-16 h-16 bg-background rounded-md border border-border z-20"
+                style={{ animation: 'breathe-glow 4s ease-in-out infinite' }}
+              >
+                <div className="absolute inset-0 bg-primary/10 rounded-md blur-sm"></div>
+                <Crosshair className="text-foreground relative z-10 w-7 h-7" />
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10 mt-auto">
+              <h3 className="text-2xl font-bold font-sans text-foreground tracking-tight">
+                Live GPS Tracking
+              </h3>
+              <p className="leading-relaxed text-muted-foreground mt-2 font-mono text-sm">
+                Pinpoint accuracy for your cargo with 24/7 real-time monitoring across all transit
+                routes.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Card 2: Smart Routing */}
+          <motion.div
+            variants={staggerItemVariants}
+            className="md:col-span-2 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-lg"
+          >
+            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/20 transition-colors duration-700"></div>
+
+            {/* Visual */}
+            <div className="relative h-48 w-full flex items-center justify-center mb-6 overflow-visible">
+              <svg
+                className="absolute top-0 right-0 bottom-0 left-0 w-full h-full"
+                viewBox="0 0 400 200"
+                fill="none"
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <defs>
+                  <linearGradient id="flowGradientLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0"></stop>
+                    <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="1"></stop>
+                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0"></stop>
+                  </linearGradient>
+                  <linearGradient id="flowGradientRight" x1="100%" y1="0%" x2="0%" y2="0%">
+                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0"></stop>
+                    <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="1"></stop>
+                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0"></stop>
+                  </linearGradient>
+                </defs>
+
+                <path
+                  d="M50 100 L120 100 L150 70"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  className="text-border"
+                ></path>
+                <path
+                  d="M350 100 L280 100 L250 130"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  className="text-border"
+                ></path>
+
+                <path
+                  d="M50 100 L120 100 L150 70"
+                  stroke="url(#flowGradientLeft)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeDasharray="120"
+                  strokeDashoffset="120"
+                  style={{ animation: 'flow-data 3s cubic-bezier(0.4, 0, 0.2, 1) infinite' }}
+                ></path>
+                <path
+                  d="M350 100 L280 100 L250 130"
+                  stroke="url(#flowGradientRight)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeDasharray="120"
+                  strokeDashoffset="120"
+                  style={{
+                    animation: 'flow-data 3s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+                    animationDelay: '1.5s',
+                  }}
+                ></path>
+
+                <g transform="translate(50 100) rotate(45)">
+                  <rect
+                    x="-10"
+                    y="-10"
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                    className="text-background stroke-border group-hover:stroke-primary/50 transition-colors duration-300"
+                  ></rect>
+                  <circle
+                    cx="0"
+                    cy="0"
+                    r="2"
+                    fill="hsl(var(--primary))"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  ></circle>
+                </g>
+                <g transform="translate(350 100) rotate(45)">
+                  <rect
+                    x="-10"
+                    y="-10"
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                    className="text-background stroke-border group-hover:stroke-primary/50 transition-colors duration-300"
+                  ></rect>
+                  <circle
+                    cx="0"
+                    cy="0"
+                    r="2"
+                    fill="hsl(var(--primary))"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  ></circle>
+                </g>
+              </svg>
+
+              <div className="relative flex items-center justify-center">
+                <div className="absolute inset-0 bg-primary blur-[40px] opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+                <div
+                  className="w-24 h-24 border border-primary/30 bg-background/80 backdrop-blur-md rounded-md flex items-center justify-center z-10 relative overflow-hidden"
+                  style={{ animation: 'breathe-diamond 4s ease-in-out infinite' }}
+                >
+                  <div className="w-12 h-12 border border-primary/50 rounded-md flex items-center justify-center bg-primary/5 relative z-20">
+                    <Map className="text-primary w-6 h-6 z-20" />
+                  </div>
+                  <div
+                    className="absolute inset-0 z-10 opacity-30"
+                    style={{ animation: 'orbit-spin 8s linear infinite' }}
+                  >
+                    <div className="w-full h-full border-t border-r border-primary/40"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative z-10 mt-auto">
+              <h3 className="text-2xl font-bold font-sans text-foreground tracking-tight">
+                Smart Routing Algorithms
+              </h3>
+              <p className="leading-relaxed text-muted-foreground mt-2 font-mono text-sm max-w-xl">
+                Our system calculates the most efficient transit paths, minimizing delays and
+                optimizing fuel usage across established corridors.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Card 3: Automated Dispatch */}
+          <motion.div
+            variants={staggerItemVariants}
+            className="md:col-span-2 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-lg"
+          >
+            <div className="flex w-full h-48 mb-6 relative items-center justify-center">
+              <div className="flex items-center gap-4 relative">
+                <div
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/10 blur-[60px] rounded-full pointer-events-none"
+                  style={{ animation: 'breathe-glow 4s ease-in-out infinite' }}
+                ></div>
+
+                <div
+                  className="w-12 h-12 rounded-md border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
+                  style={{
+                    animation: 'shimmer-lock 4s ease-in-out infinite',
+                    animationDelay: '0s',
+                  }}
+                >
+                  <Network className="w-5 h-5" />
+                </div>
+                <div
+                  className="w-12 h-12 rounded-md border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
+                  style={{
+                    animation: 'shimmer-lock 4s ease-in-out infinite',
+                    animationDelay: '1s',
+                  }}
+                >
+                  <Network className="w-5 h-5" />
+                </div>
+
+                <div
+                  className="relative w-20 h-20 rounded-md bg-primary flex items-center justify-center text-primary-foreground shadow-lg z-10 border border-primary/20 ring-4 ring-background"
+                  style={{ animation: 'active-pulse-2 3s ease-in-out infinite' }}
+                >
+                  <div className="absolute inset-0 overflow-hidden rounded-md">
+                    <div
+                      className="w-full h-1/3 bg-gradient-to-b from-white/0 via-white/20 to-white/0 absolute top-0 left-0"
+                      style={{ animation: 'scan-sweep 3s ease-in-out infinite' }}
+                    ></div>
+                  </div>
+
+                  <svg
+                    className="absolute inset-0 w-full h-full -rotate-90 p-1"
+                    viewBox="0 0 36 36"
+                  >
+                    <path
+                      className="text-primary-foreground/20"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    ></path>
+                    <path
+                      className="text-primary-foreground drop-shadow-[0_0_2px_oklch(100%_0_0deg/0.8)]"
+                      strokeDasharray="100 100"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      style={{ animation: 'progress-spin 1.5s ease-out forwards' }}
+                    ></path>
+                  </svg>
+
+                  <Shield className="w-8 h-8 relative z-10" />
+
+                  <div className="absolute -bottom-3 bg-background text-foreground border border-border px-2 py-0.5 rounded-md flex items-center gap-1.5 shadow-md">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success"></span>
+                    </span>
+                    <span className="text-[10px] font-mono tracking-wider font-semibold">LIVE</span>
+                  </div>
+                </div>
+
+                <div
+                  className="w-12 h-12 rounded-md border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
+                  style={{
+                    animation: 'shimmer-lock 4s ease-in-out infinite',
+                    animationDelay: '2s',
+                  }}
+                >
+                  <Network className="w-5 h-5" />
+                </div>
+                <div
+                  className="w-12 h-12 rounded-md border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
+                  style={{
+                    animation: 'shimmer-lock 4s ease-in-out infinite',
+                    animationDelay: '3s',
+                  }}
+                >
+                  <Network className="w-5 h-5" />
+                </div>
+              </div>
+            </div>
+
+            <div className="relative z-10 mt-auto">
+              <h3 className="text-2xl font-bold font-sans text-foreground tracking-tight">
+                Automated Dispatch
+              </h3>
+              <p className="leading-relaxed text-muted-foreground mt-2 font-mono text-sm max-w-xl">
+                Seamless handover protocols and automated alerts ensure zero downtime from warehouse
+                sorting to final delivery.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Card 4: Enterprise Scalability */}
+          <motion.div
+            variants={staggerItemVariants}
+            className="md:col-span-1 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-md"
+          >
+            <div
+              className="absolute inset-0 opacity-[0.03] pointer-events-none"
+              style={{
+                backgroundImage:
+                  'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)',
+                backgroundSize: '40px 40px',
+                transform: 'scale(1.5) rotate(15deg)',
+              }}
+            ></div>
+
+            <div className="relative h-48 w-full flex items-center justify-center mb-6 z-10">
+              <svg className="w-full h-full text-foreground/20" viewBox="0 0 200 200" fill="none">
+                <line
+                  x1="100"
+                  y1="20"
+                  x2="100"
+                  y2="180"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                ></line>
+                <line
+                  x1="60"
+                  y1="20"
+                  x2="60"
+                  y2="180"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  strokeDasharray="4 4"
+                  style={{ animation: 'signal-flow 3s linear infinite' }}
+                ></line>
+                <line
+                  x1="140"
+                  y1="20"
+                  x2="140"
+                  y2="180"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  strokeDasharray="4 4"
+                  style={{ animation: 'signal-flow 4s linear infinite reverse' }}
+                ></line>
+
+                <g style={{ animation: 'drift-vertical-slow 7s ease-in-out infinite' }}>
+                  <path
+                    d="M60 80 C 80 80, 80 100, 100 100"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                  ></path>
+                  <circle
+                    cx="60"
+                    cy="80"
+                    r="3"
+                    className="text-foreground"
+                    style={{ animation: 'node-activate 8s ease-in-out infinite 0.5s' }}
+                  ></circle>
+                </g>
+
+                <g style={{ animation: 'drift-vertical-reverse 8s ease-in-out infinite 1s' }}>
+                  <path
+                    d="M100 60 C 120 60, 120 80, 140 80"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                  ></path>
+                  <circle
+                    cx="140"
+                    cy="80"
+                    r="3"
+                    className="text-foreground"
+                    style={{ animation: 'node-activate 8s ease-in-out infinite 3s' }}
+                  ></circle>
+                </g>
+
+                <g style={{ animation: 'drift-vertical-slow 6s ease-in-out infinite 2s' }}>
+                  <path
+                    d="M100 120 C 80 120, 80 140, 60 140"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                  ></path>
+                  <circle
+                    cx="60"
+                    cy="140"
+                    r="3"
+                    className="text-foreground"
+                    style={{ animation: 'node-activate 8s ease-in-out infinite 5.5s' }}
+                  ></circle>
+                </g>
+
+                <circle
+                  cx="100"
+                  cy="60"
+                  r="3"
+                  className="text-foreground"
+                  style={{ animation: 'node-activate 8s ease-in-out infinite 0s' }}
+                ></circle>
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="3"
+                  className="text-foreground"
+                  style={{ animation: 'node-activate 8s ease-in-out infinite 2s' }}
+                ></circle>
+                <circle
+                  cx="100"
+                  cy="150"
+                  r="3"
+                  className="text-foreground"
+                  style={{ animation: 'node-activate 8s ease-in-out infinite 4s' }}
+                ></circle>
+
+                <circle
+                  cx="120"
+                  cy="40"
+                  r="1"
+                  fill="hsl(var(--primary))"
+                  className="opacity-50"
+                  style={{ animation: 'drift-vertical-reverse 10s ease-in-out infinite' }}
+                ></circle>
+                <circle
+                  cx="80"
+                  cy="160"
+                  r="1"
+                  fill="hsl(var(--primary))"
+                  className="opacity-50"
+                  style={{ animation: 'drift-vertical-slow 9s ease-in-out infinite' }}
+                ></circle>
+              </svg>
+            </div>
+
+            <div className="relative z-10 mt-auto">
+              <h3 className="text-2xl font-bold font-sans text-foreground tracking-tight">
+                Enterprise Scalability
+              </h3>
+              <p className="leading-relaxed text-muted-foreground mt-2 font-mono text-sm">
+                TAC grows with you, effortlessly handling thousands of daily shipments and complex
+                logistics networks.
+              </p>
+            </div>
+          </motion.div>
+        </StaggerChildren>
       </div>
     </section>
   );

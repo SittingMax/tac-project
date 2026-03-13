@@ -1,75 +1,94 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="notranslate" translate="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google" content="notranslate" />
+    <title>TAC - Enterprise Logistics Platform</title>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="google" content="notranslate">
-  <title>TAC - Enterprise Logistics Platform</title>
+    <!-- Content Security Policy -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.sentry.io https://api.openrouter.ai https://lottie.host https://cdn.jsdelivr.net https://unpkg.com ws://localhost:* http://localhost:* ws://127.0.0.1:* http://127.0.0.1:*; worker-src 'self' blob:; frame-src 'self';"
+    />
 
-  <!-- SEO Meta -->
-  <meta name="description"
-    content="TAC — Enterprise logistics platform for air and ground freight. Real-time shipment tracking, manifest management, scanning, invoicing, and analytics.">
-  <meta name="keywords" content="logistics, cargo, freight, shipment tracking, manifest, TAC">
-  <meta name="author" content="TAC">
-  <meta name="theme-color" content="#4338ca">
+    <!-- SEO Meta -->
+    <meta
+      name="description"
+      content="TAC — Enterprise logistics platform for air and ground freight. Real-time shipment tracking, manifest management, scanning, invoicing, and analytics."
+    />
+    <meta name="keywords" content="logistics, cargo, freight, shipment tracking, manifest, TAC" />
+    <meta name="author" content="TAC" />
+    <meta name="theme-color" content="#4338ca" />
 
-  <!-- Open Graph / Social Sharing -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="TAC - Enterprise Logistics Platform">
-  <meta property="og:description"
-    content="Real-time shipment tracking, manifest management, scanning, invoicing, and analytics for air and ground freight.">
-  <meta property="og:image" content="/tac-hero-bg.jpeg">
-  <meta property="og:site_name" content="TAC">
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="TAC - Enterprise Logistics Platform" />
+    <meta
+      property="og:description"
+      content="Real-time shipment tracking, manifest management, scanning, invoicing, and analytics for air and ground freight."
+    />
+    <meta property="og:image" content="/tac-hero-bg.jpeg" />
+    <meta property="og:site_name" content="TAC" />
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="TAC - Enterprise Logistics Platform">
-  <meta name="twitter:description"
-    content="Real-time shipment tracking, manifest management, scanning, invoicing, and analytics.">
-  <meta name="twitter:image" content="/tac-hero-bg.jpeg">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TAC - Enterprise Logistics Platform" />
+    <meta
+      name="twitter:description"
+      content="Real-time shipment tracking, manifest management, scanning, invoicing, and analytics."
+    />
+    <meta name="twitter:image" content="/tac-hero-bg.jpeg" />
 
-  <!-- Favicon & Icons -->
-  <link rel="icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" href="/favicon.ico" />
+    <!-- Favicon & Icons -->
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/favicon.ico" />
 
-  <!-- PWA & Mobile -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="TAC">
+    <!-- PWA & Mobile -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TAC" />
 
-  <!-- Google Fonts (Optimized Loading) - Soft Modern UI -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style"
-    href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-    rel="stylesheet" media="print" onload="this.media='all'" />
-  <noscript>
+    <!-- Google Fonts (Optimized Loading) - Vanguard UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-      rel="stylesheet" />
-  </noscript>
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
 
-  <!-- Blocking: apply saved theme before first paint (prevents flash-of-wrong-theme) -->
-  <script>
-    (function () {
-      try {
-        var stored = JSON.parse(localStorage.getItem('tac-storage') || '{}');
-        var theme = (stored.state && stored.state.theme) || 'dark';
-        if (theme === 'system') {
-          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    <!-- Blocking: apply saved theme before first paint (prevents flash-of-wrong-theme) -->
+    <script>
+      (function () {
+        try {
+          var stored = JSON.parse(localStorage.getItem('tac-storage') || '{}');
+          var theme = (stored.state && stored.state.theme) || 'dark';
+          if (theme === 'system') {
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          document.documentElement.classList.add(theme);
+        } catch (e) {
+          document.documentElement.classList.add('dark');
         }
-        document.documentElement.classList.add(theme);
-      } catch (e) { document.documentElement.classList.add('dark'); }
-    })();
-  </script>
-</head>
+      })();
+    </script>
+  </head>
 
-<body>
-  <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
-
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>

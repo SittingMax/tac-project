@@ -7,6 +7,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 import type { Database } from '@/lib/database.types';
 import { SupabaseClient } from '@supabase/supabase-js';
 
@@ -65,6 +66,7 @@ type RBACDatabase = Omit<Database, 'public'> & {
 };
 
 // Cast supabase client to include RBAC types
+// eslint-disable-next-line no-restricted-syntax -- Type casting for RBAC database schema
 const db = supabase as unknown as SupabaseClient<RBACDatabase>;
 
 /**
@@ -78,13 +80,13 @@ export async function fetchAllPermissions(): Promise<Permission[]> {
       .order('module', { ascending: true });
 
     if (error) {
-      console.error('[RBAC] Failed to fetch permissions:', error);
+      logger.error('RBAC', 'Failed to fetch permissions', { error });
       return [];
     }
 
     return (data as Permission[]) || [];
   } catch {
-    console.error('[RBAC] Permissions table may not exist yet');
+    logger.warn('RBAC', 'Permissions table may not exist yet');
     return [];
   }
 }
@@ -100,13 +102,13 @@ export async function fetchRolePermissions(role: string): Promise<string[]> {
       .eq('role', role);
 
     if (error) {
-      console.error('[RBAC] Failed to fetch role permissions:', error);
+      logger.error('RBAC', 'Failed to fetch role permissions', { error });
       return [];
     }
 
     return data?.map((rp: { permission_code: string }) => rp.permission_code) || [];
   } catch {
-    console.error('[RBAC] Role permissions table may not exist yet');
+    logger.warn('RBAC', 'Role permissions table may not exist yet');
     return [];
   }
 }
@@ -119,13 +121,13 @@ export async function fetchUserPermissions(): Promise<UserPermission[]> {
     const { data, error } = await db.rpc('get_user_permissions');
 
     if (error) {
-      console.error('[RBAC] Failed to fetch user permissions:', error);
+      logger.error('RBAC', 'Failed to fetch user permissions', { error });
       return [];
     }
 
     return (data as UserPermission[]) || [];
   } catch {
-    console.error('[RBAC] get_user_permissions function may not exist yet');
+    logger.warn('RBAC', 'get_user_permissions function may not exist yet');
     return [];
   }
 }
@@ -141,7 +143,7 @@ export async function checkPermission(permission: string): Promise<boolean> {
     });
 
     if (error) {
-      console.error('[RBAC] Permission check failed:', error);
+      logger.error('RBAC', 'Permission check failed', { error });
       return false;
     }
 
@@ -162,7 +164,7 @@ export async function checkModuleAccess(module: string): Promise<boolean> {
     });
 
     if (error) {
-      console.error('[RBAC] Module access check failed:', error);
+      logger.error('RBAC', 'Module access check failed', { error });
       return false;
     }
 

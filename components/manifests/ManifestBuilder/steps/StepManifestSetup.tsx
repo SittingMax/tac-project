@@ -107,6 +107,16 @@ export function StepManifestSetup({
     mode: 'onChange',
   });
 
+  React.useEffect(() => {
+    const currentValues = form.getValues();
+    // Prevent infinite loop by only resetting if data changed from outside
+    if (JSON.stringify(currentValues) !== JSON.stringify(data)) {
+      form.reset(data);
+    }
+    const result = manifestSettingsSchema.safeParse(data);
+    onValidationChange(result.success);
+  }, [data, form, onValidationChange]);
+
   // Sync form state with parent and validate manually
   React.useEffect(() => {
     const subscription = form.watch((value) => {
@@ -131,9 +141,9 @@ export function StepManifestSetup({
   const toHub = hubs.find((h) => h.id === form.watch('toHubId'));
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       {/* Section 1: Route & Transport */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         {/* Route Selection */}
         <Card className="border-border bg-card/50 xl:col-span-7">
           <CardHeader className="pb-4">
@@ -227,12 +237,12 @@ export function StepManifestSetup({
                     shouldTouch: true,
                   });
               }}
-              className="flex gap-3"
+              className="flex gap-4"
             >
               <ToggleGroupItem
                 value="AIR"
                 className={cn(
-                  'flex-1 h-[72px] flex flex-col items-center justify-center gap-1.5 border border-border rounded-none transition-all',
+                  'flex-1 h-[72px] flex flex-col items-center justify-center gap-1.5 border border-border rounded-md transition-all',
                   'data-[state=on]:bg-feature-air/20 data-[state=on]:text-feature-air data-[state=on]:border-feature-air/50',
                   transportType === 'AIR' && 'ring-2 ring-feature-air/30'
                 )}
@@ -243,7 +253,7 @@ export function StepManifestSetup({
               <ToggleGroupItem
                 value="TRUCK"
                 className={cn(
-                  'flex-1 h-[72px] flex flex-col items-center justify-center gap-1.5 border border-border rounded-none transition-all',
+                  'flex-1 h-[72px] flex flex-col items-center justify-center gap-1.5 border border-border rounded-md transition-all',
                   'data-[state=on]:bg-feature-ground/20 data-[state=on]:text-feature-ground data-[state=on]:border-feature-ground/50',
                   transportType === 'TRUCK' && 'ring-2 ring-feature-ground/30'
                 )}
@@ -257,7 +267,7 @@ export function StepManifestSetup({
       </div>
 
       {/* Section 2: Details */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* Schedule (Only for TRUCK) */}
         {transportType === 'TRUCK' && (
           <Card className="border-border bg-card/50">
@@ -406,8 +416,8 @@ export function StepManifestSetup({
                     )}
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2 md:col-span-2">
                     <Label>Flight Date</Label>
                     <Popover>
                       <PopoverTrigger asChild>

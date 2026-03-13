@@ -12,10 +12,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useStore } from '../../store';
 import { useAuthStore } from '../../store/authStore';
+import { logger } from '@/lib/logger';
 import { LogOut, User, Settings, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ProfileDialog } from '../domain/ProfileDialog';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface UserProfileProps {
   collapsed?: boolean;
@@ -43,8 +45,33 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed, className }
     try {
       await signOut();
       legacyLogout();
+      toast(
+        <div className="flex items-center gap-3">
+          <div className="relative w-10 h-10 rounded-md bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden">
+            <span className="absolute inset-0 inline-flex h-full w-full rounded-md bg-primary/40 opacity-75 animate-ping"></span>
+            <img
+              src="/lottie/logout-success.gif"
+              alt="Logout Success"
+              className="w-8 h-8 relative z-10 object-contain"
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold text-foreground">Logged Out</span>
+            <span className="text-[10px] font-mono text-muted-foreground">
+              You have been securely signed out.
+            </span>
+          </div>
+        </div>,
+        {
+          className: 'rounded-md border border-border/50 bg-background shadow-xl p-4',
+          duration: 4000,
+        }
+      );
     } catch (error) {
-      console.error('Sign out failed:', error);
+      logger.error('UserProfile', 'Sign out failed', { error });
+      toast.error('Failed to sign out', {
+        className: 'rounded-md border border-destructive/50 bg-background shadow-xl text-xs',
+      });
     }
   };
 
@@ -77,12 +104,12 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed, className }
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              'flex items-center gap-3 p-2 rounded-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-full border border-transparent hover:border-sidebar-border/50 group',
+              'flex items-center gap-2 p-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-full border border-transparent hover:border-sidebar-border/50 group',
               collapsed ? 'justify-center' : 'justify-between',
               className
             )}
           >
-            <div className="flex items-center gap-3 overflow-hidden">
+            <div className="flex items-center gap-2 overflow-hidden">
               <Avatar className="h-9 w-9 border border-border/40 shrink-0 shadow-sm transition-transform group-hover:scale-105">
                 <AvatarImage src={avatarUrl || ''} alt={displayName} />
                 <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
@@ -115,7 +142,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed, className }
           sideOffset={collapsed ? 20 : 8}
           forceMount
         >
-          <DropdownMenuLabel className="font-normal px-2 py-3">
+          <DropdownMenuLabel className="font-normal px-2 py-2">
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-bold leading-none text-primary">{displayName}</p>
               <p className="text-xs leading-none text-muted-foreground truncate">{displayEmail}</p>
@@ -128,7 +155,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed, className }
               className="cursor-pointer py-2.5"
               onClick={() => setShowProfileDialog(true)}
             >
-              <User className="mr-3 h-4 w-4 text-muted-foreground" />
+              <User className="mr-2 h-4 w-4 text-muted-foreground" />
               <span>Profile</span>
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>
@@ -137,7 +164,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed, className }
               className="cursor-pointer py-2.5"
               onClick={() => navigate('/settings')}
             >
-              <Settings className="mr-3 h-4 w-4 text-muted-foreground" />
+              <Settings className="mr-2 h-4 w-4 text-muted-foreground" />
               <span>Settings</span>
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
@@ -149,7 +176,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed, className }
             className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 py-2.5"
             onClick={handleSignOut}
           >
-            <LogOut className="mr-3 h-4 w-4" />
+            <LogOut className="mr-2 h-4 w-4" />
             <span>Sign out</span>
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>

@@ -19,14 +19,8 @@ export const SearchResults: React.FC = () => {
   React.useEffect(() => {
     if (isAuto && !isLoading && results?.length === 1) {
       const result = results[0];
-      // Route shipments to the invoice/finance page (not shipment detail)
-      if (result.entity_type === 'shipment' && result.title) {
-        navigate(`/finance?awb=${encodeURIComponent(result.title)}`, { replace: true });
-        toast.success(`Opening invoice for: ${result.title}`);
-      } else {
-        navigate(result.link, { replace: true });
-        toast.success(`Found ${result.entity_type}: ${result.title}`);
-      }
+      navigate(result.link, { replace: true });
+      toast.success(`Found ${result.entity_type}: ${result.title}`);
     }
   }, [isAuto, isLoading, results, navigate]);
 
@@ -38,7 +32,7 @@ export const SearchResults: React.FC = () => {
           description="Enter a query to search across the platform."
         />
         <Card className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground border-dashed">
-          <div className="mb-4 p-4 rounded-none bg-muted/50">
+          <div className="mb-4 p-4 rounded-lg bg-muted/50">
             <Box className="w-8 h-8 opacity-50" />
           </div>
           <p className="text-lg font-medium">Start typing to search</p>
@@ -65,7 +59,7 @@ export const SearchResults: React.FC = () => {
         </Card>
       ) : results?.length === 0 ? (
         <Card className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground border-dashed">
-          <div className="mb-4 p-4 rounded-none bg-muted/50">
+          <div className="mb-4 p-4 rounded-lg bg-muted/50">
             <Box className="w-8 h-8 opacity-50" />
           </div>
           <p className="text-lg font-medium">No results found</p>

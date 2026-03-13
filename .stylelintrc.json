@@ -1,6 +1,7 @@
 {
   "extends": ["stylelint-config-standard"],
   "plugins": ["stylelint-no-indistinguishable-colors"],
+  "ignoreFiles": ["**/*setrex-styles.css"],
   "rules": {
     "at-rule-no-unknown": [
       true,
@@ -24,8 +25,10 @@
         "severity": "warning"
       }
     ],
+    "import-notation": "string",
     "no-descending-specificity": null,
     "custom-property-pattern": null,
-    "selector-class-pattern": null
+    "selector-class-pattern": null,
+    "selector-id-pattern": null
   }
 }

@@ -6,6 +6,7 @@ import { useStore } from './store';
 import { useAuthStore } from './store/authStore';
 import { useIdleTimeout } from './hooks/useIdleTimeout';
 import { queryClient } from './lib/query-client';
+import { logger } from './lib/logger';
 import { PageSkeleton } from './components/ui/skeleton';
 import { ErrorBoundary } from './components/ui/error-boundary';
 import { PageTransition } from './components/ui/page-transition';
@@ -14,6 +15,7 @@ import { ScanContextProvider } from './context/ScanContext';
 import { GlobalScanListener } from './components/scanning/GlobalScanListener';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { DashboardLayout } from './components/layout/DashboardLayout';
+import { ScrollToTop } from './components/shared/ScrollToTop';
 import { routes, AppRoute } from './routes/index';
 import { Login } from './components/auth/Login';
 
@@ -33,7 +35,7 @@ const App: React.FC = () => {
       })
       .catch((error) => {
         if (error instanceof Error && error.name === 'AbortError') return;
-        console.error('[App] Auth initialization failed:', error);
+        logger.captureError('App', error, { phase: 'auth-init' });
       });
 
     return () => {
@@ -63,6 +65,7 @@ const App: React.FC = () => {
         <ScanContextProvider>
           <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <GlobalScanListener />
+            <ScrollToTop />
             <div className="min-h-screen">
               <Suspense
                 fallback={
@@ -86,7 +89,21 @@ const App: React.FC = () => {
                             layout: hasLayout,
                             allowedRoles,
                           } = route;
-                          let routeElement = <Element />;
+
+                          // Each page gets its own ErrorBoundary so one crash
+                          // doesn't take down the entire application
+                          let routeElement = (
+                            <ErrorBoundary
+                              onError={(error, errorInfo) => {
+                                logger.captureError('PageBoundary', error, {
+                                  route: path,
+                                  componentStack: errorInfo.componentStack,
+                                });
+                              }}
+                            >
+                              <Element />
+                            </ErrorBoundary>
+                          );
 
                           if (hasLayout) {
                             routeElement = <DashboardLayout>{routeElement}</DashboardLayout>;

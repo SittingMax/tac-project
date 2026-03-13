@@ -68,14 +68,15 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
   };
 
   const handleShareWhatsapp = () => {
-    const message = `Invoice ${invoice.invoiceNumber} | awb: ${invoice.awb} | Amount: ₹${invoice.financials.totalAmount.toLocaleString('en-IN')} | Status: ${invoice.status}`;
+    const trackingUrl = `${window.location.origin}/track/${invoice.awb}`;
+    const message = `Invoice ${invoice.invoiceNumber} | awb: ${invoice.awb} | Amount: ₹${invoice.financials.totalAmount.toLocaleString('en-IN')} | Status: ${invoice.status} | Track: ${trackingUrl}`;
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
 
   const handleShareEmail = () => {
     const subject = `Invoice ${invoice.invoiceNumber} - ${invoice.customerName}`;
-    const body = `Dear Customer,\n\nPlease find your invoice details below:\n\nInvoice: ${invoice.invoiceNumber}\nCN: ${invoice.awb}\nAmount: ₹${invoice.financials.totalAmount.toLocaleString('en-IN')}\nStatus: ${invoice.status}\nDue Date: ${invoice.dueDate?.split('T')[0] || 'N/A'}\n\nThank you for choosing TAC Cargo.`;
+    const body = `Dear Customer,\n\nPlease find your invoice details below:\n\nInvoice: ${invoice.invoiceNumber}\nCN: ${invoice.awb}\nAmount: ₹${invoice.financials.totalAmount.toLocaleString('en-IN')}\nStatus: ${invoice.status}\nDue Date: ${invoice.dueDate?.split('T')[0] || 'N/A'}\nTrack: ${window.location.origin}/track/${invoice.awb}\n\nThank you for choosing TAC Cargo.`;
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
 
@@ -91,13 +92,13 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <h2 className="text-2xl font-bold font-mono text-foreground">
                 {invoice.invoiceNumber}
               </h2>
               <Badge className={STATUS_STYLES[invoice.status]}>{invoice.status}</Badge>
             </div>
-            <div className="flex items-center gap-3 mt-1">
+            <div className="flex items-center gap-2 mt-1">
               <p className="text-sm text-muted-foreground">
                 awb: <span className="font-mono">{invoice.awb || '—'}</span>
               </p>
@@ -198,8 +199,8 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                 </div>
                 <div className="flex-1 px-4 flex flex-col items-center">
                   <div className="w-full h-0.5 bg-border relative">
-                    <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 rounded-none bg-muted-foreground" />
-                    <div className="absolute top-1/2 right-0 -translate-y-1/2 w-2 h-2 rounded-none bg-primary" />
+                    <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 rounded-full bg-muted-foreground" />
+                    <div className="absolute top-1/2 right-0 -translate-y-1/2 w-2 h-2 rounded-full bg-primary" />
                     <div className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-card px-2">
                       {shipment.mode === 'AIR' ? (
                         <Plane className="w-4 h-4 text-muted-foreground" />
@@ -323,7 +324,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                 className="text-status-success border-status-success/30 hover:bg-status-success/10"
                 onClick={handleShareWhatsapp}
               >
-                <MessageCircle className="w-4 h-4 mr-2" /> WhatsApp
+                <MessageCircle className="w-4 h-4 mr-2" /> Compose WhatsApp
               </Button>
               <Button
                 variant="outline"
@@ -331,7 +332,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                 className="text-status-info border-status-info/30 hover:bg-status-info/10"
                 onClick={handleShareEmail}
               >
-                <Mail className="w-4 h-4 mr-2" /> Email
+                <Mail className="w-4 h-4 mr-2" /> Compose Email
               </Button>
             </div>
           </Card>

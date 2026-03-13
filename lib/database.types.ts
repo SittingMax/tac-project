@@ -18,7 +18,7 @@ export type Database = {
           entity_id: string;
           entity_type: string;
           id: string;
-          ip_address: string | null;
+          ip_address: unknown;
           org_id: string;
           user_agent: string | null;
         };
@@ -31,7 +31,7 @@ export type Database = {
           entity_id: string;
           entity_type: string;
           id?: string;
-          ip_address?: string | null;
+          ip_address?: unknown;
           org_id: string;
           user_agent?: string | null;
         };
@@ -44,7 +44,7 @@ export type Database = {
           entity_id?: string;
           entity_type?: string;
           id?: string;
-          ip_address?: string | null;
+          ip_address?: unknown;
           org_id?: string;
           user_agent?: string | null;
         };
@@ -64,6 +64,33 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      booking_rate_limits: {
+        Row: {
+          booking_count: number;
+          created_at: string | null;
+          id: string;
+          identifier: string;
+          identifier_type: string;
+          window_start: string;
+        };
+        Insert: {
+          booking_count?: number;
+          created_at?: string | null;
+          id?: string;
+          identifier: string;
+          identifier_type: string;
+          window_start?: string;
+        };
+        Update: {
+          booking_count?: number;
+          created_at?: string | null;
+          id?: string;
+          identifier?: string;
+          identifier_type?: string;
+          window_start?: string;
+        };
+        Relationships: [];
       };
       bookings: {
         Row: {
@@ -112,6 +139,7 @@ export type Database = {
           id: string;
           message: string;
           name: string;
+          org_id: string | null;
           phone: string | null;
           replied: boolean | null;
           replied_at: string | null;
@@ -126,6 +154,7 @@ export type Database = {
           id?: string;
           message: string;
           name: string;
+          org_id?: string | null;
           phone?: string | null;
           replied?: boolean | null;
           replied_at?: string | null;
@@ -140,6 +169,7 @@ export type Database = {
           id?: string;
           message?: string;
           name?: string;
+          org_id?: string | null;
           phone?: string | null;
           replied?: boolean | null;
           replied_at?: string | null;
@@ -147,7 +177,15 @@ export type Database = {
           reply_content?: string | null;
           status?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'contact_messages_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'orgs';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       customers: {
         Row: {
@@ -294,6 +332,102 @@ export type Database = {
           },
           {
             foreignKeyName: 'exceptions_shipment_id_fkey';
+            columns: ['shipment_id'];
+            isOneToOne: false;
+            referencedRelation: 'shipments';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      handling_units: {
+        Row: {
+          container_type: string | null;
+          created_at: string | null;
+          created_by_staff_id: string | null;
+          description: string | null;
+          dimensions: Json | null;
+          gross_weight: number | null;
+          id: string;
+          identifier: string | null;
+          manifest_id: string | null;
+          max_weight: number | null;
+          org_id: string;
+          seal_number: string | null;
+          shipment_id: string | null;
+          tare_weight: number | null;
+          unit_type: Database['public']['Enums']['handling_unit_type'];
+          updated_at: string | null;
+          weight: number | null;
+        };
+        Insert: {
+          container_type?: string | null;
+          created_at?: string | null;
+          created_by_staff_id?: string | null;
+          description?: string | null;
+          dimensions?: Json | null;
+          gross_weight?: number | null;
+          id?: string;
+          identifier?: string | null;
+          manifest_id?: string | null;
+          max_weight?: number | null;
+          org_id: string;
+          seal_number?: string | null;
+          shipment_id?: string | null;
+          tare_weight?: number | null;
+          unit_type: Database['public']['Enums']['handling_unit_type'];
+          updated_at?: string | null;
+          weight?: number | null;
+        };
+        Update: {
+          container_type?: string | null;
+          created_at?: string | null;
+          created_by_staff_id?: string | null;
+          description?: string | null;
+          dimensions?: Json | null;
+          gross_weight?: number | null;
+          id?: string;
+          identifier?: string | null;
+          manifest_id?: string | null;
+          max_weight?: number | null;
+          org_id?: string;
+          seal_number?: string | null;
+          shipment_id?: string | null;
+          tare_weight?: number | null;
+          unit_type?: Database['public']['Enums']['handling_unit_type'];
+          updated_at?: string | null;
+          weight?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'handling_units_created_by_staff_id_fkey';
+            columns: ['created_by_staff_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'handling_units_manifest_id_fkey';
+            columns: ['manifest_id'];
+            isOneToOne: false;
+            referencedRelation: 'manifests';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'handling_units_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'orgs';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'handling_units_shipment_id_fkey';
+            columns: ['shipment_id'];
+            isOneToOne: false;
+            referencedRelation: 'public_shipment_tracking';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'handling_units_shipment_id_fkey';
             columns: ['shipment_id'];
             isOneToOne: false;
             referencedRelation: 'shipments';
@@ -499,7 +633,7 @@ export type Database = {
             foreignKeyName: 'manifest_container_items_container_id_fkey';
             columns: ['container_id'];
             isOneToOne: false;
-            referencedRelation: 'manifest_containers';
+            referencedRelation: 'handling_units';
             referencedColumns: ['id'];
           },
           {
@@ -1048,10 +1182,42 @@ export type Database = {
           },
         ];
       };
+      shipment_counters: {
+        Row: {
+          last_number: number | null;
+          org_id: string;
+          year: number;
+        };
+        Insert: {
+          last_number?: number | null;
+          org_id: string;
+          year: number;
+        };
+        Update: {
+          last_number?: number | null;
+          org_id?: string;
+          year?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'shipment_counters_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'orgs';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       shipments: {
         Row: {
-          cn_number: string;
           chargeable_weight: number | null;
+          cn_number: string;
+          consignee_address: Json;
+          consignee_name: string;
+          consignee_phone: string;
+          consignor_address: Json | null;
+          consignor_name: string | null;
+          consignor_phone: string | null;
           created_at: string | null;
           current_hub_id: string | null;
           customer_id: string;
@@ -1067,12 +1233,6 @@ export type Database = {
           package_count: number;
           pod_image_url: string | null;
           pod_signature_url: string | null;
-          consignee_address: Json;
-          consignee_name: string;
-          consignee_phone: string;
-          consignor_address: Json | null;
-          consignor_name: string | null;
-          consignor_phone: string | null;
           service_level: string;
           special_instructions: string | null;
           status: string;
@@ -1082,8 +1242,14 @@ export type Database = {
           volumetric_weight: number | null;
         };
         Insert: {
-          cn_number: string;
           chargeable_weight?: number | null;
+          cn_number: string;
+          consignee_address: Json;
+          consignee_name: string;
+          consignee_phone: string;
+          consignor_address?: Json | null;
+          consignor_name?: string | null;
+          consignor_phone?: string | null;
           created_at?: string | null;
           current_hub_id?: string | null;
           customer_id: string;
@@ -1099,12 +1265,6 @@ export type Database = {
           package_count?: number;
           pod_image_url?: string | null;
           pod_signature_url?: string | null;
-          consignee_address: Json;
-          consignee_name: string;
-          consignee_phone: string;
-          consignor_address?: Json | null;
-          consignor_name?: string | null;
-          consignor_phone?: string | null;
           service_level: string;
           special_instructions?: string | null;
           status?: string;
@@ -1114,8 +1274,14 @@ export type Database = {
           volumetric_weight?: number | null;
         };
         Update: {
-          cn_number?: string;
           chargeable_weight?: number | null;
+          cn_number?: string;
+          consignee_address?: Json;
+          consignee_name?: string;
+          consignee_phone?: string;
+          consignor_address?: Json | null;
+          consignor_name?: string | null;
+          consignor_phone?: string | null;
           created_at?: string | null;
           current_hub_id?: string | null;
           customer_id?: string;
@@ -1131,12 +1297,6 @@ export type Database = {
           package_count?: number;
           pod_image_url?: string | null;
           pod_signature_url?: string | null;
-          consignee_address?: Json;
-          consignee_name?: string;
-          consignee_phone?: string;
-          consignor_address?: Json | null;
-          consignor_name?: string | null;
-          consignor_phone?: string | null;
           service_level?: string;
           special_instructions?: string | null;
           status?: string;
@@ -1456,13 +1616,70 @@ export type Database = {
       };
     };
     Functions: {
+      arrive_manifest_atomic: {
+        Args: { p_manifest_id: string; p_org_id: string; p_staff_id: string };
+        Returns: {
+          manifest_id: string;
+          manifest_no: string;
+          shipments_updated: number;
+          tracking_events_created: number;
+        }[];
+      };
       can_access_hub: { Args: { hub_id: string }; Returns: boolean };
       can_access_module: { Args: { module_name: string }; Returns: boolean };
-      generate_cn_number:
-        | { Args: never; Returns: string }
-        | { Args: { p_org_id: string }; Returns: string };
+      check_booking_rate_limit: {
+        Args: {
+          p_max_bookings?: number;
+          p_whatsapp_number: string;
+          p_window_minutes?: number;
+        };
+        Returns: boolean;
+      };
+      cleanup_old_booking_rate_limits: { Args: never; Returns: number };
+      close_manifest_atomic: {
+        Args: {
+          p_manifest_id: string;
+          p_notes?: string;
+          p_org_id: string;
+          p_staff_id: string;
+        };
+        Returns: {
+          manifest_id: string;
+          manifest_no: string;
+          shipments_updated: number;
+          total_packages: number;
+          total_shipments: number;
+          total_weight: number;
+          tracking_events_created: number;
+        }[];
+      };
+      depart_manifest_atomic: {
+        Args: { p_manifest_id: string; p_org_id: string; p_staff_id: string };
+        Returns: {
+          manifest_id: string;
+          manifest_no: string;
+          shipments_updated: number;
+          tracking_events_created: number;
+        }[];
+      };
+      generate_cn_number: { Args: { p_org_id: string }; Returns: string };
       generate_invoice_number: { Args: { p_org_id: string }; Returns: string };
+      get_analytics_summary: { Args: { p_org_id: string }; Returns: Json };
       get_current_org_id: { Args: never; Returns: string };
+      get_public_shipment_by_cn: {
+        Args: { cn_code: string };
+        Returns: {
+          cn_number: string;
+          destination_hub_code: string;
+          destination_hub_name: string;
+          events: Json;
+          id: string;
+          mode: string;
+          origin_hub_code: string;
+          origin_hub_name: string;
+          status: string;
+        }[];
+      };
       get_user_hub_id: { Args: never; Returns: string };
       get_user_org_id: { Args: never; Returns: string };
       get_user_permissions: {
@@ -1530,8 +1747,14 @@ export type Database = {
           p_status?: string;
         };
         Returns: {
-          cn_number: string;
           chargeable_weight: number | null;
+          cn_number: string;
+          consignee_address: Json;
+          consignee_name: string;
+          consignee_phone: string;
+          consignor_address: Json | null;
+          consignor_name: string | null;
+          consignor_phone: string | null;
           created_at: string | null;
           current_hub_id: string | null;
           customer_id: string;
@@ -1547,12 +1770,6 @@ export type Database = {
           package_count: number;
           pod_image_url: string | null;
           pod_signature_url: string | null;
-          consignee_address: Json;
-          consignee_name: string;
-          consignee_phone: string;
-          consignor_address: Json | null;
-          consignor_name: string | null;
-          consignor_phone: string | null;
           service_level: string;
           special_instructions: string | null;
           status: string;
@@ -1570,7 +1787,7 @@ export type Database = {
       };
     };
     Enums: {
-      [_ in never]: never;
+      handling_unit_type: 'package' | 'container';
     };
     CompositeTypes: {
       search_result: {
@@ -1702,6 +1919,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      handling_unit_type: ['package', 'container'],
+    },
   },
 } as const;

@@ -2,7 +2,6 @@
  * Customer Service
  * All customer CRUD operations
  */
-/* eslint-disable @typescript-eslint/no-explicit-any -- Supabase client requires any for complex operations */
 
 import { supabase } from '@/lib/supabase';
 import { mapSupabaseError } from '@/lib/errors';
@@ -83,7 +82,7 @@ export const customerService = {
       .insert({
         ...customer,
         org_id: orgId,
-      } as any)
+      })
       .select()
       .single();
 
@@ -94,7 +93,8 @@ export const customerService = {
   async update(id: string, updates: CustomerUpdate): Promise<Customer> {
     const orgId = orgService.getCurrentOrgId();
 
-    const { data, error } = await (supabase.from('customers') as any)
+    const { data, error } = await supabase
+      .from('customers')
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
@@ -111,7 +111,8 @@ export const customerService = {
   async delete(id: string): Promise<void> {
     const orgId = orgService.getCurrentOrgId();
 
-    const { error } = await (supabase.from('customers') as any)
+    const { error } = await supabase
+      .from('customers')
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)
       .eq('org_id', orgId);

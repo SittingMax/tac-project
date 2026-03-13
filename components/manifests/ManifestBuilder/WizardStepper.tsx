@@ -1,6 +1,5 @@
 'use client';
 
-import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Step {
@@ -15,44 +14,34 @@ interface WizardStepperProps {
 
 export function WizardStepper({ steps, currentStep }: WizardStepperProps) {
   return (
-    <nav aria-label="Progress" className="w-full">
-      <ol className="flex items-center justify-between">
-        {steps.map((step, stepIdx) => (
-          <li key={step.name} className="flex items-center flex-1">
-            <div className="flex items-center gap-3">
-              <span
+    <nav aria-label="Progress" className="w-full pb-4 mb-4 border-b border-border/40">
+      <ol className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        {steps.map((step, stepIdx) => {
+          const isCompleted = step.id < currentStep;
+          const isCurrent = step.id === currentStep;
+          const isUpcoming = step.id > currentStep;
+
+          return (
+            <li key={step.name} className="flex items-center shrink-0">
+              <div
                 className={cn(
-                  'flex h-8 w-8 shrink-0 items-center justify-center rounded-none text-sm font-medium transition-colors',
-                  step.id < currentStep
-                    ? 'bg-primary text-primary-foreground'
-                    : step.id === currentStep
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary border border-border text-muted-foreground'
+                  'flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-300',
+                  isCurrent && 'bg-primary/10 text-primary font-semibold',
+                  isCompleted && 'text-muted-foreground',
+                  isUpcoming && 'text-muted-foreground/40 opacity-70'
                 )}
               >
-                {step.id < currentStep ? <Check className="h-4 w-4" /> : step.id}
-              </span>
-              <span
-                className={cn(
-                  'text-sm font-medium transition-colors hidden sm:block',
-                  step.id <= currentStep ? 'text-foreground' : 'text-muted-foreground'
-                )}
-              >
-                {step.name}
-              </span>
-            </div>
-            {stepIdx !== steps.length - 1 && (
-              <div className="flex-1 mx-4">
-                <div
-                  className={cn(
-                    'h-0.5 w-full transition-colors',
-                    step.id < currentStep ? 'bg-primary' : 'bg-border'
-                  )}
-                />
+                <span className="font-mono text-[10px] tracking-widest uppercase">
+                  {String(step.id).padStart(2, '0')}
+                </span>
+                <span className="text-sm tracking-tight">{step.name}</span>
               </div>
-            )}
-          </li>
-        ))}
+              {stepIdx !== steps.length - 1 && (
+                <div className="mx-2 h-[1px] w-6 shrink-0 bg-border/40" />
+              )}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );

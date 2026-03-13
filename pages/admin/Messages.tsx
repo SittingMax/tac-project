@@ -1,17 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { format } from 'date-fns';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { useSearchParams } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { CrudTable } from '@/components/crud/CrudTable';
+import type { ColumnDef } from '@tanstack/react-table';
 import {
   Loader2,
   Mail,
@@ -23,6 +17,8 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
+import { useAuthStore } from '@/store/authStore';
 import {
   Dialog,
   DialogContent,
@@ -46,33 +42,67 @@ interface Message {
 }
 
 export function Messages() {
+  const user = useAuthStore((state) => state.user);
+  const [searchParams] = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const statusFilter = searchParams.get('status');
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
+    if (!user) {
+      setMessages([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
-    const { data, error } = await supabase
+    let query = supabase
       .from('contact_messages')
       .select('*')
       .order('created_at', { ascending: false });
 
+    if (user.orgId) {
+      query = query.or(`org_id.eq.${user.orgId},org_id.is.null`);
+    }
+
+    if (statusFilter === 'unread' || statusFilter === 'read') {
+      query = query.eq('status', statusFilter);
+    }
+
+    const { data, error } = await query;
+
     if (error) {
       toast.error('Failed to fetch messages');
-      console.error(error);
+      logger.error('Messages', 'Error', { error });
     } else {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setMessages((data as any) || []);
     }
     setLoading(false);
-  };
+  }, [statusFilter, user]);
 
   useEffect(() => {
-    fetchMessages();
-  }, []);
+    void fetchMessages();
+  }, [fetchMessages]);
+
+  const applyMessageScope = <T extends { or: (filters: string) => T }>(query: T) => {
+    if (user?.orgId) {
+      return query.or(`org_id.eq.${user.orgId},org_id.is.null`);
+    }
+
+    return query;
+  };
 
   const updateStatus = async (id: string, status: 'read' | 'unread') => {
-    const { error } = await supabase.from('contact_messages').update({ status }).eq('id', id);
+    if (!user) {
+      toast.error('No user context available');
+      return;
+    }
+
+    const { error } = await applyMessageScope(
+      supabase.from('contact_messages').update({ status }).eq('id', id)
+    );
 
     if (error) {
       toast.error('Failed to update status');
@@ -85,10 +115,14 @@ export function Messages() {
   };
 
   const toggleArchive = async (id: string, current: boolean) => {
-    const { error } = await supabase
-      .from('contact_messages')
-      .update({ archived: !current })
-      .eq('id', id);
+    if (!user) {
+      toast.error('No user context available');
+      return;
+    }
+
+    const { error } = await applyMessageScope(
+      supabase.from('contact_messages').update({ archived: !current }).eq('id', id)
+    );
 
     if (error) {
       toast.error('Failed to update archive status');
@@ -104,7 +138,14 @@ export function Messages() {
   const deleteMessage = async (id: string) => {
     if (!confirm('Are you sure you want to delete this message?')) return;
 
-    const { error } = await supabase.from('contact_messages').delete().eq('id', id);
+    if (!user) {
+      toast.error('No user context available');
+      return;
+    }
+
+    const { error } = await applyMessageScope(
+      supabase.from('contact_messages').delete().eq('id', id)
+    );
 
     if (error) {
       toast.error('Failed to delete message');
@@ -130,33 +171,49 @@ export function Messages() {
       return;
     }
 
-    // Clean phone number (remove non-digits, keep +)
     const cleanPhone = selectedMessage.phone.replace(/[^\d+]/g, '');
     const whatsappUrl = `https://wa.me/${cleanPhone}`;
+    const popup = window.open(whatsappUrl, '_blank');
 
-    window.open(whatsappUrl, '_blank');
+    if (!popup) {
+      toast.error('Popup blocked. Please allow popups.');
+    }
+  };
 
-    // Mark as replied if not already
-    if (!selectedMessage.replied) {
-      const { error } = await supabase
+  const markSelectedMessageAsReplied = async () => {
+    if (!selectedMessage || selectedMessage.replied) {
+      return;
+    }
+
+    if (!user) {
+      toast.error('No user context available');
+      return;
+    }
+
+    const repliedAt = new Date().toISOString();
+    const { error } = await applyMessageScope(
+      supabase
         .from('contact_messages')
         .update({
           replied: true,
-          replied_at: new Date().toISOString(),
+          replied_at: repliedAt,
         })
-        .eq('id', selectedMessage.id);
+        .eq('id', selectedMessage.id)
+    );
 
-      if (!error) {
-        const updatedMessage = {
-          ...selectedMessage,
-          replied: true,
-          replied_at: new Date().toISOString(),
-        };
-        setMessages((prev) => prev.map((m) => (m.id === selectedMessage.id ? updatedMessage : m)));
-        setSelectedMessage(updatedMessage);
-        toast.success('Marked as replied');
-      }
+    if (error) {
+      toast.error('Failed to mark message as replied');
+      return;
     }
+
+    const updatedMessage = {
+      ...selectedMessage,
+      replied: true,
+      replied_at: repliedAt,
+    };
+    setMessages((prev) => prev.map((m) => (m.id === selectedMessage.id ? updatedMessage : m)));
+    setSelectedMessage(updatedMessage);
+    toast.success('Marked as replied');
   };
 
   if (loading) {
@@ -167,141 +224,149 @@ export function Messages() {
     );
   }
 
+  const columns: ColumnDef<Message>[] = [
+    {
+      accessorKey: 'created_at',
+      header: 'Date',
+      cell: ({ row }) => (
+        <span className="whitespace-nowrap">
+          {format(new Date(row.original.created_at), 'MMM d, yyyy HH:mm')}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'name',
+      header: 'Name',
+      cell: ({ row }) => <div className="font-medium">{row.original.name}</div>,
+    },
+    {
+      id: 'contact',
+      header: 'Contact',
+      cell: ({ row }) => {
+        const msg = row.original;
+        return (
+          <>
+            {msg.phone && (
+              <div className="flex items-center gap-1 text-sm">
+                <MessageCircle className="h-3 w-3 text-status-success" />
+                {msg.phone}
+              </div>
+            )}
+            {msg.email && !msg.phone && (
+              <div className="text-xs text-muted-foreground">{msg.email}</div>
+            )}
+          </>
+        );
+      },
+    },
+    {
+      accessorKey: 'message',
+      header: 'Subject/Message',
+      cell: ({ row }) => <span className="max-w-md truncate block">{row.original.message}</span>,
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => {
+        const msg = row.original;
+        return (
+          <div className="flex gap-2">
+            <Badge variant={msg.status === 'unread' ? 'default' : 'secondary'}>{msg.status}</Badge>
+            {msg.replied && (
+              <Badge
+                variant="outline"
+                className="bg-status-success/10 text-status-success border-status-success/30"
+              >
+                Replied
+              </Badge>
+            )}
+            {msg.archived && <Badge variant="outline">Archived</Badge>}
+          </div>
+        );
+      },
+    },
+    {
+      id: 'actions',
+      header: () => <div className="text-right">Actions</div>,
+      cell: ({ row }) => {
+        const msg = row.original;
+        return (
+          <div className="text-right space-x-2" onClick={(e) => e.stopPropagation()}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-2 mr-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                openMessage(msg);
+              }}
+            >
+              <Eye className="h-4 w-4" />
+              View
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                updateStatus(msg.id, msg.status === 'unread' ? 'read' : 'unread');
+              }}
+              title={msg.status === 'unread' ? 'Mark as Read' : 'Mark as Unread'}
+            >
+              {msg.status === 'unread' ? (
+                <Mail className="h-4 w-4" />
+              ) : (
+                <CheckCircle className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleArchive(msg.id, msg.archived);
+              }}
+              title={msg.archived ? 'Unarchive' : 'Archive'}
+            >
+              <Archive className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-destructive hover:text-destructive"
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteMessage(msg.id);
+              }}
+              title="Delete"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Messages</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
+          Messages
+        </h1>
         <Button onClick={fetchMessages} variant="outline" size="sm">
           Refresh
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Inbox</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Subject/Message</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {messages.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    No messages found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                messages.map((msg) => (
-                  <TableRow
-                    key={msg.id}
-                    className={`
-                                            cursor-pointer transition-colors hover:bg-muted/50
-                                            ${msg.status === 'unread' ? 'bg-muted/30 font-medium' : ''}
-                                        `}
-                    onClick={() => openMessage(msg)}
-                  >
-                    <TableCell className="whitespace-nowrap">
-                      {format(new Date(msg.created_at), 'MMM d, yyyy HH:mm')}
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium">{msg.name}</div>
-                    </TableCell>
-                    <TableCell>
-                      {msg.phone && (
-                        <div className="flex items-center gap-1 text-sm">
-                          <MessageCircle className="h-3 w-3 text-status-success" />
-                          {msg.phone}
-                        </div>
-                      )}
-                      {msg.email && !msg.phone && (
-                        <div className="text-xs text-muted-foreground">{msg.email}</div>
-                      )}
-                    </TableCell>
-                    <TableCell className="max-w-md truncate">{msg.message}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Badge variant={msg.status === 'unread' ? 'default' : 'secondary'}>
-                          {msg.status}
-                        </Badge>
-                        {msg.replied && (
-                          <Badge
-                            variant="outline"
-                            className="bg-status-success/10 text-status-success border-status-success/30"
-                          >
-                            Replied
-                          </Badge>
-                        )}
-                        {msg.archived && <Badge variant="outline">Archived</Badge>}
-                      </div>
-                    </TableCell>
-                    <TableCell
-                      className="text-right space-x-2"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-8 gap-2 mr-2"
-                        onClick={() => openMessage(msg)}
-                      >
-                        <Eye className="h-4 w-4" />
-                        View
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateStatus(msg.id, msg.status === 'unread' ? 'read' : 'unread');
-                        }}
-                        title={msg.status === 'unread' ? 'Mark as Read' : 'Mark as Unread'}
-                      >
-                        {msg.status === 'unread' ? (
-                          <Mail className="h-4 w-4" />
-                        ) : (
-                          <CheckCircle className="h-4 w-4" />
-                        )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleArchive(msg.id, msg.archived);
-                        }}
-                        title={msg.archived ? 'Unarchive' : 'Archive'}
-                      >
-                        <Archive className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteMessage(msg.id);
-                        }}
-                        title="Delete"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <div className="rounded-xl border border-border/40 overflow-hidden bg-card text-foreground shadow-xs">
+        <div className="p-6 pb-4 border-b border-border/40">
+          <h2 className="text-xl font-semibold tracking-tight">Inbox</h2>
+        </div>
+        <div className="border border-border/40 bg-card rounded-b-xl overflow-hidden shadow-xs border-x-0 border-b-0">
+          <CrudTable columns={columns} data={messages} pageSize={10} onRowClick={openMessage} />
+        </div>
+      </div>
 
       <Dialog open={!!selectedMessage} onOpenChange={(open) => !open && setSelectedMessage(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -349,27 +414,34 @@ export function Messages() {
 
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-muted-foreground">Message</h4>
-                <div className="p-4 bg-muted/30 rounded-none border border-border text-sm leading-relaxed whitespace-pre-wrap">
+                <div className="p-4 bg-muted/30 rounded-md border border-border text-sm leading-relaxed whitespace-pre-wrap">
                   {selectedMessage.message}
                 </div>
               </div>
 
               {/* Reply Action */}
               <div className="pt-4 border-t">
-                {selectedMessage.phone ? (
-                  <Button
-                    className="w-full sm:w-auto bg-status-success hover:bg-status-success/80 text-primary-foreground"
-                    onClick={handleWhatsAppClick}
-                  >
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    Reply via WhatsApp
-                    <ExternalLink className="ml-2 h-3 w-3 opacity-70" />
-                  </Button>
-                ) : (
-                  <div className="p-4 bg-status-warning/10 text-status-warning rounded-none text-sm border border-status-warning/30">
-                    This contact does not have a WhatsApp number associated with it.
-                  </div>
-                )}
+                <div className="flex flex-col sm:flex-row gap-2">
+                  {selectedMessage.phone ? (
+                    <Button
+                      className="w-full sm:w-auto bg-status-success hover:bg-status-success/80 text-primary-foreground"
+                      onClick={handleWhatsAppClick}
+                    >
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      Open WhatsApp
+                      <ExternalLink className="ml-2 h-3 w-3 opacity-70" />
+                    </Button>
+                  ) : (
+                    <div className="p-4 bg-status-warning/10 text-status-warning rounded-md text-sm border border-status-warning/30">
+                      This contact does not have a WhatsApp number associated with it.
+                    </div>
+                  )}
+                  {!selectedMessage.replied && (
+                    <Button variant="outline" onClick={() => void markSelectedMessageAsReplied()}>
+                      Mark as Replied
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           )}

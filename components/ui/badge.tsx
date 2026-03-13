@@ -1,27 +1,21 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { Slot } from 'radix-ui';
+
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-none px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  'group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border border-transparent px-1.5 py-0.5 text-[11px] font-medium tracking-wide whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!',
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-primary/20 text-primary',
-        secondary: 'border-transparent bg-muted text-muted-foreground',
-        destructive: 'badge--exception',
-        success: 'badge--delivered',
-        warning: 'badge--in-transit',
-        outline: 'border-border text-foreground',
-        // Status-specific variants using semantic tokens
-        created: 'badge--created',
-        transit: 'badge--in-transit',
-        delivered: 'badge--delivered',
-        exception: 'badge--exception',
-        manifested: 'badge--manifested',
-        arrived: 'badge--arrived',
-        cancelled: 'badge--cancelled',
-        returned: 'badge--returned',
+        default: 'bg-primary text-primary-foreground [a]:hover:bg-primary/80',
+        secondary: 'bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80',
+        destructive:
+          'bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20',
+        outline: 'border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground',
+        ghost: 'hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50',
+        link: 'text-primary underline-offset-4 hover:underline',
       },
     },
     defaultVariants: {
@@ -30,13 +24,22 @@ const badgeVariants = cva(
   }
 );
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {
-  className?: string;
-}
+function Badge({
+  className,
+  variant = 'default',
+  asChild = false,
+  ...props
+}: React.ComponentProps<'span'> & VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+  const Comp = asChild ? Slot.Root : 'span';
 
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return <div className={cn(badgeVariants({ variant }), className)} {...props} />;
+  return (
+    <Comp
+      data-slot="badge"
+      data-variant={variant}
+      className={cn(badgeVariants({ variant }), className)}
+      {...props}
+    />
+  );
 }
 
 export { Badge, badgeVariants };

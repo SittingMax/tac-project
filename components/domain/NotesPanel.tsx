@@ -25,14 +25,8 @@ import {
 } from '@/components/ui/rich-text-editor';
 import { useNoteStore } from '@/store/noteStore';
 import type { Note, NoteEntityType } from '@/types';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { DialogFooter } from '@/components/ui/dialog';
+import { SizedDialog } from '@/components/ui-core/dialog/sized-dialog';
 
 interface NotesPanelProps {
   entityType: NoteEntityType;
@@ -61,7 +55,7 @@ const NoteItem = memo<NoteItemProps>(({ note, currentUserId, onEdit, onDelete, o
     <>
       <div
         className={cn(
-          'group relative rounded-none border bg-card p-3 transition-all hover:shadow-sm',
+          'group relative rounded-md border bg-card p-4 transition-all hover:shadow-sm',
           note.isPinned && 'border-primary/50 bg-primary/5'
         )}
       >
@@ -91,7 +85,7 @@ const NoteItem = memo<NoteItemProps>(({ note, currentUserId, onEdit, onDelete, o
         </div>
 
         {/* Actions */}
-        <div className="absolute -right-1 -top-1 flex items-center gap-0.5 rounded-none border bg-background p-0.5 opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
+        <div className="absolute -right-1 -top-1 flex items-center gap-0.5 rounded-md border bg-background p-0.5 opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
           <Button
             variant="ghost"
             size="sm"
@@ -127,30 +121,28 @@ const NoteItem = memo<NoteItemProps>(({ note, currentUserId, onEdit, onDelete, o
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <DialogContent className="sm:max-w-[400px]">
-          <DialogHeader>
-            <DialogTitle>Delete Note</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this note? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                onDelete(note.id);
-                setShowDeleteConfirm(false);
-              }}
-            >
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <SizedDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="Delete Note"
+        description="Are you sure you want to delete this note? This action cannot be undone."
+        size="sm"
+      >
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              onDelete(note.id);
+              setShowDeleteConfirm(false);
+            }}
+          >
+            Delete
+          </Button>
+        </DialogFooter>
+      </SizedDialog>
     </>
   );
 });
@@ -231,11 +223,11 @@ export const NotesPanel = memo<NotesPanelProps>(
     }, []);
 
     return (
-      <div className={cn('rounded-none border bg-card', className)}>
+      <div className={cn('rounded-md border bg-card', className)}>
         {/* Header */}
         <div
           className={cn(
-            'flex items-center justify-between border-b px-4 py-3',
+            'flex items-center justify-between border-b px-4 py-2',
             collapsible && 'cursor-pointer hover:bg-muted/50'
           )}
           onClick={collapsible ? () => setIsCollapsed(!isCollapsed) : undefined}
@@ -256,7 +248,7 @@ export const NotesPanel = memo<NotesPanelProps>(
           <div className="flex items-center gap-2 min-w-0">
             <MessageSquare className="h-4 w-4 text-muted-foreground shrink-0" />
             <h3 className="text-sm font-semibold truncate">{title}</h3>
-            <span className="rounded-none bg-muted px-2 py-0.5 text-xs text-muted-foreground shrink-0">
+            <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground shrink-0">
               {notes.length}
             </span>
           </div>
@@ -287,7 +279,7 @@ export const NotesPanel = memo<NotesPanelProps>(
         {/* Notes List */}
         {!isCollapsed && (
           <div className="p-4">
-            <div className="space-y-3 overflow-y-auto pr-1" style={{ maxHeight }}>
+            <div className="space-y-4 overflow-y-auto pr-1" style={{ maxHeight }}>
               {notes.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
                   <MessageSquare className="mb-2 h-8 w-8 text-muted-foreground/50" />
@@ -318,70 +310,66 @@ export const NotesPanel = memo<NotesPanelProps>(
         )}
 
         {/* Add / Edit Note — Dialog */}
-        <Dialog
+        <SizedDialog
           open={isAdding || !!editingNote}
           onOpenChange={(open) => {
             if (!open) handleCancel();
           }}
+          title={editingNote ? 'Edit Note' : 'New Note'}
+          description={
+            editingNote
+              ? 'Update the content of this note.'
+              : 'Write a new internal note for this record.'
+          }
+          size="md"
         >
-          <DialogContent className="sm:max-w-[560px]">
-            <DialogHeader>
-              <DialogTitle>{editingNote ? 'Edit Note' : 'New Note'}</DialogTitle>
-              <DialogDescription>
-                {editingNote
-                  ? 'Update the content of this note.'
-                  : 'Write a new internal note for this record.'}
-              </DialogDescription>
-            </DialogHeader>
+          <div className="py-2">
+            <RichTextEditor
+              ref={editorRef}
+              content={content}
+              onChange={setContent}
+              placeholder="Write your note..."
+              toolbarVariant="minimal"
+              minHeight="160px"
+              maxHeight="320px"
+              autofocus
+            />
+          </div>
 
-            <div className="py-2">
-              <RichTextEditor
-                ref={editorRef}
-                content={content}
-                onChange={setContent}
-                placeholder="Write your note..."
-                toolbarVariant="minimal"
-                minHeight="160px"
-                maxHeight="320px"
-                autofocus
-              />
-            </div>
-
-            <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 sm:justify-between">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn('gap-1.5 text-xs', isInternal && 'text-status-warning')}
-                onClick={() => setIsInternal(!isInternal)}
-              >
-                {isInternal ? (
-                  <>
-                    <Lock className="h-3.5 w-3.5" />
-                    Internal Only
-                  </>
-                ) : (
-                  <>
-                    <Unlock className="h-3.5 w-3.5" />
-                    Visible to All
-                  </>
-                )}
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 sm:justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn('gap-1.5 text-xs', isInternal && 'text-status-warning')}
+              onClick={() => setIsInternal(!isInternal)}
+            >
+              {isInternal ? (
+                <>
+                  <Lock className="h-3.5 w-3.5" />
+                  Internal Only
+                </>
+              ) : (
+                <>
+                  <Unlock className="h-3.5 w-3.5" />
+                  Visible to All
+                </>
+              )}
+            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={handleCancel}>
+                Cancel
               </Button>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleCancel}>
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={editingNote ? handleUpdateNote : handleCreateNote}
-                  disabled={!content.trim() || content === '<p></p>'}
-                >
-                  <Check className="h-3.5 w-3.5 mr-1.5" />
-                  {editingNote ? 'Update' : 'Save Note'}
-                </Button>
-              </div>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              <Button
+                size="sm"
+                onClick={editingNote ? handleUpdateNote : handleCreateNote}
+                disabled={!content.trim() || content === '<p></p>'}
+              >
+                <Check className="h-3.5 w-3.5 mr-1.5" />
+                {editingNote ? 'Update' : 'Save Note'}
+              </Button>
+            </div>
+          </DialogFooter>
+        </SizedDialog>
       </div>
     );
   }

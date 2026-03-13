@@ -77,9 +77,9 @@ export const CargoStep = ({ form, setShowLabelPreview }: Props) => {
         </div>
       </div>
 
-      <div className="p-6 bg-muted/50 rounded-none border border-border space-y-6">
+      <div className="p-6 bg-muted/50 rounded-md border border-border space-y-6">
         {/* Dimensions Row */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <Label className="flex gap-2">
             <Ruler className="w-4 h-4" /> Package Dimensions (L × W × H in cm)
           </Label>
@@ -116,7 +116,7 @@ export const CargoStep = ({ form, setShowLabelPreview }: Props) => {
 
         {/* Weights Row */}
         <div className="grid grid-cols-2 gap-6 pt-4 border-t border-border">
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label className="flex gap-2">
               <Scale className="w-4 h-4" /> Actual Weight
             </Label>
@@ -132,7 +132,7 @@ export const CargoStep = ({ form, setShowLabelPreview }: Props) => {
               </span>
             </div>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label className="flex gap-2 text-primary">
               <CheckCircle className="w-4 h-4" /> Charged Weight
             </Label>

@@ -22,7 +22,7 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
 
   return (
     <div className="space-y-6 py-2">
-      <Card className="p-6 border-t-4 border-t-primary rounded-none">
+      <Card className="p-6 border-t-4 border-t-primary rounded-md">
         <SectionHeader icon={Calculator} title="Freight & Charges" />
 
         <div className="grid grid-cols-2 gap-6 mb-6">
@@ -80,7 +80,7 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
               <Input
                 type="number"
                 {...form.register('discount')}
-                className="pl-10 text-right text-status-success font-bold bg-status-success/5 border-status-success/30 rounded-none"
+                className="pl-10 text-right text-status-success font-bold bg-status-success/5 border-status-success/30 rounded-md"
               />
             </div>
           </div>
@@ -88,16 +88,16 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
       </Card>
 
       {/* Summary Panel */}
-      <div className="bg-gradient-to-br from-muted/60 to-muted/30 p-6 rounded-none border border-border shadow-sm">
+      <div className="bg-gradient-to-br from-muted/60 to-muted/30 p-6 rounded-md border border-border shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-border/50">
               <span className="text-sm text-muted-foreground">Subtotal</span>
               <span className="font-semibold text-foreground">{formatCurrency(subtotal)}</span>
             </div>
 
             <div className="flex justify-between items-center py-2">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <Controller
                     control={form.control}
@@ -139,18 +139,18 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
             </div>
 
             {balance > 0 && balance !== total && (
-              <div className="flex justify-between items-center py-2 bg-status-warning/10 px-3 rounded-none border border-status-warning/20">
+              <div className="flex justify-between items-center py-2 bg-status-warning/10 px-2 rounded-md border border-status-warning/20">
                 <span className="text-sm font-medium text-status-warning">Balance Due</span>
                 <span className="font-bold text-status-warning">{formatCurrency(balance)}</span>
               </div>
             )}
           </div>
 
-          <div className="flex flex-col items-end justify-center bg-primary/5 rounded-none p-6 border border-primary/20">
+          <div className="flex flex-col items-end justify-center bg-primary/5 rounded-md p-6 border border-primary/20">
             <div className="text-xs uppercase text-primary/70 tracking-wider font-bold mb-1">
               Grand Total
             </div>
-            <div className="text-4xl font-black text-primary tracking-tight">
+            <div className="text-4xl font-semibold text-primary tracking-tight">
               {formatCurrency(total)}
             </div>
             <div className="text-xs text-muted-foreground mt-2">

@@ -5,6 +5,7 @@ import { CrudRowActions } from '@/components/crud/CrudRowActions';
 import { Badge } from '@/components/ui/badge';
 import { Mail, Phone, Building, User, FileText } from 'lucide-react';
 import { Customer } from '@/hooks/useCustomers';
+import { IdBadge } from '@/components/ui-core/data/id-badge';
 
 export interface CustomersColumnsParams {
   onEdit: (row: Customer) => void;
@@ -21,8 +22,8 @@ export function getCustomersColumns(params: CustomersColumnsParams): ColumnDef<C
       accessorKey: 'name',
       header: 'Customer',
       cell: ({ row }) => (
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-none bg-muted flex items-center justify-center text-primary">
+        <div className="flex items-center gap-4">
+          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center text-primary">
             {row.original.type === 'BUSINESS' ? (
               <Building className="w-4 h-4" />
             ) : (
@@ -30,12 +31,12 @@ export function getCustomersColumns(params: CustomersColumnsParams): ColumnDef<C
             )}
           </div>
           <div>
-            <div className="font-medium text-foreground">
-              {row.original.companyName || row.original.name}
-            </div>
-            <div className="text-xs text-muted-foreground font-mono">
-              {row.original.customer_code}
-            </div>
+            <div className="font-medium text-foreground">{row.original.name}</div>
+            <IdBadge
+              entity="customer"
+              idValue={row.original.id}
+              cnNumber={row.original.customer_code}
+            />
           </div>
         </div>
       ),
@@ -46,7 +47,7 @@ export function getCustomersColumns(params: CustomersColumnsParams): ColumnDef<C
       cell: ({ row }) => (
         <div>
           <div className="text-sm text-muted-foreground">{row.original.name}</div>
-          <div className="flex gap-3 mt-1 text-xs">
+          <div className="flex gap-4 mt-1 text-xs">
             {row.original.email && (
               <a
                 href={`mailto:${row.original.email}`}
@@ -66,25 +67,9 @@ export function getCustomersColumns(params: CustomersColumnsParams): ColumnDef<C
       ),
     },
     {
-      accessorKey: 'tier',
-      header: 'Tier',
-      cell: ({ row }) => {
-        const tier = row.original.tier || 'STANDARD';
-        return (
-          <Badge
-            variant={tier === 'ENTERPRISE' ? 'default' : 'secondary'}
-            className={
-              tier === 'ENTERPRISE'
-                ? 'bg-primary text-primary-foreground'
-                : tier === 'PRIORITY'
-                  ? 'bg-status-warning/20 text-status-warning'
-                  : ''
-            }
-          >
-            {tier}
-          </Badge>
-        );
-      },
+      accessorKey: 'type',
+      header: 'Type',
+      cell: ({ row }) => <Badge variant="secondary">{row.original.type.replace(/_/g, ' ')}</Badge>,
     },
     {
       accessorKey: 'gstin',

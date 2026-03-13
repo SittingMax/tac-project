@@ -11,7 +11,7 @@ type ExtendedShipment = Shipment & {
 };
 
 export async function generateShipmentLabel(shipment: Shipment): Promise<string> {
-  logger.debug('[Label] Starting generation', { awb: shipment.awb });
+  logger.debug('generateShipmentLabel', 'Starting generation', { awb: shipment.awb });
 
   if (!shipment || !shipment.awb) {
     throw new Error('Invalid shipment data: missing CN');
@@ -25,7 +25,7 @@ export async function generateShipmentLabel(shipment: Shipment): Promise<string>
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-  logger.debug('[Label] PDF document created, embedding fonts...');
+  logger.debug('generateShipmentLabel', 'PDF document created, embedding fonts...');
 
   // Background and Main Border
   page.drawRectangle({ x: 0, y: 0, width, height, color: C.WHITE });
@@ -57,13 +57,13 @@ export async function generateShipmentLabel(shipment: Shipment): Promise<string>
   // Barcode & AWB
   y -= 30;
   const barcodeDataUrl = await generate1DBarcode(shipment.awb);
-  logger.debug('[Label] Barcode generated', { success: !!barcodeDataUrl });
+  logger.debug('generateShipmentLabel', 'Barcode generated', { success: !!barcodeDataUrl });
   if (barcodeDataUrl) {
     try {
       const barcodeImg = await pdfDoc.embedPng(barcodeDataUrl);
       page.drawImage(barcodeImg, { x: 16, y: y - 40, width: 160, height: 45 });
     } catch (barcodeErr) {
-      console.error('[Label] Failed to embed barcode image:', barcodeErr);
+      logger.warn('generateShipmentLabel', 'Failed to embed barcode image', { error: barcodeErr });
       // Continue without barcode
     }
   }
@@ -385,17 +385,17 @@ export async function generateShipmentLabel(shipment: Shipment): Promise<string>
   page.drawText('W', { x: xBrand + 14, y: 8, size: 12, font: fontBold, color: C.BLACK });
   page.drawText('EE', { x: xBrand + 30, y: 8, size: 12, font, color: C.BLACK });
 
-  logger.debug('[Label] Saving PDF...');
+  logger.debug('generateShipmentLabel', 'Saving PDF...');
   const pdfBytes = await pdfDoc.save();
   const url = URL.createObjectURL(new Blob([pdfBytes as BlobPart], { type: 'application/pdf' }));
-  logger.debug('[Label] PDF generated successfully');
+  logger.debug('generateShipmentLabel', 'PDF generated successfully');
   return url;
 }
 
 // --- LABEL PDF GENERATOR (Pixel-matched to LabelGenerator.tsx HTML preview) ---
 // All dimensions derived from LabelGenerator.tsx CSS at scale 0.75 (288pt / 384px)
 export async function generateLabelPDF(data: LabelData): Promise<string> {
-  logger.debug('[LabelPDF] Starting generation', { awb: data.awb });
+  logger.debug('generateLabelPDF', 'Starting generation', { awb: data.awb });
   if (!data?.awb) throw new Error('Invalid label data: missing CN');
 
   const pdfDoc = await PDFDocument.create();
@@ -515,7 +515,7 @@ export async function generateLabelPDF(data: LabelData): Promise<string> {
         height: 30,
       });
     } catch (err) {
-      console.error('[LabelPDF] Barcode embed failed:', err);
+      logger.warn('generateLabelPDF', 'Barcode embed failed', { error: err });
     }
   }
 
@@ -866,7 +866,7 @@ export async function generateLabelPDF(data: LabelData): Promise<string> {
   // Save
   const pdfBytes = await pdfDoc.save();
   const url = URL.createObjectURL(new Blob([pdfBytes as BlobPart], { type: 'application/pdf' }));
-  logger.debug('[LabelPDF] PDF generated successfully');
+  logger.debug('generateLabelPDF', 'PDF generated successfully');
   return url;
 }
 

@@ -111,12 +111,12 @@ export const LiveFleetMap = () => {
             style={{ left: `${hub.x}%`, top: `${hub.y}%` }}
           >
             {/* Ping animation */}
-            <div className="absolute inset-0 rounded-none bg-primary/30 animate-ping group-hover:bg-primary/50" />
+            <div className="absolute inset-0 rounded-full bg-primary/30 animate-ping group-hover:bg-primary/50" />
 
             {/* Core dot */}
             <div
               className={cn(
-                'relative w-4 h-4 rounded-none border-2 border-background shadow-lg transition-colors z-10',
+                'relative w-4 h-4 rounded-full border-2 border-background shadow-lg transition-colors z-10',
                 'bg-primary/80 group-hover:bg-primary'
               )}
             />
@@ -124,7 +124,7 @@ export const LiveFleetMap = () => {
             {/* Label */}
             <div
               className={cn(
-                'absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 rounded-none bg-background/90 text-xs font-medium border border-border shadow-sm whitespace-nowrap transition-all z-20',
+                'absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 rounded-md bg-background/90 text-xs font-medium border border-border shadow-sm whitespace-nowrap transition-all z-20',
                 'opacity-70 scale-95 group-hover:opacity-100 group-hover:scale-100'
               )}
             >

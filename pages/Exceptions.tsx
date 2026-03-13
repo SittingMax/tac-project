@@ -1,6 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -13,20 +16,21 @@ import {
   useCreateException,
   useResolveException,
   ExceptionWithRelations,
-} from '../hooks/useExceptions';
-import { useFindShipmentByCN } from '../hooks/useShipments';
-import { useRealtimeExceptions } from '../hooks/useRealtime';
+} from '@/hooks/useExceptions';
+import { useFindShipmentByCN } from '@/hooks/useShipments';
+import { useRealtimeExceptions } from '@/hooks/useRealtime';
 import { AlertCircle, CheckCircle, Plus, ShieldAlert, Clock } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
-import { StatusBadge } from '../components/domain/StatusBadge';
-import { KPICard } from '../components/domain/KPICard';
+import { StatusBadge } from '@/components/domain/StatusBadge';
+import { KPICard } from '@/components/domain/KPICard';
 import { EmptyExceptions } from '@/components/ui/empty-state';
 import { CrudTable } from '@/components/crud/CrudTable';
+import { IdBadge } from '@/components/ui-core/data/id-badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { PageHeader } from '@/components/ui/page-header';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -52,15 +56,37 @@ const resolveSchema = z.object({
 type RaiseFormData = z.infer<typeof raiseSchema>;
 type ResolveFormData = z.infer<typeof resolveSchema>;
 
+const STATUS_FILTER_OPTIONS = [
+  { value: 'ALL', label: 'All Statuses' },
+  { value: 'OPEN', label: 'Open' },
+  { value: 'IN_PROGRESS', label: 'In Progress' },
+  { value: 'RESOLVED', label: 'Resolved' },
+  { value: 'CLOSED', label: 'Closed' },
+] as const;
+
+const SEVERITY_FILTER_OPTIONS = [
+  { value: 'ALL', label: 'All Severities' },
+  { value: 'LOW', label: 'Low' },
+  { value: 'MEDIUM', label: 'Medium' },
+  { value: 'HIGH', label: 'High' },
+  { value: 'CRITICAL', label: 'Critical' },
+] as const;
+
 export const Exceptions: React.FC = () => {
-  const { data: exceptions = [], isLoading } = useExceptions();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const statusFilter = searchParams.get('status') ?? 'ALL';
+  const severityFilter = searchParams.get('severity') ?? 'ALL';
+
+  const { data: exceptions = [], isLoading } = useExceptions({
+    status: statusFilter !== 'ALL' ? statusFilter : undefined,
+    severity: severityFilter !== 'ALL' ? severityFilter : undefined,
+  });
   const createMutation = useCreateException();
   const resolveMutation = useResolveException();
   const findShipment = useFindShipmentByCN();
   const [isRaiseModalOpen, setIsRaiseModalOpen] = useState(false);
   const [selectedException, setSelectedException] = useState<ExceptionWithRelations | null>(null);
 
-  // Enable realtime updates
   useRealtimeExceptions();
 
   const {
@@ -70,33 +96,29 @@ export const Exceptions: React.FC = () => {
     control: controlRaise,
   } = useForm<RaiseFormData>({
     resolver: zodResolver(raiseSchema),
-    defaultValues: {
-      type: 'DAMAGE',
-      severity: 'MEDIUM',
-    },
+    defaultValues: { type: 'DAMAGE', severity: 'MEDIUM' },
   });
 
   const {
     register: registerResolve,
     handleSubmit: handleSubmitResolve,
     reset: resetResolve,
-  } = useForm<ResolveFormData>({
-    resolver: zodResolver(resolveSchema),
-  });
+  } = useForm<ResolveFormData>({ resolver: zodResolver(resolveSchema) });
 
   const columns: ColumnDef<ExceptionWithRelations>[] = useMemo(
     () => [
       {
         accessorKey: 'id',
         header: 'ID',
-        cell: ({ row }) => <span className="font-mono text-xs">{row.getValue('id')}</span>,
+        cell: ({ row }) => <IdBadge entity="exception" idValue={row.getValue('id')} />,
       },
       {
-        id: 'CN Number',
+        id: 'cn_number',
         header: 'CN Number',
+        accessorFn: (row) => row.shipment?.cn_number ?? '',
         cell: ({ row }) => (
           <span className="font-mono font-bold text-primary">
-            {row.original.shipment?.cn_number || 'N/A'}
+            {row.getValue('cn_number') || 'N/A'}
           </span>
         ),
       },
@@ -139,7 +161,7 @@ export const Exceptions: React.FC = () => {
           if (ex.status === 'OPEN') {
             return (
               <Button variant="outline" size="sm" onClick={() => setSelectedException(ex)}>
-                <CheckCircle className="w-4 h-4 mr-1" /> Resolve
+                <CheckCircle className="size-4" data-icon="inline-start" /> Resolve
               </Button>
             );
           }
@@ -156,14 +178,11 @@ export const Exceptions: React.FC = () => {
   ).length;
 
   const onRaiseSubmit = async (data: RaiseFormData) => {
-    // Look up shipment by AWB via hook
     const shipmentData = await findShipment.mutateAsync(data.awb);
-
     if (!shipmentData) {
       toast.error('Shipment not found for the given CN Number.');
       return;
     }
-
     await createMutation.mutateAsync({
       shipment_id: shipmentData.id,
       cn_number: data.awb,
@@ -183,54 +202,98 @@ export const Exceptions: React.FC = () => {
     }
   };
 
+  const updateFilterParam = (key: 'status' | 'severity', value: string) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (value === 'ALL') {
+      nextParams.delete(key);
+    } else {
+      nextParams.set(key, value);
+    }
+    setSearchParams(nextParams);
+  };
+
+  const clearFilters = () => {
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete('status');
+    nextParams.delete('severity');
+    setSearchParams(nextParams);
+  };
+
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
-      <div className="flex justify-between items-end border-b border-border/40 pb-4">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
-            Logistics Exceptions<span className="text-destructive">.</span>
-          </h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
-            Track and resolve anomalies
-          </p>
-        </div>
-        <Button
-          variant="destructive"
-          onClick={() => setIsRaiseModalOpen(true)}
-          className="rounded-none font-mono text-xs uppercase tracking-widest px-8"
-        >
-          <Plus className="w-4 h-4 mr-2" /> Init Exception
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+      <PageHeader title="Exceptions" description="Track and resolve shipment anomalies">
+        <Button variant="destructive" onClick={() => setIsRaiseModalOpen(true)}>
+          <Plus data-icon="inline-start" /> Raise Exception
         </Button>
-      </div>
+      </PageHeader>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <KPICard
           title="Open Exceptions"
           value={openCount}
-          icon={<AlertCircle className="w-5 h-5" />}
+          icon={<AlertCircle className="size-5" />}
           trend={openCount > 0 ? 'down' : 'neutral'}
         />
         <KPICard
           title="Critical Issues"
           value={criticalCount}
-          icon={<ShieldAlert className="w-5 h-5" />}
+          icon={<ShieldAlert className="size-5" />}
           trend={criticalCount > 0 ? 'down' : 'neutral'}
         />
         <KPICard
           title="Total Exceptions"
           value={exceptions.length}
-          icon={<Clock className="w-5 h-5" />}
+          icon={<Clock className="size-5" />}
         />
       </div>
 
       <CrudTable
         columns={columns}
         data={exceptions}
-        searchKey="awb"
+        searchKey="cn_number"
         searchPlaceholder="Search by CN..."
         isLoading={isLoading}
         emptyState={<EmptyExceptions />}
         emptyMessage="No exceptions found."
+        toolbar={
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <Select
+              value={statusFilter}
+              onValueChange={(value) => updateFilterParam('status', value)}
+            >
+              <SelectTrigger className="w-full sm:w-[160px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_FILTER_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={severityFilter}
+              onValueChange={(value) => updateFilterParam('severity', value)}
+            >
+              <SelectTrigger className="w-full sm:w-[170px]">
+                <SelectValue placeholder="Severity" />
+              </SelectTrigger>
+              <SelectContent>
+                {SEVERITY_FILTER_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {(statusFilter !== 'ALL' || severityFilter !== 'ALL') && (
+              <Button variant="outline" onClick={clearFilters}>
+                Clear Filters
+              </Button>
+            )}
+          </div>
+        }
       />
 
       {/* Raise Modal */}
@@ -239,18 +302,18 @@ export const Exceptions: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Raise New Exception</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmitRaise(onRaiseSubmit)} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1.5">
-                CN Number
-              </label>
-              <Input {...registerRaise('awb')} placeholder="Scan or type CN Number" />
+          <form onSubmit={handleSubmitRaise(onRaiseSubmit)} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="raise-awb">CN Number</Label>
+              <Input
+                id="raise-awb"
+                {...registerRaise('awb')}
+                placeholder="Scan or type CN Number"
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1.5">
-                  Type
-                </label>
+              <div className="flex flex-col gap-1.5">
+                <Label>Type</Label>
                 <Controller
                   control={controlRaise}
                   name="type"
@@ -272,10 +335,8 @@ export const Exceptions: React.FC = () => {
                   )}
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1.5">
-                  Severity
-                </label>
+              <div className="flex flex-col gap-1.5">
+                <Label>Severity</Label>
                 <Controller
                   control={controlRaise}
                   name="severity"
@@ -295,16 +356,19 @@ export const Exceptions: React.FC = () => {
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1.5">
-                Description
-              </label>
-              <Input {...registerRaise('description')} placeholder="Details of the issue..." />
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="raise-description">Description</Label>
+              <Textarea
+                id="raise-description"
+                {...registerRaise('description')}
+                placeholder="Details of the issue..."
+                rows={3}
+              />
             </div>
             <Button
               type="submit"
               variant="destructive"
-              className="w-full mt-4"
+              className="w-full"
               disabled={createMutation.isPending}
             >
               {createMutation.isPending ? 'Reporting...' : 'Report Exception'}
@@ -324,20 +388,23 @@ export const Exceptions: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Resolve Exception</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmitResolve(onResolveSubmit)} className="space-y-4">
-            <div className="bg-muted/50 p-4 rounded-none text-sm mb-4 border border-border">
+          <form onSubmit={handleSubmitResolve(onResolveSubmit)} className="flex flex-col gap-4">
+            <div className="bg-muted/50 p-4 rounded-md text-sm border border-border">
               <div className="font-medium text-foreground">
                 Exception: {selectedException?.type}
               </div>
               <div className="text-muted-foreground mt-1">{selectedException?.description}</div>
             </div>
-            <div>
-              <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-1.5">
-                Resolution Note
-              </label>
-              <Input {...registerResolve('note')} placeholder="How was this resolved?" />
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="resolve-note">Resolution Note</Label>
+              <Textarea
+                id="resolve-note"
+                {...registerResolve('note')}
+                placeholder="How was this resolved?"
+                rows={3}
+              />
             </div>
-            <Button type="submit" className="w-full mt-4" disabled={resolveMutation.isPending}>
+            <Button type="submit" className="w-full" disabled={resolveMutation.isPending}>
               {resolveMutation.isPending ? 'Resolving...' : 'Confirm Resolution'}
             </Button>
           </form>

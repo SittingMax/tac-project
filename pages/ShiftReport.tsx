@@ -16,7 +16,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/ui/page-header';
 import {
   Package,
   Truck,
@@ -46,74 +49,56 @@ export default function ShiftReport() {
   const exportMutation = useExportShiftReport();
 
   const handleExport = () => {
-    if (report) {
-      exportMutation.mutate(report);
-    }
+    if (report) exportMutation.mutate(report);
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-border/40 pb-4 mb-8">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
-            Shift Handover<span className="text-primary">.</span>
-          </h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
-            Operations summary for designated duration
-          </p>
-        </div>
+    <div className="flex flex-col gap-6 pb-24">
+      <PageHeader title="Shift Handover" description="Operations summary for designated duration">
+        <Select value={shiftHours} onValueChange={(v) => setShiftHours(v as ShiftDuration)}>
+          <SelectTrigger className="w-[140px] h-10">
+            <SelectValue placeholder="DURATION" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="4">Last 4 hours</SelectItem>
+            <SelectItem value="8">Last 8 hours</SelectItem>
+            <SelectItem value="12">Last 12 hours</SelectItem>
+            <SelectItem value="24">Last 24 hours</SelectItem>
+          </SelectContent>
+        </Select>
 
-        <div className="flex items-center gap-3">
-          <Select value={shiftHours} onValueChange={(v) => setShiftHours(v as ShiftDuration)}>
-            <SelectTrigger className="w-[140px] rounded-none font-mono text-xs uppercase tracking-widest h-10 border-border bg-background">
-              <SelectValue placeholder="DURATION" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="4">Last 4 hours</SelectItem>
-              <SelectItem value="8">Last 8 hours</SelectItem>
-              <SelectItem value="12">Last 12 hours</SelectItem>
-              <SelectItem value="24">Last 24 hours</SelectItem>
-            </SelectContent>
-          </Select>
+        <Button
+          variant="outline"
+          size="icon"
+          className="size-10"
+          onClick={() => refetch()}
+          disabled={isFetching}
+        >
+          <RefreshCw className={`size-4 ${isFetching ? 'animate-spin' : ''}`} />
+        </Button>
 
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-none h-10 w-10 border-border"
-            onClick={() => refetch()}
-            disabled={isFetching}
-          >
-            <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
-          </Button>
-
-          <Button
-            className="rounded-none font-mono uppercase tracking-widest text-xs h-10 px-6"
-            onClick={handleExport}
-            disabled={!report || exportMutation.isPending}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export Data
-          </Button>
-        </div>
-      </div>
+        <Button onClick={handleExport} disabled={!report || exportMutation.isPending}>
+          <Download data-icon="inline-start" /> Export Data
+        </Button>
+      </PageHeader>
 
       {/* Shift Period Info */}
       {report && (
-        <Card className="rounded-none border-border shadow-none bg-muted/5">
+        <Card>
           <CardContent className="py-4 px-6">
-            <div className="flex flex-wrap items-center gap-4 text-xs font-mono uppercase tracking-widest">
-              <Clock className="h-4 w-4 text-primary" />
+            <div className="flex flex-wrap items-center gap-4 text-sm">
+              <Clock className="size-4 text-primary" />
               <span className="text-muted-foreground">Period:</span>
               <span className="font-bold text-foreground">
                 {format(new Date(report.shiftPeriod.start), 'PPp')}
               </span>
-              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              <ArrowRight className="size-4 text-muted-foreground" />
               <span className="font-bold text-foreground">
                 {format(new Date(report.shiftPeriod.end), 'PPp')}
               </span>
-              <span className="bg-primary/10 text-primary border border-primary/30 px-2 py-0.5 ml-auto">
-                {report.shiftPeriod.durationHours} HRS
-              </span>
+              <Badge variant="outline" className="ml-auto border-primary/30 text-primary">
+                {report.shiftPeriod.durationHours} hrs
+              </Badge>
             </div>
           </CardContent>
         </Card>
@@ -134,60 +119,64 @@ export default function ShiftReport() {
         </div>
       ) : report ? (
         <>
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40 border-y border-border/40 my-8">
-            <Card className="rounded-none border-0 shadow-none bg-background p-6">
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+          {/* Summary Cards — full shadcn/ui CardHeader / CardContent composition */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   Shipments
-                </span>
-                <Package className="h-4 w-4 text-primary opacity-50" />
-              </div>
-              <div className="text-3xl font-black tracking-tighter">{report.shipments.total}</div>
-              <p className="text-xs text-muted-foreground font-mono mt-2">
-                {report.shipments.created} CR / {report.shipments.delivered} DLV
-              </p>
+                </CardTitle>
+                <Package className="size-4 text-primary opacity-50" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-semibold">{report.shipments.total}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {report.shipments.created} created / {report.shipments.delivered} delivered
+                </p>
+              </CardContent>
             </Card>
 
-            <Card className="rounded-none border-0 shadow-none bg-background p-6">
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   Manifests
-                </span>
-                <Truck className="h-4 w-4 text-primary opacity-50" />
-              </div>
-              <div className="text-3xl font-black tracking-tighter">{report.manifests.total}</div>
-              <p className="text-xs text-muted-foreground font-mono mt-2">
-                {report.manifests.closed} CLS / {report.manifests.departed} DPT
-              </p>
+                </CardTitle>
+                <Truck className="size-4 text-primary opacity-50" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-semibold">{report.manifests.total}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {report.manifests.closed} closed / {report.manifests.departed} departed
+                </p>
+              </CardContent>
             </Card>
 
-            <Card className="rounded-none border-0 shadow-none bg-background p-6">
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-destructive">
-                  Exceptions
-                </span>
-                <AlertTriangle className="h-4 w-4 text-destructive opacity-50" />
-              </div>
-              <div className="text-3xl font-black tracking-tighter text-destructive">
-                {report.exceptions.total}
-              </div>
-              <p className="text-xs text-destructive/80 font-mono mt-2">
-                {report.exceptions.resolved} RSV / {report.exceptions.pending} PND
-              </p>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-destructive">Exceptions</CardTitle>
+                <AlertTriangle className="size-4 text-destructive opacity-50" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-semibold text-destructive">
+                  {report.exceptions.total}
+                </div>
+                <p className="text-xs text-destructive/80 mt-1">
+                  {report.exceptions.resolved} resolved / {report.exceptions.pending} pending
+                </p>
+              </CardContent>
             </Card>
 
-            <Card className="rounded-none border-0 shadow-none bg-background p-6">
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                  Scans
-                </span>
-                <ScanLine className="h-4 w-4 text-primary opacity-50" />
-              </div>
-              <div className="text-3xl font-black tracking-tighter">{report.scans.total}</div>
-              <p className="text-xs text-muted-foreground font-mono mt-2">
-                {report.scans.uniqueShipments} UQ
-              </p>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Scans</CardTitle>
+                <ScanLine className="size-4 text-primary opacity-50" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-semibold">{report.scans.total}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {report.scans.uniqueShipments} unique shipments
+                </p>
+              </CardContent>
             </Card>
           </div>
 
@@ -200,19 +189,17 @@ export default function ShiftReport() {
                 <CardDescription>Distribution of shipment statuses</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                   {Object.entries(report.shipments.byStatus).map(([status, count]) => (
                     <div key={status} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="min-w-[120px] justify-center">
-                          {status.replace(/_/g, ' ')}
-                        </Badge>
-                      </div>
+                      <Badge variant="outline" className="min-w-[120px] justify-center">
+                        {status.replace(/_/g, ' ')}
+                      </Badge>
                       <span className="font-medium">{count}</span>
                     </div>
                   ))}
                   {Object.keys(report.shipments.byStatus).length === 0 && (
-                    <p className="text-sm text-muted-foreground">No shipment activity</p>
+                    <EmptyState icon={Package} title="No shipment activity" className="p-4 py-8" />
                   )}
                 </div>
               </CardContent>
@@ -225,10 +212,10 @@ export default function ShiftReport() {
                 <CardDescription>Items requiring attention for next shift</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-none">
-                    <div className="flex items-center gap-3">
-                      <AlertCircle className="h-5 w-5 text-status-warning" />
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="size-5 text-status-warning" />
                       <span>Open Manifests</span>
                     </div>
                     <Badge
@@ -239,10 +226,9 @@ export default function ShiftReport() {
                       {report.pendingActions.openManifests}
                     </Badge>
                   </div>
-
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-none">
-                    <div className="flex items-center gap-3">
-                      <XCircle className="h-5 w-5 text-status-error" />
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <XCircle className="size-5 text-status-error" />
                       <span>Unresolved Exceptions</span>
                     </div>
                     <Badge
@@ -253,10 +239,9 @@ export default function ShiftReport() {
                       {report.pendingActions.unresolvedExceptions}
                     </Badge>
                   </div>
-
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-none">
-                    <div className="flex items-center gap-3">
-                      <Package className="h-5 w-5 text-status-info" />
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Package className="size-5 text-status-info" />
                       <span>Awaiting Pickup</span>
                     </div>
                     <Badge variant="secondary">
@@ -274,7 +259,7 @@ export default function ShiftReport() {
                 <CardDescription>Exceptions by severity and type</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   <div>
                     <h4 className="text-sm font-medium mb-2">By Severity</h4>
                     <div className="flex flex-wrap gap-2">
@@ -305,31 +290,33 @@ export default function ShiftReport() {
               </CardContent>
             </Card>
 
-            {/* Recent Activity */}
+            {/* Recent Activity — uses ScrollArea instead of overflow-y-auto */}
             <Card>
               <CardHeader>
                 <CardTitle>Recent Activity</CardTitle>
                 <CardDescription>Latest operations during shift</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3 max-h-[300px] overflow-y-auto">
-                  {report.recentActivity.map((activity, i) => (
-                    <div key={i} className="flex items-start gap-3 text-sm">
-                      <span className="text-muted-foreground whitespace-nowrap">
-                        {format(new Date(activity.time), 'HH:mm')}
-                      </span>
-                      <div className="flex-1">
-                        <p>{activity.description}</p>
-                        {activity.actor && (
-                          <p className="text-xs text-muted-foreground">by {activity.actor}</p>
-                        )}
+                <ScrollArea className="h-[300px]">
+                  <div className="flex flex-col gap-3 pr-3">
+                    {report.recentActivity.map((activity, i) => (
+                      <div key={i} className="flex items-start gap-2 text-sm">
+                        <span className="text-muted-foreground whitespace-nowrap">
+                          {format(new Date(activity.time), 'HH:mm')}
+                        </span>
+                        <div className="flex-1">
+                          <p>{activity.description}</p>
+                          {activity.actor && (
+                            <p className="text-xs text-muted-foreground">by {activity.actor}</p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                  {report.recentActivity.length === 0 && (
-                    <p className="text-sm text-muted-foreground">No recent activity</p>
-                  )}
-                </div>
+                    ))}
+                    {report.recentActivity.length === 0 && (
+                      <EmptyState icon={Clock} title="No recent activity" className="p-4 py-8" />
+                    )}
+                  </div>
+                </ScrollArea>
               </CardContent>
             </Card>
           </div>
@@ -346,9 +333,9 @@ export default function ShiftReport() {
                   {Object.entries(report.scans.bySource).map(([source, count]) => (
                     <div
                       key={source}
-                      className="flex items-center gap-2 p-3 bg-muted/50 rounded-none"
+                      className="flex items-center gap-2 p-4 bg-muted/50 rounded-lg"
                     >
-                      <ScanLine className="h-4 w-4 text-muted-foreground" />
+                      <ScanLine className="size-4 text-muted-foreground" />
                       <span className="text-sm">{source}</span>
                       <Badge variant="secondary">{count}</Badge>
                     </div>

@@ -38,6 +38,7 @@ export interface LabelData {
 interface LabelGeneratorProps {
   data: LabelData;
   onPrint?: () => void;
+  hidePrintButton?: boolean;
 }
 
 const TransportIcon: React.FC<{ mode: TransportMode; className?: string }> = ({
@@ -68,7 +69,11 @@ const TransportIcon: React.FC<{ mode: TransportMode; className?: string }> = ({
   );
 };
 
-export const LabelGenerator: React.FC<LabelGeneratorProps> = ({ data, onPrint }) => {
+export const LabelGenerator: React.FC<LabelGeneratorProps> = ({
+  data,
+  onPrint,
+  hidePrintButton,
+}) => {
   const labelRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = () => {
@@ -82,11 +87,13 @@ export const LabelGenerator: React.FC<LabelGeneratorProps> = ({ data, onPrint })
   return (
     <div className="label-page-root">
       {/* Print Controls */}
-      <div className="label-toolbar print:hidden">
-        <Button onClick={handlePrint} size="sm">
-          <Printer className="w-4 h-4 mr-2" /> Print Label
-        </Button>
-      </div>
+      {!hidePrintButton && (
+        <div className="label-toolbar print:hidden">
+          <Button onClick={handlePrint} size="sm">
+            <Printer className="w-4 h-4 mr-2" /> Print Label
+          </Button>
+        </div>
+      )}
 
       {/* Label */}
       <div ref={labelRef} className="label-container">

@@ -1,117 +1,65 @@
 import { Link } from 'react-router-dom';
-import { Box } from 'lucide-react';
-import { StaggerChildren } from '@/components/motion/StaggerChildren';
-import { FadeUp } from '@/components/motion/FadeUp';
-import { motion } from '@/lib/motion';
-import { Badge } from '@/components/ui/badge';
+import { TacLogo } from '@/components/shared/tac-logo';
+import { Linkedin, Twitter } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-background border-t border-border pt-20 pb-10">
-      <div className="container mx-auto max-w-7xl px-6">
-        <StaggerChildren
-          className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 mb-16"
-          staggerDelay={0.1}
-        >
+    <footer className="border-t border-border/40 py-16 bg-muted/20 relative overflow-hidden">
+      <div className="absolute bottom-0 left-1/2 w-[800px] h-[400px] bg-primary/5 rounded-full blur-[100px] -translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
           {/* Brand */}
-          <motion.div
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-            className="md:col-span-4 lg:col-span-5"
-          >
-            <Link to="/" className="flex items-center gap-3 mb-6 group w-fit">
-              <div className="flex h-10 w-10 items-center justify-center rounded-none bg-primary text-primary-foreground font-bold transition-all duration-300 group-hover:scale-110 shadow-lg shadow-primary/20">
-                <Box className="h-6 w-6 fill-current" />
-              </div>
-              <span className="text-foreground text-xl font-sans font-bold tracking-tight">
-                TAC
-              </span>
-            </Link>
-            <p className="text-muted-foreground text-base leading-relaxed max-w-sm mb-8">
-              Advanced logistics for the modern world. Connecting the Northeast corridor with
-              precision, speed, and unwavering reliability.
+          <div className="md:col-span-2 space-y-6">
+            <TacLogo size="lg" showSubtitle />
+            <p className="text-muted-foreground text-sm font-mono max-w-sm leading-loose">
+              Serving you with dedication for over 15 years. We proudly connect Imphal and New Delhi
+              with reliable air, surface, pick-and-drop, and packing services. We look forward to
+              expanding our services nationwide to serve you better.
             </p>
-            <div className="flex gap-4">{/* Social placeholders could go here */}</div>
-          </motion.div>
+          </div>
 
-          {/* Links Column 1 */}
-          <motion.div
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-            className="md:col-span-2 lg:col-span-2 lg:col-start-7"
-          >
-            <h3 className="font-sans font-bold text-foreground mb-6">Platform</h3>
-            <ul className="space-y-4 text-sm text-muted-foreground">
+          {/* Links */}
+          <div className="md:col-span-1 lg:col-span-1">
+            <h3 className="font-bold text-foreground mb-6 text-xs uppercase tracking-widest font-mono border-b border-border/40 pb-2">
+              Platform
+            </h3>
+            <ul className="space-y-4 text-xs font-mono uppercase tracking-wider text-muted-foreground">
               <li>
-                <Link
-                  to="/#tracking"
-                  className="hover:text-primary transition-colors hover:translate-x-1 inline-block duration-200"
+                <a
+                  href="#tracking"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
                 >
-                  Tracking
-                </Link>
+                  Track Shipment
+                </a>
               </li>
               <li>
-                <Link
-                  to="/#services"
-                  className="hover:text-primary transition-colors hover:translate-x-1 inline-block duration-200"
+                <a
+                  href="#system-capabilities"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
                 >
-                  Services
-                </Link>
+                  Capabilities
+                </a>
               </li>
               <li>
-                <Link
-                  to="/#pricing"
-                  className="hover:text-primary transition-colors hover:translate-x-1 inline-block duration-200"
+                <a
+                  href="#contact"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
                 >
-                  Pricing
-                </Link>
+                  Contact Us
+                </a>
               </li>
             </ul>
-          </motion.div>
+          </div>
 
-          {/* Links Column 2 */}
-          <motion.div
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-            className="md:col-span-2 lg:col-span-2"
-          >
-            <h3 className="font-sans font-bold text-foreground mb-6">Company</h3>
-            <ul className="space-y-4 text-sm text-muted-foreground">
-              <li>
-                <Link
-                  to="/about"
-                  className="hover:text-primary transition-colors hover:translate-x-1 inline-block duration-200"
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/contact"
-                  className="hover:text-primary transition-colors hover:translate-x-1 inline-block duration-200"
-                >
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/careers"
-                  className="hover:text-primary transition-colors hover:translate-x-1 inline-block duration-200"
-                >
-                  Careers
-                </Link>
-              </li>
-            </ul>
-          </motion.div>
-
-          {/* Links Column 3 */}
-          <motion.div
-            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-            className="md:col-span-2 lg:col-span-2"
-          >
-            <h3 className="font-sans font-bold text-foreground mb-6">Legal</h3>
-            <ul className="space-y-4 text-sm text-muted-foreground">
+          <div className="md:col-span-1 lg:col-span-1">
+            <h3 className="font-bold text-foreground mb-6 text-xs uppercase tracking-widest font-mono border-b border-border/40 pb-2">
+              Legal
+            </h3>
+            <ul className="space-y-4 text-xs font-mono uppercase tracking-wider text-muted-foreground">
               <li>
                 <Link
                   to="/privacy"
-                  className="hover:text-primary transition-colors hover:translate-x-1 inline-block duration-200"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
                 >
                   Privacy Policy
                 </Link>
@@ -119,35 +67,53 @@ export function Footer() {
               <li>
                 <Link
                   to="/terms"
-                  className="hover:text-primary transition-colors hover:translate-x-1 inline-block duration-200"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
                 >
                   Terms of Service
                 </Link>
               </li>
             </ul>
-          </motion.div>
-        </StaggerChildren>
+          </div>
 
-        <FadeUp
-          delay={0.4}
-          className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
-        >
-          <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} TAC. All rights reserved.
+          <div className="md:col-span-1 lg:col-span-1">
+            <h3 className="font-bold text-foreground mb-6 text-xs uppercase tracking-widest font-mono border-b border-border/40 pb-2">
+              Social
+            </h3>
+            <ul className="space-y-4 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              <li>
+                <a
+                  href="#"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all flex items-center gap-2 group w-fit"
+                >
+                  <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-md group-hover:shadow-primary/30 transition-all">
+                    <Linkedin className="w-3 h-3" strokeWidth={2} />
+                  </div>
+                  LinkedIn
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all flex items-center gap-2 group w-fit"
+                >
+                  <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-md group-hover:shadow-primary/30 transition-all">
+                    <Twitter className="w-3 h-3" strokeWidth={2} />
+                  </div>
+                  Twitter
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-border/40 pt-8 mt-2 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-muted-foreground text-xs text-center md:text-left">
+            © {new Date().getFullYear()} Tapan Associate Cargo. All rights reserved.
           </p>
-          <Badge
-            variant="secondary"
-            className="gap-3 px-4 py-2 rounded-none border border-border/50"
-          >
-            <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
-              System Status
-            </span>
-            <span className="flex items-center gap-1.5 text-status-live font-bold text-xs">
-              <span className="w-2 h-2 rounded-none bg-current animate-pulse shadow-[0_0_8px_currentColor]"></span>
-              OPTIMAL
-            </span>
-          </Badge>
-        </FadeUp>
+          <p className="text-muted-foreground text-xs text-center md:text-right">
+            Dedicated to Serving You Better
+          </p>
+        </div>
       </div>
     </footer>
   );

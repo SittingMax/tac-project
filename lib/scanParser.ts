@@ -45,8 +45,8 @@ export function parseScanInput(input: string): ScanResult {
     throw new ValidationError('Empty scan input');
   }
 
-  // 1. Try raw CN format (TAC, WGS, or legacy WEE followed by digits)
-  if (/^(TAC|WEE|WGS)\d{8,11}$/i.test(trimmed)) {
+  // 1. Try raw CN format (TAC or CN- followed by digits/patterns)
+  if (/^(TAC|WGS)\d{8,11}$/i.test(trimmed)) {
     return {
       type: 'shipment',
       awb: trimmed.toUpperCase(),
@@ -54,13 +54,19 @@ export function parseScanInput(input: string): ScanResult {
     };
   }
 
-  // 1b. Try CN- or TAC- format (e.g., CN-2026-0001). Legacy: WEE-
-  if (/^(CN|WEE|TAC)-\d{4}-\d{4}$/i.test(trimmed)) {
+  if (/^(CN|TAC)-\d{4}-\d{4}$/i.test(trimmed)) {
     return {
       type: 'shipment',
       awb: trimmed.toUpperCase(),
       raw: trimmed,
     };
+  }
+
+  // Reject legacy formats explicitly to give frontend clarity
+  if (/^WEE/i.test(trimmed) || /^MAN-/i.test(trimmed)) {
+    throw new ValidationError(
+      'Legacy formats are no longer supported. Please use TAC/CN barcodes.'
+    );
   }
 
   // 2. Try JSON payload
@@ -105,8 +111,8 @@ export function parseScanInput(input: string): ScanResult {
       // Handle shipment scan (default)
       if (payload.awb) {
         if (
-          !/^(TAC|WEE|WGS)\d{8,11}$/i.test(payload.awb) &&
-          !/^(CN|WEE|TAC)-\d{4}-\d{4}$/i.test(payload.awb)
+          !/^(TAC|WGS)\d{8,11}$/i.test(payload.awb) &&
+          !/^(CN|TAC)-\d{4}-\d{4}$/i.test(payload.awb)
         ) {
           throw new ValidationError('Invalid CN format in payload');
         }
@@ -156,7 +162,7 @@ export function parseScanInput(input: string): ScanResult {
  * Validate CN format
  */
 export function isValidAWB(awb: string): boolean {
-  return /^(TAC|WEE|WGS)\d{8,11}$/i.test(awb) || /^(CN|WEE|TAC)-\d{4}-\d{4}$/i.test(awb);
+  return /^(TAC|WGS)\d{8,11}$/i.test(awb) || /^(CN|TAC)-\d{4}-\d{4}$/i.test(awb);
 }
 
 /**

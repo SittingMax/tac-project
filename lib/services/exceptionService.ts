@@ -2,7 +2,6 @@
  * Exception Service
  * Handles exception management for shipments
  */
-/* eslint-disable @typescript-eslint/no-explicit-any -- Supabase client requires any for complex operations */
 
 import { supabase } from '@/lib/supabase';
 import { mapSupabaseError } from '@/lib/errors';
@@ -72,6 +71,7 @@ export const exceptionService = {
 
     const { data, error } = await query;
     if (error) throw mapSupabaseError(error);
+    // eslint-disable-next-line no-restricted-syntax -- Supabase query result type casting
     return (data ?? []) as unknown as ExceptionWithRelations[];
   },
 
@@ -92,6 +92,7 @@ export const exceptionService = {
       .single();
 
     if (error) throw mapSupabaseError(error);
+    // eslint-disable-next-line no-restricted-syntax -- Supabase query result type casting
     return data as unknown as ExceptionWithRelations;
   },
 
@@ -112,6 +113,7 @@ export const exceptionService = {
       .order('created_at', { ascending: false });
 
     if (error) throw mapSupabaseError(error);
+    // eslint-disable-next-line no-restricted-syntax -- Supabase query result type casting
     return (data ?? []) as unknown as ExceptionWithRelations[];
   },
 
@@ -123,14 +125,15 @@ export const exceptionService = {
       .insert({
         ...exception,
         org_id: orgId,
-      } as any)
+      })
       .select()
       .single();
 
     if (error) throw mapSupabaseError(error);
 
     // Update shipment status to EXCEPTION
-    await (supabase.from('shipments') as any)
+    await supabase
+      .from('shipments')
       .update({ status: 'EXCEPTION', updated_at: new Date().toISOString() })
       .eq('id', exception.shipment_id);
 
@@ -140,7 +143,8 @@ export const exceptionService = {
   async update(id: string, updates: ExceptionUpdate): Promise<Exception> {
     const orgId = orgService.getCurrentOrgId();
 
-    const { data, error } = await (supabase.from('exceptions') as any)
+    const { data, error } = await supabase
+      .from('exceptions')
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
@@ -169,7 +173,8 @@ export const exceptionService = {
     });
 
     // Update shipment status back to previous state or RECEIVED
-    await (supabase.from('shipments') as any)
+    await supabase
+      .from('shipments')
       .update({ status: 'RECEIVED', updated_at: new Date().toISOString() })
       .eq('id', exception.shipment_id);
 

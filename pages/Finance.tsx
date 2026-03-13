@@ -5,9 +5,10 @@ import { FileText, CreditCard, Plus, Check, Printer, Mail, MessageCircle } from 
 
 // UI Components
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EmptyInvoices } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/ui/page-header';
 
 // CRUD Components
 import { CrudTable } from '@/components/crud/CrudTable';
@@ -31,7 +32,6 @@ import { getInvoicesColumns } from '@/components/finance/invoices.columns';
 import { useAuthStore } from '@/store/authStore';
 
 // Utils
-// Utils
 import { formatCurrency } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Invoice, Shipment } from '@/types';
@@ -42,16 +42,15 @@ export const Finance: React.FC = () => {
   const { user } = useAuthStore();
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
-  // Use Supabase hooks for invoices
   const { data: invoicesData = [], refetch: refetchInvoices, isLoading } = useInvoices();
   const updateStatusMutation = useUpdateInvoiceStatus();
 
-  // Support ?awb= URL parameter for direct navigation from scanned shipments
-  const awbParam = searchParams.get('CN Number');
+  const actionParam = searchParams.get('action') || '';
+  const awbParam = searchParams.get('awb') || searchParams.get('CN Number');
+  const shouldOpenCreateModal = actionParam === 'create';
   const { data: invoiceByAWB, isLoading: isLoadingByAWB } = useInvoiceByAWB(awbParam);
   const hardDeleteMutation = useHardDeleteInvoice();
 
-  // Modal state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<InvoiceWithRelations | null>(null);
   const [successData, setSuccessData] = useState<{
@@ -60,12 +59,9 @@ export const Finance: React.FC = () => {
   } | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<Invoice | null>(null);
-
-  // View detail modal state
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
   const [viewShipment, setViewShipment] = useState<Shipment | undefined>(undefined);
 
-  // Extracted invoice actions and formatting helpers
   const {
     labelPreviewOpen,
     setLabelPreviewOpen,
@@ -79,19 +75,13 @@ export const Finance: React.FC = () => {
     mapShipmentForLabel,
   } = useInvoiceActions();
 
-  // Open invoice detail view
   const handleViewInvoice = async (row: any) => {
     const inv = buildInvoiceFromRow(row);
     setViewInvoice(inv);
-    // Try to load shipment data for route info
     if (inv.awb) {
       try {
         const shipmentRow = await getShipment(inv.awb);
-        if (shipmentRow) {
-          setViewShipment(mapShipmentForLabel(shipmentRow));
-        } else {
-          setViewShipment(undefined);
-        }
+        setViewShipment(shipmentRow ? mapShipmentForLabel(shipmentRow) : undefined);
       } catch {
         setViewShipment(undefined);
       }
@@ -106,49 +96,62 @@ export const Finance: React.FC = () => {
     }
   };
 
-  const onInvoiceCreated = (invoice?: Invoice, shipment?: Shipment) => {
-    setIsCreateOpen(false);
-    setEditingInvoice(null);
-    if (invoice) {
-      setSuccessData({ invoice, shipment });
+  const clearCreateActionParam = () => {
+    if (searchParams.get('action') === 'create') {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete('action');
+      setSearchParams(nextParams, { replace: true });
     }
+  };
+
+  const handleCreateModalChange = (open: boolean) => {
+    setIsCreateOpen(open);
+    if (!open) {
+      setEditingInvoice(null);
+      clearCreateActionParam();
+    }
+  };
+
+  const onInvoiceCreated = (invoice?: Invoice, shipment?: Shipment) => {
+    handleCreateModalChange(false);
+    if (invoice) setSuccessData({ invoice, shipment });
     refetchInvoices();
   };
 
   const handleDelete = async () => {
     if (!rowToDelete) return;
-
     if (isSuperAdmin) {
       await hardDeleteMutation.mutateAsync(rowToDelete.id);
     } else {
       await updateStatusMutation.mutateAsync({ id: rowToDelete.id, status: 'CANCELLED' });
     }
-
     setRowToDelete(null);
     setDeleteOpen(false);
   };
 
-  // Auto-open invoice when navigating with ?awb= parameter (from scanned shipment)
   useEffect(() => {
     if (awbParam && invoiceByAWB && !isLoadingByAWB) {
-      // Found invoice for this AWB - open it
       handleViewInvoice(invoiceByAWB);
-      // Clear the URL parameter to avoid re-triggering
       setSearchParams({});
     } else if (awbParam && !isLoadingByAWB && !invoiceByAWB) {
-      // No invoice found for this AWB
       toast.error(`No invoice found for shipment ${awbParam}`);
       setSearchParams({});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [awbParam, invoiceByAWB, isLoadingByAWB]);
 
+  useEffect(() => {
+    if (shouldOpenCreateModal) {
+      setEditingInvoice(null);
+      setIsCreateOpen(true);
+    }
+  }, [shouldOpenCreateModal]);
+
   const handleEditInvoice = (row: InvoiceWithRelations) => {
     setEditingInvoice(row);
     setIsCreateOpen(true);
   };
 
-  // Table columns with callbacks
   const columns = useMemo(
     () =>
       getInvoicesColumns({
@@ -171,10 +174,6 @@ export const Finance: React.FC = () => {
     [navigate, isSuperAdmin]
   );
 
-  // Use Supabase data directly - already in correct format
-  const tableData = invoicesData;
-
-  // Stats from Supabase data - use correct DB column names
   const totalRevenue = invoicesData.reduce(
     (acc: number, inv) => acc + (inv.status === 'PAID' ? inv.total || 0 : 0),
     0
@@ -189,105 +188,92 @@ export const Finance: React.FC = () => {
   );
 
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
-      <div className="flex justify-between items-end border-b border-border/40 pb-4">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
-            Financial Log<span className="text-primary">.</span>
-          </h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
-            Manage invoices, billing engines, and payment gateways
-          </p>
-        </div>
-      </div>
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+      <PageHeader
+        title="Finance"
+        description="Manage invoices, billing records, and shipment documents"
+      >
+        <Button onClick={() => setIsCreateOpen(true)}>
+          <Plus data-icon="inline-start" />
+          New Invoice
+        </Button>
+      </PageHeader>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-border/40 border-y border-border/40 my-8">
-        <Card className="rounded-none border-0 shadow-none bg-background p-6">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-              Total Ledgers
-            </span>
-            <FileText className="w-4 h-4 text-primary opacity-50" />
-          </div>
-          <div className="text-3xl font-black tracking-tighter">{invoicesData.length}</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Invoices
+            </CardTitle>
+            <FileText className="size-4 text-primary opacity-50" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-semibold">{invoicesData.length}</div>
+          </CardContent>
         </Card>
 
-        <Card className="rounded-none border-0 shadow-none bg-background p-6">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-status-success">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-status-success">
               Revenue (Paid)
-            </span>
-            <CreditCard className="w-4 h-4 text-status-success opacity-50" />
-          </div>
-          <div
-            className="text-3xl font-black tracking-tighter text-status-success truncate"
-            title={formatCurrency(totalRevenue)}
-          >
-            {formatCurrency(totalRevenue)}
-          </div>
+            </CardTitle>
+            <CreditCard className="size-4 text-status-success opacity-50" />
+          </CardHeader>
+          <CardContent>
+            <div
+              className="text-2xl font-semibold text-status-success truncate"
+              title={formatCurrency(totalRevenue)}
+            >
+              {formatCurrency(totalRevenue)}
+            </div>
+          </CardContent>
         </Card>
 
-        <Card className="rounded-none border-0 shadow-none bg-background p-6">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-status-warning">
-              Pending Auth
-            </span>
-            <FileText className="w-4 h-4 text-status-warning opacity-50" />
-          </div>
-          <div
-            className="text-3xl font-black tracking-tighter text-status-warning truncate"
-            title={formatCurrency(pendingAmount)}
-          >
-            {formatCurrency(pendingAmount)}
-          </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-status-warning">Pending</CardTitle>
+            <FileText className="size-4 text-status-warning opacity-50" />
+          </CardHeader>
+          <CardContent>
+            <div
+              className="text-2xl font-semibold text-status-warning truncate"
+              title={formatCurrency(pendingAmount)}
+            >
+              {formatCurrency(pendingAmount)}
+            </div>
+          </CardContent>
         </Card>
 
-        <Card className="rounded-none border-0 shadow-none bg-background p-6">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-destructive">
-              Delinquent
-            </span>
-            <FileText className="w-4 h-4 text-destructive opacity-50" />
-          </div>
-          <div
-            className="text-3xl font-black tracking-tighter text-destructive truncate"
-            title={formatCurrency(overdueAmount)}
-          >
-            {formatCurrency(overdueAmount)}
-          </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-destructive">Overdue</CardTitle>
+            <FileText className="size-4 text-destructive opacity-50" />
+          </CardHeader>
+          <CardContent>
+            <div
+              className="text-2xl font-semibold text-destructive truncate"
+              title={formatCurrency(overdueAmount)}
+            >
+              {formatCurrency(overdueAmount)}
+            </div>
+          </CardContent>
         </Card>
       </div>
 
       {/* Table with CRUD */}
       <CrudTable
         columns={columns}
-        data={tableData}
+        data={invoicesData}
         searchKey="invoice_no"
         searchPlaceholder="Search invoices..."
         isLoading={isLoading}
         emptyState={<EmptyInvoices onCreate={() => setIsCreateOpen(true)} />}
         emptyMessage="No invoices found."
-        toolbar={
-          <Button
-            onClick={() => setIsCreateOpen(true)}
-            className="rounded-none font-mono text-xs uppercase tracking-widest px-8"
-          >
-            <Plus className="w-4 h-4 mr-2" /> Init Ledger
-          </Button>
-        }
       />
 
       {/* Create Invoice Modal */}
-      <Dialog
-        open={isCreateOpen}
-        onOpenChange={(open) => {
-          if (!open) {
-            setIsCreateOpen(false);
-            setEditingInvoice(null);
-          }
-        }}
-      >
+      <Dialog open={isCreateOpen} onOpenChange={handleCreateModalChange}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>
@@ -298,10 +284,7 @@ export const Finance: React.FC = () => {
           </DialogHeader>
           <CreateInvoiceForm
             onSuccess={onInvoiceCreated}
-            onCancel={() => {
-              setIsCreateOpen(false);
-              setEditingInvoice(null);
-            }}
+            onCancel={() => handleCreateModalChange(false)}
             initialData={editingInvoice || undefined}
           />
         </DialogContent>
@@ -316,36 +299,34 @@ export const Finance: React.FC = () => {
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Invoice Created Successfully</DialogTitle>
+            <DialogTitle>Documents Created Successfully</DialogTitle>
           </DialogHeader>
           {successData && (
-            <div className="text-center space-y-6">
-              <div className="w-16 h-16 bg-status-success/10 rounded-none flex items-center justify-center mx-auto">
-                <Check className="w-8 h-8 text-status-success" />
+            <div className="text-center flex flex-col gap-6">
+              <div className="size-16 bg-status-success/10 rounded-xl flex items-center justify-center mx-auto">
+                <Check className="size-8 text-status-success" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Ready for Dispatch</h3>
+                <h3 className="text-xl font-bold text-foreground mb-2">Documents Ready</h3>
                 <p className="text-muted-foreground text-sm">
-                  Invoice {successData.invoice.invoiceNumber} and AWB {successData.invoice.awb}{' '}
-                  generated.
+                  Invoice {successData.invoice.invoiceNumber} and shipment document{' '}
+                  {successData.invoice.awb} are available for download.
                 </p>
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <Button size="lg" onClick={(e) => handleDownloadInvoice(successData.invoice, e)}>
-                  <FileText className="w-5 h-5 mr-2" /> Download Invoice
+                  <FileText data-icon="inline-start" /> Download Invoice
                 </Button>
                 <Button
                   size="lg"
                   variant="secondary"
                   onClick={(e) => handleDownloadLabel(successData.invoice, e)}
                 >
-                  <Printer className="w-5 h-5 mr-2" /> Print Label
+                  <Printer data-icon="inline-start" /> Print Label
                 </Button>
               </div>
-
               <div className="border-t border-border pt-4">
-                <p className="text-xs text-muted-foreground mb-3 uppercase font-bold tracking-wider">
+                <p className="text-xs text-muted-foreground mb-3 font-medium">
                   Share with Customer
                 </p>
                 <div className="flex justify-center gap-4">
@@ -354,14 +335,14 @@ export const Finance: React.FC = () => {
                     className="text-status-success border border-status-success/30 hover:bg-status-success/10"
                     onClick={() => handleShareWhatsapp(successData.invoice)}
                   >
-                    <MessageCircle className="w-5 h-5 mr-2" /> WhatsApp
+                    <MessageCircle data-icon="inline-start" /> WhatsApp
                   </Button>
                   <Button
                     variant="ghost"
                     className="text-status-info border border-status-info/30 hover:bg-status-info/10"
                     onClick={() => handleShareEmail(successData.invoice)}
                   >
-                    <Mail className="w-5 h-5 mr-2" /> Email
+                    <Mail data-icon="inline-start" /> Email
                   </Button>
                 </div>
               </div>

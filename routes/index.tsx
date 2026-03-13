@@ -11,6 +11,12 @@ const Dashboard = lazy(() =>
 const Shipments = lazy(() =>
   import('@/pages/Shipments').then((module) => ({ default: module.Shipments }))
 );
+const TermsOfService = lazy(() =>
+  import('@/pages/TermsOfService').then((module) => ({ default: module.TermsOfService }))
+);
+const PrivacyPolicy = lazy(() =>
+  import('@/pages/PrivacyPolicy').then((module) => ({ default: module.PrivacyPolicy }))
+);
 const ShipmentDetailsPage = lazy(() =>
   import('@/pages/ShipmentDetailsPage').then((module) => ({ default: module.ShipmentDetailsPage }))
 );
@@ -85,10 +91,18 @@ export const routes: AppRoute[] = [
   { path: '/', element: Landing, protected: false, layout: false },
   { path: '/track', element: PublicTracking, protected: false, layout: false },
   { path: '/track/:awb', element: PublicTracking, protected: false, layout: false },
+  { path: '/terms', element: TermsOfService, protected: false, layout: false },
+  { path: '/privacy', element: PrivacyPolicy, protected: false, layout: false },
 
   // Protected Routes with Layout
   { path: '/dashboard', element: Dashboard, protected: true, layout: true },
-  { path: '/bookings', element: Bookings, protected: true, layout: true },
+  {
+    path: '/bookings',
+    element: Bookings,
+    protected: true,
+    layout: true,
+    allowedRoles: ['ADMIN', 'MANAGER', 'OPS_STAFF'],
+  },
   {
     path: '/analytics',
     element: Analytics,
@@ -167,15 +181,21 @@ export const routes: AppRoute[] = [
   { path: '/shift-report', element: ShiftReport, protected: true, layout: true },
   { path: '/notifications', element: Notifications, protected: true, layout: true },
 
-  // Other Protected Routes
-  { path: '/print/label/:awb', element: PrintLabel, protected: false, layout: false },
-  {
-    path: '/dev/ui-kit',
-    element: DevUIKit,
-    protected: true,
-    layout: false,
-    allowedRoles: ['ADMIN'],
-  },
+  // Print label — protected to prevent PII exposure (consignor/consignee details)
+  { path: '/print/label/:awb', element: PrintLabel, protected: true, layout: false },
+
+  // Dev-only routes — excluded from production builds via tree-shaking
+  ...(import.meta.env.DEV
+    ? [
+        {
+          path: '/dev/ui-kit',
+          element: DevUIKit,
+          protected: true as const,
+          layout: false as const,
+          allowedRoles: ['ADMIN'] as UserRole[],
+        },
+      ]
+    : []),
 
   // 404
   { path: '*', element: NotFound, protected: false, layout: false },

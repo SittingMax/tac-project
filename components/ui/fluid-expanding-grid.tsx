@@ -150,7 +150,7 @@ export default function FluidExpandingGrid({
                       <div className="flex items-center gap-2">
                         <div
                           className={cn(
-                            'w-1.5 h-1.5 rounded-none animate-pulse',
+                            'w-1.5 h-1.5 rounded-full animate-pulse',
                             isSelected ? 'bg-status-live' : 'bg-primary'
                           )}
                         ></div>
@@ -173,7 +173,7 @@ export default function FluidExpandingGrid({
                       </motion.h3>
                       <motion.div
                         layout="position"
-                        className="h-1 w-12 rounded-none mb-3"
+                        className="h-1 w-12 rounded-full mb-3"
                         style={{ backgroundColor: item.color }}
                       />
                       <motion.p
@@ -186,10 +186,10 @@ export default function FluidExpandingGrid({
                   </motion.div>
 
                   {/* Corner Brackets */}
-                  <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-primary/20 rounded-none pointer-events-none group-hover:border-primary/50 transition-colors" />
-                  <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-primary/20 rounded-none pointer-events-none group-hover:border-primary/50 transition-colors" />
-                  <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-primary/20 rounded-none pointer-events-none group-hover:border-primary/50 transition-colors" />
-                  <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-primary/20 rounded-none pointer-events-none group-hover:border-primary/50 transition-colors" />
+                  <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-primary/20 pointer-events-none group-hover:border-primary/50 transition-colors" />
+                  <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-primary/20 pointer-events-none group-hover:border-primary/50 transition-colors" />
+                  <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-primary/20 pointer-events-none group-hover:border-primary/50 transition-colors" />
+                  <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-primary/20 pointer-events-none group-hover:border-primary/50 transition-colors" />
 
                   <motion.div
                     layoutId={`${id}-${item.id}-border`}

@@ -31,7 +31,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onCl
       {/* Header */}
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-none bg-primary/10 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center">
             {customer.type === 'BUSINESS' ? (
               <Building className="w-7 h-7 text-primary" />
             ) : (
@@ -39,7 +39,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onCl
             )}
           </div>
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <h2 className="text-2xl font-bold text-foreground">
                 {customer.companyName || customer.name}
               </h2>

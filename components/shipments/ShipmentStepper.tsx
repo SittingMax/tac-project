@@ -98,7 +98,7 @@ export const ShipmentStepper: React.FC<ShipmentStepperProps> = ({ currentStatus,
               <div className="relative flex flex-col items-center flex-1">
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-none flex items-center justify-center border-2 z-10 bg-card transition-colors duration-500',
+                    'w-10 h-10 rounded-full flex items-center justify-center border-2 z-10 bg-card transition-colors duration-500',
                     isCompleted
                       ? 'border-primary bg-primary text-primary-foreground'
                       : isCurrent
@@ -112,10 +112,10 @@ export const ShipmentStepper: React.FC<ShipmentStepperProps> = ({ currentStatus,
                 {/* Exception branching indicator if this is the furthest step */}
                 {idx === furthestIndex && isException && (
                   <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center animate-in slide-in-from-bottom-2">
-                    <div className="bg-destructive text-destructive-foreground text-[10px] font-bold px-2 py-0.5 rounded-none uppercase tracking-wider whitespace-nowrap shadow-sm mb-1 flex items-center gap-1">
+                    <div className="bg-destructive text-destructive-foreground text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider whitespace-nowrap shadow-sm mb-1 flex items-center gap-1">
                       <AlertTriangle className="w-3 h-3" /> Exception
                     </div>
-                    <div className="w-0.5 h-4 bg-destructive rounded-none" />
+                    <div className="w-0.5 h-4 bg-destructive rounded-full" />
                   </div>
                 )}
 

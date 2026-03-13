@@ -2,15 +2,99 @@ import React from 'react';
 import { useManifests } from '../../hooks/useManifests';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
-import { Table, TableHead as Th, TableCell as Td } from '../ui/table';
+import { CrudTable } from '@/components/crud/CrudTable';
+import type { ColumnDef } from '@tanstack/react-table';
 import { FileText, Plane, Truck, ArrowRight, Loader } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { StatusBadge } from '../domain/StatusBadge';
+import { type ManifestWithRelations } from '@/hooks/useManifests';
+import { IdBadge } from '@/components/ui-core/data/id-badge';
 
 export const ManifestList: React.FC = () => {
   const { data: manifests, isLoading, error } = useManifests();
   const navigate = useNavigate();
+
+  const columns: ColumnDef<ManifestWithRelations>[] = React.useMemo(
+    () => [
+      {
+        accessorKey: 'manifest_no',
+        header: 'MANIFEST NO',
+        cell: ({ row }) => (
+          <IdBadge
+            entity="manifest"
+            idValue={row.original.id}
+            cnNumber={row.original.manifest_no}
+            href={`/manifests/${row.original.id}`}
+          />
+        ),
+      },
+      {
+        id: 'route',
+        header: 'ROUTE',
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="font-bold">{row.original.from_hub?.code}</span>
+            <ArrowRight className="w-3 h-3 text-muted-foreground" />
+            <span className="font-bold">{row.original.to_hub?.code}</span>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'type',
+        header: 'MODE',
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2">
+            {row.original.type === 'AIR' ? (
+              <Plane className="w-3 h-3 text-feature-air" />
+            ) : (
+              <Truck className="w-3 h-3 text-feature-ground" />
+            )}
+            <span className="text-xs">{row.original.type}</span>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'status',
+        header: 'STATUS',
+        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+      },
+      {
+        id: 'load',
+        header: 'LOAD',
+        cell: ({ row }) => (
+          <div className="text-right text-xs">
+            <div>{row.original.total_shipments} Shipments</div>
+            <div className="text-muted-foreground">{row.original.total_weight} kg</div>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'created_at',
+        header: 'CREATED',
+        cell: ({ row }) => (
+          <div className="text-right text-xs text-muted-foreground">
+            {format(new Date(row.original.created_at), 'dd MMM HH:mm')}
+          </div>
+        ),
+      },
+      {
+        id: 'actions',
+        header: '',
+        cell: ({ row }) => (
+          <div className="text-right">
+            <Link
+              to={`/manifests/${row.original.id}`}
+              className="inline-flex items-center justify-center p-2 rounded-md hover:bg-muted transition-colors"
+            >
+              <ArrowRight className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
+            </Link>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
 
   if (isLoading)
     return (
@@ -35,79 +119,8 @@ export const ManifestList: React.FC = () => {
         </Button>
       </div>
 
-      <div className="overflow-x-auto">
-        <Table>
-          <thead>
-            <tr>
-              <Th>MANIFEST NO</Th>
-              <Th>ROUTE</Th>
-              <Th>MODE</Th>
-              <Th>STATUS</Th>
-              <Th>LOAD</Th>
-              <Th>CREATED</Th>
-              <Th></Th>
-            </tr>
-          </thead>
-          <tbody>
-            {manifests?.map((manifest) => (
-              <tr key={manifest.id} className="group hover:bg-muted transition-colors">
-                <Td className="font-mono text-primary font-bold">
-                  <Link
-                    to={`/manifests/${manifest.id}`}
-                    className="hover:underline block w-full h-full"
-                  >
-                    {manifest.manifest_no}
-                  </Link>
-                </Td>
-                <Td>
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="font-bold">{manifest.from_hub?.code}</span>
-                    <ArrowRight className="w-3 h-3 text-muted-foreground" />
-                    <span className="font-bold">{manifest.to_hub?.code}</span>
-                  </div>
-                </Td>
-                <Td>
-                  <div className="flex items-center gap-2">
-                    {manifest.type === 'AIR' ? (
-                      <Plane className="w-3 h-3" />
-                    ) : (
-                      <Truck className="w-3 h-3" />
-                    )}
-                    <span className="text-xs">{manifest.type}</span>
-                  </div>
-                </Td>
-                <Td>
-                  <StatusBadge status={manifest.status} />
-                </Td>
-                <Td className="text-right">
-                  <div className="text-xs">
-                    <div>{manifest.total_shipments} Shipments</div>
-                    <div className="text-muted-foreground">{manifest.total_weight} kg</div>
-                  </div>
-                </Td>
-                <Td className="text-right text-xs text-muted-foreground">
-                  {format(new Date(manifest.created_at), 'dd MMM HH:mm')}
-                </Td>
-                <Td className="text-right">
-                  <Link
-                    to={`/manifests/${manifest.id}`}
-                    className="inline-flex items-center justify-center p-2 rounded-none hover:bg-muted transition-colors"
-                  >
-                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </Link>
-                </Td>
-              </tr>
-            ))}
-            {(!manifests || manifests.length === 0) && (
-              <tr>
-                <Td className="text-center py-8 text-muted-foreground">
-                  No manifests found (ColSpan not supported in Td wrapper properly, checked
-                  manually)
-                </Td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
+      <div className="border border-border/40 bg-card rounded-xl overflow-hidden shadow-xs">
+        <CrudTable columns={columns} data={manifests || []} pageSize={10} />
       </div>
     </Card>
   );

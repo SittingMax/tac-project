@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- Supabase client requires any for complex operations */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { Json } from '../lib/database.types';
-import { getOrCreateDefaultOrg } from '../lib/org-helper';
+import { useAuthStore } from '@/store/authStore';
 
 // Type helper - removed unused db
 
@@ -86,9 +85,11 @@ export interface ManifestWithRelations {
 }
 
 export function useManifests(options?: ManifestListFilters) {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useQuery({
     queryKey: manifestKeys.list(options),
     queryFn: async () => {
+      if (!orgId) return [];
       let query = supabase
         .from('manifests')
         .select(
@@ -99,6 +100,7 @@ export function useManifests(options?: ManifestListFilters) {
           creator:staff!manifests_created_by_staff_id_fkey(full_name)
         `
         )
+        .eq('org_id', orgId)
         .order('created_at', { ascending: false });
 
       if (options?.status) {
@@ -113,13 +115,16 @@ export function useManifests(options?: ManifestListFilters) {
       if (error) throw error;
       return (data ?? []) as unknown as ManifestWithRelations[];
     },
+    enabled: !!orgId,
   });
 }
 
 export function useManifest(id: string) {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useQuery({
     queryKey: manifestKeys.detail(id),
     queryFn: async () => {
+      if (!orgId) throw new Error('No organization context available for manifest lookup.');
       const { data, error } = await supabase
         .from('manifests')
         .select(
@@ -131,19 +136,22 @@ export function useManifest(id: string) {
         `
         )
         .eq('id', id)
+        .eq('org_id', orgId)
         .single();
 
       if (error) throw error;
       return data as unknown as ManifestWithRelations;
     },
-    enabled: !!id,
+    enabled: !!id && !!orgId,
   });
 }
 
 export function useManifestItems(manifestId: string) {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useQuery({
     queryKey: manifestKeys.items(manifestId),
     queryFn: async () => {
+      if (!orgId) return [];
       // Join with shipments to get details
       const { data, error } = await supabase
         .from('manifest_items')
@@ -153,24 +161,27 @@ export function useManifestItems(manifestId: string) {
           shipment:shipments(*)
         `
         )
-        .eq('manifest_id', manifestId);
+        .eq('manifest_id', manifestId)
+        .eq('org_id', orgId);
 
       if (error) throw error;
       return (data ?? []) as unknown as ManifestItemWithRelations[];
     },
-    enabled: !!manifestId,
+    enabled: !!manifestId && !!orgId,
   });
 }
 
 export function useAvailableShipments(originHubId: string, destinationHubId: string) {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useQuery({
     queryKey: manifestKeys.availableShipments(originHubId, destinationHubId),
     queryFn: async (): Promise<AvailableShipment[]> => {
-      if (!originHubId || !destinationHubId) return [];
+      if (!originHubId || !destinationHubId || !orgId) return [];
 
       const { data, error } = await supabase
         .from('shipments')
         .select('*')
+        .eq('org_id', orgId)
         .eq('origin_hub_id', originHubId)
         .eq('destination_hub_id', destinationHubId)
         .is('manifest_id', null)
@@ -180,7 +191,7 @@ export function useAvailableShipments(originHubId: string, destinationHubId: str
       if (error) throw error;
       return (data ?? []) as AvailableShipment[];
     },
-    enabled: !!originHubId && !!destinationHubId,
+    enabled: !!originHubId && !!destinationHubId && !!orgId,
   });
 }
 
@@ -194,10 +205,13 @@ interface CreateManifestInput {
 
 export function useCreateManifest() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async (input: CreateManifestInput) => {
-      const orgId = await getOrCreateDefaultOrg();
+      if (!orgId) {
+        throw new Error('No organization context available for manifest creation.');
+      }
 
       const {
         data: { user },
@@ -205,18 +219,22 @@ export function useCreateManifest() {
       // Try to find staff ID
       let staffId;
       if (user?.id) {
-        const { data: staff } = await (supabase.from('staff') as any)
+        const { data: staff } = await supabase
+          .from('staff')
           .select('id')
           .eq('auth_user_id', user.id)
+          .eq('org_id', orgId)
           .maybeSingle();
         staffId = staff?.id;
       }
 
       // Fallback to System Admin or first available admin if not found
       if (!staffId) {
-        const { data: defaultStaff } = await (supabase.from('staff') as any)
+        const { data: defaultStaff } = await supabase
+          .from('staff')
           .select('id')
           .eq('role', 'ADMIN')
+          .eq('org_id', orgId)
           .limit(1)
           .maybeSingle();
         staffId = defaultStaff?.id;
@@ -226,8 +244,10 @@ export function useCreateManifest() {
         throw new Error('Staff profile not found for current user and no default admin available');
 
       // Calculate totals
-      const { data: shipments, error: shipmentsError } = await (supabase.from('shipments') as any)
+      const { data: shipments, error: shipmentsError } = await supabase
+        .from('shipments')
         .select('package_count, total_weight')
+        .eq('org_id', orgId)
         .in('id', input.shipment_ids);
 
       if (shipmentsError) throw shipmentsError;
@@ -246,9 +266,11 @@ export function useCreateManifest() {
       );
 
       // Create Manifest (manifest_no generated by DB trigger)
-      const { data: manifest, error: manifestError } = await (supabase.from('manifests') as any)
+      const { data: manifest, error: manifestError } = await supabase
+        .from('manifests')
         .insert({
           org_id: orgId,
+          manifest_no: '', // Auto-generated by trigger
           type: input.type,
           from_hub_id: input.from_hub_id,
           to_hub_id: input.to_hub_id,
@@ -274,12 +296,14 @@ export function useCreateManifest() {
           scanned_at: new Date().toISOString(),
         }));
 
-        const { error: itemsError } = await (supabase.from('manifest_items') as any).insert(items);
+        const { error: itemsError } = await supabase.from('manifest_items').insert(items);
         if (itemsError) throw itemsError;
 
         // Update Shipments
-        const { error: shipmentsError } = await (supabase.from('shipments') as any)
+        const { error: shipmentsError } = await supabase
+          .from('shipments')
           .update({ manifest_id: manifest.id, status: 'IN_TRANSIT' })
+          .eq('org_id', orgId)
           .in('id', input.shipment_ids);
         if (shipmentsError) throw shipmentsError;
       }
@@ -298,9 +322,13 @@ export function useCreateManifest() {
 
 export function useUpdateManifestStatus() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: ManifestStatus }) => {
+      if (!orgId) {
+        throw new Error('No organization context available for manifest updates.');
+      }
       const updatePayload: Record<string, string> = {
         status,
         updated_at: new Date().toISOString(),
@@ -309,9 +337,11 @@ export function useUpdateManifestStatus() {
       if (status === 'ARRIVED') updatePayload.arrived_at = new Date().toISOString();
       if (status === 'CLOSED') updatePayload.closed_at = new Date().toISOString();
 
-      const { error } = await (supabase.from('manifests') as any)
+      const { error } = await supabase
+        .from('manifests')
         .update(updatePayload)
-        .eq('id', id);
+        .eq('id', id)
+        .eq('org_id', orgId);
 
       if (error) throw error;
     },
@@ -332,11 +362,17 @@ export interface ManifestLookupResult {
 }
 
 export function useFindManifestByCode() {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useMutation({
     mutationFn: async (code: string): Promise<ManifestLookupResult | null> => {
+      if (!orgId) {
+        throw new Error('No organization context available for manifest lookup.');
+      }
       // Try to find by ID or manifest_no
-      const { data, error } = await (supabase.from('manifests') as any)
+      const { data, error } = await supabase
+        .from('manifests')
         .select('id, manifest_no, from_hub_id, to_hub_id, status')
+        .eq('org_id', orgId)
         .or(`id.eq.${code},manifest_no.eq.${code}`)
         .maybeSingle();
 
@@ -350,15 +386,19 @@ export function useFindManifestByCode() {
 // CRITICAL: Includes idempotency check to prevent duplicate scans
 export function useAddManifestItem() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async (input: { manifest_id: string; shipment_id: string }) => {
-      const orgId = await getOrCreateDefaultOrg();
+      if (!orgId) {
+        throw new Error('No organization context available for manifest updates.');
+      }
 
       // IDEMPOTENCY CHECK: Prevent duplicate manifest items
       const { data: existing } = await supabase
         .from('manifest_items')
         .select('id')
+        .eq('org_id', orgId)
         .eq('manifest_id', input.manifest_id)
         .eq('shipment_id', input.shipment_id)
         .maybeSingle();
@@ -369,7 +409,8 @@ export function useAddManifestItem() {
         return existing;
       }
 
-      const { data, error } = await (supabase.from('manifest_items') as any)
+      const { data, error } = await supabase
+        .from('manifest_items')
         .insert({
           org_id: orgId,
           manifest_id: input.manifest_id,
@@ -393,10 +434,16 @@ export function useAddManifestItem() {
 
 // Check if shipment is in manifest (for VERIFY_MANIFEST scan mode)
 export function useCheckManifestItem() {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useMutation({
     mutationFn: async (input: { manifest_id: string; shipment_id: string }): Promise<boolean> => {
-      const { data, error } = await (supabase.from('manifest_items') as any)
+      if (!orgId) {
+        throw new Error('No organization context available for manifest verification.');
+      }
+      const { data, error } = await supabase
+        .from('manifest_items')
         .select('id')
+        .eq('org_id', orgId)
         .eq('manifest_id', input.manifest_id)
         .eq('shipment_id', input.shipment_id)
         .maybeSingle();
@@ -413,10 +460,14 @@ export function useCheckManifestItem() {
  */
 export function useHardDeleteManifest() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('manifests').delete().eq('id', id);
+      if (!orgId) {
+        throw new Error('No organization context available for manifest deletion.');
+      }
+      const { error } = await supabase.from('manifests').delete().eq('id', id).eq('org_id', orgId);
 
       if (error) throw error;
     },

@@ -39,7 +39,7 @@ export function useRealtimeShipments() {
             table: 'shipments',
           },
           (payload) => {
-            logger.debug('[Realtime] Shipment changed', { eventType: payload.eventType });
+            logger.debug('Realtime', 'Shipment changed', { eventType: payload.eventType });
 
             // Invalidate shipments queries
             queryClient.invalidateQueries({ queryKey: queryKeys.shipments.all });
@@ -54,7 +54,7 @@ export function useRealtimeShipments() {
           }
         )
         .subscribe((status) => {
-          logger.debug('[Realtime] Shipments subscription', { status });
+          logger.debug('Realtime', 'Shipments subscription', { status });
         });
 
       channelRef.current = channel;
@@ -102,7 +102,7 @@ export function useRealtimeManifests() {
             table: 'manifests',
           },
           (payload) => {
-            logger.debug('[Realtime] Manifest changed', { eventType: payload.eventType });
+            logger.debug('Realtime', 'Manifest changed', { eventType: payload.eventType });
             queryClient.invalidateQueries({ queryKey: queryKeys.manifests.all });
           }
         )
@@ -163,7 +163,7 @@ export function useRealtimeTracking(awb?: string) {
             filter: `cn_number=eq.${awb}`,
           },
           () => {
-            logger.debug('[Realtime] New tracking event', { awb });
+            logger.debug('Realtime', 'New tracking event', { awb });
             queryClient.invalidateQueries({ queryKey: queryKeys.tracking.byCN(awb) });
           }
         )
@@ -215,7 +215,7 @@ export function useRealtimeExceptions() {
             table: 'exceptions',
           },
           (payload) => {
-            logger.debug('[Realtime] Exception changed', { eventType: payload.eventType });
+            logger.debug('Realtime', 'Exception changed', { eventType: payload.eventType });
             queryClient.invalidateQueries({ queryKey: queryKeys.exceptions.all });
           }
         )

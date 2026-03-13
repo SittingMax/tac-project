@@ -12,9 +12,9 @@ export const SectionHeader: React.FC<{
   title: string;
   action?: React.ReactNode;
 }> = ({ icon: Icon, title, action }) => (
-  <div className="flex items-center justify-between pb-3 mb-4 border-b border-border/40">
+  <div className="flex items-center justify-between pb-2 mb-4 border-b border-border/40">
     <div className="flex items-center gap-2.5">
-      <div className="p-1.5 rounded-none bg-primary/10 text-primary border border-primary/20">
+      <div className="p-1.5 rounded-md bg-primary/10 text-primary border border-primary/20">
         <Icon className="w-4 h-4" />
       </div>
       <span className="text-sm font-bold tracking-wide text-foreground uppercase">{title}</span>
@@ -52,7 +52,7 @@ export const CustomerSearch: React.FC<{
   const fuse = useMemo(
     () =>
       new Fuse(customers, {
-        keys: ['name', 'companyName', 'phone'],
+        keys: ['name', 'phone'],
         threshold: 0.3,
         includeScore: true,
       }),
@@ -69,8 +69,7 @@ export const CustomerSearch: React.FC<{
 
   const handleSelect = (c: CustomerDB) => {
     onSelect(c);
-    const label = c.companyName || c.name;
-    setDisplayLabel(label);
+    setDisplayLabel(c.name);
     setSearch('');
     setOpen(false);
   };
@@ -107,7 +106,7 @@ export const CustomerSearch: React.FC<{
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="flex items-center border-b border-border px-3">
+        <div className="flex items-center border-b border-border px-2">
           <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
           <Input
             ref={inputRef}
@@ -127,15 +126,10 @@ export const CustomerSearch: React.FC<{
                   key={c.id}
                   type="button"
                   onClick={() => handleSelect(c)}
-                  className="w-full text-left flex flex-col items-start gap-0.5 cursor-pointer rounded-none px-3 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground transition-colors"
+                  className="w-full text-left flex flex-col items-start gap-0.5 cursor-pointer rounded-md px-2 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
                   <div className="text-xs font-bold text-foreground flex items-center justify-between w-full">
-                    <span>{c.companyName || c.name}</span>
-                    {c.tier === 'ENTERPRISE' && (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded-none bg-primary/10 text-primary font-semibold">
-                        VIP
-                      </span>
-                    )}
+                    <span>{c.name}</span>
                   </div>
                   <div className="flex items-center justify-between w-full">
                     <span className="text-[10px] text-muted-foreground">{c.phone}</span>
@@ -148,7 +142,7 @@ export const CustomerSearch: React.FC<{
                   {c.preferences && (
                     <div className="flex gap-1 mt-0.5">
                       {c.preferences.preferredTransportMode && (
-                        <span className="text-[8px] px-1 py-0.5 rounded-none bg-muted text-muted-foreground flex items-center gap-1">
+                        <span className="text-[8px] px-1 py-0.5 rounded-sm bg-muted text-muted-foreground flex items-center gap-1">
                           {c.preferences.preferredTransportMode === 'AIR' ? (
                             <Plane className="w-2.5 h-2.5" />
                           ) : (
@@ -158,7 +152,7 @@ export const CustomerSearch: React.FC<{
                         </span>
                       )}
                       {c.preferences.preferredPaymentMode && (
-                        <span className="text-[8px] px-1 py-0.5 rounded-none bg-muted text-muted-foreground">
+                        <span className="text-[8px] px-1 py-0.5 rounded-sm bg-muted text-muted-foreground">
                           {c.preferences.preferredPaymentMode}
                         </span>
                       )}

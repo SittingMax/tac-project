@@ -3,6 +3,8 @@
  * Handles invoice and notification emails
  */
 
+import { logger } from '@/lib/logger';
+
 import { supabase } from './supabase';
 
 // ============================================================================
@@ -166,13 +168,13 @@ export const sendEmail = async (
     });
 
     if (error) {
-      console.error('[Email] Failed to send:', error);
+      logger.error('Email', 'Failed to send', { error });
       return { success: false, error: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('[Email] Exception:', error);
+    logger.error('Email', 'Exception sending email', { error });
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 };

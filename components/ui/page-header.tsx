@@ -17,18 +17,18 @@ export function PageHeader({ title, description, icon, children, className }: Pa
   return (
     <div
       className={cn(
-        'flex flex-col gap-6 md:flex-row md:items-end md:justify-between mb-12',
+        'flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-6',
         className
       )}
     >
-      <div className="flex flex-col gap-2">
-        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none flex items-center gap-2.5 text-foreground">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase leading-none flex items-center gap-2 text-foreground">
           {icon && <span className="shrink-0">{icon}</span>}
           {title}
-          <span className="text-primary">.</span>
+          <span className="text-primary opacity-50">/</span>
         </h1>
         {description && (
-          <p className="text-muted-foreground font-mono text-xs tracking-widest uppercase">
+          <p className="text-muted-foreground font-mono text-[10px] tracking-widest uppercase mt-1">
             {description}
           </p>
         )}

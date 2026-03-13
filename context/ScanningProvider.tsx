@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { X, ScanBarcode, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import { ScanSource } from '@/types';
 import {
   ScanningContext,
@@ -17,17 +18,27 @@ interface ScanningProviderProps {
 }
 
 // --- Constants ---
+// Try to get configurable values from localStorage, fallback to defaults
+const getConfig = (key: string, defaultValue: number): number => {
+  try {
+    const val = localStorage.getItem(`TAC_SCANNER_${key}`);
+    return val ? parseInt(val, 10) : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
+
 // If keystrokes arrive faster than this average, they are from a scanner, not a human.
 // Increased from 100ms to 150ms to accommodate various scanner hardware
-const SCANNER_SPEED_THRESHOLD_MS = 150;
+const SCANNER_SPEED_THRESHOLD_MS = getConfig('SPEED_THRESHOLD_MS', 150);
 // Minimum number of characters for a valid scan sequence.
-const MIN_SCAN_LENGTH = 3;
+const MIN_SCAN_LENGTH = getConfig('MIN_SCAN_LENGTH', 3);
 // If no key arrives within this window, the buffer is considered stale and reset.
 // Increased from 500ms to 1000ms for more robust scanning
-const BUFFER_STALE_TIMEOUT_MS = 1000;
+const BUFFER_STALE_TIMEOUT_MS = getConfig('BUFFER_STALE_TIMEOUT_MS', 1000);
 // Auto-submit delay for scanners that don't send Enter key
 // If no key arrives within this window after scanner-speed input, auto-submit
-const AUTO_SUBMIT_DELAY_MS = 100;
+const AUTO_SUBMIT_DELAY_MS = getConfig('AUTO_SUBMIT_DELAY_MS', 100);
 // Debug mode: submit buffer regardless of timing detection
 const DEBUG_MODE = false; // Set to true to capture all input regardless of speed (DEBUG ONLY)
 
@@ -46,6 +57,7 @@ export function ScanningProvider({ children }: ScanningProviderProps) {
   const lastKeyTimeRef = useRef<number>(0);
   const keyTimingsRef = useRef<number[]>([]); // Inter-key delays for speed detection
   const autoSubmitTimerRef = useRef<NodeJS.Timeout | null>(null); // Auto-submit timer for scanners without Enter
+  const recentSubmissionsRef = useRef<Map<string, number>>(new Map()); // Debounce duplicates
 
   // Keep the ref in sync with state
   useEffect(() => {
@@ -88,11 +100,11 @@ export function ScanningProvider({ children }: ScanningProviderProps) {
         try {
           cb(data, source);
         } catch (e) {
-          console.error('[ScanningProvider] Error in listener:', e);
+          logger.error('ScanningProvider', 'Error in listener', { error: e });
         }
       });
     } else {
-      console.warn('[ScanningProvider] No listeners registered for this scan.');
+      logger.warn('ScanningProvider', 'No listeners registered for this scan');
       if (source === ScanSource.BARCODE_SCANNER) {
         toast.success(`Scanned: ${data}`);
       }
@@ -146,6 +158,16 @@ export function ScanningProvider({ children }: ScanningProviderProps) {
         : buffer && buffer.length >= MIN_SCAN_LENGTH && isScannerSpeed(timings);
 
       if (scannerDetected) {
+        const now = Date.now();
+        const lastTime = recentSubmissionsRef.current.get(buffer);
+        if (lastTime && now - lastTime < 500) {
+          // Debounce duplicate submissions
+          bufferRef.current = '';
+          keyTimingsRef.current = [];
+          return;
+        }
+        recentSubmissionsRef.current.set(buffer, now);
+
         // eslint-disable-next-line no-console
         console.debug('[ScanningProvider] Scanner detected - submitting:', buffer);
 

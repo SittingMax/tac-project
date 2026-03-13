@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarDays, PackageSearch } from 'lucide-react';
+import { CalendarDays, PackageSearch, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BookingDialog } from '@/components/bookings/BookingDialog';
 import { useBookings } from '@/hooks/useBookings';
@@ -11,6 +11,7 @@ import { StatusBadge } from '@/components/domain/StatusBadge';
 import { format } from 'date-fns';
 import { ColumnDef } from '@tanstack/react-table';
 import { Booking } from '@/types';
+import { IdBadge } from '@/components/ui-core/data/id-badge';
 
 export const Bookings: React.FC = () => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -18,7 +19,6 @@ export const Bookings: React.FC = () => {
 
   const pendingCount = bookings.filter((b) => b.status === 'PENDING').length;
 
-  // Count bookings created today
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayCount = bookings.filter((b) => new Date(b.created_at) >= today).length;
@@ -27,7 +27,7 @@ export const Bookings: React.FC = () => {
     {
       accessorKey: 'id',
       header: 'ID',
-      cell: ({ row }) => <span className="font-mono text-xs">{row.getValue('id')}</span>,
+      cell: ({ row }) => <IdBadge entity="booking" idValue={row.getValue('id')} />,
     },
     {
       accessorKey: 'created_at',
@@ -67,59 +67,52 @@ export const Bookings: React.FC = () => {
   ];
 
   return (
-    <div className="flex-1 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-700">
-      <div className="flex items-center justify-between">
-        <PageHeader
-          title="Bookings Management"
-          description="View, manage, and track all incoming logistics bookings."
-        />
-        <Button
-          onClick={() => setIsBookingModalOpen(true)}
-          className="font-mono text-xs uppercase tracking-widest px-8 rounded-none"
-        >
-          <CalendarDays className="h-4 w-4 mr-2" />
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <PageHeader
+        title="Bookings"
+        description="View, manage, and track all incoming logistics bookings"
+      >
+        <Button onClick={() => setIsBookingModalOpen(true)}>
+          <Plus data-icon="inline-start" />
           New Booking
         </Button>
-        <BookingDialog open={isBookingModalOpen} onOpenChange={setIsBookingModalOpen} />
-      </div>
+      </PageHeader>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="rounded-none border-border/40 shadow-sm backdrop-blur-lg bg-card/80">
+      <BookingDialog open={isBookingModalOpen} onOpenChange={setIsBookingModalOpen} />
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Pending Bookings
             </CardTitle>
-            <CalendarDays className="h-4 w-4 text-status-warning" />
+            <CalendarDays className="size-4 text-status-warning" />
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <Skeleton className="h-8 w-16" />
             ) : (
               <>
-                <div className="text-3xl font-black text-foreground">{pendingCount}</div>
-                <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-1">
-                  Requires attention
-                </p>
+                <div className="text-2xl font-semibold text-foreground">{pendingCount}</div>
+                <p className="text-xs text-muted-foreground mt-1">Requires attention</p>
               </>
             )}
           </CardContent>
         </Card>
-        <Card className="rounded-none border-border/40 shadow-sm backdrop-blur-lg bg-card/80">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Created Today
             </CardTitle>
-            <PackageSearch className="h-4 w-4 text-status-success" />
+            <PackageSearch className="size-4 text-status-success" />
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <Skeleton className="h-8 w-16" />
             ) : (
               <>
-                <div className="text-3xl font-black text-foreground">{todayCount}</div>
-                <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-1">
-                  Total volume
-                </p>
+                <div className="text-2xl font-semibold text-foreground">{todayCount}</div>
+                <p className="text-xs text-muted-foreground mt-1">Bookings received today</p>
               </>
             )}
           </CardContent>

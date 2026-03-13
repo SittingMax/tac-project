@@ -1,32 +1,78 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Building2, Shield, Bell, User, Truck, MapPin, Moon, Sun, Monitor } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { ColumnDef } from '@tanstack/react-table';
+import { CrudTable } from '@/components/crud/CrudTable';
 import { HUBS, SHIPMENT_MODES, SERVICE_LEVELS, PAYMENT_MODES } from '@/lib/constants';
 
-import {
-  SectionHeader,
-  FieldLabel,
-  SelectField,
-  ToggleSwitch,
-} from '@/components/settings/SettingsComponents';
+import { SectionHeader, FieldLabel, SelectField } from '@/components/settings/SettingsComponents';
 import { AuditLogsTab } from '@/components/settings/AuditLogsTab';
+import { settingsService } from '@/lib/services/settingsService';
 import { cn } from '@/lib/utils';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+
+const DEFAULT_NOTIFICATIONS = {
+  shipment_delays: true,
+  new_orders: true,
+  system_alerts: true,
+  driver_updates: false,
+};
+
+const hubColumns: ColumnDef<(typeof HUBS)[keyof typeof HUBS]>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Hub Name',
+    cell: ({ row }) => (
+      <span className="font-bold text-foreground font-mono">{row.original.name}</span>
+    ),
+  },
+  {
+    accessorKey: 'code',
+    header: 'Code',
+    cell: ({ row }) => <Badge variant="outline">{row.original.code}</Badge>,
+  },
+  {
+    accessorKey: 'sortCode',
+    header: 'Sort Code',
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground">{row.original.sortCode}</span>
+    ),
+  },
+  {
+    accessorKey: 'address',
+    header: 'Address',
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground max-w-xs">{row.original.address}</span>
+    ),
+  },
+  {
+    id: 'status',
+    header: 'Status',
+    cell: () => (
+      <Badge
+        variant="default"
+        className="bg-status-success/10 text-status-success border-status-success/30"
+      >
+        Active
+      </Badge>
+    ),
+  },
+];
 
 export const Settings = () => {
   const { user, session } = useAuthStore();
@@ -41,26 +87,123 @@ export const Settings = () => {
   const [dateFormat, setDateFormat] = useState('DD/MM/YYYY');
 
   // Operational Defaults
-  const [defaultMode, setDefaultMode] = useState('TRUCK_LINEHAUL');
+  const [defaultMode, setDefaultMode] = useState('TRUCK');
   const [defaultServiceLevel, setDefaultServiceLevel] = useState('STANDARD');
-  const [defaultPaymentMode, setDefaultPaymentMode] = useState('PREPAID');
+  const [defaultPaymentMode, setDefaultPaymentMode] = useState('PAID');
   const [exportFormat, setExportFormat] = useState('CSV');
 
   // Notification Toggles
-  const [notifications, setNotifications] = useState({
-    shipment_delays: true,
-    new_orders: true,
-    system_alerts: true,
-    driver_updates: false,
-  });
+  const [notifications, setNotifications] = useState(DEFAULT_NOTIFICATIONS);
 
-  const handleSaveGeneral = () => {
+  const loadSettings = useCallback(async () => {
+    if (!user?.id) return;
+
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const [{ name, settings }, userSettings] = await Promise.all([
+        settingsService.getOrgSettings(),
+        settingsService.getUserSettings(user.id),
+      ]);
+
+      const orgSettings = settings as Record<string, unknown>;
+      const notificationTypes = Array.isArray(userSettings.notifications?.types)
+        ? userSettings.notifications.types
+        : null;
+
+      setTerminalName(name || 'MAIN HUB - MUMBAI');
+      setTimezone(typeof orgSettings.timezone === 'string' ? orgSettings.timezone : 'Asia/Kolkata');
+      setCurrency(typeof orgSettings.currency === 'string' ? orgSettings.currency : 'INR');
+      setDateFormat(
+        typeof orgSettings.dateFormat === 'string' ? orgSettings.dateFormat : 'DD/MM/YYYY'
+      );
+      setDefaultMode(
+        typeof orgSettings.defaultMode === 'string' ? orgSettings.defaultMode : 'TRUCK'
+      );
+      setDefaultServiceLevel(
+        typeof orgSettings.defaultServiceLevel === 'string'
+          ? orgSettings.defaultServiceLevel
+          : 'STANDARD'
+      );
+      setDefaultPaymentMode(
+        typeof orgSettings.defaultPaymentMode === 'string' ? orgSettings.defaultPaymentMode : 'PAID'
+      );
+      setExportFormat(
+        typeof orgSettings.exportFormat === 'string' ? orgSettings.exportFormat : 'CSV'
+      );
+      setTheme(userSettings.theme ?? 'system');
+      setNotifications(
+        notificationTypes
+          ? {
+              shipment_delays: notificationTypes.includes('shipment_delays'),
+              new_orders: notificationTypes.includes('new_orders'),
+              system_alerts: notificationTypes.includes('system_alerts'),
+              driver_updates: notificationTypes.includes('driver_updates'),
+            }
+          : DEFAULT_NOTIFICATIONS
+      );
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to load settings');
+    } finally {
       setIsLoading(false);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    void loadSettings();
+  }, [loadSettings]);
+
+  const handleSaveGeneral = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await settingsService.updateOrgSettings(terminalName, {
+        timezone,
+        currency,
+        dateFormat,
+        defaultMode,
+        defaultServiceLevel,
+        defaultPaymentMode,
+        exportFormat,
+      });
       toast.success('Configuration saved successfully');
-    }, 1000);
-  };
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to save configuration');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    currency,
+    dateFormat,
+    defaultMode,
+    defaultPaymentMode,
+    defaultServiceLevel,
+    exportFormat,
+    terminalName,
+    timezone,
+  ]);
+
+  const handleSaveSecurity = useCallback(async () => {
+    if (!user?.id) {
+      toast.error('User profile unavailable');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await settingsService.updateUserSettings(user.id, {
+        theme,
+        notifications: {
+          types: Object.entries(notifications)
+            .filter(([, enabled]) => enabled)
+            .map(([key]) => key),
+        },
+      });
+      toast.success('Preferences saved successfully');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to save preferences');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [notifications, theme, user?.id]);
 
   const toggleNotification = (id: keyof typeof notifications) => {
     setNotifications((prev) => ({
@@ -70,13 +213,13 @@ export const Settings = () => {
   };
 
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
-      <div className="flex justify-between items-end border-b border-border/40 pb-4">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+      <div className="flex justify-between items-end pb-4">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
-            System Config<span className="text-primary">.</span>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
+            Settings
           </h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
+          <p className="text-sm text-muted-foreground mt-1">
             Manage organization settings, security, and audit logs
           </p>
         </div>
@@ -86,22 +229,22 @@ export const Settings = () => {
         value={activeTab}
         onValueChange={(v) => setActiveTab(v as 'GENERAL' | 'SECURITY' | 'AUDIT')}
       >
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-border/20 pb-4">
-          <div className="flex gap-0 border border-border/40">
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-border pb-4">
+          <div className="flex gap-0 rounded-lg border border-border overflow-hidden">
             {[
-              { id: 'GENERAL', label: 'GENERAL_CONFIG' },
-              { id: 'SECURITY', label: 'SECURITY_AUTH' },
-              { id: 'AUDIT', label: 'AUDIT_STREAM' },
+              { id: 'GENERAL', label: 'General' },
+              { id: 'SECURITY', label: 'Security' },
+              { id: 'AUDIT', label: 'Audit Logs' },
             ].map((tab) => (
               <button
                 key={tab.id}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onClick={() => setActiveTab(tab.id as any)}
                 className={cn(
-                  'px-8 py-3 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 border-l first:border-l-0 border-border/40',
+                  'px-6 py-2 text-sm font-medium transition-all duration-200 border-l first:border-l-0 border-border',
                   activeTab === tab.id
                     ? 'bg-primary text-primary-foreground'
-                    : 'bg-background text-muted-foreground hover:bg-muted/10'
+                    : 'bg-background text-muted-foreground hover:bg-muted'
                 )}
               >
                 {tab.label}
@@ -112,170 +255,171 @@ export const Settings = () => {
 
         {/* ============= GENERAL TAB ============= */}
         <TabsContent value="GENERAL" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border/40 border border-border/40">
-            {/* Organization Profile */}
-            <Card className="p-8 rounded-none border-0 shadow-none bg-background">
-              <SectionHeader icon={Building2} title="Organization Profile" />
-              <div className="space-y-6">
-                <div>
-                  <FieldLabel>Terminal Name</FieldLabel>
-                  <Input
-                    value={terminalName}
-                    onChange={(e) => setTerminalName(e.target.value)}
-                    disabled={isLoading}
-                    className="rounded-none font-mono text-xs uppercase h-10"
-                  />
-                </div>
-                <div>
-                  <FieldLabel>Timezone</FieldLabel>
-                  <SelectField
-                    value={timezone}
-                    onChange={setTimezone}
-                    options={[
-                      { value: 'UTC', label: 'UTC' },
-                      { value: 'Asia/Kolkata', label: 'Asia/Kolkata (IST)' },
-                      { value: 'America/New_York', label: 'America/New_York (EST)' },
-                      { value: 'Europe/London', label: 'Europe/London (GMT)' },
-                      { value: 'Asia/Dubai', label: 'Asia/Dubai (GST)' },
-                      { value: 'Asia/Singapore', label: 'Asia/Singapore (SGT)' },
-                    ]}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+          <Accordion
+            type="multiple"
+            defaultValue={['item-1', 'item-2', 'item-3']}
+            className="w-full space-y-4"
+          >
+            <AccordionItem
+              value="item-1"
+              className="border-none bg-card rounded-lg border border-border"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
+                <SectionHeader icon={Building2} title="Organization Profile" className="mb-0" />
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6 pt-2">
+                <div className="space-y-6">
                   <div>
-                    <FieldLabel>Currency</FieldLabel>
-                    <SelectField
-                      value={currency}
-                      onChange={setCurrency}
-                      options={[
-                        { value: 'INR', label: '₹ INR' },
-                        { value: 'USD', label: '$ USD' },
-                        { value: 'EUR', label: '€ EUR' },
-                        { value: 'GBP', label: '£ GBP' },
-                      ]}
+                    <FieldLabel>Terminal Name</FieldLabel>
+                    <Input
+                      value={terminalName}
+                      onChange={(e) => setTerminalName(e.target.value)}
+                      disabled={isLoading}
+                      className="h-10"
                     />
                   </div>
                   <div>
-                    <FieldLabel>Date Format</FieldLabel>
+                    <FieldLabel>Timezone</FieldLabel>
                     <SelectField
-                      value={dateFormat}
-                      onChange={setDateFormat}
+                      value={timezone}
+                      onChange={setTimezone}
                       options={[
-                        { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY' },
-                        { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },
-                        { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD (ISO)' },
+                        { value: 'UTC', label: 'UTC' },
+                        { value: 'Asia/Kolkata', label: 'Asia/Kolkata (IST)' },
+                        { value: 'America/New_York', label: 'America/New_York (EST)' },
+                        { value: 'Europe/London', label: 'Europe/London (GMT)' },
+                        { value: 'Asia/Dubai', label: 'Asia/Dubai (GST)' },
+                        { value: 'Asia/Singapore', label: 'Asia/Singapore (SGT)' },
+                      ]}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <FieldLabel>Currency</FieldLabel>
+                      <SelectField
+                        value={currency}
+                        onChange={setCurrency}
+                        options={[
+                          { value: 'INR', label: '₹ INR' },
+                          { value: 'USD', label: '$ USD' },
+                          { value: 'EUR', label: '€ EUR' },
+                          { value: 'GBP', label: '£ GBP' },
+                        ]}
+                      />
+                    </div>
+                    <div>
+                      <FieldLabel>Date Format</FieldLabel>
+                      <SelectField
+                        value={dateFormat}
+                        onChange={setDateFormat}
+                        options={[
+                          { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY' },
+                          { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },
+                          { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD (ISO)' },
+                        ]}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem
+              value="item-2"
+              className="border-none bg-card rounded-lg border border-border"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
+                <SectionHeader icon={Truck} title="Operational Defaults" className="mb-0" />
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6 pt-2">
+                <div className="space-y-6">
+                  <div>
+                    <FieldLabel>Default Shipment Mode</FieldLabel>
+                    <SelectField
+                      value={defaultMode}
+                      onChange={setDefaultMode}
+                      options={SHIPMENT_MODES.map((m) => ({ value: m.id, label: m.label }))}
+                    />
+                  </div>
+                  <div>
+                    <FieldLabel>Default Service Level</FieldLabel>
+                    <SelectField
+                      value={defaultServiceLevel}
+                      onChange={setDefaultServiceLevel}
+                      options={SERVICE_LEVELS.map((s) => ({ value: s.id, label: s.label }))}
+                    />
+                  </div>
+                  <div>
+                    <FieldLabel>Default Payment Mode</FieldLabel>
+                    <RadioGroup
+                      value={defaultPaymentMode}
+                      onValueChange={setDefaultPaymentMode}
+                      className="flex space-x-4 mt-2"
+                    >
+                      {PAYMENT_MODES.map((p) => (
+                        <div
+                          key={p.id}
+                          className="flex items-center space-x-2 bg-muted/30 border border-border px-4 py-2 rounded-md"
+                        >
+                          <RadioGroupItem value={p.id} id={`payment-${p.id}`} />
+                          <Label
+                            htmlFor={`payment-${p.id}`}
+                            className="cursor-pointer font-normal text-sm"
+                          >
+                            {p.label}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </div>
+                  <div>
+                    <FieldLabel>Export Format</FieldLabel>
+                    <SelectField
+                      value={exportFormat}
+                      onChange={setExportFormat}
+                      options={[
+                        { value: 'CSV', label: 'CSV (Spreadsheet)' },
+                        { value: 'PDF', label: 'PDF (Document)' },
+                        { value: 'XLSX', label: 'Excel (XLSX)' },
                       ]}
                     />
                   </div>
                 </div>
-              </div>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            {/* Operational Defaults */}
-            <Card className="p-8 rounded-none border-0 shadow-none bg-background">
-              <SectionHeader icon={Truck} title="Operational Defaults" />
-              <div className="space-y-6">
-                <div>
-                  <FieldLabel>Default Shipment Mode</FieldLabel>
-                  <SelectField
-                    value={defaultMode}
-                    onChange={setDefaultMode}
-                    options={SHIPMENT_MODES.map((m) => ({ value: m.id, label: m.label }))}
-                  />
-                </div>
-                <div>
-                  <FieldLabel>Default Service Level</FieldLabel>
-                  <SelectField
-                    value={defaultServiceLevel}
-                    onChange={setDefaultServiceLevel}
-                    options={SERVICE_LEVELS.map((s) => ({ value: s.id, label: s.label }))}
-                  />
-                </div>
-                <div>
-                  <FieldLabel>Default Payment Mode</FieldLabel>
-                  <SelectField
-                    value={defaultPaymentMode}
-                    onChange={setDefaultPaymentMode}
-                    options={PAYMENT_MODES.map((p) => ({ value: p.id, label: p.label }))}
-                  />
-                </div>
-                <div>
-                  <FieldLabel>Export Format</FieldLabel>
-                  <SelectField
-                    value={exportFormat}
-                    onChange={setExportFormat}
-                    options={[
-                      { value: 'CSV', label: 'CSV (Spreadsheet)' },
-                      { value: 'PDF', label: 'PDF (Document)' },
-                      { value: 'XLSX', label: 'Excel (XLSX)' },
-                    ]}
-                  />
-                </div>
-              </div>
-            </Card>
+            <AccordionItem
+              value="item-3"
+              className="border-none bg-card rounded-lg border border-border"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
+                <SectionHeader
+                  icon={MapPin}
+                  title="Hub Network"
+                  color="text-primary"
+                  className="mb-0"
+                />
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6 pt-2">
+                <CrudTable
+                  columns={hubColumns}
+                  data={Object.values(HUBS)}
+                  pageSize={100}
+                  enableColumnVisibility={false}
+                />
+                <p className="text-xs text-muted-foreground mt-4">
+                  Hub configuration is managed at the infrastructure level. Contact support to add
+                  or modify hubs.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
-            {/* Hub Network — Full width */}
-            <Card className="p-8 rounded-none border-0 shadow-none md:col-span-2 bg-background">
-              <SectionHeader icon={MapPin} title="Hub Network" color="text-primary" />
-              <div className="border border-border/40 overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/5 font-mono text-xs uppercase tracking-widest">
-                      <TableHead>Hub Name</TableHead>
-                      <TableHead>Code</TableHead>
-                      <TableHead>Sort Code</TableHead>
-                      <TableHead>Address</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {Object.entries(HUBS).map(([key, hub]) => (
-                      <TableRow key={key}>
-                        <TableCell className="font-bold text-foreground font-mono">
-                          {hub.name}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="outline"
-                            className="font-mono rounded-none tracking-widest text-[10px]"
-                          >
-                            {hub.code}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="font-mono text-xs text-muted-foreground">
-                          {hub.sortCode}
-                        </TableCell>
-                        <TableCell className="text-xs text-muted-foreground max-w-xs font-mono">
-                          {hub.address}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="default"
-                            className="bg-status-success/10 text-status-success border-status-success/30 rounded-none font-mono tracking-widest text-[10px]"
-                          >
-                            ACTIVE
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-4">
-                Hub configuration is managed at the infrastructure level. Contact support to add or
-                modify hubs.
-              </p>
-            </Card>
-
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             {/* Save Button — Full width */}
             <div className="md:col-span-2 p-8 bg-background flex justify-end">
-              <Button
-                onClick={handleSaveGeneral}
-                disabled={isLoading}
-                size="lg"
-                className="rounded-none font-mono text-xs uppercase tracking-widest px-12 h-14"
-              >
-                {isLoading ? 'Saving...' : 'Execute Changes'}
+              <Button onClick={handleSaveGeneral} disabled={isLoading} size="lg">
+                {isLoading ? 'Saving...' : 'Save Settings'}
               </Button>
             </div>
           </div>
@@ -283,201 +427,211 @@ export const Settings = () => {
 
         {/* ============= SECURITY & NOTIFICATIONS TAB ============= */}
         <TabsContent value="SECURITY" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border/40 border border-border/40">
-            {/* User Profile */}
-            <Card className="p-8 rounded-none border-0 shadow-none bg-background">
-              <SectionHeader icon={User} title="User Profile" />
-              <div className="space-y-6">
-                <div className="flex items-center gap-6 p-4 bg-muted/5 border border-border/40">
-                  <div className="w-16 h-16 bg-primary/10 flex items-center justify-center text-primary font-black text-2xl border border-primary/20">
-                    {user?.fullName
-                      ?.split(' ')
-                      .map((n) => n[0])
-                      .join('')
-                      .toUpperCase()
-                      .slice(0, 2) || '??'}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xl font-black text-foreground uppercase tracking-tighter truncate">
-                      {user?.fullName || 'Unknown'}
+          <Accordion
+            type="multiple"
+            defaultValue={['item-1', 'item-2', 'item-3', 'item-4']}
+            className="w-full space-y-4"
+          >
+            <AccordionItem
+              value="item-1"
+              className="border-none bg-card rounded-lg border border-border"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
+                <SectionHeader icon={User} title="User Profile" className="mb-0" />
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6 pt-2">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-6 p-4 rounded-lg bg-muted/30 border border-border">
+                    <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold text-2xl">
+                      {user?.fullName
+                        ?.split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2) || '??'}
                     </div>
-                    <div className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest truncate mt-1">
-                      {user?.email || '—'}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-lg font-semibold text-foreground truncate">
+                        {user?.fullName || 'Unknown'}
+                      </div>
+                      <div className="text-sm text-muted-foreground truncate mt-0.5">
+                        {user?.email || '—'}
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="shrink-0 border-primary/30 text-primary">
+                      {user?.role || '—'}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 rounded-lg bg-muted/30">
+                      <div className="text-xs text-muted-foreground mb-1">Primary Hub</div>
+                      <div className="text-sm font-medium text-foreground">
+                        {user?.hubCode || 'All Hubs'}
+                      </div>
+                    </div>
+                    <div className="p-4 rounded-lg bg-muted/30">
+                      <div className="text-xs text-muted-foreground mb-1">Account Status</div>
+                      <div className="text-sm font-medium">
+                        {user?.isActive ? (
+                          <span className="text-status-success">Active</span>
+                        ) : (
+                          <span className="text-status-error">Inactive</span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <Badge
-                    variant="outline"
-                    className="shrink-0 rounded-none font-mono text-[10px] uppercase tracking-widest border-primary/30 text-primary"
-                  >
-                    {user?.role || '—'}
-                  </Badge>
                 </div>
-                <div className="grid grid-cols-2 gap-px bg-border/40 border border-border/40">
-                  <div className="p-4 bg-background">
-                    <div className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest mb-1.5 opacity-50">
-                      Primary Hub
-                    </div>
-                    <div className="text-xs font-black text-foreground font-mono uppercase tracking-widest">
-                      {user?.hubCode || 'All Hubs'}
-                    </div>
-                  </div>
-                  <div className="p-4 bg-background border-l border-border/40">
-                    <div className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest mb-1.5 opacity-50">
-                      Status
-                    </div>
-                    <div className="text-xs font-black uppercase tracking-widest">
-                      {user?.isActive ? (
-                        <span className="text-status-success">System Online</span>
-                      ) : (
-                        <span className="text-status-error">System Offline</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            {/* Appearance */}
-            <Card className="p-8 rounded-none border-0 shadow-none bg-background">
-              <SectionHeader icon={Moon} title="Appearance" />
-              <div className="space-y-6">
-                <div>
-                  <FieldLabel>Theme Mode</FieldLabel>
-                  <div className="grid grid-cols-3 border border-border/40">
-                    {[
-                      { id: 'light' as const, icon: Sun, label: 'Light' },
-                      { id: 'dark' as const, icon: Moon, label: 'Dark' },
-                      { id: 'system' as const, icon: Monitor, label: 'System' },
-                    ].map(({ id, icon: ThemeIcon, label }) => (
-                      <button
-                        key={id}
-                        onClick={() => setTheme(id)}
-                        className={`flex flex-col items-center justify-center p-4 transition-all duration-300 ${theme === id ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-muted/10 border-l first:border-l-0 border-border/40'}`}
-                      >
-                        <ThemeIcon className="w-4 h-4 mb-2" />
-                        <span className="text-[10px] font-mono uppercase tracking-widest">
-                          {label}
+            <AccordionItem
+              value="item-2"
+              className="border-none bg-card rounded-lg border border-border"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
+                <SectionHeader icon={Moon} title="Appearance" className="mb-0" />
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6 pt-2">
+                <div className="space-y-6">
+                  <div>
+                    <FieldLabel>Theme Mode</FieldLabel>
+                    <div className="grid grid-cols-3 rounded-lg border border-border overflow-hidden">
+                      {[
+                        { id: 'light' as const, icon: Sun, label: 'Light' },
+                        { id: 'dark' as const, icon: Moon, label: 'Dark' },
+                        { id: 'system' as const, icon: Monitor, label: 'System' },
+                      ].map(({ id, icon: ThemeIcon, label }) => (
+                        <button
+                          key={id}
+                          onClick={() => setTheme(id)}
+                          className={`flex flex-col items-center justify-center p-4 transition-all duration-200 ${theme === id ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-muted border-l first:border-l-0 border-border'}`}
+                        >
+                          <ThemeIcon className="w-4 h-4 mb-2" />
+                          <span className="text-xs font-medium">{label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="pt-6 border-t border-border">
+                    <div className="text-xs text-muted-foreground mb-4">Session Details</div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center rounded-md bg-muted/30 p-3 px-4">
+                        <span className="text-xs text-muted-foreground">Last Sign-In</span>
+                        <span className="text-xs text-foreground font-medium">
+                          {session?.user?.last_sign_in_at
+                            ? new Date(session.user.last_sign_in_at).toLocaleTimeString()
+                            : '—'}
                         </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="pt-6 border-t border-border/40">
-                  <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-4 opacity-50">
-                    Session Identity
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center bg-muted/5 p-2 px-3 border border-border/20">
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                        Last Active Request
-                      </span>
-                      <span className="font-mono text-[10px] text-foreground font-bold">
-                        {session?.user?.last_sign_in_at
-                          ? new Date(session.user.last_sign_in_at).toLocaleTimeString()
-                          : '—'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center bg-muted/5 p-2 px-3 border border-border/20">
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                        Cryptographic ID
-                      </span>
-                      <span className="font-mono text-[10px] text-foreground font-bold truncate max-w-[120px]">
-                        {session?.user?.id?.slice(0, 12) || '—'}…
-                      </span>
+                      </div>
+                      <div className="flex justify-between items-center rounded-md bg-muted/30 p-3 px-4">
+                        <span className="text-xs text-muted-foreground">User ID</span>
+                        <span className="font-mono text-xs text-foreground font-medium truncate max-w-[160px]">
+                          {session?.user?.id?.slice(0, 12) || '—'}…
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            {/* Notification Parameters */}
-            <Card className="p-8 rounded-none border-0 shadow-none bg-background">
-              <SectionHeader icon={Bell} title="Notifications" />
-              <div className="border border-border/40">
-                {[
-                  {
-                    id: 'shipment_delays',
-                    label: 'Delay Alerts',
-                  },
-                  {
-                    id: 'new_orders',
-                    label: 'Ingress Events',
-                  },
-                  {
-                    id: 'system_alerts',
-                    label: 'Kernel Notifications',
-                  },
-                  {
-                    id: 'driver_updates',
-                    label: 'Asset Streams',
-                  },
-                ].map((item, idx) => (
-                  <div key={item.id} className={idx > 0 ? 'border-t border-border/40' : ''}>
-                    <ToggleSwitch
-                      checked={notifications[item.id as keyof typeof notifications]}
-                      onToggle={() => toggleNotification(item.id as keyof typeof notifications)}
-                      label={item.label}
-                    />
-                  </div>
-                ))}
-              </div>
-            </Card>
+            <AccordionItem
+              value="item-3"
+              className="border-none bg-card rounded-lg border border-border"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
+                <SectionHeader icon={Bell} title="Notifications" className="mb-0" />
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6 pt-2">
+                <div className="rounded-lg border border-border overflow-hidden">
+                  {[
+                    {
+                      id: 'shipment_delays',
+                      label: 'Delay Alerts',
+                    },
+                    {
+                      id: 'new_orders',
+                      label: 'New Bookings & Orders',
+                    },
+                    {
+                      id: 'system_alerts',
+                      label: 'System Alerts',
+                    },
+                    {
+                      id: 'driver_updates',
+                      label: 'Driver & Vehicle Updates',
+                    },
+                  ].map((item, idx) => (
+                    <div
+                      key={item.id}
+                      className={`flex items-center justify-between px-4 py-3 ${idx > 0 ? 'border-t border-border' : ''}`}
+                    >
+                      <span className="text-sm font-medium">{item.label}</span>
+                      <Switch
+                        checked={notifications[item.id as keyof typeof notifications]}
+                        onCheckedChange={() =>
+                          toggleNotification(item.id as keyof typeof notifications)
+                        }
+                        aria-label={`Toggle ${item.label}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-            {/* Security Architecture */}
-            <Card className="p-8 rounded-none border-0 shadow-none bg-background">
-              <SectionHeader icon={Shield} title="Security" />
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-4 border border-border/40 bg-muted/5">
-                  <div className="min-w-0 pr-4">
-                    <div className="text-[10px] font-mono font-black text-foreground uppercase tracking-widest">
-                      MFA Infrastructure
+            <AccordionItem
+              value="item-4"
+              className="border-none bg-card rounded-lg border border-border"
+            >
+              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
+                <SectionHeader icon={Shield} title="Security" className="mb-0" />
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6 pt-2">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-4 rounded-lg border border-border bg-muted/30">
+                    <div className="min-w-0 pr-4">
+                      <div className="text-sm font-medium text-foreground">MFA Infrastructure</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        Identity Provider Managed
+                      </div>
                     </div>
-                    <div className="text-[10px] font-mono text-muted-foreground uppercase mt-1">
-                      Identity Provider Managed
-                    </div>
+                    <Badge variant="outline">Managed</Badge>
                   </div>
-                  <Button
-                    variant="outline"
-                    className="rounded-none font-mono text-[10px] uppercase tracking-widest h-8"
-                    disabled
-                  >
-                    Config
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center p-4 border border-border/40 bg-muted/5">
-                  <div className="min-w-0 pr-4">
-                    <div className="text-[10px] font-mono font-black text-foreground uppercase tracking-widest">
-                      API Access Gateway
+                  <div className="flex justify-between items-center p-4 rounded-lg border border-border bg-muted/30">
+                    <div className="min-w-0 pr-4">
+                      <div className="text-sm font-medium text-foreground">API Access Gateway</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        Privileged access only
+                      </div>
                     </div>
-                    <div className="text-[10px] font-mono text-muted-foreground uppercase mt-1">
-                      Privileged access only
-                    </div>
+                    <Badge variant="outline">Restricted</Badge>
                   </div>
-                  <Button
-                    variant="outline"
-                    className="rounded-none font-mono text-[10px] uppercase tracking-widest h-8"
-                  >
-                    Manage
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center p-4 border border-border/40 bg-muted/5">
-                  <div className="min-w-0 pr-4">
-                    <div className="text-[10px] font-mono font-black text-foreground uppercase tracking-widest">
-                      Policy Enforcement
+                  <div className="flex justify-between items-center p-4 rounded-lg border border-border bg-muted/30">
+                    <div className="min-w-0 pr-4">
+                      <div className="text-sm font-medium text-foreground">Policy Enforcement</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        8+ Chars / Leak Protection
+                      </div>
                     </div>
-                    <div className="text-[10px] font-mono text-muted-foreground uppercase mt-1">
-                      8+ Chars / Leak Protection
-                    </div>
+                    <Badge
+                      variant="default"
+                      className="bg-status-success/10 text-status-success border-status-success/30"
+                    >
+                      Active
+                    </Badge>
                   </div>
-                  <Badge
-                    variant="outline"
-                    className="bg-status-success/10 text-status-success border-status-success/40 rounded-none font-mono text-[10px] uppercase tracking-widest"
-                  >
-                    ACTIVE
-                  </Badge>
                 </div>
-              </div>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="md:col-span-2 p-8 bg-background flex justify-end">
+              <Button onClick={handleSaveSecurity} disabled={isLoading || !user?.id} size="lg">
+                {isLoading ? 'Saving...' : 'Save Preferences'}
+              </Button>
+            </div>
           </div>
         </TabsContent>
 

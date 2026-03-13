@@ -29,7 +29,7 @@ export function ShippingLabel({ shipment, packageIndex = 1 }: ShippingLabelProps
     <div className="bg-white text-black p-4 font-sans" style={{ width: '4in', height: '6in' }}>
       {/* Header */}
       <div className="text-center border-b-2 border-black pb-2 mb-3">
-        <h1 className="text-2xl font-black tracking-tight">TAC</h1>
+        <h1 className="text-2xl font-bold tracking-tight">TAC</h1>
         <p className="text-xs text-muted-foreground">Express Logistics • Imphal ↔ New Delhi</p>
       </div>
 
@@ -45,26 +45,26 @@ export function ShippingLabel({ shipment, packageIndex = 1 }: ShippingLabelProps
       </div>
 
       {/* Route Display */}
-      <div className="flex items-center justify-between bg-foreground text-background rounded-none p-3 mb-3">
+      <div className="flex items-center justify-between bg-foreground text-background rounded-md p-4 mb-3">
         <div className="text-center flex-1">
-          <p className="text-3xl font-black">{origin.code}</p>
+          <p className="text-3xl font-bold">{origin.code}</p>
           <p className="text-[10px] opacity-70">{origin.name}</p>
         </div>
         <div className="text-2xl px-4">→</div>
         <div className="text-center flex-1">
-          <p className="text-3xl font-black">{dest.code}</p>
+          <p className="text-3xl font-bold">{dest.code}</p>
           <p className="text-[10px] opacity-70">{dest.name}</p>
         </div>
       </div>
 
       {/* Sort Code */}
-      <div className="text-center bg-muted rounded-none py-2 mb-3">
+      <div className="text-center bg-muted rounded-md py-2 mb-3">
         <p className="text-xs text-muted-foreground">SORT CODE</p>
-        <p className="text-2xl font-black font-mono">{dest.sortCode}</p>
+        <p className="text-2xl font-bold font-mono">{dest.sortCode}</p>
       </div>
 
       {/* Package Info */}
-      <div className="flex justify-between items-center border border-border rounded-none p-2 mb-3">
+      <div className="flex justify-between items-center border border-border rounded-md p-2 mb-3">
         <div>
           <p className="text-xs text-muted-foreground">PACKAGE</p>
           <p className="text-xl font-bold">
@@ -82,7 +82,7 @@ export function ShippingLabel({ shipment, packageIndex = 1 }: ShippingLabelProps
       </div>
 
       {/* QR Code & Consignee */}
-      <div className="flex gap-3">
+      <div className="flex gap-4">
         <div className="flex-shrink-0">
           <QRCodeSVG value={qrData} size={80} level="M" />
         </div>

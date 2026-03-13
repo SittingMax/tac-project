@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 import { GSTIN_PATTERN, GSTIN_ERROR_MESSAGE } from '@/lib/constants';
 
@@ -234,7 +235,7 @@ export function useMultiStepInvoice(_initialData?: unknown) {
         setCurrentStep((prev) => prev + 1);
       } else {
         form.handleSubmit(onSubmit, (errors) => {
-          console.error('Form validation failed:', errors);
+          logger.warn('useMultiStepInvoice', 'Form validation failed', { errors });
           toast.error('Please check for errors in the form');
         })();
       }

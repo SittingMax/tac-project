@@ -17,6 +17,7 @@ import {
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { useNotificationStore } from '../lib/notifications/store';
+import { useAuthStore } from '@/store/authStore';
 import type {
   Notification,
   NotificationCategory,
@@ -75,6 +76,7 @@ function groupNotificationsByDate(notifications: Notification[]) {
 
 export const Notifications: React.FC = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const { notifications, markAsRead, markAllAsRead, deleteNotification, clearAll, unreadCount } =
     useNotificationStore();
 
@@ -82,10 +84,14 @@ export const Notifications: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
-  const count = unreadCount();
+  const userNotifications = useMemo(
+    () => notifications.filter((n) => n.user_id === user?.id),
+    [notifications, user?.id]
+  );
+  const count = unreadCount(user?.id);
 
   const filteredNotifications = useMemo(() => {
-    let result = [...notifications];
+    let result = [...userNotifications];
 
     if (activeTab === 'unread') {
       result = result.filter((n) => !n.is_read);
@@ -102,7 +108,7 @@ export const Notifications: React.FC = () => {
     return result.sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
-  }, [notifications, activeTab, categoryFilter, typeFilter]);
+  }, [userNotifications, activeTab, categoryFilter, typeFilter]);
 
   const groupedNotifications = useMemo(
     () => groupNotificationsByDate(filteredNotifications),
@@ -128,69 +134,71 @@ export const Notifications: React.FC = () => {
   );
 
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-end border-b border-border/40 pb-4">
+      <div className="flex flex-col md:flex-row justify-between items-end pb-4">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
-            System Alerts<span className="text-primary">.</span>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
+            Notifications
           </h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
-            Invoices, Shipments, and Event Streams
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">Alerts captured for your account</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[10px] font-mono border border-border px-2 py-0.5">
-            {count} UNREAD
-          </span>
+          <Badge variant="outline">{count} unread</Badge>
           <Button
             variant="default"
             size="sm"
-            className="rounded-none font-mono uppercase text-[10px] tracking-widest"
-            onClick={() => markAllAsRead()}
+            onClick={() => {
+              if (user?.id) {
+                markAllAsRead(user.id);
+              }
+            }}
             disabled={count === 0}
           >
             <CheckCheck className="w-3 h-3 mr-2" />
-            Ack All
+            Mark All Read
           </Button>
           <Button
             variant="destructive"
             size="sm"
-            className="rounded-none font-mono uppercase text-[10px] tracking-widest"
-            onClick={() => clearAll()}
-            disabled={notifications.length === 0}
+            onClick={() => {
+              if (user?.id) {
+                clearAll(user.id);
+              }
+            }}
+            disabled={userNotifications.length === 0}
           >
             <Trash2 className="w-3 h-3 mr-2" />
-            Purge
+            Clear All
           </Button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-border/20 pb-4">
+      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-border pb-4">
         {/* Tabs */}
-        <div className="flex gap-0 border border-border">
+        <div className="flex gap-0 rounded-lg border border-border overflow-hidden">
           <button
             onClick={() => setActiveTab('unread')}
             className={cn(
-              'px-6 py-2 text-[10px] font-mono uppercase tracking-widest transition-colors',
+              'px-5 py-2 text-sm font-medium transition-colors',
               activeTab === 'unread'
                 ? 'bg-primary text-primary-foreground'
-                : 'bg-background text-muted-foreground hover:bg-muted/10'
+                : 'bg-background text-muted-foreground hover:bg-muted'
             )}
           >
-            UNREAD ({notifications.filter((n) => !n.is_read).length})
+            Unread ({userNotifications.filter((n) => !n.is_read).length})
           </button>
           <button
             onClick={() => setActiveTab('all')}
             className={cn(
-              'px-6 py-2 text-[10px] font-mono uppercase tracking-widest transition-colors border-l border-border',
+              'px-5 py-2 text-sm font-medium transition-colors border-l border-border',
               activeTab === 'all'
                 ? 'bg-primary text-primary-foreground'
-                : 'bg-background text-muted-foreground hover:bg-muted/10'
+                : 'bg-background text-muted-foreground hover:bg-muted'
             )}
           >
-            ALL ({notifications.length})
+            All ({userNotifications.length})
           </button>
         </div>
 
@@ -200,7 +208,7 @@ export const Notifications: React.FC = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="border rounded-none px-3 py-2 text-sm bg-background"
+            className="border rounded-md px-3 py-2 text-sm bg-background"
           >
             <option value="all">All Categories</option>
             <option value="invoice">Invoice</option>
@@ -214,7 +222,7 @@ export const Notifications: React.FC = () => {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="border rounded-none px-3 py-2 text-sm bg-background"
+            className="border rounded-md px-3 py-2 text-sm bg-background"
           >
             <option value="all">All Types</option>
             <option value="success">Success</option>
@@ -226,10 +234,10 @@ export const Notifications: React.FC = () => {
       </div>
 
       {/* Notification List */}
-      <div className="bg-background border border-border p-6 shadow-none rounded-none">
+      <div className="bg-background border border-border p-6 rounded-lg">
         {filteredNotifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-none bg-muted flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-4">
               {activeTab === 'unread' ? (
                 <Check className="w-8 h-8 text-muted-foreground" />
               ) : (
@@ -242,7 +250,7 @@ export const Notifications: React.FC = () => {
             <p className="text-sm text-muted-foreground">
               {activeTab === 'unread'
                 ? 'You have no unread notifications.'
-                : 'Notifications will appear here when you receive them.'}
+                : 'Captured alerts will appear here as new events arrive.'}
             </p>
           </div>
         ) : (
@@ -264,7 +272,7 @@ export const Notifications: React.FC = () => {
                         key={notification.id}
                         onClick={() => handleNotificationClick(notification)}
                         className={cn(
-                          'w-full text-left rounded-none p-4 border transition-all hover:shadow-md',
+                          'w-full text-left rounded-lg p-4 border transition-all hover:shadow-md',
                           notification.is_read
                             ? 'bg-transparent border-border opacity-70'
                             : 'bg-accent/20 border-accent/30'
@@ -273,7 +281,7 @@ export const Notifications: React.FC = () => {
                         <div className="flex items-start gap-4">
                           <div
                             className={cn(
-                              'w-10 h-10 rounded-none flex items-center justify-center flex-shrink-0',
+                              'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
                               notification.is_read ? 'bg-muted' : 'bg-primary/10'
                             )}
                           >
@@ -286,7 +294,7 @@ export const Notifications: React.FC = () => {
                           </div>
 
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start justify-between gap-4">
                               <div>
                                 <div className="flex items-center gap-2">
                                   <span
@@ -300,7 +308,7 @@ export const Notifications: React.FC = () => {
                                   {!notification.is_read && (
                                     <span
                                       className={cn(
-                                        'h-2 w-2 rounded-none',
+                                        'h-2 w-2 rounded-full',
                                         TYPE_COLORS[notification.type]
                                       )}
                                     />
@@ -313,7 +321,7 @@ export const Notifications: React.FC = () => {
                                   </p>
                                 )}
 
-                                <div className="flex items-center gap-3 mt-2">
+                                <div className="flex items-center gap-4 mt-2">
                                   <span className="text-xs text-muted-foreground">{timeAgo}</span>
                                   <Badge variant="outline" className="text-[10px]">
                                     {notification.category}
@@ -335,7 +343,7 @@ export const Notifications: React.FC = () => {
                                 )}
                                 <button
                                   onClick={(e) => handleDelete(notification.id, e)}
-                                  className="p-1 rounded-none hover:bg-muted transition-colors"
+                                  className="p-1 rounded-md hover:bg-muted transition-colors"
                                   title="Delete"
                                 >
                                   <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />

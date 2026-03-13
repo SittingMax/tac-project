@@ -59,7 +59,7 @@ const STATUS_CLASS_MAP: Record<string, { class: string; animate?: boolean }> = {
 const SIZE_CLASSES = {
   sm: 'text-xs px-2 py-0.5',
   md: 'text-xs px-2.5 py-1',
-  lg: 'text-sm px-3 py-1.5',
+  lg: 'text-sm px-4 py-1.5',
 };
 
 export function StatusBadge({ status, size = 'md', className, showDot = true }: StatusBadgeProps) {
@@ -69,7 +69,7 @@ export function StatusBadge({ status, size = 'md', className, showDot = true }: 
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-none font-medium',
+        'inline-flex items-center gap-1.5 rounded-md font-medium whitespace-nowrap',
         config.class,
         SIZE_CLASSES[size],
         className
@@ -77,7 +77,7 @@ export function StatusBadge({ status, size = 'md', className, showDot = true }: 
     >
       {showDot && (
         <span
-          className={cn('w-1.5 h-1.5 rounded-none bg-current', config.animate && 'animate-pulse')}
+          className={cn('w-1.5 h-1.5 rounded-full bg-current', config.animate && 'animate-pulse')}
         />
       )}
       <span className="capitalize">{displayText.toLowerCase()}</span>

@@ -12,6 +12,7 @@ import {
 
 export interface CrudRowActionsProps {
   onEdit: () => void;
+  editLabel?: string;
   onDelete?: () => void;
   extraItems?: { label: string; icon?: React.ReactNode; onClick: () => void }[];
   disabled?: boolean;
@@ -23,6 +24,7 @@ export interface CrudRowActionsProps {
  */
 export function CrudRowActions({
   onEdit,
+  editLabel = 'Edit',
   onDelete,
   extraItems,
   disabled = false,
@@ -39,7 +41,7 @@ export function CrudRowActions({
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem onClick={onEdit} className="cursor-pointer">
           <Pencil className="mr-2 h-4 w-4" />
-          Edit
+          {editLabel}
         </DropdownMenuItem>
 
         {extraItems?.map((item, index) => (

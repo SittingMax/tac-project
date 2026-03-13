@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
 import { format, startOfDay, subDays } from 'date-fns';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import {
   ChartContainer,
   ChartTooltip,
@@ -10,16 +10,16 @@ import {
   type ChartConfig,
 } from '../../ui/chart';
 import { ChartSkeleton } from '../../ui/skeleton';
-import { useShipments } from '../../../hooks/useShipments';
+import { useInvoices } from '../../../hooks/useInvoices';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 
 const chartConfig = {
-  revenue: {
-    label: 'Revenue',
+  issued: {
+    label: 'Issued Total',
     color: 'var(--chart-1)',
   },
-  cost: {
-    label: 'Operational Cost',
+  paid: {
+    label: 'Paid Total',
     color: 'var(--chart-5)',
   },
 } satisfies ChartConfig;
@@ -27,106 +27,107 @@ const chartConfig = {
 export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
   isLoading: externalLoading,
 }) => {
-  const { data: shipments = [], isLoading: shipmentsLoading } = useShipments({ limit: 1000 });
+  const { data: invoices = [], isLoading: invoicesLoading } = useInvoices();
   const [timeRange, setTimeRange] = useState('30d');
+  const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>('issued');
 
-  const isLoading = externalLoading || shipmentsLoading;
+  const isLoading = externalLoading || invoicesLoading;
 
   const chartData = useMemo(() => {
     let days = 30;
     if (timeRange === '90d') days = 90;
     if (timeRange === '7d') days = 7;
 
-    const dateMap = new Map<string, { revenue: number; cost: number }>();
+    const dateMap = new Map<string, { issued: number; paid: number }>();
 
     for (let i = 0; i < days; i++) {
       const date = format(subDays(new Date(), days - i - 1), 'yyyy-MM-dd');
-      dateMap.set(date, { revenue: 0, cost: 0 });
+      dateMap.set(date, { issued: 0, paid: 0 });
     }
 
-    shipments.forEach((shipment) => {
-      const createdDate = format(startOfDay(new Date(shipment.created_at)), 'yyyy-MM-dd');
-      const existing = dateMap.get(createdDate);
+    invoices.forEach((invoice) => {
+      const issueSource = invoice.issue_date || invoice.created_at;
+      if (issueSource) {
+        const issueDate = format(startOfDay(new Date(issueSource)), 'yyyy-MM-dd');
+        const existingIssueDay = dateMap.get(issueDate);
+        if (existingIssueDay) {
+          existingIssueDay.issued += Number(invoice.total || 0);
+        }
+      }
 
-      if (existing) {
-        // Mock revenue/cost based on weight if real financials aren't available
-        // In a real app, this would use the `financials` table
-        const baseRev = shipment.total_weight * 150; // 150 INR per kg
-        const baseCost = shipment.total_weight * 90; // 90 INR cost per kg
-
-        // Add some random fuzziness based on service level
-        const multiplier = shipment.service_level === 'EXPRESS' ? 1.5 : 1;
-
-        existing.revenue += baseRev * multiplier;
-        existing.cost += baseCost * multiplier;
+      if (invoice.paid_at) {
+        const paidDate = format(startOfDay(new Date(invoice.paid_at)), 'yyyy-MM-dd');
+        const existingPaidDay = dateMap.get(paidDate);
+        if (existingPaidDay) {
+          existingPaidDay.paid += Number(invoice.total || 0);
+        }
       }
     });
 
     return Array.from(dateMap.entries())
       .map(([date, counts]) => ({ date, ...counts }))
       .sort((a, b) => a.date.localeCompare(b.date));
-  }, [shipments, timeRange]);
+  }, [invoices, timeRange]);
 
-  if (isLoading) return <ChartSkeleton height={300} />;
+  if (isLoading) return <ChartSkeleton height={250} />;
 
-  if (chartData.every((d) => d.revenue === 0)) {
+  if (chartData.every((d) => d.issued === 0 && d.paid === 0)) {
     return (
-      <Card className="flex flex-col h-full border-border bg-card shadow-sm">
-        <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-          <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-            <CardTitle>Revenue & Costs</CardTitle>
-            <CardDescription>Daily financial performance</CardDescription>
+      <Card className="flex flex-col h-full border border-border/40 bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300">
+        <CardHeader className="flex flex-col items-stretch space-y-0 border-b border-border/40 p-0 sm:flex-row">
+          <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-4 sm:py-6">
+            <CardTitle className="text-xs text-muted-foreground">Invoice Totals</CardTitle>
+            <div className="text-lg font-semibold text-foreground">Billing Activity</div>
           </div>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-12">
-          <p className="text-sm text-muted-foreground">No financial data available</p>
+          <p className="text-sm text-muted-foreground">No invoice data available</p>
         </CardContent>
       </Card>
     );
   }
 
-  // Calculate totals for the header metrics
-  const totalRevenue = chartData.reduce((sum, item) => sum + item.revenue, 0);
-  const totalCost = chartData.reduce((sum, item) => sum + item.cost, 0);
+  const totals = {
+    issued: chartData.reduce((sum, item) => sum + item.issued, 0),
+    paid: chartData.reduce((sum, item) => sum + item.paid, 0),
+  };
 
   return (
-    <Card className="flex flex-col h-full border-border bg-card shadow-sm">
-      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle className="flex justify-between items-center">
-            <span>Revenue & Costs</span>
+    <Card className="flex flex-col h-full border border-border/40 bg-card shadow-sm py-0 p-0">
+      <CardHeader className="flex flex-col items-stretch space-y-0 border-b border-border/40 p-0! sm:flex-row">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:py-6">
+          <CardTitle className="flex justify-between items-center text-xs text-muted-foreground">
+            <span>Invoice Totals</span>
             <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-[130px] h-8 text-xs rounded-none">
+              <SelectTrigger className="w-[120px] h-8 text-xs border-border/40 bg-transparent shadow-none">
                 <SelectValue placeholder="Time range" />
               </SelectTrigger>
-              <SelectContent className="rounded-none">
-                <SelectItem value="90d" className="rounded-none text-xs">
-                  Last 90 days
-                </SelectItem>
-                <SelectItem value="30d" className="rounded-none text-xs">
-                  Last 30 days
-                </SelectItem>
-                <SelectItem value="7d" className="rounded-none text-xs">
-                  Last 7 days
-                </SelectItem>
+              <SelectContent>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="7d">Last 7 days</SelectItem>
               </SelectContent>
             </Select>
           </CardTitle>
-          <CardDescription>Daily financial performance</CardDescription>
+          <div className="text-lg font-semibold text-foreground">Finance Overview</div>
         </div>
         <div className="flex">
-          <div className="flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left sm:border-t-0 sm:border-l sm:px-8 sm:py-6 relative z-30">
-            <span className="text-xs text-muted-foreground">{chartConfig.revenue.label}</span>
-            <span className="text-lg font-bold leading-none sm:text-2xl">
-              ₹{(totalRevenue / 1000).toFixed(1)}k
-            </span>
-          </div>
-          <div className="flex flex-1 flex-col justify-center gap-1 border-t border-l px-6 py-4 text-left sm:border-t-0 sm:px-8 sm:py-6 relative z-30">
-            <span className="text-xs text-muted-foreground">{chartConfig.cost.label}</span>
-            <span className="text-lg font-bold leading-none sm:text-2xl">
-              ₹{(totalCost / 1000).toFixed(1)}k
-            </span>
-          </div>
+          {(['issued', 'paid'] as const).map((key) => {
+            const chart = key as keyof typeof chartConfig;
+            return (
+              <button
+                key={chart}
+                data-active={activeChart === chart}
+                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t border-border/40 px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-6 transition-colors"
+                onClick={() => setActiveChart(chart)}
+              >
+                <span className="text-xs text-muted-foreground">{chartConfig[chart].label}</span>
+                <span className="text-xl font-semibold sm:text-3xl text-foreground">
+                  ₹{(totals[key] / 1000).toFixed(1)}k
+                </span>
+              </button>
+            );
+          })}
         </div>
       </CardHeader>
       <CardContent className="px-2 sm:p-6 flex-1">
@@ -139,12 +140,18 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
               right: 12,
             }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid
+              vertical={false}
+              strokeDasharray="4 4"
+              stroke="var(--border)"
+              opacity={0.2}
+            />
             <XAxis
               dataKey="date"
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
+              tickMargin={12}
+              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
               tickFormatter={(value) => {
                 const date = new Date(value);
                 return date.toLocaleDateString('en-US', {
@@ -153,20 +160,33 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
                 });
               }}
             />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Line
-              dataKey="revenue"
-              type="monotone"
-              stroke="var(--color-revenue)"
-              strokeWidth={2}
-              dot={false}
+            <ChartTooltip
+              cursor={{
+                stroke: 'hsl(var(--muted-foreground))',
+                strokeWidth: 1,
+                strokeDasharray: '4 4',
+              }}
+              content={
+                <ChartTooltipContent
+                  className="w-[150px] backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl"
+                  nameKey="views"
+                  labelFormatter={(value) => {
+                    return new Date(value).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    });
+                  }}
+                />
+              }
             />
             <Line
-              dataKey="cost"
+              dataKey={activeChart}
               type="monotone"
-              stroke="var(--color-cost)"
-              strokeWidth={2}
+              stroke={`var(--color-${activeChart})`}
+              strokeWidth={3}
               dot={false}
+              activeDot={{ r: 6, strokeWidth: 0 }}
             />
           </LineChart>
         </ChartContainer>

@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { MapPin, FileText, Search, Loader2, Satellite } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { MapPin, FileText, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { TrackingResultCard } from '@/components/landing-new/tracking-result-card';
 import { toast } from 'sonner';
 import { getTrackingInfo, TrackingData } from '@/lib/tracking-service';
+import { logger } from '@/lib/logger';
 import { FadeUp } from '@/components/motion/FadeUp';
-
-// --- Components ---
+import { TextReveal } from '@/components/motion/TextReveal';
+import { LottieSlot } from './lottie-slot';
 
 export function TrackingSection() {
   const [trackingMode, setTrackingMode] = useState<'gps' | 'custody'>('gps');
@@ -27,7 +27,6 @@ export function TrackingSection() {
 
     try {
       const result = await getTrackingInfo(trackingNumber.trim());
-
       if (result.success && result.data) {
         setTrackingData(result.data);
         setShowResult(true);
@@ -36,145 +35,128 @@ export function TrackingSection() {
       }
     } catch (error) {
       toast.error('An unexpected error occurred. Please try again.');
-      console.error('Tracking search error:', error);
+      logger.error('TrackingSection', 'Tracking search error', { error });
     } finally {
       setIsSearching(false);
     }
   };
 
   return (
-    <section id="tracking" className="relative w-full py-24 lg:py-32 overflow-hidden">
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="flex flex-col items-center justify-center max-w-5xl mx-auto text-center">
-          {/* Badge */}
-          <FadeUp delay={0.1} className="mb-8">
-            <Badge variant="secondary" className="gap-2 px-4 py-2 rounded-none backdrop-blur-sm">
-              <Satellite className="w-4 h-4 text-secondary-foreground animate-pulse" />
-              <span className="text-xs font-mono font-bold tracking-[0.2em] uppercase">
-                Live Satellite Uplink
-              </span>
-            </Badge>
-          </FadeUp>
+    <section
+      id="tracking"
+      className="py-16 lg:py-24 bg-background text-foreground relative overflow-hidden"
+    >
+      {/* Background Glow */}
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[150px] rounded-full pointer-events-none" />
 
-          {/* Heading */}
-          <div className="mb-6 space-y-4">
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-foreground">
-              Global Tracking Protocol
-            </h2>
-            <FadeUp delay={0.2}>
-              <p className="max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground font-light leading-relaxed">
-                Real-time visibility into your supply chain with millisecond precision telemetry and
-                blockchain-verified custody logs.
-              </p>
-            </FadeUp>
+      <div className="max-w-4xl mx-auto px-6 relative z-10">
+        <FadeUp className="mb-16 flex flex-col items-center text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-card border border-border text-xs font-semibold text-primary mb-6 shadow-sm">
+            Shipment Tracking
           </div>
+          <TextReveal
+            as="h2"
+            text="Track Your Shipment"
+            className="text-4xl md:text-5xl font-extrabold text-foreground mb-6 tracking-tight text-center [text-wrap:balance]"
+          />
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-mono text-sm leading-relaxed">
+            Easily monitor your cargo status between key global hubs. Enter your tracking number for
+            instant custody updates.
+          </p>
+        </FadeUp>
 
-          {/* Tracking Interface */}
-          <FadeUp delay={0.3} className="w-full max-w-xl mt-12">
-            <div className="relative p-2 rounded-none bg-background/50 backdrop-blur-lg border border-border/50 shadow-2xl shadow-primary/5">
-              {/* Tabs */}
-              <div className="flex justify-center mb-6 pt-4">
-                <Tabs
-                  defaultValue="gps"
-                  value={trackingMode}
-                  onValueChange={(v: string) => setTrackingMode(v as 'gps' | 'custody')}
-                  className="w-auto"
+        <FadeUp
+          delay={0.2}
+          className="max-w-2xl mx-auto p-8 md:p-14 rounded-md glass-panel relative overflow-visible shadow-xl shadow-primary/5 hover:border-primary/30 transition-colors duration-500"
+        >
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+          <div className="relative z-10">
+            {/* Lottie Animation for Route Visualization */}
+            <div className="mb-8 flex justify-center overflow-hidden">
+              <LottieSlot
+                src="/lottie/dotted A→B route.json"
+                className="w-full max-w-[400px] h-24 sm:h-32 opacity-80"
+                fallbackIcon={<MapPin className="h-8 w-8 text-primary opacity-50" />}
+              />
+            </div>
+
+            <Tabs
+              defaultValue="gps"
+              value={trackingMode}
+              onValueChange={(v: string) => setTrackingMode(v as 'gps' | 'custody')}
+              className="w-full mb-10"
+            >
+              <TabsList className="grid w-full grid-cols-2 p-1 bg-transparent border-b border-border/50 rounded-md h-auto">
+                <TabsTrigger
+                  value="gps"
+                  className="flex items-center justify-center gap-3 rounded-md py-3 pb-4 border-b-2 border-transparent data-[state=active]:bg-transparent data-[state=active]:text-foreground text-muted-foreground data-[state=active]:shadow-none data-[state=active]:border-primary text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
                 >
-                  <TabsList className="bg-transparent border-b border-border/10 p-0 h-auto gap-8">
-                    <TabsTrigger
-                      value="gps"
-                      className="rounded-none border-b-2 border-transparent px-4 py-2 text-sm font-medium text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent transition-all"
-                    >
-                      <MapPin className="mr-2 h-4 w-4" />
-                      GPS Telemetry
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="custody"
-                      className="rounded-none border-b-2 border-transparent px-4 py-2 text-sm font-medium text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent transition-all"
-                    >
-                      <FileText className="mr-2 h-4 w-4" />
-                      Chain of Custody
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-
-              {/* Input Area */}
-              <div className="flex flex-col sm:flex-row items-center gap-3 p-2 bg-background rounded-none border border-border/50 shadow-inner group focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                <div className="flex-1 w-full relative">
-                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <Input
-                    placeholder={trackingMode === 'gps' ? 'ENTER CN / HAWB ID' : 'ENTER CUSTODY ID'}
-                    className="w-full h-12 pl-14 pr-4 bg-transparent border-none text-base font-mono placeholder:text-muted-foreground/50 focus-visible:ring-0 shadow-none"
-                    value={trackingNumber}
-                    onChange={(e) => setTrackingNumber(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSearch();
-                    }}
-                  />
-                </div>
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto h-12 px-8 rounded-none bg-primary text-primary-foreground font-bold tracking-wide shadow-glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all"
-                  onClick={handleSearch}
-                  disabled={isSearching || !trackingNumber}
+                  <MapPin className="h-4 w-4" />
+                  Track by Number
+                </TabsTrigger>
+                <TabsTrigger
+                  value="custody"
+                  className="flex items-center justify-center gap-3 rounded-md py-3 pb-4 border-b-2 border-transparent data-[state=active]:bg-transparent data-[state=active]:text-foreground text-muted-foreground data-[state=active]:shadow-none data-[state=active]:border-primary text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
                 >
-                  {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : 'TRACE'}
-                </Button>
-              </div>
+                  <FileText className="h-4 w-4" />
+                  View History
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
 
-              {/* Recent Traces */}
-              <div className="mt-8 mb-4 px-6">
-                <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-4 text-center">
-                  Recent Traces
-                </p>
-                <div className="flex flex-wrap justify-center gap-3">
-                  {['WGS882190', 'WGS-02531', 'DEL-98234', 'IMP-45621'].map((example) => (
-                    <button
-                      key={example}
-                      type="button"
-                      onClick={() => setTrackingNumber(example)}
-                      className="px-4 py-2 rounded-none bg-secondary/5 border border-border/50 text-xs font-mono text-muted-foreground hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-colors"
-                    >
-                      {example}
-                    </button>
-                  ))}
-                </div>
+            <div className="flex flex-col sm:flex-row gap-4 mt-4">
+              <div className="flex-1 relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <Input
+                  placeholder={
+                    trackingMode === 'gps' ? 'Enter tracking number' : 'Enter Custody ID'
+                  }
+                  className="h-14 pl-12 pr-4 rounded-md border border-border/50 bg-background/80 text-foreground text-base focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary placeholder:text-muted-foreground transition-all hover:bg-background shadow-inner"
+                  value={trackingNumber}
+                  onChange={(e) => setTrackingNumber(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSearch();
+                  }}
+                  aria-label="Tracking Number Input"
+                />
+              </div>
+              <button
+                onClick={handleSearch}
+                disabled={isSearching || !trackingNumber}
+                className="h-14 px-10 bg-primary text-primary-foreground border border-transparent rounded-md font-semibold text-sm shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-3 w-full sm:w-auto hover:-translate-y-0.5"
+                aria-live="polite"
+              >
+                {isSearching ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Track Entity'}
+              </button>
+            </div>
+
+            <div className="mt-8 text-center pt-8 relative">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-border to-transparent"></div>
+              <p className="text-[10px] sm:text-xs font-bold text-muted-foreground mb-4 uppercase tracking-widest font-mono">
+                Example tracking numbers
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                {['WGS882190', 'DEL-98234', 'IMP-45621'].map((example) => (
+                  <button
+                    key={example}
+                    onClick={() => setTrackingNumber(example)}
+                    className="px-4 py-2 text-xs font-medium border border-border/50 rounded-md bg-muted/30 text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/5 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                  >
+                    {example}
+                  </button>
+                ))}
               </div>
             </div>
-          </FadeUp>
-
-          {/* System Status */}
-          <FadeUp delay={0.4} className="mt-12">
-            <Badge
-              variant="outline"
-              className="gap-2 px-4 py-1.5 rounded-none border-primary/10 bg-primary/5 backdrop-blur-sm"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-none bg-primary opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-none bg-primary" />
-              </span>
-              <span className="font-mono text-[10px] font-bold tracking-widest text-primary uppercase">
-                System Operational • 99.9% Uptime
-              </span>
-            </Badge>
-          </FadeUp>
-        </div>
+          </div>
+        </FadeUp>
       </div>
 
       {/* Tracking Result Modal */}
       <Dialog open={showResult && !!trackingData} onOpenChange={setShowResult}>
-        <DialogContent
-          className="border-none bg-transparent p-0 shadow-none sm:max-w-md w-full [&>button[class*='absolute']]:hidden"
-          aria-describedby={undefined}
-        >
-          <DialogTitle className="sr-only">
-            Tracking Information for {trackingData?.shipment.reference}
-          </DialogTitle>
+        <DialogContent className="sm:max-w-md">
+          <DialogTitle className="sr-only">Tracking Information</DialogTitle>
           {trackingData && (
-            <div className="p-4">
-              <TrackingResultCard data={trackingData} onClose={() => setShowResult(false)} />
-            </div>
+            <TrackingResultCard data={trackingData} onClose={() => setShowResult(false)} />
           )}
         </DialogContent>
       </Dialog>

@@ -176,7 +176,7 @@ export default function VerticalTabs() {
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
             >
-              <div className="relative aspect-4/5 md:aspect-4/3 lg:aspect-16/11 rounded-none md:rounded-none.5rem] overflow-hidden bg-muted/30 border border-border/40">
+              <div className="relative aspect-4/5 md:aspect-4/3 lg:aspect-16/11 rounded-md overflow-hidden bg-muted/30 border border-border/40">
                 <AnimatePresence initial={false} custom={direction} mode="popLayout">
                   <motion.div
                     key={activeIndex}
@@ -202,13 +202,13 @@ export default function VerticalTabs() {
                   </motion.div>
                 </AnimatePresence>
 
-                <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 flex gap-2 md:gap-3 z-20">
+                <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 flex gap-2 md:gap-4 z-20">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handlePrev();
                     }}
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-none bg-background/80 backdrop-blur-md border border-border/50 flex items-center justify-center text-foreground hover:bg-background transition-all active:scale-90"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-md bg-background/80 backdrop-blur-md border border-border/50 flex items-center justify-center text-foreground hover:bg-background transition-all active:scale-90"
                     aria-label="Previous"
                   >
                     <ArrowLeft size={20} />
@@ -218,7 +218,7 @@ export default function VerticalTabs() {
                       e.stopPropagation();
                       handleNext();
                     }}
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-none bg-background/80 backdrop-blur-md border border-border/50 flex items-center justify-center text-foreground hover:bg-background transition-all active:scale-90"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-md bg-background/80 backdrop-blur-md border border-border/50 flex items-center justify-center text-foreground hover:bg-background transition-all active:scale-90"
                     aria-label="Next"
                   >
                     <ArrowRight size={20} />

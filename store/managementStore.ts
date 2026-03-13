@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- Supabase client requires any for complex operations */
 import { create } from 'zustand';
 import { User, UserRole } from '../types';
 import { supabase } from '../lib/supabase';
+import { logger } from '@/lib/logger';
 import { toast } from 'sonner';
 
 interface ManagementState {
@@ -41,7 +41,7 @@ export const useManagementStore = create<ManagementState>((set) => ({
         .order('full_name', { ascending: true });
 
       if (error) {
-        console.error('Failed to fetch staff:', error);
+        logger.error('ManagementStore', 'Failed to fetch staff', { error });
         set({ isLoading: false });
         return;
       }
@@ -60,7 +60,7 @@ export const useManagementStore = create<ManagementState>((set) => ({
 
       set({ users: mappedUsers, isLoading: false });
     } catch (error) {
-      console.error('Failed to fetch staff:', error);
+      logger.error('ManagementStore', 'Failed to fetch staff', { error });
       set({ isLoading: false });
     }
   },
@@ -68,17 +68,17 @@ export const useManagementStore = create<ManagementState>((set) => ({
   addUser: async (userData) => {
     set({ isLoading: true });
     try {
-      const { data: orgData } = await (supabase.from('orgs').select('id').single() as any);
+      const { data: orgData } = await supabase.from('orgs').select('id').single();
       if (!orgData) throw new Error('No organization found');
 
       // Map hub code to hub_id
       let hubId: string | null = null;
       if (userData.assignedHub) {
-        const { data: hubData } = await (supabase
+        const { data: hubData } = await supabase
           .from('hubs')
           .select('id')
           .eq('code', userData.assignedHub)
-          .single() as any);
+          .single();
         hubId = hubData?.id ?? null;
       }
 
@@ -91,7 +91,8 @@ export const useManagementStore = create<ManagementState>((set) => ({
         is_active: true,
       };
 
-      const { data, error } = await (supabase.from('staff') as any)
+      const { data, error } = await supabase
+        .from('staff')
         .insert(insertPayload)
         .select(`*, hub:hubs(code, name)`)
         .single();
@@ -117,7 +118,7 @@ export const useManagementStore = create<ManagementState>((set) => ({
       toast.success(`User ${newUser.name} added successfully`);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Failed to add user:', error);
+      logger.error('ManagementStore', 'Failed to add user', { error });
       toast.error(`Failed to add user: ${errorMessage}`);
       set({ isLoading: false });
     }
@@ -130,7 +131,8 @@ export const useManagementStore = create<ManagementState>((set) => ({
     }));
 
     try {
-      const { error } = await (supabase.from('staff') as any)
+      const { error } = await supabase
+        .from('staff')
         .update({ is_active: !currentStatus, updated_at: new Date().toISOString() })
         .eq('id', id);
 

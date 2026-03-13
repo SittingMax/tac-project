@@ -191,8 +191,8 @@ const CardsSection: React.FC = () => (
 
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Card>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-none bg-primary/10">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="p-2 rounded-md bg-primary/10">
             <Package className="w-5 h-5 text-primary" />
           </div>
           <span className="font-semibold">Shipments</span>
@@ -201,8 +201,8 @@ const CardsSection: React.FC = () => (
         <p className="text-sm text-muted-foreground">Active this month</p>
       </Card>
       <Card>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-none bg-chart-2/10">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="p-2 rounded-md bg-chart-2/10">
             <Truck className="w-5 h-5 text-chart-2" />
           </div>
           <span className="font-semibold">In Transit</span>
@@ -211,8 +211,8 @@ const CardsSection: React.FC = () => (
         <p className="text-sm text-muted-foreground">Currently moving</p>
       </Card>
       <Card>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-none bg-destructive/10">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="p-2 rounded-md bg-destructive/10">
             <AlertTriangle className="w-5 h-5 text-destructive" />
           </div>
           <span className="font-semibold">Exceptions</span>
@@ -331,9 +331,7 @@ const ColorsSection: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {colorTokens.map((token) => (
             <div key={token.name} className="space-y-2">
-              <div
-                className={`${token.var} ${token.text} p-4 rounded-none text-center font-medium`}
-              >
+              <div className={`${token.var} ${token.text} p-4 rounded-md text-center font-medium`}>
                 {token.name}
               </div>
               <p className="text-xs text-muted-foreground text-center font-mono">{token.var}</p>
@@ -347,7 +345,7 @@ const ColorsSection: React.FC = () => {
         <div className="flex gap-4">
           {chartColors.map((color) => (
             <div key={color.name} className="space-y-2">
-              <div className={`${color.var} w-16 h-16 rounded-none`} />
+              <div className={`${color.var} w-16 h-16 rounded-md`} />
               <p className="text-xs text-muted-foreground text-center font-mono">{color.name}</p>
             </div>
           ))}
@@ -356,7 +354,7 @@ const ColorsSection: React.FC = () => {
 
       <Card>
         <SectionTitle>Usage Examples</SectionTitle>
-        <div className="bg-muted/50 rounded-none p-4 font-mono text-sm space-y-2">
+        <div className="bg-muted/50 rounded-md p-4 font-mono text-sm space-y-2">
           <p className="text-muted-foreground">// ❌ Avoid hardcoded colors</p>
           <code className="text-destructive block">
             {'className="text-'}
@@ -364,7 +362,7 @@ const ColorsSection: React.FC = () => {
             {'slate-400"'}
           </code>
           <p className="text-muted-foreground mt-4">// ✅ Preferred semantic tokens</p>
-          <code className="text-green-500 block">{'className="text-muted-foreground"'}</code>
+          <code className="text-muted-foreground block">{'className="text-muted-foreground"'}</code>
         </div>
       </Card>
     </div>
@@ -460,12 +458,10 @@ const ScannerDebugSection: React.FC = () => {
           Focus anywhere on this page and scan/type. This logger intercepts events globally (capture
           phase).
           <br />
-          <span className="text-xs font-mono bg-muted px-1 rounded-none">
-            Threshold: &lt; 100ms
-          </span>
+          <span className="text-xs font-mono bg-muted px-1 rounded-md">Threshold: &lt; 100ms</span>
         </p>
 
-        <div className="border rounded-none overflow-hidden">
+        <div className="border rounded-md overflow-hidden">
           <div className="bg-muted px-4 py-2 grid grid-cols-12 text-xs font-medium text-muted-foreground">
             <div className="col-span-2">Key</div>
             <div className="col-span-3">Time</div>
@@ -491,7 +487,7 @@ const ScannerDebugSection: React.FC = () => {
                   {Math.floor(log.time % 1000)}
                 </div>
                 <div
-                  className={`col-span-3 ${log.diff < 100 ? 'text-green-500 font-bold' : 'text-yellow-500'}`}
+                  className={`col-span-3 ${log.diff < 100 ? 'text-muted-foreground font-bold' : 'text-muted-foreground'}`}
                 >
                   {log.diff}ms
                 </div>
@@ -499,7 +495,7 @@ const ScannerDebugSection: React.FC = () => {
                   {log.isScanner ? (
                     <Badge
                       variant="default"
-                      className="bg-green-500/20 text-green-500 hover:bg-green-500/30 border-0"
+                      className="text-muted-foreground/20 text-muted-foreground hover:text-muted-foreground/30 border-0"
                     >
                       YES
                     </Badge>

@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { User, MapPin } from 'lucide-react';
 import { SectionHeader, CustomerSearch } from './shared';
 import { Customer as CustomerDB } from '@/hooks/useCustomers';
@@ -30,7 +31,7 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-2">
       {/* Consignor */}
-      <div className="space-y-4 border rounded-none p-4 bg-muted/30">
+      <div className="space-y-4 border rounded-md p-4 bg-muted/30">
         <SectionHeader
           icon={User}
           title="Consignor"
@@ -43,7 +44,7 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
             </div>
           }
         />
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="space-y-1">
             <Input placeholder="Company / Full Name" {...form.register('consignorName')} />
             {errors.consignorName && (
@@ -52,45 +53,60 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
           </div>
           <Input {...form.register('consignorPhone')} placeholder="Phone Number" />
           <Input placeholder="Address Line" {...form.register('consignorAddress')} />
-          <div className="grid grid-cols-2 gap-3">
-            <Select
-              value={
-                POPULAR_CITIES.includes(watch('consignorCity')) ? watch('consignorCity') : 'OTHER'
-              }
-              onValueChange={(city) => {
-                if (city === 'OTHER') {
-                  setConsignorCityMode('INPUT');
-                  setValue('consignorCity', '');
-                } else {
-                  setValue('consignorCity', city);
-                  const hub = HUB_PREFILL[city];
-                  if (hub) {
-                    setValue('consignorAddress', hub.address, { shouldValidate: true });
-                    setValue('consignorZip', hub.zip, { shouldValidate: true });
-                    setValue('consignorState', hub.state, { shouldValidate: true });
-                  }
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                City
+              </Label>
+              <Select
+                value={
+                  POPULAR_CITIES.includes(watch('consignorCity')) ? watch('consignorCity') : 'OTHER'
                 }
-              }}
-            >
-              <SelectTrigger className="h-10 bg-background">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {POPULAR_CITIES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-                <SelectItem value="OTHER">Other...</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input placeholder="Zip Code" {...form.register('consignorZip')} maxLength={6} />
+                onValueChange={(city) => {
+                  if (city === 'OTHER') {
+                    setConsignorCityMode('INPUT');
+                    setValue('consignorCity', '');
+                  } else {
+                    setValue('consignorCity', city);
+                    const hub = HUB_PREFILL[city];
+                    if (hub) {
+                      setValue('consignorAddress', hub.address, { shouldValidate: true });
+                      setValue('consignorZip', hub.zip, { shouldValidate: true });
+                      setValue('consignorState', hub.state, { shouldValidate: true });
+                    }
+                  }
+                }}
+              >
+                <SelectTrigger className="h-10 bg-background">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {POPULAR_CITIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="OTHER">Other...</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                Zip Code
+              </Label>
+              <Input
+                placeholder="Zip Code"
+                {...form.register('consignorZip')}
+                maxLength={6}
+                className="h-10"
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {/* Consignee */}
-      <div className="space-y-4 border rounded-none p-4 bg-muted/30">
+      <div className="space-y-4 border rounded-md p-4 bg-muted/30">
         <SectionHeader
           icon={MapPin}
           title="Consignee"
@@ -103,7 +119,7 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
             </div>
           }
         />
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="space-y-1">
             <Input placeholder="Company / Full Name" {...form.register('consigneeName')} />
             {errors.consigneeName && (
@@ -112,39 +128,54 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
           </div>
           <Input {...form.register('consigneePhone')} placeholder="Phone Number" />
           <Input placeholder="Address Line" {...form.register('consigneeAddress')} />
-          <div className="grid grid-cols-2 gap-3">
-            <Select
-              value={
-                POPULAR_CITIES.includes(watch('consigneeCity')) ? watch('consigneeCity') : 'OTHER'
-              }
-              onValueChange={(city) => {
-                if (city === 'OTHER') {
-                  setConsigneeCityMode('INPUT');
-                  setValue('consigneeCity', '');
-                } else {
-                  setValue('consigneeCity', city);
-                  const hub = HUB_PREFILL[city];
-                  if (hub) {
-                    setValue('consigneeAddress', hub.address, { shouldValidate: true });
-                    setValue('consigneeZip', hub.zip, { shouldValidate: true });
-                    setValue('consigneeState', hub.state, { shouldValidate: true });
-                  }
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                City
+              </Label>
+              <Select
+                value={
+                  POPULAR_CITIES.includes(watch('consigneeCity')) ? watch('consigneeCity') : 'OTHER'
                 }
-              }}
-            >
-              <SelectTrigger className="h-10 bg-background">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {POPULAR_CITIES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-                <SelectItem value="OTHER">Other...</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input placeholder="Zip Code" {...form.register('consigneeZip')} maxLength={6} />
+                onValueChange={(city) => {
+                  if (city === 'OTHER') {
+                    setConsigneeCityMode('INPUT');
+                    setValue('consigneeCity', '');
+                  } else {
+                    setValue('consigneeCity', city);
+                    const hub = HUB_PREFILL[city];
+                    if (hub) {
+                      setValue('consigneeAddress', hub.address, { shouldValidate: true });
+                      setValue('consigneeZip', hub.zip, { shouldValidate: true });
+                      setValue('consigneeState', hub.state, { shouldValidate: true });
+                    }
+                  }
+                }}
+              >
+                <SelectTrigger className="h-10 bg-background">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {POPULAR_CITIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="OTHER">Other...</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                Zip Code
+              </Label>
+              <Input
+                placeholder="Zip Code"
+                {...form.register('consigneeZip')}
+                maxLength={6}
+                className="h-10"
+              />
+            </div>
           </div>
         </div>
       </div>

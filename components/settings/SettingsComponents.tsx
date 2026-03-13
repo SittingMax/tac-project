@@ -3,13 +3,11 @@ import { ChevronDown } from 'lucide-react';
 
 export const PageHeader = ({ title, description }: { title: string; description: string }) => (
   <div className="mb-12 border-b border-border/40 pb-6">
-    <h1 className="text-4xl font-black text-foreground uppercase tracking-tighter mb-2">
+    <h1 className="text-4xl font-semibold text-foreground tracking-tight mb-2">
       {title}
       <span className="text-primary">.</span>
     </h1>
-    <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-      {description}
-    </p>
+    <p className="text-sm text-muted-foreground">{description}</p>
   </div>
 );
 
@@ -17,22 +15,24 @@ export const SectionHeader = ({
   icon: Icon,
   title,
   color = 'text-primary',
+  className,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: any;
   title: string;
   color?: string;
+  className?: string;
 }) => (
-  <div className="flex items-center gap-3 mb-8 pb-4 border-b border-border/40">
+  <div className={`flex items-center gap-4 mb-8 pb-4 border-b border-border/40 ${className || ''}`}>
     <Icon className={`w-4 h-4 ${color} opacity-70`} />
-    <h3 className="text-xs font-mono font-black border border-border px-2 py-0.5 uppercase tracking-widest text-foreground">
+    <h3 className="text-xs font-semibold border border-border px-2 py-0.5 rounded-sm text-foreground">
       {title}
     </h3>
   </div>
 );
 
 export const FieldLabel = ({ children }: { children: React.ReactNode }) => (
-  <label className="block text-[10px] font-black text-muted-foreground uppercase tracking-wider mb-1.5 ml-0.5">
+  <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-0.5">
     {children}
   </label>
 );
@@ -54,7 +54,7 @@ export const SelectField = ({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
-      className="flex h-10 w-full rounded-none border border-border bg-background px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest text-foreground transition-colors focus:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 appearance-none pr-8 hover:bg-muted/10 cursor-pointer"
+      className="flex h-10 w-full rounded-md border border-border bg-background px-4 py-1.5 text-sm text-foreground transition-colors focus:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 appearance-none pr-8 hover:bg-muted/10 cursor-pointer"
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value} className="bg-background">
@@ -82,7 +82,7 @@ export const ToggleSwitch = ({
     className="w-full flex items-center justify-between px-4 py-4 border border-transparent hover:bg-muted/5 transition-colors group"
     onClick={onToggle}
   >
-    <span className="text-[10px] font-mono uppercase tracking-widest text-foreground group-hover:text-primary transition-colors">
+    <span className="text-xs font-medium text-foreground group-hover:text-primary transition-colors">
       {label}
     </span>
     <div

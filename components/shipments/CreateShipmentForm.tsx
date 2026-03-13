@@ -1,15 +1,50 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { HUBS, SHIPMENT_MODES, SERVICE_LEVELS } from '../../lib/constants';
-
 import { Package, Truck, Plane, Zap, Clock } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useCustomers } from '@/hooks/useCustomers';
 import { useCreateShipment } from '@/hooks/useShipments';
-import { toast } from 'sonner';
+import { HUBS, SHIPMENT_MODES, SERVICE_LEVELS } from '@/lib/constants';
+import { logger } from '@/lib/logger';
+
+const getAddressValue = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+
+const normalizeCustomerAddress = (address: unknown) => {
+  if (typeof address === 'string') {
+    return {
+      line1: address.trim(),
+      city: '',
+      state: '',
+      zip: '',
+    };
+  }
+
+  if (!address || typeof address !== 'object' || Array.isArray(address)) {
+    return {
+      line1: '',
+      city: '',
+      state: '',
+      zip: '',
+    };
+  }
+
+  const record = address as Record<string, unknown>;
+
+  return {
+    line1: getAddressValue(record.line1 ?? record.address ?? record.street ?? record.address1),
+    city: getAddressValue(record.city),
+    state: getAddressValue(record.state),
+    zip: getAddressValue(
+      record.zip ?? record.postal_code ?? record.postalCode ?? record.pincode ?? record.pin
+    ),
+  };
+};
 
 const schema = z
   .object({
@@ -23,6 +58,12 @@ const schema = z
     dimL: z.number().min(1),
     dimW: z.number().min(1),
     dimH: z.number().min(1),
+    consigneeName: z.string().min(1, 'Consignee name is required'),
+    consigneePhone: z.string().min(10, 'Consignee phone is required'),
+    consigneeAddress: z.string().min(5, 'Delivery address is required'),
+    consigneeCity: z.string().min(2, 'Destination city is required'),
+    consigneeState: z.string().min(2, 'Destination state is required'),
+    consigneeZip: z.string().min(4, 'Destination ZIP is required'),
     specialInstructions: z.string().optional(),
   })
   .refine((data) => data.originHub !== data.destinationHub, {
@@ -36,9 +77,6 @@ interface Props {
   onSuccess: () => void;
   onCancel: () => void;
 }
-
-import { Controller } from 'react-hook-form';
-import { RichTextEditor } from '../ui/rich-text-editor';
 
 export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => {
   const { data: customers = [] } = useCustomers();
@@ -68,12 +106,20 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
       dimL: 10,
       dimW: 10,
       dimH: 10,
+      consigneeName: '',
+      consigneePhone: '',
+      consigneeAddress: '',
+      consigneeCity: '',
+      consigneeState: '',
+      consigneeZip: '',
       specialInstructions: '',
     },
   });
 
+  const selectedCustomerId = watch('customerId');
   const selectedMode = watch('mode');
   const selectedService = watch('serviceLevel');
+  const selectedCustomer = customers.find((customer) => customer.id === selectedCustomerId);
 
   const onSubmit = async (data: FormData) => {
     // eslint-disable-next-line no-console
@@ -83,10 +129,16 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
       return;
     }
 
+    if (!selectedCustomer) {
+      toast.error('Please select a valid customer before creating the shipment.');
+      return;
+    }
+
     // Volumetric Calculation (Standard L*W*H / 5000 for Air)
     const divisor = data.mode === 'AIR' ? 5000 : 4000;
     const volWeight = (data.dimL * data.dimW * data.dimH) / divisor;
     const chargeable = Math.max(data.weightDead, volWeight);
+    const consignorAddress = normalizeCustomerAddress(selectedCustomer.address);
 
     try {
       await createShipmentMutation.mutateAsync({
@@ -97,10 +149,22 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
         service_level: data.serviceLevel,
         package_count: data.packageCount,
         total_weight: parseFloat(chargeable.toFixed(2)),
-        // Required DB fields not in form yet:
-        consignee_name: 'Walk-in Customer',
-        consignee_phone: '9999999999',
-        consignee_address: { line1: 'TBD', city: 'TBD' },
+        consignee_name: data.consigneeName,
+        consignee_phone: data.consigneePhone,
+        consignee_address: {
+          line1: data.consigneeAddress,
+          city: data.consigneeCity,
+          state: data.consigneeState,
+          zip: data.consigneeZip,
+        },
+        consignor_name: selectedCustomer.name,
+        consignor_phone: selectedCustomer.phone,
+        consignor_address: {
+          line1: consignorAddress.line1,
+          city: consignorAddress.city,
+          state: consignorAddress.state,
+          zip: consignorAddress.zip,
+        },
         special_instructions:
           data.specialInstructions || `Dims: ${data.dimL}x${data.dimW}x${data.dimH}`,
       });
@@ -111,7 +175,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
         onSuccess();
       }, 500);
     } catch (e) {
-      console.error(e);
+      logger.error('CreateShipmentForm', 'Error', { error: e });
       toast.error('Failed to create shipment', {
         description: e instanceof Error ? e.message : 'Please check your internet connection.',
       });
@@ -126,7 +190,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
           <label className="block text-xs font-mono text-muted-foreground mb-1">ORIGIN HUB</label>
           <select
             {...register('originHub')}
-            className="w-full bg-background border border-input rounded-none px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
+            className="w-full bg-background border border-input rounded-md px-4 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
           >
             <option value="">Select Hub</option>
             {Object.values(HUBS).map((hub) => (
@@ -142,7 +206,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
           </label>
           <select
             {...register('destinationHub')}
-            className="w-full bg-background border border-input rounded-none px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
+            className="w-full bg-background border border-input rounded-md px-4 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
           >
             <option value="">Select Hub</option>
             {Object.values(HUBS).map((hub) => (
@@ -162,18 +226,85 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
         <label className="block text-xs font-mono text-muted-foreground mb-1">CUSTOMER</label>
         <select
           {...register('customerId')}
-          className="w-full bg-background border border-input rounded-none px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
+          className="w-full bg-background border border-input rounded-md px-4 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
         >
           <option value="">Select Customer</option>
           {customers.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.companyName || c.name}
+              {c.name}
             </option>
           ))}
         </select>
         {errors.customerId && (
           <span className="text-destructive text-xs">{errors.customerId.message}</span>
         )}
+        {selectedCustomer && (
+          <div className="mt-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+            Shipper details will use the selected customer record: {selectedCustomer.name}
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 bg-muted/40 rounded-md border border-border">
+        <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+          <Package className="w-4 h-4" /> Consignee Details
+        </h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-mono text-muted-foreground mb-1">
+              CONSIGNEE NAME
+            </label>
+            <Input {...register('consigneeName')} />
+            {errors.consigneeName && (
+              <span className="text-destructive text-xs">{errors.consigneeName.message}</span>
+            )}
+          </div>
+          <div>
+            <label className="block text-xs font-mono text-muted-foreground mb-1">
+              CONSIGNEE PHONE
+            </label>
+            <Input {...register('consigneePhone')} />
+            {errors.consigneePhone && (
+              <span className="text-destructive text-xs">{errors.consigneePhone.message}</span>
+            )}
+          </div>
+          <div className="col-span-2">
+            <label className="block text-xs font-mono text-muted-foreground mb-1">
+              DELIVERY ADDRESS
+            </label>
+            <Input {...register('consigneeAddress')} />
+            {errors.consigneeAddress && (
+              <span className="text-destructive text-xs">{errors.consigneeAddress.message}</span>
+            )}
+          </div>
+          <div>
+            <label className="block text-xs font-mono text-muted-foreground mb-1">
+              DESTINATION CITY
+            </label>
+            <Input {...register('consigneeCity')} />
+            {errors.consigneeCity && (
+              <span className="text-destructive text-xs">{errors.consigneeCity.message}</span>
+            )}
+          </div>
+          <div>
+            <label className="block text-xs font-mono text-muted-foreground mb-1">
+              DESTINATION STATE
+            </label>
+            <Input {...register('consigneeState')} />
+            {errors.consigneeState && (
+              <span className="text-destructive text-xs">{errors.consigneeState.message}</span>
+            )}
+          </div>
+          <div>
+            <label className="block text-xs font-mono text-muted-foreground mb-1">
+              DESTINATION ZIP
+            </label>
+            <Input {...register('consigneeZip')} />
+            {errors.consigneeZip && (
+              <span className="text-destructive text-xs">{errors.consigneeZip.message}</span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Mode & Service */}
@@ -187,7 +318,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               <label
                 key={mode.id}
                 className={`
-                                cursor-pointer border rounded-none p-2 flex flex-col items-center justify-center text-xs transition-all text-center
+                                cursor-pointer border rounded-md p-2 flex flex-col items-center justify-center text-xs transition-all text-center
                                 ${
                                   selectedMode === mode.id
                                     ? 'bg-primary/10 border-primary text-primary'
@@ -215,7 +346,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               <label
                 key={level.id}
                 className={`
-                                cursor-pointer border rounded-none p-2 flex flex-col items-center justify-center text-xs transition-all text-center
+                                cursor-pointer border rounded-md p-2 flex flex-col items-center justify-center text-xs transition-all text-center
                                 ${
                                   selectedService === level.id
                                     ? 'bg-primary/10 border-primary/30 text-primary'
@@ -242,7 +373,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
       </div>
 
       {/* Package Details */}
-      <div className="p-4 bg-muted/40 rounded-none border border-border">
+      <div className="p-4 bg-muted/40 rounded-md border border-border">
         <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
           <Package className="w-4 h-4" /> Package Details
         </h3>
@@ -291,7 +422,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
         />
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t border-border">
+      <div className="flex justify-end gap-4 pt-4 border-t border-border">
         <Button type="button" variant="ghost" onClick={onCancel}>
           Cancel
         </Button>

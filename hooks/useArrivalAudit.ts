@@ -137,6 +137,27 @@ export function useArrivalAudit() {
     },
   });
 
+  // Safety timeout ref — prevents isScanning from staying true forever
+  // if the Supabase call hangs or the finally block somehow doesn't execute.
+  const scanTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const acquireScanLock = useCallback(() => {
+    setIsScanning(true);
+    // Auto-release after 15 seconds to prevent permanent lockout
+    scanTimeoutRef.current = setTimeout(() => {
+      console.warn('[useArrivalAudit] Scan lock auto-released after 15s timeout');
+      setIsScanning(false);
+    }, 15_000);
+  }, []);
+
+  const releaseScanLock = useCallback(() => {
+    if (scanTimeoutRef.current) {
+      clearTimeout(scanTimeoutRef.current);
+      scanTimeoutRef.current = null;
+    }
+    setIsScanning(false);
+  }, []);
+
   // Process a scan for an item
   const processScan = useCallback(
     async (input: string, _source: ScanSource = ScanSource.MANUAL) => {
@@ -145,7 +166,7 @@ export function useArrivalAudit() {
         return;
       }
 
-      setIsScanning(true);
+      acquireScanLock();
       try {
         let awb = input.trim().toUpperCase();
         try {
@@ -201,10 +222,18 @@ export function useArrivalAudit() {
         playBeep('error');
         throw err;
       } finally {
-        setIsScanning(false);
+        releaseScanLock();
       }
     },
-    [activeManifestId, findManifest, playBeep, queryClient, refetchItems]
+    [
+      activeManifestId,
+      findManifest,
+      playBeep,
+      queryClient,
+      refetchItems,
+      acquireScanLock,
+      releaseScanLock,
+    ]
   );
 
   const clearManifest = () => {

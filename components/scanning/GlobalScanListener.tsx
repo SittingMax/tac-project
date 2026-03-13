@@ -14,9 +14,10 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useScanner } from '../../context/useScanner';
-import { useScanContext } from '../../context/ScanContext';
-import { ScanSource } from '../../types';
+import { useScanner } from '@/context/useScanner';
+import { useScanContext } from '@/context/ScanContext';
+import { ScanSource } from '@/types';
+import { parseScanInput } from '@/lib/scanParser';
 import { ScanPreviewDialog, type ScanPreviewType } from './ScanPreviewDialog';
 
 export const GlobalScanListener: React.FC = () => {
@@ -69,26 +70,32 @@ export const GlobalScanListener: React.FC = () => {
       return;
     }
 
-    // Rule 3: CN format → preview shipment
-    if (cleanData.startsWith('TAC')) {
-      setPreviewType('shipment');
+    // Use the canonical scan parser for type detection
+    try {
+      const parsed = parseScanInput(cleanData);
+
+      switch (parsed.type) {
+        case 'shipment':
+          setPreviewType('shipment');
+          break;
+        case 'manifest':
+          setPreviewType('manifest');
+          break;
+        case 'package':
+          setPreviewType('shipment'); // packages resolve to shipment preview
+          break;
+        default:
+          setPreviewType('unknown');
+      }
+
       setPreviewData(cleanData);
       setPreviewOpen(true);
-      return;
-    }
-
-    // Rule 4: Manifest format → preview manifest (MAN- legacy + MNF- current)
-    if (cleanData.startsWith('MAN') || cleanData.startsWith('MNF')) {
-      setPreviewType('manifest');
+    } catch {
+      // parseScanInput threw ValidationError — treat as unknown
+      setPreviewType('unknown');
       setPreviewData(cleanData);
       setPreviewOpen(true);
-      return;
     }
-
-    // Rule 5: Unknown format → preview with copy option
-    setPreviewType('unknown');
-    setPreviewData(cleanData);
-    setPreviewOpen(true);
   }, []);
 
   useEffect(() => {

@@ -54,9 +54,9 @@ export const BarcodePresets: Record<string, BarcodePreset> = {
     mode: 'compact',
     format: 'CODE128',
     config: {
-      width: 5,
-      height: 80,
-      margin: 10,
+      width: 2,
+      height: 50,
+      margin: 5,
       displayValue: true,
     },
     description: 'Compact size for table cells',

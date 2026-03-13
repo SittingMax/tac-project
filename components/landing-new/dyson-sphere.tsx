@@ -98,7 +98,7 @@ export function DysonSphere({ className }: { className?: string }) {
       {/* Bright Core */}
       <div
         ref={coreRef}
-        className="absolute w-[30%] h-[30%] bg-primary/30 rounded-none blur-[40px] z-0"
+        className="absolute w-[30%] h-[30%] bg-primary/30 rounded-full blur-[40px] z-0"
       />
 
       {/* Rotating Structure Container */}
@@ -157,8 +157,8 @@ export function DysonSphere({ className }: { className?: string }) {
           ref={satelliteGroupRef}
           className="satellite-group absolute inset-0 transform-style-3d"
         >
-          <div className="absolute top-1/2 left-0 w-1.5 h-1.5 bg-primary/80 rounded-none shadow-[0_0_15px_currentColor]" />
-          <div className="absolute bottom-0 right-1/4 w-1 h-1 bg-foreground/60 rounded-none" />
+          <div className="absolute top-1/2 left-0 w-1.5 h-1.5 bg-primary/80 rounded-full shadow-[0_0_15px_currentColor]" />
+          <div className="absolute bottom-0 right-1/4 w-1 h-1 bg-foreground/60 rounded-full" />
         </div>
       </div>
     </div>

@@ -2,7 +2,6 @@
  * Audit Service
  * Handles audit log operations
  */
-/* eslint-disable @typescript-eslint/no-explicit-any -- Supabase client requires any for complex operations */
 
 import { supabase } from '@/lib/supabase';
 import { mapSupabaseError } from '@/lib/errors';
@@ -84,7 +83,7 @@ export const auditService = {
       .insert({
         ...log,
         org_id: orgId,
-      } as any)
+      })
       .select()
       .single();
 
@@ -97,7 +96,9 @@ export const auditService = {
     entityType: string,
     entityId: string,
     staffId?: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic audit data
     before?: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic audit data
     after?: any
   ): Promise<AuditLog> {
     return this.create({
@@ -115,6 +116,7 @@ export const auditService = {
     entityType: string,
     entityId: string,
     staffId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic entity data
     data: any
   ): Promise<AuditLog> {
     return this.logAction('CREATE', entityType, entityId, staffId, null, data);
@@ -124,7 +126,9 @@ export const auditService = {
     entityType: string,
     entityId: string,
     staffId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic entity data
     before: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic entity data
     after: any
   ): Promise<AuditLog> {
     return this.logAction('UPDATE', entityType, entityId, staffId, before, after);
@@ -134,6 +138,7 @@ export const auditService = {
     entityType: string,
     entityId: string,
     staffId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic entity data
     data: any
   ): Promise<AuditLog> {
     return this.logAction('DELETE', entityType, entityId, staffId, data, null);

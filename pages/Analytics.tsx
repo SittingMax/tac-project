@@ -24,7 +24,7 @@ export const Analytics: React.FC = () => {
     backgroundColor: 'var(--background)',
     borderColor: 'var(--border)',
     color: 'var(--foreground)',
-    borderRadius: '0px',
+    borderRadius: '8px',
     boxShadow: '4px 4px 0px 0px rgba(0,0,0,0.1)',
     fontFamily: 'Inter, sans-serif',
     fontWeight: 500,
@@ -60,11 +60,14 @@ export const Analytics: React.FC = () => {
     return (
       <div className="space-y-12 animate-in fade-in duration-500">
         <PageHeader title="Telemetry" description="Real-time macroscopic telemetry." />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-px bg-border/50 border border-border/50">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="p-8 bg-background flex flex-col gap-4">
-              <Skeleton className="h-4 w-24 rounded-none" />
-              <Skeleton className="h-10 w-16 rounded-none" />
+            <div
+              key={i}
+              className="p-6 bg-card border border-border rounded-lg flex flex-col gap-4"
+            >
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-16" />
             </div>
           ))}
         </div>
@@ -74,93 +77,72 @@ export const Analytics: React.FC = () => {
 
   if (isError || !summary) {
     return (
-      <div className="flex items-center justify-center p-24 text-destructive font-mono uppercase text-sm tracking-widest border border-destructive/20 bg-destructive/5">
-        Telemetry Malfunction: Failed to retrieve analytics matrix.
+      <div className="flex items-center justify-center p-24 text-destructive text-sm rounded-lg border border-destructive/20 bg-destructive/5">
+        Failed to load analytics data. Please try again.
       </div>
     );
   }
 
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none">
-          Telemetry<span className="text-primary">.</span>
-        </h1>
-        <p className="text-muted-foreground font-mono text-sm tracking-widest uppercase">
-          Live operations matrix / Realtime sync active
-        </p>
-      </div>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+      <PageHeader title="Analytics" description="Live operations overview" />
 
-      {/* Avant-Garde KPI Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-px bg-border/40 border-y border-border/40">
-        <div className="bg-background p-8 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10">
-          <div className="flex items-center justify-between mb-8">
-            <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
-              Gross Volume
-            </span>
+      {/* KPI Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-card border border-border rounded-lg p-6 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">Total Shipments</span>
             <Package className="w-4 h-4 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
           </div>
-          <div className="text-5xl font-black tracking-tighter">
+          <div className="text-2xl font-semibold text-foreground">
             {summary.total_shipments.toLocaleString()}
           </div>
-          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
         </div>
 
-        <div className="bg-background p-8 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10">
-          <div className="flex items-center justify-between mb-8">
-            <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
-              Delivery Rate
-            </span>
+        <div className="bg-card border border-border rounded-lg p-6 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">Delivery Rate</span>
             <TrendingUp className="w-4 h-4 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
           </div>
           <div
             className={cn(
-              'text-5xl font-black tracking-tighter',
+              'text-2xl font-semibold',
               Number(deliveryRate) > 95 ? 'text-primary' : 'text-status-warning'
             )}
           >
             {deliveryRate}
-            <span className="text-2xl text-muted-foreground ml-1">%</span>
+            <span className="text-lg text-muted-foreground ml-1">%</span>
           </div>
-          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
         </div>
 
-        <div className="bg-background p-8 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10">
-          <div className="flex items-center justify-between mb-8">
-            <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
-              On Track
-            </span>
+        <div className="bg-card border border-border rounded-lg p-6 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">On Track</span>
             <CheckCircle className="w-4 h-4 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
           </div>
-          <div className="text-5xl font-black tracking-tighter">
+          <div className="text-2xl font-semibold text-foreground">
             {summary.on_track.toLocaleString()}
           </div>
-          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
         </div>
 
-        <div className="bg-background p-8 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/10">
-          <div className="flex items-center justify-between mb-8">
-            <span className="text-xs font-mono text-destructive uppercase tracking-widest">
-              Anomalies
-            </span>
+        <div className="bg-card border border-border rounded-lg p-6 flex flex-col justify-between group relative overflow-hidden transition-all hover:bg-muted/5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-destructive">Exceptions</span>
             <AlertTriangle className="w-4 h-4 text-destructive opacity-50 group-hover:opacity-100 transition-opacity" />
           </div>
-          <div className="text-5xl font-black tracking-tighter text-destructive">
+          <div className="text-2xl font-semibold text-destructive">
             {summary.exceptions.toLocaleString()}
           </div>
-          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-destructive transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
         {/* Trajectory */}
-        <div className="space-y-6">
-          <div className="flex items-end justify-between border-b border-border/40 pb-4">
+        <div className="space-y-4">
+          <div className="flex items-end justify-between border-b border-border pb-4">
             <div>
-              <h3 className="text-xl font-bold uppercase tracking-tight">Flow Trajectory</h3>
-              <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
-                6-Month historical macro-view
-              </p>
+              <h3 className="text-xs text-muted-foreground">Shipment Volume</h3>
+              <p className="text-lg font-semibold text-foreground mt-1">6-Month Overview</p>
             </div>
           </div>
 
@@ -225,13 +207,11 @@ export const Analytics: React.FC = () => {
         </div>
 
         {/* State Distribution */}
-        <div className="space-y-6">
-          <div className="flex items-end justify-between border-b border-border/40 pb-4">
+        <div className="space-y-4">
+          <div className="flex items-end justify-between border-b border-border pb-4">
             <div>
-              <h3 className="text-xl font-bold uppercase tracking-tight">Status Distribution</h3>
-              <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
-                Current state architecture
-              </p>
+              <h3 className="text-xs text-muted-foreground">Status Distribution</h3>
+              <p className="text-lg font-semibold text-foreground mt-1">Current Breakdown</p>
             </div>
           </div>
 
@@ -272,7 +252,13 @@ export const Analytics: React.FC = () => {
                   contentStyle={tooltipStyle}
                   cursor={{ fill: 'var(--muted)', opacity: 0.1 }}
                 />
-                <Bar dataKey="value" name="Units" fill="var(--primary)" radius={0} barSize={24} />
+                <Bar
+                  dataKey="value"
+                  name="Units"
+                  fill="var(--primary)"
+                  radius={[0, 4, 4, 0]}
+                  barSize={24}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>

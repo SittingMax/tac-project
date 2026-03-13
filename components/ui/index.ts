@@ -24,7 +24,6 @@ export {
   DialogTitle,
   DialogDescription,
 } from './dialog';
-export { DataTable } from './data-table';
 export {
   ChartContainer,
   ChartTooltip,

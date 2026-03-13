@@ -270,7 +270,7 @@ export function DateTimePicker({
           initialFocus
         />
         {showTime && (
-          <div className="border-t p-3 space-y-2">
+          <div className="border-t p-4 space-y-2">
             <Label className="text-xs text-muted-foreground">Time</Label>
             <TimePicker value={timeValue} onChange={handleTimeChange} use24Hour={true} />
           </div>

@@ -18,6 +18,7 @@ import JsBarcode from 'jsbarcode';
 import type { BarcodeProps, BarcodeModeConfig } from './types';
 import { MODE_CONFIGS } from './types';
 import { BarcodePresets } from './BarcodePresets';
+import { logger } from '@/lib/logger';
 
 export const UniversalBarcode: React.FC<BarcodeProps> = ({
   value,
@@ -63,7 +64,7 @@ export const UniversalBarcode: React.FC<BarcodeProps> = ({
       // Generate barcode
       JsBarcode(svgRef.current, value, config);
     } catch (error) {
-      console.error('[UniversalBarcode] Generation failed:', error, { value, mode, format });
+      logger.error('UniversalBarcode', 'Generation failed', { error, value, mode });
       if (onError) {
         onError(error as Error);
       }
