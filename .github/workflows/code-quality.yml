@@ -198,30 +198,50 @@ jobs:
     runs-on: ubuntu-latest
     # Skip E2E tests if Supabase environment is not configured
     # (Dependabot PRs and environments without Supabase secrets will skip)
-    if: ${{ vars.VITE_SUPABASE_URL != '' && vars.VITE_SUPABASE_ANON_KEY != '' && github.actor != 'dependabot[bot]' }}
+    # Skip E2E tests if triggered by Dependabot
+    # (Dependabot PRs cannot access repository secrets for security reasons)
+    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Check Supabase secrets are configured
+        id: check-secrets
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_ANON_KEY" ]; then
+            echo "⚠️ Supabase environment is not configured — skipping E2E tests"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
       - name: Setup Node.js
+        if: steps.check-secrets.outputs.skip != 'true'
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install dependencies
+        if: steps.check-secrets.outputs.skip != 'true'
         run: npm ci --no-audit
 
       - name: Install Playwright browsers
+        if: steps.check-secrets.outputs.skip != 'true'
         run: npx playwright install --with-deps chromium
 
       - name: Build application
+        if: steps.check-secrets.outputs.skip != 'true'
         run: npm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Start preview server and run E2E tests
+        if: steps.check-secrets.outputs.skip != 'true'
         run: |
           # Start preview server in background
           npm run preview &
