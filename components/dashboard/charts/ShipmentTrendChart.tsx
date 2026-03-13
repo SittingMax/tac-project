@@ -146,7 +146,11 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
                 }}
               />
               <ChartTooltip
-                cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                cursor={{
+                  stroke: 'hsl(var(--muted-foreground))',
+                  strokeWidth: 1,
+                  strokeDasharray: '4 4',
+                }}
                 content={
                   <ChartTooltipContent
                     className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl"
@@ -154,7 +158,7 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
                       return new Date(value).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
-                        year: 'numeric'
+                        year: 'numeric',
                       });
                     }}
                     indicator="dot"

@@ -240,8 +240,26 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
               className="text-xs"
               tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
             />
-            <YAxis tickLine={false} axisLine={false} tickMargin={12} className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }} />
-            <ChartTooltip cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }} content={<ChartTooltipContent indicator="line" className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl" />} />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={12}
+              className="text-xs"
+              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
+            />
+            <ChartTooltip
+              cursor={{
+                stroke: 'hsl(var(--muted-foreground))',
+                strokeWidth: 1,
+                strokeDasharray: '4 4',
+              }}
+              content={
+                <ChartTooltipContent
+                  indicator="line"
+                  className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl"
+                />
+              }
+            />
             <Area
               type="monotone"
               dataKey="hubA"
@@ -327,7 +345,15 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
       case 'pie':
         return (
           <PieChart>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl" />} />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  hideLabel
+                  className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl"
+                />
+              }
+            />
             <Pie
               data={hubProfile.cumulativeData}
               dataKey="value"

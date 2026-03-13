@@ -324,7 +324,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
       <Separator />
 
       {/* Image Upload */}
-      <Card className={isMobile ? "mb-6" : ""}>
+      <Card className={isMobile ? 'mb-6' : ''}>
         <CardHeader>
           <CardTitle className="text-base">Images</CardTitle>
         </CardHeader>
@@ -373,10 +373,13 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
         </CardContent>
       </Card>
 
-      <div className={isMobile 
-        ? "sticky bottom-0 -mx-4 -mb-4 mt-6 p-4 bg-background border-t border-border flex justify-end gap-3 z-10" 
-        : "flex justify-end gap-3 pt-4"
-      }>
+      <div
+        className={
+          isMobile
+            ? 'sticky bottom-0 -mx-4 -mb-4 mt-6 p-4 bg-background border-t border-border flex justify-end gap-3 z-10'
+            : 'flex justify-end gap-3 pt-4'
+        }
+      >
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>

@@ -221,10 +221,7 @@ export const Exceptions: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
-      <PageHeader
-        title="Exceptions"
-        description="Track and resolve shipment anomalies"
-      >
+      <PageHeader title="Exceptions" description="Track and resolve shipment anomalies">
         <Button variant="destructive" onClick={() => setIsRaiseModalOpen(true)}>
           <Plus data-icon="inline-start" /> Raise Exception
         </Button>
@@ -260,7 +257,10 @@ export const Exceptions: React.FC = () => {
         emptyMessage="No exceptions found."
         toolbar={
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <Select value={statusFilter} onValueChange={(value) => updateFilterParam('status', value)}>
+            <Select
+              value={statusFilter}
+              onValueChange={(value) => updateFilterParam('status', value)}
+            >
               <SelectTrigger className="w-full sm:w-[160px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -272,7 +272,10 @@ export const Exceptions: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={severityFilter} onValueChange={(value) => updateFilterParam('severity', value)}>
+            <Select
+              value={severityFilter}
+              onValueChange={(value) => updateFilterParam('severity', value)}
+            >
               <SelectTrigger className="w-full sm:w-[170px]">
                 <SelectValue placeholder="Severity" />
               </SelectTrigger>
@@ -377,7 +380,9 @@ export const Exceptions: React.FC = () => {
       {/* Resolve Modal */}
       <Dialog
         open={!!selectedException}
-        onOpenChange={(open) => { if (!open) setSelectedException(null); }}
+        onOpenChange={(open) => {
+          if (!open) setSelectedException(null);
+        }}
       >
         <DialogContent>
           <DialogHeader>
@@ -385,7 +390,9 @@ export const Exceptions: React.FC = () => {
           </DialogHeader>
           <form onSubmit={handleSubmitResolve(onResolveSubmit)} className="flex flex-col gap-4">
             <div className="bg-muted/50 p-4 rounded-md text-sm border border-border">
-              <div className="font-medium text-foreground">Exception: {selectedException?.type}</div>
+              <div className="font-medium text-foreground">
+                Exception: {selectedException?.type}
+              </div>
               <div className="text-muted-foreground mt-1">{selectedException?.description}</div>
             </div>
             <div className="flex flex-col gap-1.5">

@@ -291,7 +291,12 @@ export const Finance: React.FC = () => {
       </Dialog>
 
       {/* Success Modal */}
-      <Dialog open={!!successData} onOpenChange={(open) => { if (!open) setSuccessData(null); }}>
+      <Dialog
+        open={!!successData}
+        onOpenChange={(open) => {
+          if (!open) setSuccessData(null);
+        }}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Documents Created Successfully</DialogTitle>
@@ -321,7 +326,9 @@ export const Finance: React.FC = () => {
                 </Button>
               </div>
               <div className="border-t border-border pt-4">
-                <p className="text-xs text-muted-foreground mb-3 font-medium">Share with Customer</p>
+                <p className="text-xs text-muted-foreground mb-3 font-medium">
+                  Share with Customer
+                </p>
                 <div className="flex justify-center gap-4">
                   <Button
                     variant="ghost"
@@ -362,7 +369,10 @@ export const Finance: React.FC = () => {
             <InvoiceDetails
               invoice={viewInvoice}
               shipment={viewShipment}
-              onClose={() => { setViewInvoice(null); setViewShipment(undefined); }}
+              onClose={() => {
+                setViewInvoice(null);
+                setViewShipment(undefined);
+              }}
               onDownloadInvoice={handleDownloadInvoice}
               onDownloadLabel={handleDownloadLabel}
               onMarkPaid={(id) => handleStatusUpdate(id, 'PAID')}

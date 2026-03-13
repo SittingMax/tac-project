@@ -121,9 +121,7 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
                 className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t border-border/40 px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-6 transition-colors"
                 onClick={() => setActiveChart(chart)}
               >
-                <span className="text-xs text-muted-foreground">
-                  {chartConfig[chart].label}
-                </span>
+                <span className="text-xs text-muted-foreground">{chartConfig[chart].label}</span>
                 <span className="text-xl font-semibold sm:text-3xl text-foreground">
                   ₹{(totals[key] / 1000).toFixed(1)}k
                 </span>
@@ -162,21 +160,25 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
                 });
               }}
             />
-            <ChartTooltip 
-              cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }} 
+            <ChartTooltip
+              cursor={{
+                stroke: 'hsl(var(--muted-foreground))',
+                strokeWidth: 1,
+                strokeDasharray: '4 4',
+              }}
               content={
-                <ChartTooltipContent 
+                <ChartTooltipContent
                   className="w-[150px] backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl"
                   nameKey="views"
                   labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
+                    return new Date(value).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
                     });
                   }}
                 />
-              } 
+              }
             />
             <Line
               dataKey={activeChart}

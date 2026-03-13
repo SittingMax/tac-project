@@ -16,8 +16,8 @@ import { logger } from '@/lib/logger';
 import { queryKeys } from '@/lib/queryKeys';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Dynamically import heavy charting components
 const RealtimeCorridorActivity = lazy(() =>
@@ -148,11 +148,13 @@ export const Dashboard: React.FC = () => {
               Good morning, {userGreetingName}
             </h1>
             <p className="text-primary-foreground/80 md:text-lg max-w-2xl font-medium">
-              Real-time logistics telemetry and operations health. 
-              {hasRoleAccess(user?.role, ['ADMIN', 'SUPER_ADMIN']) ? ' You have full administrative access.' : ' Viewing operations overview.'}
+              Real-time logistics telemetry and operations health.
+              {hasRoleAccess(user?.role, ['ADMIN', 'SUPER_ADMIN'])
+                ? ' You have full administrative access.'
+                : ' Viewing operations overview.'}
             </p>
           </div>
-          
+
           <div className="flex flex-wrap items-center gap-3">
             <div className="hidden xl:flex items-center gap-2 bg-black/10 backdrop-blur-md rounded-md px-4 py-2 border border-white/10 shadow-inner">
               <Activity className="h-4 w-4 text-emerald-400 animate-pulse" />
@@ -204,13 +206,17 @@ export const Dashboard: React.FC = () => {
             Network Telemetry
           </h2>
         </div>
-        
-        <ResizablePanelGroup 
-          orientation="horizontal" 
+
+        <ResizablePanelGroup
+          orientation="horizontal"
           className="min-h-[600px] w-full items-stretch rounded-lg border border-border/40 bg-card overflow-hidden"
         >
           {/* Main Chart Column */}
-          <ResizablePanel defaultSize={65} minSize={40} className="p-0 flex flex-col items-stretch h-full">
+          <ResizablePanel
+            defaultSize={65}
+            minSize={40}
+            className="p-0 flex flex-col items-stretch h-full"
+          >
             <div className="flex-1 space-y-6 flex flex-col p-4 w-full h-full min-h-[600px] overflow-auto custom-scrollbar">
               <ErrorBoundary fallback={<InlineError message="Failed to load shipment trend" />}>
                 <Suspense fallback={<ChartSkeleton height={400} title="Volume Trend" fullHeight />}>
@@ -225,23 +231,41 @@ export const Dashboard: React.FC = () => {
             </div>
           </ResizablePanel>
 
-          <ResizableHandle withHandle className="bg-border/50 hover:bg-primary/50 transition-colors w-2" />
+          <ResizableHandle
+            withHandle
+            className="bg-border/50 hover:bg-primary/50 transition-colors w-2"
+          />
 
           {/* Secondary Charts Column */}
-          <ResizablePanel defaultSize={35} minSize={25} className="p-0 flex flex-col items-stretch h-full bg-muted/10 border-l border-border/40">
+          <ResizablePanel
+            defaultSize={35}
+            minSize={25}
+            className="p-0 flex flex-col items-stretch h-full bg-muted/10 border-l border-border/40"
+          >
             <div className="flex-1 flex flex-col p-4 w-full h-full min-h-[600px] overflow-auto custom-scrollbar">
               <Tabs defaultValue="status" className="flex-1 flex flex-col h-full space-y-4">
                 <div className="flex items-center justify-between">
                   <TabsList className="grid w-full grid-cols-3 bg-muted/50 border border-border/50">
-                    <TabsTrigger value="status" className="text-xs">Status</TabsTrigger>
-                    <TabsTrigger value="hub" className="text-xs">Hub</TabsTrigger>
-                    <TabsTrigger value="revenue" className="text-xs">Finance</TabsTrigger>
+                    <TabsTrigger value="status" className="text-xs">
+                      Status
+                    </TabsTrigger>
+                    <TabsTrigger value="hub" className="text-xs">
+                      Hub
+                    </TabsTrigger>
+                    <TabsTrigger value="revenue" className="text-xs">
+                      Finance
+                    </TabsTrigger>
                   </TabsList>
                 </div>
 
-                <TabsContent value="status" className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0">
+                <TabsContent
+                  value="status"
+                  className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0"
+                >
                   <div className="h-full flex flex-col w-full">
-                    <ErrorBoundary fallback={<InlineError message="Failed to load status distribution" />}>
+                    <ErrorBoundary
+                      fallback={<InlineError message="Failed to load status distribution" />}
+                    >
                       <Suspense fallback={<ChartSkeleton height={300} title="Current Breakdown" />}>
                         <StatusDistributionChart />
                       </Suspense>
@@ -249,9 +273,14 @@ export const Dashboard: React.FC = () => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="hub" className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0">
+                <TabsContent
+                  value="hub"
+                  className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0"
+                >
                   <div className="h-full flex flex-col w-full">
-                    <ErrorBoundary fallback={<InlineError message="Failed to load hub comparison" />}>
+                    <ErrorBoundary
+                      fallback={<InlineError message="Failed to load hub comparison" />}
+                    >
                       <Suspense fallback={<ChartSkeleton height={320} title="Hub Profile" />}>
                         <HubPerformanceChart />
                       </Suspense>
@@ -259,9 +288,14 @@ export const Dashboard: React.FC = () => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="revenue" className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0">
+                <TabsContent
+                  value="revenue"
+                  className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0"
+                >
                   <div className="h-full flex flex-col w-full">
-                    <ErrorBoundary fallback={<InlineError message="Failed to load billing chart" />}>
+                    <ErrorBoundary
+                      fallback={<InlineError message="Failed to load billing chart" />}
+                    >
                       <Suspense fallback={<ChartSkeleton height={250} title="Billing Trend" />}>
                         <RevenueTrendChart />
                       </Suspense>

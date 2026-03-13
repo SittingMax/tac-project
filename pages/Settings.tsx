@@ -12,11 +12,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { CrudTable } from '@/components/crud/CrudTable';
 import { HUBS, SHIPMENT_MODES, SERVICE_LEVELS, PAYMENT_MODES } from '@/lib/constants';
 
-import {
-  SectionHeader,
-  FieldLabel,
-  SelectField,
-} from '@/components/settings/SettingsComponents';
+import { SectionHeader, FieldLabel, SelectField } from '@/components/settings/SettingsComponents';
 import { AuditLogsTab } from '@/components/settings/AuditLogsTab';
 import { settingsService } from '@/lib/services/settingsService';
 import { cn } from '@/lib/utils';
@@ -259,8 +255,15 @@ export const Settings = () => {
 
         {/* ============= GENERAL TAB ============= */}
         <TabsContent value="GENERAL" className="mt-6">
-          <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3"]} className="w-full space-y-4">
-            <AccordionItem value="item-1" className="border-none bg-card rounded-lg border border-border">
+          <Accordion
+            type="multiple"
+            defaultValue={['item-1', 'item-2', 'item-3']}
+            className="w-full space-y-4"
+          >
+            <AccordionItem
+              value="item-1"
+              className="border-none bg-card rounded-lg border border-border"
+            >
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
                 <SectionHeader icon={Building2} title="Organization Profile" className="mb-0" />
               </AccordionTrigger>
@@ -321,7 +324,10 @@ export const Settings = () => {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-2" className="border-none bg-card rounded-lg border border-border">
+            <AccordionItem
+              value="item-2"
+              className="border-none bg-card rounded-lg border border-border"
+            >
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
                 <SectionHeader icon={Truck} title="Operational Defaults" className="mb-0" />
               </AccordionTrigger>
@@ -345,15 +351,23 @@ export const Settings = () => {
                   </div>
                   <div>
                     <FieldLabel>Default Payment Mode</FieldLabel>
-                    <RadioGroup 
-                      value={defaultPaymentMode} 
+                    <RadioGroup
+                      value={defaultPaymentMode}
                       onValueChange={setDefaultPaymentMode}
                       className="flex space-x-4 mt-2"
                     >
                       {PAYMENT_MODES.map((p) => (
-                        <div key={p.id} className="flex items-center space-x-2 bg-muted/30 border border-border px-4 py-2 rounded-md">
+                        <div
+                          key={p.id}
+                          className="flex items-center space-x-2 bg-muted/30 border border-border px-4 py-2 rounded-md"
+                        >
                           <RadioGroupItem value={p.id} id={`payment-${p.id}`} />
-                          <Label htmlFor={`payment-${p.id}`} className="cursor-pointer font-normal text-sm">{p.label}</Label>
+                          <Label
+                            htmlFor={`payment-${p.id}`}
+                            className="cursor-pointer font-normal text-sm"
+                          >
+                            {p.label}
+                          </Label>
                         </div>
                       ))}
                     </RadioGroup>
@@ -374,9 +388,17 @@ export const Settings = () => {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-3" className="border-none bg-card rounded-lg border border-border">
+            <AccordionItem
+              value="item-3"
+              className="border-none bg-card rounded-lg border border-border"
+            >
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
-                <SectionHeader icon={MapPin} title="Hub Network" color="text-primary" className="mb-0" />
+                <SectionHeader
+                  icon={MapPin}
+                  title="Hub Network"
+                  color="text-primary"
+                  className="mb-0"
+                />
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-6 pt-2">
                 <CrudTable
@@ -386,15 +408,14 @@ export const Settings = () => {
                   enableColumnVisibility={false}
                 />
                 <p className="text-xs text-muted-foreground mt-4">
-                  Hub configuration is managed at the infrastructure level. Contact support to add or
-                  modify hubs.
+                  Hub configuration is managed at the infrastructure level. Contact support to add
+                  or modify hubs.
                 </p>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-
             {/* Save Button — Full width */}
             <div className="md:col-span-2 p-8 bg-background flex justify-end">
               <Button onClick={handleSaveGeneral} disabled={isLoading} size="lg">
@@ -406,8 +427,15 @@ export const Settings = () => {
 
         {/* ============= SECURITY & NOTIFICATIONS TAB ============= */}
         <TabsContent value="SECURITY" className="mt-6">
-          <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3", "item-4"]} className="w-full space-y-4">
-            <AccordionItem value="item-1" className="border-none bg-card rounded-lg border border-border">
+          <Accordion
+            type="multiple"
+            defaultValue={['item-1', 'item-2', 'item-3', 'item-4']}
+            className="w-full space-y-4"
+          >
+            <AccordionItem
+              value="item-1"
+              className="border-none bg-card rounded-lg border border-border"
+            >
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
                 <SectionHeader icon={User} title="User Profile" className="mb-0" />
               </AccordionTrigger>
@@ -456,7 +484,10 @@ export const Settings = () => {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-2" className="border-none bg-card rounded-lg border border-border">
+            <AccordionItem
+              value="item-2"
+              className="border-none bg-card rounded-lg border border-border"
+            >
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
                 <SectionHeader icon={Moon} title="Appearance" className="mb-0" />
               </AccordionTrigger>
@@ -504,7 +535,10 @@ export const Settings = () => {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-3" className="border-none bg-card rounded-lg border border-border">
+            <AccordionItem
+              value="item-3"
+              className="border-none bg-card rounded-lg border border-border"
+            >
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
                 <SectionHeader icon={Bell} title="Notifications" className="mb-0" />
               </AccordionTrigger>
@@ -528,11 +562,16 @@ export const Settings = () => {
                       label: 'Driver & Vehicle Updates',
                     },
                   ].map((item, idx) => (
-                    <div key={item.id} className={`flex items-center justify-between px-4 py-3 ${idx > 0 ? 'border-t border-border' : ''}`}>
+                    <div
+                      key={item.id}
+                      className={`flex items-center justify-between px-4 py-3 ${idx > 0 ? 'border-t border-border' : ''}`}
+                    >
                       <span className="text-sm font-medium">{item.label}</span>
                       <Switch
                         checked={notifications[item.id as keyof typeof notifications]}
-                        onCheckedChange={() => toggleNotification(item.id as keyof typeof notifications)}
+                        onCheckedChange={() =>
+                          toggleNotification(item.id as keyof typeof notifications)
+                        }
                         aria-label={`Toggle ${item.label}`}
                       />
                     </div>
@@ -541,7 +580,10 @@ export const Settings = () => {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-4" className="border-none bg-card rounded-lg border border-border">
+            <AccordionItem
+              value="item-4"
+              className="border-none bg-card rounded-lg border border-border"
+            >
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
                 <SectionHeader icon={Shield} title="Security" className="mb-0" />
               </AccordionTrigger>

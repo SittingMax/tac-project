@@ -151,7 +151,10 @@ export function RealtimeCorridorActivity() {
           config={corridorActivity.chartConfig}
           className="aspect-auto h-[350px] w-full"
         >
-          <AreaChart data={corridorActivity.chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+          <AreaChart
+            data={corridorActivity.chartData}
+            margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+          >
             <defs>
               <linearGradient id="fillPrimary" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.8} />
@@ -184,7 +187,11 @@ export function RealtimeCorridorActivity() {
               }}
             />
             <ChartTooltip
-              cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
+              cursor={{
+                stroke: 'hsl(var(--muted-foreground))',
+                strokeWidth: 1,
+                strokeDasharray: '4 4',
+              }}
               content={
                 <ChartTooltipContent
                   className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl"

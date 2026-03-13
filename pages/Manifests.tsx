@@ -259,10 +259,7 @@ export const Manifests: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
-      <PageHeader
-        title="Fleet Manifests"
-        description="Manage linehaul movements between hubs"
-      >
+      <PageHeader title="Fleet Manifests" description="Manage linehaul movements between hubs">
         <Button onClick={openCreateManifest} data-testid="create-manifest-button">
           <Scan data-icon="inline-start" /> New Manifest
         </Button>

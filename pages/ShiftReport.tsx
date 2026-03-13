@@ -54,10 +54,7 @@ export default function ShiftReport() {
 
   return (
     <div className="flex flex-col gap-6 pb-24">
-      <PageHeader
-        title="Shift Handover"
-        description="Operations summary for designated duration"
-      >
+      <PageHeader title="Shift Handover" description="Operations summary for designated duration">
         <Select value={shiftHours} onValueChange={(v) => setShiftHours(v as ShiftDuration)}>
           <SelectTrigger className="w-[140px] h-10">
             <SelectValue placeholder="DURATION" />
@@ -80,10 +77,7 @@ export default function ShiftReport() {
           <RefreshCw className={`size-4 ${isFetching ? 'animate-spin' : ''}`} />
         </Button>
 
-        <Button
-          onClick={handleExport}
-          disabled={!report || exportMutation.isPending}
-        >
+        <Button onClick={handleExport} disabled={!report || exportMutation.isPending}>
           <Download data-icon="inline-start" /> Export Data
         </Button>
       </PageHeader>
@@ -159,9 +153,7 @@ export default function ShiftReport() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-destructive">
-                  Exceptions
-                </CardTitle>
+                <CardTitle className="text-sm font-medium text-destructive">Exceptions</CardTitle>
                 <AlertTriangle className="size-4 text-destructive opacity-50" />
               </CardHeader>
               <CardContent>
@@ -176,9 +168,7 @@ export default function ShiftReport() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Scans
-                </CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Scans</CardTitle>
                 <ScanLine className="size-4 text-primary opacity-50" />
               </CardHeader>
               <CardContent>
@@ -228,7 +218,11 @@ export default function ShiftReport() {
                       <AlertCircle className="size-5 text-status-warning" />
                       <span>Open Manifests</span>
                     </div>
-                    <Badge variant={report.pendingActions.openManifests > 0 ? 'destructive' : 'secondary'}>
+                    <Badge
+                      variant={
+                        report.pendingActions.openManifests > 0 ? 'destructive' : 'secondary'
+                      }
+                    >
                       {report.pendingActions.openManifests}
                     </Badge>
                   </div>
@@ -237,7 +231,11 @@ export default function ShiftReport() {
                       <XCircle className="size-5 text-status-error" />
                       <span>Unresolved Exceptions</span>
                     </div>
-                    <Badge variant={report.pendingActions.unresolvedExceptions > 0 ? 'destructive' : 'secondary'}>
+                    <Badge
+                      variant={
+                        report.pendingActions.unresolvedExceptions > 0 ? 'destructive' : 'secondary'
+                      }
+                    >
                       {report.pendingActions.unresolvedExceptions}
                     </Badge>
                   </div>

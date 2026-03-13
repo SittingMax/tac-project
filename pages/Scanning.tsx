@@ -30,11 +30,7 @@ import { ScannerDebug } from '@/components/scanning/ScannerDebug';
 import { UniversalBarcode } from '@/components/barcodes';
 import { useScanningLogic, type ScanMode } from '@/hooks/useScanningLogic';
 import { useScanQueue } from '@/store/scanQueueStore';
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from '@/components/ui/resizable';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 
 /* ── Mode Metadata ──────────────────────────────────────────── */
 const MODE_META: Record<
@@ -258,200 +254,208 @@ export const Scanning: React.FC = () => {
       <div className="flex-1 min-h-0">
         <ResizablePanelGroup orientation="horizontal" className="h-full items-stretch pb-0">
           {/* Scanner Viewport */}
-          <ResizablePanel defaultSize={65} minSize={30} className="relative bg-muted/20 overflow-hidden flex flex-col min-h-0">
-          {/* Top overlay bar */}
-          <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-2 bg-gradient-to-b from-background/80 to-transparent">
-            {/* Camera / Manual toggle */}
-            <div className="flex gap-1 bg-background/90 border border-border backdrop-blur-sm rounded-md overflow-hidden">
-              <Button
-                variant={useCameraScanner ? 'default' : 'ghost'}
-                size="icon"
-                className="size-9 rounded-none"
-                onClick={() => setUseCameraScanner(true)}
-                title="Camera scanner"
-              >
-                <Camera className="size-4" />
-              </Button>
-              <Button
-                variant={!useCameraScanner ? 'default' : 'ghost'}
-                size="icon"
-                className="size-9 rounded-none"
-                onClick={() => setUseCameraScanner(false)}
-                title="Manual / HID scanner"
-              >
-                <Keyboard className="size-4" />
-              </Button>
+          <ResizablePanel
+            defaultSize={65}
+            minSize={30}
+            className="relative bg-muted/20 overflow-hidden flex flex-col min-h-0"
+          >
+            {/* Top overlay bar */}
+            <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-2 bg-gradient-to-b from-background/80 to-transparent">
+              {/* Camera / Manual toggle */}
+              <div className="flex gap-1 bg-background/90 border border-border backdrop-blur-sm rounded-md overflow-hidden">
+                <Button
+                  variant={useCameraScanner ? 'default' : 'ghost'}
+                  size="icon"
+                  className="size-9 rounded-none"
+                  onClick={() => setUseCameraScanner(true)}
+                  title="Camera scanner"
+                >
+                  <Camera className="size-4" />
+                </Button>
+                <Button
+                  variant={!useCameraScanner ? 'default' : 'ghost'}
+                  size="icon"
+                  className="size-9 rounded-none"
+                  onClick={() => setUseCameraScanner(false)}
+                  title="Manual / HID scanner"
+                >
+                  <Keyboard className="size-4" />
+                </Button>
+              </div>
+
+              {/* Mobile KPIs */}
+              <div className="flex md:hidden items-center gap-2 text-xs font-mono">
+                <span className="bg-status-success/20 text-status-success px-2 py-1 rounded-md">
+                  ✓ {scanCount.success}
+                </span>
+                <span className="bg-status-error/20 text-status-error px-2 py-1 rounded-md">
+                  ✗ {scanCount.error}
+                </span>
+              </div>
             </div>
 
-            {/* Mobile KPIs */}
-            <div className="flex md:hidden items-center gap-2 text-xs font-mono">
-              <span className="bg-status-success/20 text-status-success px-2 py-1 rounded-md">
-                ✓ {scanCount.success}
-              </span>
-              <span className="bg-status-error/20 text-status-error px-2 py-1 rounded-md">
-                ✗ {scanCount.error}
-              </span>
-            </div>
-          </div>
-
-          {/* Viewport content */}
-          {useCameraScanner ? (
-            <BarcodeScanner
-              onScan={handleCameraScan}
-              active={true}
-              className="flex-1 min-h-[300px]"
-            />
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center relative">
-              {/* Dot grid pattern */}
-              <div
-                className="absolute inset-0 opacity-[0.04]"
-                style={{
-                  backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-                  backgroundSize: '24px 24px',
-                }}
+            {/* Viewport content */}
+            {useCameraScanner ? (
+              <BarcodeScanner
+                onScan={handleCameraScan}
+                active={true}
+                className="flex-1 min-h-[300px]"
               />
-
-              {/* Animated scan line */}
-              <div className="absolute inset-x-0 top-0 h-full pointer-events-none overflow-hidden">
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center relative">
+                {/* Dot grid pattern */}
                 <div
-                  className="absolute left-[10%] right-[10%] h-[2px] opacity-60"
+                  className="absolute inset-0 opacity-[0.04]"
                   style={{
-                    background: `linear-gradient(90deg, transparent, var(--primary), transparent)`,
-                    animation: 'scan 3s ease-in-out infinite',
+                    backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
+                    backgroundSize: '24px 24px',
                   }}
                 />
-              </div>
 
-              {/* Center crosshair */}
-              <div className="relative z-10 flex flex-col items-center gap-6">
-                <div className="relative">
-                  {/* Corner brackets */}
-                  <div className="w-32 h-32 relative">
-                    <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-primary/50" />
-                    <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-primary/50" />
-                    <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-primary/50" />
-                    <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-primary/50" />
-                    <ScanLine className="w-10 h-10 text-primary/40 absolute inset-0 m-auto animate-pulse" />
+                {/* Animated scan line */}
+                <div className="absolute inset-x-0 top-0 h-full pointer-events-none overflow-hidden">
+                  <div
+                    className="absolute left-[10%] right-[10%] h-[2px] opacity-60"
+                    style={{
+                      background: `linear-gradient(90deg, transparent, var(--primary), transparent)`,
+                      animation: 'scan 3s ease-in-out infinite',
+                    }}
+                  />
+                </div>
+
+                {/* Center crosshair */}
+                <div className="relative z-10 flex flex-col items-center gap-6">
+                  <div className="relative">
+                    {/* Corner brackets */}
+                    <div className="w-32 h-32 relative">
+                      <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-primary/50" />
+                      <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-primary/50" />
+                      <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-primary/50" />
+                      <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-primary/50" />
+                      <ScanLine className="w-10 h-10 text-primary/40 absolute inset-0 m-auto animate-pulse" />
+                    </div>
+                  </div>
+
+                  <div className="px-4 py-2 bg-background/80 backdrop-blur-sm rounded-lg border border-border">
+                    <p className="text-xs text-muted-foreground text-center">
+                      {needsManifest ? 'Awaiting manifest scan' : 'HID scanner ready'}
+                    </p>
+                    <p className="text-[10px] font-mono text-muted-foreground/60 text-center mt-1">
+                      Use keyboard input or connect a barcode scanner
+                    </p>
                   </div>
                 </div>
-
-                <div className="px-4 py-2 bg-background/80 backdrop-blur-sm rounded-lg border border-border">
-                  <p className="text-xs text-muted-foreground text-center">
-                    {needsManifest ? 'Awaiting manifest scan' : 'HID scanner ready'}
-                  </p>
-                  <p className="text-[10px] font-mono text-muted-foreground/60 text-center mt-1">
-                    Use keyboard input or connect a barcode scanner
-                  </p>
-                </div>
               </div>
-            </div>
-          )}
+            )}
           </ResizablePanel>
 
           <ResizableHandle withHandle className="hidden lg:flex" />
 
           {/* ── RIGHT PANEL: Input + Feed ────────────────── */}
-          <ResizablePanel defaultSize={35} minSize={25} className="flex flex-col min-h-0 bg-background border-t border-border lg:border-none">
-          {/* Manual Input */}
-          <div className="flex-shrink-0 p-4 border-b border-border">
-            <Label
-              htmlFor="scan-input"
-              className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5"
-            >
-              <Keyboard className="size-3" />
-              {needsManifest
-                ? 'Enter manifest code'
-                : `Scan ${scanMode === 'DELIVER' ? 'delivery' : 'shipment'}`}
-            </Label>
-            <form onSubmit={handleScanSubmit} className="flex gap-2" data-testid="scan-form">
-              <Input
-                ref={inputRef}
-                placeholder={needsManifest ? 'MAN-XXXX-XXXX...' : 'TAC / CN number...'}
-                value={currentCode}
-                onChange={(e) => setCurrentCode(e.target.value)}
-                autoFocus
-                autoComplete="off"
-                data-testid="scan-input"
-                aria-label="Scan input field"
-                id="scan-input"
-                name="scan-input"
-                className="flex-1 h-12 bg-muted/30"
-              />
-              <Button
-                type="submit"
-                disabled={!currentCode}
-                data-testid="scan-submit-button"
-                className="px-6 h-12"
+          <ResizablePanel
+            defaultSize={35}
+            minSize={25}
+            className="flex flex-col min-h-0 bg-background border-t border-border lg:border-none"
+          >
+            {/* Manual Input */}
+            <div className="flex-shrink-0 p-4 border-b border-border">
+              <Label
+                htmlFor="scan-input"
+                className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5"
               >
-                Submit
-              </Button>
-            </form>
-          </div>
-
-          {/* Scan Feed */}
-          <div className="flex-1 overflow-y-auto min-h-0">
-            <div className="px-4 py-2 border-b border-border bg-muted/20 sticky top-0 z-10">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs text-muted-foreground flex items-center gap-1.5">
-                  <Activity className="w-3 h-3" />
-                  Scan Feed
-                </h3>
-                <span className="text-[10px] font-mono text-muted-foreground">
-                  {scannedItems.length} entries
-                </span>
-              </div>
+                <Keyboard className="size-3" />
+                {needsManifest
+                  ? 'Enter manifest code'
+                  : `Scan ${scanMode === 'DELIVER' ? 'delivery' : 'shipment'}`}
+              </Label>
+              <form onSubmit={handleScanSubmit} className="flex gap-2" data-testid="scan-form">
+                <Input
+                  ref={inputRef}
+                  placeholder={needsManifest ? 'MAN-XXXX-XXXX...' : 'TAC / CN number...'}
+                  value={currentCode}
+                  onChange={(e) => setCurrentCode(e.target.value)}
+                  autoFocus
+                  autoComplete="off"
+                  data-testid="scan-input"
+                  aria-label="Scan input field"
+                  id="scan-input"
+                  name="scan-input"
+                  className="flex-1 h-12 bg-muted/30"
+                />
+                <Button
+                  type="submit"
+                  disabled={!currentCode}
+                  data-testid="scan-submit-button"
+                  className="px-6 h-12"
+                >
+                  Submit
+                </Button>
+              </form>
             </div>
 
-            <div className="divide-y divide-border">
-              {scannedItems.length === 0 ? (
-                <div className="p-6 space-y-6">
-                  <div className="text-center py-8">
-                    <ScanLine className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">No scans this session</p>
-                    <p className="text-[10px] text-muted-foreground/60 mt-1">
-                      Point your scanner or type a code above
-                    </p>
-                  </div>
-
-                  {/* Diagnostics (collapsible) */}
-                  <div className="border-t border-border pt-4">
-                    <button
-                      onClick={() => setShowDiagnostics(!showDiagnostics)}
-                      className="flex items-center justify-between w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <span className="text-xs">Scanner Diagnostics</span>
-                      {showDiagnostics ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )}
-                    </button>
-                    {showDiagnostics && (
-                      <div className="mt-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
-                        <p className="text-[10px] text-muted-foreground">
-                          Scan the barcode below to test your scanner connection:
-                        </p>
-                        <div className="flex justify-center py-2 bg-white">
-                          <UniversalBarcode
-                            value="TAC123456789"
-                            mode="screen"
-                            width={5}
-                            height={80}
-                          />
-                        </div>
-                        <p className="text-[10px] text-center text-muted-foreground font-mono">
-                          TAC123456789
-                        </p>
-                      </div>
-                    )}
-                  </div>
+            {/* Scan Feed */}
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <div className="px-4 py-2 border-b border-border bg-muted/20 sticky top-0 z-10">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Activity className="w-3 h-3" />
+                    Scan Feed
+                  </h3>
+                  <span className="text-[10px] font-mono text-muted-foreground">
+                    {scannedItems.length} entries
+                  </span>
                 </div>
-              ) : (
-                scannedItems.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className={`
+              </div>
+
+              <div className="divide-y divide-border">
+                {scannedItems.length === 0 ? (
+                  <div className="p-6 space-y-6">
+                    <div className="text-center py-8">
+                      <ScanLine className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">No scans this session</p>
+                      <p className="text-[10px] text-muted-foreground/60 mt-1">
+                        Point your scanner or type a code above
+                      </p>
+                    </div>
+
+                    {/* Diagnostics (collapsible) */}
+                    <div className="border-t border-border pt-4">
+                      <button
+                        onClick={() => setShowDiagnostics(!showDiagnostics)}
+                        className="flex items-center justify-between w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <span className="text-xs">Scanner Diagnostics</span>
+                        {showDiagnostics ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )}
+                      </button>
+                      {showDiagnostics && (
+                        <div className="mt-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                          <p className="text-[10px] text-muted-foreground">
+                            Scan the barcode below to test your scanner connection:
+                          </p>
+                          <div className="flex justify-center py-2 bg-white">
+                            <UniversalBarcode
+                              value="TAC123456789"
+                              mode="screen"
+                              width={5}
+                              height={80}
+                            />
+                          </div>
+                          <p className="text-[10px] text-center text-muted-foreground font-mono">
+                            TAC123456789
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  scannedItems.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className={`
                       flex items-center gap-2 px-4 py-2 border-l-3
                       animate-in slide-in-from-right-4 duration-300
                       ${
@@ -461,43 +465,43 @@ export const Scanning: React.FC = () => {
                       }
                       ${idx === 0 ? 'bg-opacity-100' : ''}
                     `}
-                    style={{ animationDelay: `${idx * 30}ms` }}
-                  >
-                    {/* Icon */}
-                    <div className="flex-shrink-0">
-                      {item.msg.includes('EXCEPTION') ? (
-                        <AlertTriangle className="w-4 h-4 text-status-error" />
-                      ) : item.status === 'SUCCESS' ? (
-                        <Check className="w-4 h-4 text-status-success" />
-                      ) : (
-                        <X className="w-4 h-4 text-status-error" />
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-sm text-foreground truncate">
-                          {item.code}
-                        </span>
-                        {idx === 0 && (
-                          <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4">
-                            latest
-                          </Badge>
+                      style={{ animationDelay: `${idx * 30}ms` }}
+                    >
+                      {/* Icon */}
+                      <div className="flex-shrink-0">
+                        {item.msg.includes('EXCEPTION') ? (
+                          <AlertTriangle className="w-4 h-4 text-status-error" />
+                        ) : item.status === 'SUCCESS' ? (
+                          <Check className="w-4 h-4 text-status-success" />
+                        ) : (
+                          <X className="w-4 h-4 text-status-error" />
                         )}
                       </div>
-                      <p className="text-[11px] text-muted-foreground truncate">{item.msg}</p>
-                    </div>
 
-                    {/* Timestamp */}
-                    <span className="flex-shrink-0 text-[10px] font-mono text-muted-foreground/60">
-                      {item.timestamp}
-                    </span>
-                  </div>
-                ))
-              )}
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-sm text-foreground truncate">
+                            {item.code}
+                          </span>
+                          {idx === 0 && (
+                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4">
+                              latest
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-muted-foreground truncate">{item.msg}</p>
+                      </div>
+
+                      {/* Timestamp */}
+                      <span className="flex-shrink-0 text-[10px] font-mono text-muted-foreground/60">
+                        {item.timestamp}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

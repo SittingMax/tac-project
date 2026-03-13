@@ -69,12 +69,18 @@ const normalizeCustomerAddressForForm = (customer: Customer | null) => {
   const raw = customer.address as any;
 
   if (typeof raw === 'string') return { line1: raw, city: '', state: '', zip: '' };
-  if (typeof raw !== 'object' || Array.isArray(raw)) return { line1: '', city: '', state: '', zip: '' };
+  if (typeof raw !== 'object' || Array.isArray(raw))
+    return { line1: '', city: '', state: '', zip: '' };
 
   const line1 = (raw.line1 ?? raw.line_1 ?? raw.street ?? raw.address ?? '') as string;
   const city = (raw.city ?? '') as string;
   const state = (raw.state ?? '') as string;
-  const zip = (raw.zip ?? raw.postal_code ?? raw.postalCode ?? raw.pincode ?? raw.pin ?? '') as string;
+  const zip = (raw.zip ??
+    raw.postal_code ??
+    raw.postalCode ??
+    raw.pincode ??
+    raw.pin ??
+    '') as string;
 
   return { line1: line1.trim(), city: city.trim(), state: state.trim(), zip: zip.trim() };
 };
@@ -178,10 +184,7 @@ export const Customers: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
-      <PageHeader
-        title="Customers"
-        description="Manage customer profiles and billing details"
-      >
+      <PageHeader title="Customers" description="Manage customer profiles and billing details">
         <Button onClick={openCreate} data-testid="add-customer-button">
           <Plus data-icon="inline-start" /> Add Customer
         </Button>
@@ -203,7 +206,9 @@ export const Customers: React.FC = () => {
         mode={mode}
         title={mode === 'create' ? 'Create Customer' : 'Edit Customer'}
         description={
-          mode === 'create' ? 'Add a new customer to your directory.' : 'Update customer information.'
+          mode === 'create'
+            ? 'Add a new customer to your directory.'
+            : 'Update customer information.'
         }
         schema={customerFormSchema}
         defaultValues={formDefaultValues}

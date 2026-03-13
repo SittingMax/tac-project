@@ -252,7 +252,13 @@ export const Analytics: React.FC = () => {
                   contentStyle={tooltipStyle}
                   cursor={{ fill: 'var(--muted)', opacity: 0.1 }}
                 />
-                <Bar dataKey="value" name="Units" fill="var(--primary)" radius={[0, 4, 4, 0]} barSize={24} />
+                <Bar
+                  dataKey="value"
+                  name="Units"
+                  fill="var(--primary)"
+                  radius={[0, 4, 4, 0]}
+                  barSize={24}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>

@@ -145,7 +145,15 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
           className="mx-auto aspect-square w-full max-w-[280px]"
         >
           <PieChart>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl" />} />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  hideLabel
+                  className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl"
+                />
+              }
+            />
             <Pie
               data={statusChartData}
               dataKey="count"

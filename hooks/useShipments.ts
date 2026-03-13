@@ -165,7 +165,7 @@ export function useShipmentByAWB(awb: string | null) {
       if (error) throw error;
       return data as unknown as ShipmentWithRelations;
     },
-    enabled: !!awb,
+    enabled: !!awb && !!orgId,
   });
 }
 

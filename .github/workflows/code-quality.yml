@@ -196,9 +196,9 @@ jobs:
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
-    # Skip E2E tests if triggered by Dependabot
-    # (Dependabot PRs cannot access repository secrets for security reasons)
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    # Skip E2E tests if Supabase environment is not configured
+    # (Dependabot PRs and environments without Supabase secrets will skip)
+    if: ${{ vars.VITE_SUPABASE_URL != '' && vars.VITE_SUPABASE_ANON_KEY != '' && github.actor != 'dependabot[bot]' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

@@ -160,7 +160,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           linkTo="/dashboard"
         />
       </SidebarHeader>
-      
+
       <SidebarContent className="px-3 py-4 gap-4">
         {navGroups.map((group) => {
           const visibleItems = group.items.filter((item) =>
@@ -199,17 +199,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             >
                               <SidebarMenuItem>
                                 <CollapsibleTrigger asChild>
-                                  <SidebarMenuButton 
-                                    tooltip={item.label} 
+                                  <SidebarMenuButton
+                                    tooltip={item.label}
                                     isActive={isActive}
                                     className={cn(
-                                      "h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0",
-                                      isActive 
-                                        ? "bg-primary/10 text-primary border-l-2 border-primary rounded-none rounded-r-md font-semibold"
-                                        : "hover:bg-accent/50 hover:text-accent-foreground text-muted-foreground border-l-2 border-transparent"
+                                      'h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0',
+                                      isActive
+                                        ? 'bg-primary/10 text-primary border-l-2 border-primary rounded-none rounded-r-md font-semibold'
+                                        : 'hover:bg-accent/50 hover:text-accent-foreground text-muted-foreground border-l-2 border-transparent'
                                     )}
                                   >
-                                    {item.icon && <item.icon className="w-4 h-4 shrink-0" strokeWidth={2} />}
+                                    {item.icon && (
+                                      <item.icon className="w-4 h-4 shrink-0" strokeWidth={2} />
+                                    )}
                                     <span>{item.label}</span>
                                     <ChevronRight className="ml-auto w-4 h-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 opacity-50" />
                                   </SidebarMenuButton>
@@ -220,14 +222,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                       const isSubActive = location.pathname === subItem.url;
                                       return (
                                         <SidebarMenuSubItem key={subItem.title}>
-                                          <SidebarMenuSubButton 
-                                            asChild 
+                                          <SidebarMenuSubButton
+                                            asChild
                                             isActive={isSubActive}
                                             className={cn(
-                                              "h-8 text-xs font-medium transition-all group-data-[collapsible=icon]:hidden",
-                                              isSubActive 
-                                                ? "text-primary font-bold" 
-                                                : "text-muted-foreground hover:text-foreground"
+                                              'h-8 text-xs font-medium transition-all group-data-[collapsible=icon]:hidden',
+                                              isSubActive
+                                                ? 'text-primary font-bold'
+                                                : 'text-muted-foreground hover:text-foreground'
                                             )}
                                           >
                                             <Link to={subItem.url}>
@@ -247,27 +249,33 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         // Single Item
                         return (
                           <SidebarMenuItem key={item.label}>
-                            <SidebarMenuButton 
-                              asChild 
-                              isActive={isActive} 
+                            <SidebarMenuButton
+                              asChild
+                              isActive={isActive}
                               tooltip={item.label}
                               className={cn(
-                                "h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0",
-                                isActive 
-                                  ? "bg-primary/10 text-primary border-l-2 border-primary rounded-none rounded-r-md font-semibold"
-                                  : "hover:bg-accent/50 hover:text-accent-foreground text-muted-foreground border-l-2 border-transparent"
+                                'h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0',
+                                isActive
+                                  ? 'bg-primary/10 text-primary border-l-2 border-primary rounded-none rounded-r-md font-semibold'
+                                  : 'hover:bg-accent/50 hover:text-accent-foreground text-muted-foreground border-l-2 border-transparent'
                               )}
                             >
                               <Link to={item.url}>
-                                {item.icon && <item.icon className="w-4 h-4 shrink-0" strokeWidth={2} />}
+                                {item.icon && (
+                                  <item.icon className="w-4 h-4 shrink-0" strokeWidth={2} />
+                                )}
                                 <span>{item.label}</span>
                               </Link>
                             </SidebarMenuButton>
                             {badgeCount !== undefined && badgeCount > 0 && (
-                              <SidebarMenuBadge className={cn(
-                                "text-[10px] w-5 h-5 flex items-center justify-center rounded-md font-bold mt-2",
-                                isActive ? "bg-primary text-primary-foreground" : "bg-destructive/10 text-destructive"
-                              )}>
+                              <SidebarMenuBadge
+                                className={cn(
+                                  'text-[10px] w-5 h-5 flex items-center justify-center rounded-md font-bold mt-2',
+                                  isActive
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'bg-destructive/10 text-destructive'
+                                )}
+                              >
                                 {badgeCount > 99 ? '99+' : badgeCount}
                               </SidebarMenuBadge>
                             )}

@@ -15,7 +15,6 @@ export function HeroSection() {
       {/* Background Gradient/Glow (Simulating the video shadow from Setrex) */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-primary opacity-[0.07] blur-[120px] rounded-full pointer-events-none z-0"></div>
 
-
       <div className="relative z-10 mx-auto flex min-h-[90vh] max-w-5xl items-center px-6 text-center">
         <div className="w-full">
           {/* Setrex-style transparent badge */}

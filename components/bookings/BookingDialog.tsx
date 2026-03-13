@@ -17,7 +17,7 @@ interface BookingDialogProps {
 
 export const BookingDialog: React.FC<BookingDialogProps> = ({ open, onOpenChange }) => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
-  
+
   if (isDesktop) {
     return (
       <SizedDialog
@@ -44,7 +44,11 @@ export const BookingDialog: React.FC<BookingDialogProps> = ({ open, onOpenChange
           </DrawerDescription>
         </DrawerHeader>
         <div className="overflow-y-auto p-4 pb-0 flex-1">
-          <BookingForm onSuccess={() => onOpenChange(false)} onCancel={() => onOpenChange(false)} isMobile />
+          <BookingForm
+            onSuccess={() => onOpenChange(false)}
+            onCancel={() => onOpenChange(false)}
+            isMobile
+          />
         </div>
       </DrawerContent>
     </Drawer>

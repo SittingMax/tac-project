@@ -163,10 +163,7 @@ export const Management: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
-      <PageHeader
-        title="Staff & Hubs"
-        description="Manage access control and personnel"
-      >
+      <PageHeader title="Staff & Hubs" description="Manage access control and personnel">
         {isSuperAdmin && (
           <Button onClick={() => setCreateUserOpen(true)} variant="destructive">
             <Plus data-icon="inline-start" /> Create User
