@@ -1,48 +1,55 @@
 import React, { lazy, Suspense } from 'react';
-import { useStore } from '@/store';
-import { ShipmentWithRelations } from '@/hooks/useShipments';
-import { InvoiceWithRelations } from '@/hooks/useInvoices';
-import { KPIGrid } from '../components/dashboard/KPIGrid';
+import { useQueryClient } from '@tanstack/react-query';
+import { Activity, RefreshCw } from 'lucide-react';
+import { KPIGrid } from '@/components/dashboard/KPIGrid';
+import { QuickActions } from '@/components/dashboard/QuickActions';
+import { LiveActivityFeed } from '@/components/dashboard/LiveActivityFeed';
+import { OperationalHealth } from '@/components/dashboard/OperationalHealth';
+import { DateRangeSelector } from '@/components/dashboard/DateRangeSelector';
+import { Button } from '@/components/ui/button';
+import { ErrorBoundary, InlineError } from '@/components/ui/error-boundary';
+import type { InvoiceWithRelations } from '@/hooks/useInvoices';
+import type { ShipmentWithRelations } from '@/hooks/useShipments';
+import { useRealtimeDashboard } from '@/hooks/useRealtime';
+import { hasRoleAccess } from '@/lib/access-control';
+import { logger } from '@/lib/logger';
+import { queryKeys } from '@/lib/queryKeys';
+import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/authStore';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Dynamically import heavy charting components
-const DashboardCharts = lazy(() =>
-  import('../components/dashboard/Charts').then((m) => ({ default: m.DashboardCharts }))
-);
 const RealtimeCorridorActivity = lazy(() =>
-  import('../components/dashboard/RealtimeCorridorActivity').then((m) => ({
+  import('@/components/dashboard/RealtimeCorridorActivity').then((m) => ({
     default: m.RealtimeCorridorActivity,
   }))
 );
-const ChartBarInteractive = lazy(() =>
-  import('../components/dashboard/charts/ChartBarInteractive').then((m) => ({
-    default: m.ChartBarInteractive,
+const ShipmentTrendChart = lazy(() =>
+  import('@/components/dashboard/charts/ShipmentTrendChart').then((m) => ({
+    default: m.ShipmentTrendChart,
   }))
 );
-const ChartRadialGrid = lazy(() =>
-  import('../components/dashboard/charts/ChartRadialGrid').then((m) => ({
-    default: m.ChartRadialGrid,
+const StatusDistributionChart = lazy(() =>
+  import('@/components/dashboard/charts/StatusDistributionChart').then((m) => ({
+    default: m.StatusDistributionChart,
   }))
 );
-import { Button } from '@/components/ui/button';
-import { PageHeader } from '@/components/ui/page-header';
-import { RefreshCw } from 'lucide-react';
-import { QuickActions } from '../components/dashboard/QuickActions';
-
-import { LiveActivityFeed } from '../components/dashboard/LiveActivityFeed';
-import { OperationalHealth } from '../components/dashboard/OperationalHealth';
-import { DateRangeSelector } from '../components/dashboard/DateRangeSelector';
-
-import { ErrorBoundary, InlineError } from '../components/ui/error-boundary';
-import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '../lib/queryKeys';
-import { useRealtimeDashboard } from '../hooks/useRealtime';
-import { logger } from '@/lib/logger';
-import { cn } from '@/lib/utils';
+const RevenueTrendChart = lazy(() =>
+  import('@/components/dashboard/charts/RevenueTrendChart').then((m) => ({
+    default: m.RevenueTrendChart,
+  }))
+);
+const HubPerformanceChart = lazy(() =>
+  import('@/components/dashboard/charts/HubPerformanceChart').then((m) => ({
+    default: m.HubPerformanceChart,
+  }))
+);
 
 export const Dashboard: React.FC = () => {
   const queryClient = useQueryClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Store type inference
-  const { user } = useStore() as any;
+  const user = useAuthStore((state) => state.user);
+  const canExportDashboardReport = hasRoleAccess(user?.role, ['ADMIN', 'MANAGER', 'FINANCE_STAFF']);
 
   // Enable realtime subscriptions
   useRealtimeDashboard();
@@ -53,6 +60,7 @@ export const Dashboard: React.FC = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.manifests.all });
     queryClient.invalidateQueries({ queryKey: queryKeys.exceptions.all });
     queryClient.invalidateQueries({ queryKey: ['bookings'] });
+    queryClient.invalidateQueries({ queryKey: ['dashboard', 'kpis'] });
   };
 
   // Data for Report Generation
@@ -61,7 +69,14 @@ export const Dashboard: React.FC = () => {
   const handleDownloadReport = async () => {
     try {
       const { toast } = await import('sonner');
-      const { supabase } = await import('../lib/supabase');
+      if (!canExportDashboardReport) {
+        toast.error('Report export is only available to finance-authorized roles.');
+        return;
+      }
+      const { supabase } = await import('@/lib/supabase');
+      if (!user?.orgId) {
+        throw new Error('No organization context available');
+      }
       toast.info('Generating report...');
 
       // Fetch data on-demand with pagination cap
@@ -76,7 +91,7 @@ export const Dashboard: React.FC = () => {
             destination_hub:hubs!destination_hub_id(code, name)
           `
           )
-          .eq('org_id', user?.orgId)
+          .eq('org_id', user.orgId)
           .order('created_at', { ascending: false })
           .limit(500),
         supabase
@@ -88,7 +103,7 @@ export const Dashboard: React.FC = () => {
             shipment:shipments(cn_number)
           `
           )
-          .eq('org_id', user?.orgId)
+          .eq('org_id', user.orgId)
           .is('deleted_at', null)
           .order('created_at', { ascending: false })
           .limit(500),
@@ -100,7 +115,7 @@ export const Dashboard: React.FC = () => {
       const shipments = (shipmentsResult.data || []) as unknown as ShipmentWithRelations[];
       const invoices = (invoicesResult.data || []) as unknown as InvoiceWithRelations[];
 
-      const { generateDashboardReport } = await import('../lib/dashboard-report-generator');
+      const { generateDashboardReport } = await import('@/lib/dashboard-report-generator');
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const inventoryCount = shipments.filter((s: any) =>
@@ -121,99 +136,152 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  return (
-    <div data-testid="dashboard-page" className="space-y-4 animate-in fade-in duration-300 pb-8">
-      {/* Header with actions */}
-      <PageHeader
-        title="Mission Control"
-        description="Real-time logistics overview and operations."
-      >
-        <Button
-          data-testid="dashboard-refresh-button"
-          variant="ghost"
-          onClick={refreshData}
-          className="hover:bg-primary/5"
-        >
-          <RefreshCw className="w-4 h-4 sm:mr-2" />
-          <span className="hidden sm:inline">Refresh</span>
-        </Button>
-        <DateRangeSelector />
-        <Button
-          data-testid="dashboard-download-button"
-          variant="secondary"
-          onClick={handleDownloadReport}
-        >
-          <span className="hidden sm:inline">Export Report</span>
-          <span className="sm:hidden">Export</span>
-        </Button>
-      </PageHeader>
+  const userGreetingName = user?.fullName?.split(' ')[0] || 'Team';
 
+  return (
+    <div data-testid="dashboard-page" className="space-y-6 animate-in fade-in duration-300 pb-8">
       {/* Vibrant SaaS Welcome Hero */}
-      <div className="relative overflow-hidden rounded-none bg-gradient-to-br from-primary via-primary/90 to-primary/60 p-8 text-primary-foreground shadow-lg">
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight mb-2">
-              Good morning, {user?.name?.split(' ')[0] || 'Team'}
-            </h2>
-            <p className="text-primary-foreground/80 text-lg max-w-xl">
-              Here is what's happening with your logistics operations today. You have{' '}
-              {user?.role === 'SUPER_ADMIN' ? 'full access' : 'limited access'} to system features.
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6 md:p-8 text-primary-foreground shadow-lg border border-primary/20">
+        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+              Good morning, {userGreetingName}
+            </h1>
+            <p className="text-primary-foreground/80 md:text-lg max-w-2xl font-medium">
+              Real-time logistics telemetry and operations health. 
+              {hasRoleAccess(user?.role, ['ADMIN', 'SUPER_ADMIN']) ? ' You have full administrative access.' : ' Viewing operations overview.'}
             </p>
           </div>
-          <div className="mt-6 md:mt-0 hidden md:block">
-            {/* Decorative Element */}
-            <div className="flex gap-4">
-              <div className="h-16 w-32 rounded-none bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-inner">
-                <span className="text-2xl font-bold">98%</span>
-              </div>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="hidden xl:flex items-center gap-2 bg-black/10 backdrop-blur-md rounded-md px-4 py-2 border border-white/10 shadow-inner">
+              <Activity className="h-4 w-4 text-emerald-400 animate-pulse" />
+              <span className="text-sm font-medium text-white shadow-sm">Live Telemetry</span>
             </div>
+            <DateRangeSelector />
+            <Button
+              data-testid="dashboard-refresh-button"
+              variant="outline"
+              onClick={refreshData}
+              className="h-10 bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-sm transition-all shadow-sm"
+            >
+              <RefreshCw className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Refresh</span>
+            </Button>
+            {canExportDashboardReport && (
+              <Button
+                data-testid="dashboard-download-button"
+                className="h-10 bg-white text-primary hover:bg-white/90 shadow-sm transition-all font-semibold"
+                onClick={handleDownloadReport}
+              >
+                <span className="hidden sm:inline">Export Report</span>
+                <span className="sm:hidden">Export</span>
+              </Button>
+            )}
           </div>
         </div>
+
         {/* Abstract blur background effect */}
-        <div className="absolute -top-24 -right-24 h-64 w-64 rounded-none bg-white/20 blur-3xl pointer-events-none"></div>
+        <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-white/20 blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-12 -left-12 h-40 w-40 rounded-full bg-black/10 blur-2xl pointer-events-none"></div>
       </div>
 
-      <ErrorBoundary fallback={<InlineError message="Failed to load quick actions" />}>
-        <QuickActions />
-      </ErrorBoundary>
-
+      {/* Primary Metrics Layer */}
       <ErrorBoundary fallback={<InlineError message="Failed to load KPI data" />}>
         <KPIGrid />
       </ErrorBoundary>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-        <div className="flex flex-col gap-4">
-          <ErrorBoundary fallback={<InlineError message="Failed to load map" />}>
-            <Suspense fallback={<ChartSkeleton height={400} title="Corridor Activity" />}>
-              <RealtimeCorridorActivity />
-            </Suspense>
-          </ErrorBoundary>
-          <ErrorBoundary fallback={<InlineError message="Failed to load shipments chart" />}>
-            <Suspense fallback={<ChartSkeleton height={300} title="Shipment Analytics" />}>
-              <ChartBarInteractive />
-            </Suspense>
-          </ErrorBoundary>
-          <ErrorBoundary fallback={<InlineError message="Failed to load efficiency index" />}>
-            <Suspense fallback={<ChartSkeleton height={300} title="Efficiency Metrics" />}>
-              <ChartRadialGrid />
-            </Suspense>
-          </ErrorBoundary>
-        </div>
-
-        <ErrorBoundary fallback={<InlineError message="Failed to load charts" />}>
-          <Suspense fallback={<ChartSkeleton height={500} title="Dashboard Overview" fullHeight />}>
-            <DashboardCharts />
-          </Suspense>
+      <div className="mt-2">
+        <ErrorBoundary fallback={<InlineError message="Failed to load quick actions" />}>
+          <QuickActions />
         </ErrorBoundary>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="col-span-1 lg:col-span-2">
+      {/* Telemetry Charts Tier */}
+      <div className="space-y-4 pt-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">
+            Network Telemetry
+          </h2>
+        </div>
+        
+        <ResizablePanelGroup 
+          orientation="horizontal" 
+          className="min-h-[600px] w-full items-stretch rounded-lg border border-border/40 bg-card overflow-hidden"
+        >
+          {/* Main Chart Column */}
+          <ResizablePanel defaultSize={65} minSize={40} className="p-0 flex flex-col items-stretch h-full">
+            <div className="flex-1 space-y-6 flex flex-col p-4 w-full h-full min-h-[600px] overflow-auto custom-scrollbar">
+              <ErrorBoundary fallback={<InlineError message="Failed to load shipment trend" />}>
+                <Suspense fallback={<ChartSkeleton height={400} title="Volume Trend" fullHeight />}>
+                  <ShipmentTrendChart />
+                </Suspense>
+              </ErrorBoundary>
+              <ErrorBoundary fallback={<InlineError message="Failed to load map" />}>
+                <Suspense fallback={<ChartSkeleton height={350} title="Live Corridor" />}>
+                  <RealtimeCorridorActivity />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+          </ResizablePanel>
+
+          <ResizableHandle withHandle className="bg-border/50 hover:bg-primary/50 transition-colors w-2" />
+
+          {/* Secondary Charts Column */}
+          <ResizablePanel defaultSize={35} minSize={25} className="p-0 flex flex-col items-stretch h-full bg-muted/10 border-l border-border/40">
+            <div className="flex-1 flex flex-col p-4 w-full h-full min-h-[600px] overflow-auto custom-scrollbar">
+              <Tabs defaultValue="status" className="flex-1 flex flex-col h-full space-y-4">
+                <div className="flex items-center justify-between">
+                  <TabsList className="grid w-full grid-cols-3 bg-muted/50 border border-border/50">
+                    <TabsTrigger value="status" className="text-xs">Status</TabsTrigger>
+                    <TabsTrigger value="hub" className="text-xs">Hub</TabsTrigger>
+                    <TabsTrigger value="revenue" className="text-xs">Finance</TabsTrigger>
+                  </TabsList>
+                </div>
+
+                <TabsContent value="status" className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0">
+                  <div className="h-full flex flex-col w-full">
+                    <ErrorBoundary fallback={<InlineError message="Failed to load status distribution" />}>
+                      <Suspense fallback={<ChartSkeleton height={300} title="Current Breakdown" />}>
+                        <StatusDistributionChart />
+                      </Suspense>
+                    </ErrorBoundary>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="hub" className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0">
+                  <div className="h-full flex flex-col w-full">
+                    <ErrorBoundary fallback={<InlineError message="Failed to load hub comparison" />}>
+                      <Suspense fallback={<ChartSkeleton height={320} title="Hub Profile" />}>
+                        <HubPerformanceChart />
+                      </Suspense>
+                    </ErrorBoundary>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="revenue" className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0">
+                  <div className="h-full flex flex-col w-full">
+                    <ErrorBoundary fallback={<InlineError message="Failed to load billing chart" />}>
+                      <Suspense fallback={<ChartSkeleton height={250} title="Billing Trend" />}>
+                        <RevenueTrendChart />
+                      </Suspense>
+                    </ErrorBoundary>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
+
+      {/* Bottom Tier: Ops & Health */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(350px,1fr)] pt-4 border-t border-border/30 mt-8">
+        <div className="col-span-1 h-full">
           <ErrorBoundary fallback={<InlineError message="Failed to load recent activity" />}>
             <LiveActivityFeed />
           </ErrorBoundary>
         </div>
-        <div className="col-span-1">
+        <div className="col-span-1 h-full">
           <ErrorBoundary fallback={<InlineError message="Failed to load health score" />}>
             <OperationalHealth />
           </ErrorBoundary>
@@ -236,12 +304,12 @@ function ChartSkeleton({
   return (
     <div
       className={cn(
-        'bg-muted/10 border border-border/40 rounded-none flex flex-col items-center justify-center gap-3 p-6 transition-colors duration-300',
+        'bg-muted/10 border border-border/40 rounded-lg flex flex-col items-center justify-center gap-3 p-6 transition-colors duration-300',
         fullHeight && 'h-full min-h-[500px]'
       )}
       style={!fullHeight ? { height } : undefined}
     >
-      <div className="w-12 h-12 bg-muted/50 rounded-none animate-pulse border border-border/40" />
+      <div className="w-12 h-12 bg-muted/50 rounded-lg animate-pulse border border-border/40" />
       <p className="text-sm font-medium text-muted-foreground">{title}</p>
       <p className="text-xs text-muted-foreground/60">Loading visualization...</p>
     </div>

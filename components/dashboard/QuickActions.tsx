@@ -7,10 +7,22 @@ import { UniversalBarcode } from '@/components/barcodes';
 import { useScanner } from '@/context/useScanner';
 import { ScanSource } from '@/types';
 import { motion } from 'framer-motion';
+import { hasRoleAccess } from '@/lib/access-control';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/authStore';
+import type { UserRole } from '@/types';
+
+interface QuickActionCard {
+  label: string;
+  description: string;
+  icon: React.ElementType;
+  onClick: () => void;
+  roles?: UserRole[];
+}
 
 export const QuickActions: React.FC = () => {
   const navigate = useNavigate();
+  const userRole = useAuthStore((state) => state.user?.role);
   const [quickScanInput, setQuickScanInput] = useState('');
   const [recentScans, setRecentScans] = useState<string[]>([]);
   const { subscribe } = useScanner();
@@ -29,12 +41,12 @@ export const QuickActions: React.FC = () => {
   const handleQuickScan = (e: React.FormEvent) => {
     e.preventDefault();
     if (quickScanInput.trim()) {
-      navigate(`/tracking?cn=${quickScanInput.trim().toUpperCase()}`);
+      navigate(`/search?q=${encodeURIComponent(quickScanInput.trim().toUpperCase())}`);
       setQuickScanInput('');
     }
   };
 
-  const actions = [
+  const actions: QuickActionCard[] = [
     {
       label: 'New Shipment',
       description: 'Create & schedule orders',
@@ -46,20 +58,24 @@ export const QuickActions: React.FC = () => {
       description: 'Update status via barcode',
       icon: ScanLine,
       onClick: () => navigate('/scanning'),
+      roles: ['ADMIN', 'MANAGER', 'WAREHOUSE_STAFF'],
     },
     {
       label: 'Manifests',
       description: 'Review daily dispatches',
       icon: FileText,
       onClick: () => navigate('/manifests'),
+      roles: ['ADMIN', 'MANAGER', 'OPS_STAFF'],
     },
     {
-      label: 'Print Labels',
-      description: 'Batch print air waybills',
+      label: 'Finance & Labels',
+      description: 'Open invoices and label printing',
       icon: Printer,
-      onClick: () => navigate('/print/label/recent'),
+      onClick: () => navigate('/finance'),
+      roles: ['ADMIN', 'MANAGER', 'FINANCE_STAFF'],
     },
   ];
+  const visibleActions = actions.filter((action) => hasRoleAccess(userRole, action.roles));
 
   // Keyboard shortcuts could be implemented here via useHotkeys later
 
@@ -71,13 +87,11 @@ export const QuickActions: React.FC = () => {
             <h3 className="text-xl font-bold uppercase tracking-tight text-foreground">
               Command Center
             </h3>
-            <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
-              High-frequency operations
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">High-frequency operations</p>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
-          {actions.map((action) => {
+          {visibleActions.map((action) => {
             const Icon = action.icon;
 
             return (
@@ -89,10 +103,10 @@ export const QuickActions: React.FC = () => {
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 className={cn(
                   'flex items-center gap-5 p-5 text-left w-full relative overflow-hidden',
-                  'bg-background rounded-xl',
-                  'border border-border',
+                  'bg-background rounded-xl shadow-sm',
+                  'border border-border/40',
                   // Hover state
-                  'hover:bg-muted/50 hover:border-accent hover:shadow-lg',
+                  'hover:bg-muted/5 hover:border-border/80 hover:shadow-md',
                   // Active state
                   'active:scale-[0.98]',
                   'transition-all duration-300 ease-out group'
@@ -118,7 +132,7 @@ export const QuickActions: React.FC = () => {
       {/* Quick Scan Section */}
       <div className="mt-8 border-t border-border/40 pt-8">
         <div className="max-w-md">
-          <h3 className="text-xs font-mono text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+          <h3 className="text-xs text-muted-foreground mb-4 flex items-center gap-2">
             <Scan className="w-3 h-3" />
             Direct Telemetry Query
           </h3>
@@ -128,13 +142,13 @@ export const QuickActions: React.FC = () => {
               value={quickScanInput}
               onChange={(e) => setQuickScanInput(e.target.value)}
               placeholder="ENTER CN / TRACKING ID..."
-              className="flex-1 rounded-none border-r-0 font-mono text-xs uppercase"
+              className="flex-1"
               autoComplete="off"
             />
             <Button
               type="submit"
               variant="default"
-              className="rounded-none font-mono text-xs uppercase tracking-widest px-8"
+              className="px-6"
               disabled={!quickScanInput.trim()}
             >
               Execute
@@ -144,9 +158,7 @@ export const QuickActions: React.FC = () => {
           {/* Recent Scans */}
           {recentScans.length > 0 && (
             <div className="space-y-4">
-              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                Recent Queries:
-              </p>
+              <p className="text-xs text-muted-foreground">Recent Queries:</p>
               <div className="grid gap-px bg-border/40 border border-border/40">
                 {recentScans.map((awb, index) => (
                   <div
@@ -154,11 +166,11 @@ export const QuickActions: React.FC = () => {
                     role="button"
                     tabIndex={0}
                     className="flex items-center justify-between p-4 bg-background hover:bg-muted/10 focus-visible:ring-2 focus-visible:ring-primary cursor-pointer transition-colors group relative overflow-hidden"
-                    onClick={() => navigate(`/tracking?cn=${awb}`)}
+                    onClick={() => navigate(`/search?q=${encodeURIComponent(awb)}`)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        navigate(`/tracking?cn=${awb}`);
+                        navigate(`/search?q=${encodeURIComponent(awb)}`);
                       }
                     }}
                   >

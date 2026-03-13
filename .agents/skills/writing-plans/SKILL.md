@@ -46,8 +46,11 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 ## Task Structure
 
+*Note for downstream Task Groups:* You should explicitly specify a sensible `TaskName` for each task so the executing agent can properly structure the UX Task Groups when calling `task_boundary`.
+
 ````markdown
 ### Task N: [Component Name]
+**(TaskName: "Implementing [Component Name]")**
 
 **Files:**
 - Create: `exact/path/to/file.py`

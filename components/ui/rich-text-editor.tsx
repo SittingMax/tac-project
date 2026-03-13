@@ -101,9 +101,10 @@ const ToolbarButton = memo(
               onClick={onClick}
               disabled={disabled}
               className={cn(
-                'h-7 w-7 p-0 rounded-none transition-all duration-150',
-                'hover:bg-muted/80 hover:text-foreground',
-                isActive && 'bg-primary/15 text-primary shadow-sm ring-1 ring-primary/20',
+                'h-8 w-8 p-0 rounded-md transition-all duration-200',
+                'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
+                isActive &&
+                  'bg-primary/5 text-primary shadow-[inset_0_-2px_0_0_hsl(var(--primary))]',
                 disabled && 'opacity-30'
               )}
             >
@@ -113,8 +114,8 @@ const ToolbarButton = memo(
           <TooltipPrimitive.Portal>
             <TooltipPrimitive.Content
               side="bottom"
-              className="z-50 overflow-hidden rounded-none bg-popover px-4 py-1.5 text-xs font-medium text-popover-foreground shadow-lg border border-border/50 animate-in fade-in-0 zoom-in-95"
-              sideOffset={6}
+              className="z-50 overflow-hidden rounded-md bg-popover px-3 py-1.5 text-[10px] uppercase font-mono tracking-widest text-popover-foreground shadow-xl border border-border/50 animate-in fade-in-0 zoom-in-95"
+              sideOffset={4}
             >
               {tooltip}
             </TooltipPrimitive.Content>
@@ -126,12 +127,12 @@ const ToolbarButton = memo(
 );
 ToolbarButton.displayName = 'ToolbarButton';
 
-const ToolbarDivider = memo(() => <div className="mx-0.5 h-5 w-px bg-border/60" />);
+const ToolbarDivider = memo(() => <div className="mx-1 h-4 w-px bg-border/40" />);
 ToolbarDivider.displayName = 'ToolbarDivider';
 
 /** Grouped cluster of toolbar buttons */
 const ToolbarGroup = memo<{ children: React.ReactNode; label?: string }>(({ children, label }) => (
-  <div className="flex items-center gap-0.5 rounded-none bg-muted/40 p-0.5" aria-label={label}>
+  <div className="flex items-center gap-0.5" aria-label={label}>
     {children}
   </div>
 ));
@@ -184,7 +185,7 @@ const LinkPopover = memo<{ editor: Editor }>(({ editor }) => {
           side="bottom"
           align="start"
           sideOffset={8}
-          className="z-50 w-72 rounded-none bg-popover border border-border/60 shadow-xl p-4 animate-in fade-in-0 zoom-in-95"
+          className="z-50 w-72 rounded-md bg-popover border border-border/60 shadow-xl p-4 animate-in fade-in-0 zoom-in-95"
         >
           <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1.5 block">
             URL
@@ -248,7 +249,7 @@ const ImagePopover = memo<{ editor: Editor }>(({ editor }) => {
           side="bottom"
           align="start"
           sideOffset={8}
-          className="z-50 w-72 rounded-none bg-popover border border-border/60 shadow-xl p-4 animate-in fade-in-0 zoom-in-95"
+          className="z-50 w-72 rounded-md bg-popover border border-border/60 shadow-xl p-4 animate-in fade-in-0 zoom-in-95"
         >
           <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1.5 block">
             Image URL
@@ -466,8 +467,9 @@ const EditorToolbar = memo<EditorToolbarProps>(({ editor, variant }) => {
 
   if (variant === 'basic') {
     return (
-      <div className="flex flex-wrap items-center gap-1.5 border-b border-border/50 bg-muted/20 px-2.5 py-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border/40 bg-transparent px-3 py-1.5">
         {basicTools}
+        <ToolbarDivider />
         {historyTools}
       </div>
     );
@@ -475,23 +477,32 @@ const EditorToolbar = memo<EditorToolbarProps>(({ editor, variant }) => {
 
   if (variant === 'minimal') {
     return (
-      <div className="flex flex-wrap items-center gap-1.5 border-b border-border/50 bg-muted/20 px-2.5 py-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border/40 bg-transparent px-3 py-1.5">
         {basicTools}
+        <ToolbarDivider />
         {formattingTools}
+        <ToolbarDivider />
         {listTools}
+        <ToolbarDivider />
         {historyTools}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5 border-b border-border/50 bg-muted/20 px-2.5 py-2">
+    <div className="flex flex-wrap items-center gap-2 border-b border-border/40 bg-transparent px-3 py-1.5">
       {basicTools}
+      <ToolbarDivider />
       {formattingTools}
+      <ToolbarDivider />
       {headingTools}
+      <ToolbarDivider />
       {listTools}
+      <ToolbarDivider />
       {alignmentTools}
+      <ToolbarDivider />
       {insertTools}
+      <ToolbarDivider />
       {historyTools}
     </div>
   );
@@ -578,17 +589,18 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
       editorProps: {
         attributes: {
           class: cn(
-            'prose prose-sm dark:prose-invert max-w-none focus:outline-none px-4 py-2',
-            'prose-headings:font-semibold prose-headings:text-foreground prose-headings:tracking-tight',
-            'prose-p:text-foreground prose-p:leading-relaxed',
-            'prose-a:text-primary prose-a:no-underline hover:prose-a:underline',
-            'prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-none prose-code:text-sm prose-code:font-mono',
-            'prose-blockquote:border-l-primary/60 prose-blockquote:text-muted-foreground prose-blockquote:pl-4',
-            'prose-ul:list-disc prose-ol:list-decimal',
+            'prose prose-sm dark:prose-invert max-w-none focus:outline-none px-6 py-5',
+            'prose-headings:font-semibold prose-headings:text-foreground prose-headings:tracking-tight prose-headings:mt-6 prose-headings:mb-3',
+            'prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:my-2',
+            'prose-a:text-primary prose-a:underline hover:prose-a:text-primary/80 prose-a:underline-offset-2',
+            'prose-code:bg-muted/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-xs prose-code:font-mono prose-code:text-foreground/80',
+            'prose-blockquote:border-l-2 prose-blockquote:border-primary/40 prose-blockquote:text-muted-foreground prose-blockquote:pl-4 prose-blockquote:font-normal prose-blockquote:italic',
+            'prose-ul:list-disc prose-ul:my-2 prose-ol:list-decimal prose-ol:my-2',
+            'prose-li:my-0.5',
             '[&_ul[data-type="taskList"]]:list-none [&_ul[data-type="taskList"]]:pl-0',
-            '[&_ul[data-type="taskList"]_li]:flex [&_ul[data-type="taskList"]_li]:gap-2 [&_ul[data-type="taskList"]_li]:items-start',
-            '[&_ul[data-type="taskList"]_li_label]:mt-0.5',
-            '[&_.tiptap-placeholder::before]:text-muted-foreground/40 [&_.tiptap-placeholder::before]:font-normal'
+            '[&_ul[data-type="taskList"]_li]:flex [&_ul[data-type="taskList"]_li]:gap-3 [&_ul[data-type="taskList"]_li]:items-start [&_ul[data-type="taskList"]_li]:my-1.5',
+            '[&_ul[data-type="taskList"]_li_label]:mt-1',
+            '[&_.tiptap-placeholder::before]:text-muted-foreground/30 [&_.tiptap-placeholder::before]:font-normal [&_.tiptap-placeholder::before]:absolute'
           ),
         },
       },
@@ -620,7 +632,10 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
     if (!editor) {
       return (
         <div
-          className={cn('rounded-none border border-input bg-background animate-pulse', className)}
+          className={cn(
+            'rounded-md border border-border bg-background/50 animate-pulse',
+            className
+          )}
           style={{ minHeight }}
         />
       );
@@ -629,9 +644,9 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
     return (
       <div
         className={cn(
-          'rounded-none border border-input bg-background overflow-hidden transition-all duration-200',
-          'focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40',
-          !editable && 'opacity-60 cursor-not-allowed',
+          'rounded-md border border-border bg-background overflow-hidden transition-all duration-300 shadow-sm hover:shadow-md',
+          'focus-within:ring-1 focus-within:ring-primary focus-within:border-primary',
+          !editable && 'opacity-70 cursor-not-allowed hover:shadow-sm',
           className
         )}
       >
@@ -681,10 +696,16 @@ export const RichTextViewer = memo<{
     <div
       className={cn(
         'prose prose-sm dark:prose-invert max-w-none',
-        'prose-headings:font-semibold prose-headings:text-foreground prose-headings:tracking-tight',
-        'prose-p:text-foreground prose-p:leading-relaxed',
-        'prose-a:text-primary hover:prose-a:underline',
+        'prose-headings:font-semibold prose-headings:text-foreground prose-headings:tracking-tight prose-headings:mt-6 prose-headings:mb-3',
+        'prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:my-2',
+        'prose-a:text-primary prose-a:underline hover:prose-a:text-primary/80 prose-a:underline-offset-2',
+        'prose-code:bg-muted/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-xs prose-code:font-mono prose-code:text-foreground/80',
+        'prose-blockquote:border-l-2 prose-blockquote:border-primary/40 prose-blockquote:text-muted-foreground prose-blockquote:pl-4 prose-blockquote:font-normal prose-blockquote:italic',
+        'prose-ul:list-disc prose-ul:my-2 prose-ol:list-decimal prose-ol:my-2',
+        'prose-li:my-0.5',
         '[&_ul[data-type="taskList"]]:list-none [&_ul[data-type="taskList"]]:pl-0',
+        '[&_ul[data-type="taskList"]_li]:flex [&_ul[data-type="taskList"]_li]:gap-3 [&_ul[data-type="taskList"]_li]:items-start [&_ul[data-type="taskList"]_li]:my-1.5',
+        '[&_ul[data-type="taskList"]_li_label]:mt-1',
         className
       )}
     >

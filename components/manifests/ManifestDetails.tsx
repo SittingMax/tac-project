@@ -1,9 +1,15 @@
 import React, { useRef } from 'react';
 import { PageSkeleton } from '@/components/ui/skeleton';
-import { useManifest, useManifestItems, useUpdateManifestStatus } from '../../hooks/useManifests';
+import {
+  useManifest,
+  useManifestItems,
+  useUpdateManifestStatus,
+  type ManifestItemWithRelations,
+} from '../../hooks/useManifests';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
-import { Table, TableHead as Th, TableCell as Td } from '../ui/table';
+import { CrudTable } from '@/components/crud/CrudTable';
+import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowLeft, Printer, Truck, Plane, Package } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Manifest } from '../../types';
@@ -12,6 +18,7 @@ import { ManifestPrintView } from '@/components/manifests/ManifestPrintView';
 import { useReactToPrint } from 'react-to-print';
 import { StatusBadge } from '../domain/StatusBadge';
 import { logger } from '@/lib/logger';
+import { IdBadge } from '@/components/ui-core/data/id-badge';
 
 export const ManifestDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +26,49 @@ export const ManifestDetails: React.FC = () => {
   const { data: manifest, isLoading } = useManifest(id!);
   const { data: items, isLoading: loadingItems } = useManifestItems(id!);
   const updateStatus = useUpdateManifestStatus();
+
+  const shipmentColumns: ColumnDef<ManifestItemWithRelations>[] = React.useMemo(
+    () => [
+      {
+        accessorKey: 'shipment.cn_number',
+        header: 'CN NUMBER',
+        cell: ({ row }) => (
+          <IdBadge
+            entity="shipment"
+            idValue={row.original.shipment.id}
+            cnNumber={row.original.shipment.cn_number}
+          />
+        ),
+      },
+      {
+        accessorKey: 'shipment.consignee_name',
+        header: 'CONSIGNEE',
+        cell: ({ row }) => row.original.shipment.consignee_name,
+      },
+      {
+        accessorKey: 'shipment.package_count',
+        header: 'PKG',
+        cell: ({ row }) => row.original.shipment.package_count,
+      },
+      {
+        id: 'weight',
+        header: 'WEIGHT',
+        cell: ({ row }) => `${row.original.shipment.total_weight} kg`,
+      },
+      {
+        accessorKey: 'scanned_at',
+        header: 'SCANNED AT',
+        cell: ({ row }) => (
+          <div className="text-right text-xs text-muted-foreground">
+            {row.original.scanned_at
+              ? format(new Date(row.original.scanned_at), 'HH:mm dd/MM')
+              : '-'}
+          </div>
+        ),
+      },
+    ],
+    []
+  );
 
   // Print handling
   const printRef = useRef<HTMLDivElement>(null);
@@ -88,37 +138,14 @@ export const ManifestDetails: React.FC = () => {
               <Package className="w-4 h-4" /> Manifested Shipments
             </h3>
           </div>
-          <Table>
-            <thead>
-              <tr>
-                <Th>CN Number</Th>
-                <Th>CONSIGNEE</Th>
-                <Th>PKG</Th>
-                <Th>WEIGHT</Th>
-                <Th>SCANNED AT</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {loadingItems && (
-                <tr>
-                  <Td colSpan={5} className="text-center">
-                    Loading items...
-                  </Td>
-                </tr>
-              )}
-              {items?.map((item) => (
-                <tr key={item.id}>
-                  <Td className="font-mono font-bold">{item.shipment.cn_number}</Td>
-                  <Td>{item.shipment.consignee_name}</Td>
-                  <Td>{item.shipment.package_count}</Td>
-                  <Td>{item.shipment.total_weight} kg</Td>
-                  <Td className="text-right text-xs text-muted-foreground">
-                    {item.scanned_at ? format(new Date(item.scanned_at), 'HH:mm dd/MM') : '-'}
-                  </Td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <div className="border border-border/40 bg-card overflow-hidden shadow-xs border-x-0 border-b-0">
+            <CrudTable
+              columns={shipmentColumns}
+              data={items || []}
+              isLoading={loadingItems}
+              pageSize={10}
+            />
+          </div>
         </Card>
 
         <Card className="p-6 space-y-6 h-fit bg-white dark:bg-card border border-border">
@@ -126,7 +153,7 @@ export const ManifestDetails: React.FC = () => {
             <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3">
               Transport Details
             </h3>
-            <div className="bg-muted p-4 rounded-none space-y-4">
+            <div className="bg-muted p-4 rounded-md space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Mode</span>
                 <span className="font-bold flex items-center gap-2">

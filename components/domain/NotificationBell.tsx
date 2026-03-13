@@ -14,6 +14,7 @@ import {
   Info,
 } from 'lucide-react';
 import { useNotificationStore } from '@/lib/notifications/store';
+import { useAuthStore } from '@/store/authStore';
 import type { Notification, NotificationCategory } from '@/lib/notifications/types';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -70,14 +71,14 @@ const NotificationRow: React.FC<NotificationRowProps> = ({
     <button
       onClick={handleClick}
       className={cn(
-        'w-full text-left rounded-none p-4 mb-2 border transition-all hover:bg-accent/50',
+        'w-full text-left rounded-md p-4 mb-2 border transition-all hover:bg-accent/50',
         notification.is_read ? 'opacity-60 border-transparent' : 'bg-accent/20 border-accent/30'
       )}
     >
       <div className="flex items-start gap-4">
         <div
           className={cn(
-            'w-8 h-8 rounded-none flex items-center justify-center flex-shrink-0',
+            'w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0',
             notification.is_read ? 'bg-muted' : 'bg-primary/10'
           )}
         >
@@ -95,7 +96,7 @@ const NotificationRow: React.FC<NotificationRowProps> = ({
               {notification.title}
             </span>
             {!notification.is_read && (
-              <span className={cn('h-2 w-2 rounded-none', TYPE_COLORS[notification.type])} />
+              <span className={cn('h-2 w-2 rounded-full', TYPE_COLORS[notification.type])} />
             )}
           </div>
 
@@ -119,15 +120,20 @@ const NotificationRow: React.FC<NotificationRowProps> = ({
 
 export const NotificationBell: React.FC = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const { notifications, markAsRead, markAllAsRead, unreadCount } = useNotificationStore();
-  const count = unreadCount();
+  const userNotifications = useMemo(
+    () => notifications.filter((n) => n.user_id === user?.id),
+    [notifications, user?.id]
+  );
+  const count = unreadCount(user?.id);
 
   const unreadNotifications = useMemo(
-    () => notifications.filter((n) => !n.is_read).slice(0, 20),
-    [notifications]
+    () => userNotifications.filter((n) => !n.is_read).slice(0, 20),
+    [userNotifications]
   );
 
-  const allNotifications = useMemo(() => notifications.slice(0, 30), [notifications]);
+  const allNotifications = useMemo(() => userNotifications.slice(0, 30), [userNotifications]);
 
   const handleMarkRead = useCallback(
     (id: string) => {
@@ -146,8 +152,10 @@ export const NotificationBell: React.FC = () => {
   );
 
   const handleMarkAllRead = useCallback(() => {
-    markAllAsRead();
-  }, [markAllAsRead]);
+    if (user?.id) {
+      markAllAsRead(user.id);
+    }
+  }, [markAllAsRead, user?.id]);
 
   const handleViewAll = useCallback(() => {
     navigate('/notifications');
@@ -157,7 +165,7 @@ export const NotificationBell: React.FC = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative rounded-none p-2 hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+          className="relative rounded-md p-2 hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
           aria-label={`Notifications${count > 0 ? ` (${count} unread)` : ''}`}
         >
           <Bell className="h-5 w-5 text-muted-foreground" />
@@ -214,7 +222,7 @@ export const NotificationBell: React.FC = () => {
               <div className="p-4">
                 {unreadNotifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 text-center">
-                    <div className="w-12 h-12 rounded-none bg-muted flex items-center justify-center mb-3">
+                    <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mb-3">
                       <Check className="w-6 h-6 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">All caught up!</p>
@@ -239,7 +247,7 @@ export const NotificationBell: React.FC = () => {
               <div className="p-4">
                 {allNotifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 text-center">
-                    <div className="w-12 h-12 rounded-none bg-muted flex items-center justify-center mb-3">
+                    <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mb-3">
                       <Bell className="w-6 h-6 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">

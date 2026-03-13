@@ -11,7 +11,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Activity, Box, PackagePlus, AlertTriangle, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { STATUS_COLORS } from '@/lib/design-tokens';
-import { DataTable } from '@/components/ui/data-table';
+import { CrudTable } from '@/components/crud/CrudTable';
 import { ColumnDef } from '@tanstack/react-table';
 
 type FeedType = 'ALL' | 'SHIPMENTS' | 'BOOKINGS' | 'EXCEPTIONS';
@@ -56,7 +56,7 @@ export const LiveActivityFeed: React.FC = () => {
         icon: Box,
         colorClass:
           STATUS_COLORS[s.status as keyof typeof STATUS_COLORS] || 'text-muted-foreground',
-        link: `/tracking?cn=${s.cn_number}`,
+        link: `/shipments/${s.id}`,
       });
     });
 
@@ -189,8 +189,8 @@ export const LiveActivityFeed: React.FC = () => {
   );
 
   return (
-    <Card className="col-span-1 border-border/50 flex flex-col h-[500px]">
-      <div className="p-4 pb-0 border-b border-border/50">
+    <Card className="col-span-1 border border-border/40 bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300 flex flex-col h-[500px]">
+      <div className="p-4 pb-0 border-b border-border/40">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
@@ -213,34 +213,34 @@ export const LiveActivityFeed: React.FC = () => {
         </div>
 
         <Tabs defaultValue="ALL" onValueChange={(v) => setFilter(v as FeedType)}>
-          <TabsList className="flex w-full h-auto bg-transparent p-0 gap-6 justify-start rounded-none">
+          <TabsList className="flex w-full h-auto bg-transparent p-0 gap-6 justify-start">
             <TabsTrigger
               value="ALL"
-              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-none"
+              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary transition-none"
             >
               All
             </TabsTrigger>
             <TabsTrigger
               value="SHIPMENTS"
-              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-none hidden sm:block"
+              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary transition-none hidden sm:block"
             >
               Shipments
             </TabsTrigger>
             <TabsTrigger
               value="SHIPMENTS"
-              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-none sm:hidden"
+              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary transition-none sm:hidden"
             >
               Ship
             </TabsTrigger>
             <TabsTrigger
               value="BOOKINGS"
-              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-none"
+              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary transition-none"
             >
               Book
             </TabsTrigger>
             <TabsTrigger
               value="EXCEPTIONS"
-              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary rounded-none transition-none"
+              className="text-xs font-medium text-muted-foreground data-[state=active]:text-foreground bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 py-2 border-b-2 border-transparent data-[state=active]:border-primary transition-none"
             >
               Alerts
             </TabsTrigger>
@@ -253,20 +253,18 @@ export const LiveActivityFeed: React.FC = () => {
           <div className="p-4 space-y-4 flex-1 overflow-auto">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex gap-4 items-center">
-                <div className="w-8 h-8 rounded-none bg-muted animate-pulse" />
+                <div className="w-8 h-8 rounded-md bg-muted animate-pulse" />
                 <div className="space-y-2 flex-1">
-                  <div className="h-4 w-1/3 bg-muted animate-pulse rounded-none" />
-                  <div className="h-3 w-2/3 bg-muted animate-pulse rounded-none" />
+                  <div className="h-4 w-1/3 bg-muted animate-pulse rounded-md" />
+                  <div className="h-3 w-2/3 bg-muted animate-pulse rounded-md" />
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <DataTable
+          <CrudTable
             columns={columns}
             data={filteredItems}
-            enableSelection={false}
-            enableRowDrag={false}
             pageSize={10}
             className="flex-1 flex flex-col min-h-0 border-none shadow-none bg-transparent pt-2 px-4"
           />

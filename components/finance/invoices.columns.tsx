@@ -4,7 +4,6 @@ import { ColumnDef } from '@tanstack/react-table';
 import { CrudRowActions } from '@/components/crud/CrudRowActions';
 import { Badge } from '@/components/ui/badge';
 import {
-  FileText,
   Download,
   CheckCircle,
   XCircle,
@@ -17,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { InvoiceWithRelations } from '@/hooks/useInvoices';
+import { IdBadge } from '@/components/ui-core/data/id-badge';
 
 // Status color mapping using semantic badge classes
 const STATUS_COLORS: Record<string, string> = {
@@ -60,13 +60,19 @@ export function getInvoicesColumns(
       accessorKey: 'invoice_no',
       header: 'Invoice',
       cell: ({ row }) => (
-        <button
-          className="flex items-center gap-2 hover:underline cursor-pointer text-left"
-          onClick={() => params.onView(row.original)}
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            params.onView(row.original);
+          }}
         >
-          <FileText className="w-4 h-4 text-primary" />
-          <span className="font-mono font-bold text-primary">{row.original.invoice_no}</span>
-        </button>
+          <IdBadge
+            entity="invoice"
+            idValue={row.original.id}
+            cnNumber={row.original.invoice_no}
+            className="cursor-pointer"
+          />
+        </div>
       ),
     },
     {
@@ -79,7 +85,7 @@ export function getInvoicesColumns(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           row.original.shipment?.cn_number || (row.original.line_items as any)?.awb || '';
         return awb ? (
-          <span className="font-mono text-sm font-medium text-foreground">{awb}</span>
+          <IdBadge entity="shipment" idValue={awb} cnNumber={awb} />
         ) : (
           <span className="text-xs text-muted-foreground italic">—</span>
         );

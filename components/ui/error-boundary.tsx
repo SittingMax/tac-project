@@ -81,8 +81,8 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   description = 'An unexpected error occurred. Please try again.',
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center min-h-[200px] bg-destructive/5 border border-destructive/20 rounded-none">
-      <div className="w-12 h-12 rounded-none bg-destructive/10 flex items-center justify-center mb-4">
+    <div className="flex flex-col items-center justify-center p-8 text-center min-h-[200px] bg-destructive/5 border border-destructive/20 rounded-md">
+      <div className="w-12 h-12 rounded-lg bg-destructive/10 flex items-center justify-center mb-4">
         <AlertTriangle className="w-6 h-6 text-destructive" />
       </div>
 
@@ -95,7 +95,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
           <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
             Technical Details
           </summary>
-          <pre className="mt-2 p-4 bg-muted rounded-none text-xs overflow-auto">
+          <pre className="mt-2 p-4 bg-muted rounded-md text-xs overflow-auto">
             {error.message}
             {error.stack && (
               <>
@@ -125,7 +125,7 @@ export const InlineError: React.FC<{
   onRetry?: () => void;
 }> = ({ message, onRetry }) => {
   return (
-    <div className="flex items-center gap-2 p-4 bg-destructive/5 border border-destructive/20 rounded-none text-sm">
+    <div className="flex items-center gap-2 p-4 bg-destructive/5 border border-destructive/20 rounded-md text-sm">
       <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
       <span className="text-destructive flex-1">{message}</span>
       {onRetry && (

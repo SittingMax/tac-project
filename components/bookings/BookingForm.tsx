@@ -16,12 +16,13 @@ import { bookingService } from '@/lib/services/bookingService';
 interface BookingFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
+  isMobile?: boolean;
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_FILES = 5;
 
-export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel }) => {
+export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, isMobile }) => {
   const [uploading, setUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { user } = useAuthStore();
@@ -127,6 +128,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
           `WhatsApp: ${data.whatsappNumber}`;
 
         await supabase.from('contact_messages').insert({
+          org_id: user?.orgId ?? null,
           name: data.consignor.name,
           phone: data.whatsappNumber,
           // Use user email if available, otherwise explicit string or null
@@ -322,13 +324,13 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
       <Separator />
 
       {/* Image Upload */}
-      <Card>
+      <Card className={isMobile ? "mb-6" : ""}>
         <CardHeader>
           <CardTitle className="text-base">Images</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4">
-            <div className="border-2 border-dashed border-input rounded-none p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-accent/50 transition-colors relative">
+            <div className="border-2 border-dashed border-input rounded-md p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-accent/50 transition-colors relative">
               <input
                 type="file"
                 multiple
@@ -343,9 +345,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
             {selectedFiles.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {selectedFiles.map((file, index) => (
-                  <div key={index} className="relative group border rounded-none p-2">
+                  <div key={index} className="relative group border rounded-md p-2">
                     <div className="text-xs truncate w-full mb-1">{file.name}</div>
-                    <div className="aspect-square bg-muted rounded-none overflow-hidden relative">
+                    <div className="aspect-square bg-muted rounded-md overflow-hidden relative">
                       {/* codeql[js/xss-through-dom] - Safe object URL from file input */}
                       {/* lgtm[js/xss-through-dom] */}
                       <img
@@ -358,7 +360,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
                       type="button"
                       variant="destructive"
                       size="icon"
-                      className="absolute -top-2 -right-2 h-6 w-6 rounded-none opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={() => removeFile(index)}
                     >
                       <X className="w-3 h-3" />
@@ -371,7 +373,10 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel })
         </CardContent>
       </Card>
 
-      <div className="flex justify-end gap-3 pt-4">
+      <div className={isMobile 
+        ? "sticky bottom-0 -mx-4 -mb-4 mt-6 p-4 bg-background border-t border-border flex justify-end gap-3 z-10" 
+        : "flex justify-end gap-3 pt-4"
+      }>
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>

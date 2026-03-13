@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '../../store/authStore';
 import { useStore } from '../../store';
@@ -19,12 +19,14 @@ import {
 } from 'lucide-react';
 import { TacLogo } from '@/components/shared/tac-logo';
 import { AnimatedThemeToggler } from '../../components/ui/animated-theme-toggler';
+import { getDefaultRouteForRole } from '@/lib/access-control';
 import { gsap } from '@/lib/gsap';
 
 export const Login: React.FC = () => {
   const { signIn, isAuthenticated, isLoading, error, clearError, user } = useAuthStore();
   const { login: legacyLogin, setTheme } = useStore();
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -35,6 +37,17 @@ export const Login: React.FC = () => {
   const cardRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const formItemsRef = useRef<HTMLDivElement>(null);
+  const redirectState = location.state as
+    | {
+        from?: {
+          pathname?: string;
+          search?: string;
+          hash?: string;
+        };
+      }
+    | undefined;
+  const rememberedEmailKey = 'tac-remembered-login-email';
+  const rememberedEmailExpiryKey = 'tac-remembered-login-email-expiry';
 
   // Entrance animation
   useEffect(() => {
@@ -70,6 +83,22 @@ export const Login: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem(rememberedEmailKey);
+    const rememberedEmailExpiry = localStorage.getItem(rememberedEmailExpiryKey);
+    const hasValidRememberedEmail =
+      rememberedEmail && rememberedEmailExpiry && Number(rememberedEmailExpiry) > Date.now();
+
+    if (hasValidRememberedEmail) {
+      setEmail(rememberedEmail);
+      setRememberMe(true);
+      return;
+    }
+
+    localStorage.removeItem(rememberedEmailKey);
+    localStorage.removeItem(rememberedEmailExpiryKey);
+  }, []);
+
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -82,9 +111,15 @@ export const Login: React.FC = () => {
         active: user.isActive,
         lastLogin: new Date().toISOString(),
       });
-      navigate('/dashboard', { replace: true });
+
+      const requestedPath =
+        redirectState?.from?.pathname && redirectState.from.pathname !== '/login'
+          ? `${redirectState.from.pathname}${redirectState.from.search ?? ''}${redirectState.from.hash ?? ''}`
+          : getDefaultRouteForRole(user.role);
+
+      navigate(requestedPath, { replace: true });
     }
-  }, [isAuthenticated, user, navigate, legacyLogin]);
+  }, [isAuthenticated, user, navigate, legacyLogin, redirectState]);
 
   // Clear error when inputs change
   useEffect(() => {
@@ -103,12 +138,23 @@ export const Login: React.FC = () => {
     const result = await signIn(email, password);
 
     if (result.success) {
+      if (rememberMe) {
+        localStorage.setItem(rememberedEmailKey, email.trim());
+        localStorage.setItem(
+          rememberedEmailExpiryKey,
+          String(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        );
+      } else {
+        localStorage.removeItem(rememberedEmailKey);
+        localStorage.removeItem(rememberedEmailExpiryKey);
+      }
+
       const currentUser = useAuthStore.getState().user;
       if (currentUser) {
         toast(
           <div className="flex items-center gap-3">
-            <div className="relative w-10 h-10 rounded-none bg-status-success/20 border border-status-success/30 flex items-center justify-center shrink-0 overflow-hidden">
-              <span className="absolute inset-0 inline-flex h-full w-full rounded-none bg-status-success/40 opacity-75 animate-ping"></span>
+            <div className="relative w-10 h-10 rounded-md bg-status-success/20 border border-status-success/30 flex items-center justify-center shrink-0 overflow-hidden">
+              <span className="absolute inset-0 inline-flex h-full w-full rounded-md bg-status-success/40 opacity-75 animate-ping"></span>
               <img
                 src="/lottie/login-success.gif"
                 alt="Success"
@@ -116,24 +162,21 @@ export const Login: React.FC = () => {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-mono font-bold uppercase tracking-widest text-xs text-foreground">
-                Login Successful
-              </span>
+              <span className="font-semibold text-xs text-foreground">Login Successful</span>
               <span className="text-[10px] font-mono text-muted-foreground">
                 Welcome back, {currentUser.fullName}!
               </span>
             </div>
           </div>,
           {
-            className: 'rounded-none border border-border/50 bg-background shadow-xl p-4',
+            className: 'rounded-md border border-border/50 bg-background shadow-xl p-4',
             duration: 4000,
           }
         );
       }
     } else {
       toast.error(result.error || 'Login failed', {
-        className:
-          'rounded-none border border-destructive/50 bg-background shadow-xl font-mono uppercase tracking-widest text-xs',
+        className: 'rounded-md border border-destructive/50 bg-background shadow-xl text-xs',
       });
     }
   };
@@ -142,9 +185,9 @@ export const Login: React.FC = () => {
     <div className="min-h-screen antialiased selection:bg-primary/20 text-foreground font-sans">
       {/* Gradient Background */}
       <div className="fixed inset-0 -z-10 bg-gradient-to-br from-background via-muted/50 to-background dark:from-background dark:via-primary/5 dark:to-background transition-colors duration-500">
-        <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] rounded-none bg-primary/20 sm:bg-primary/10 blur-[120px] animate-pulse" />
+        <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] rounded-full bg-primary/20 sm:bg-primary/10 blur-[120px] animate-pulse" />
         <div
-          className="absolute bottom-1/4 -right-20 w-[400px] h-[400px] rounded-none bg-primary/10 sm:bg-primary/5 blur-[100px] animate-pulse"
+          className="absolute bottom-1/4 -right-20 w-[400px] h-[400px] rounded-full bg-primary/10 sm:bg-primary/5 blur-[100px] animate-pulse"
           style={{ animationDelay: '2s' }}
         />
       </div>
@@ -153,7 +196,7 @@ export const Login: React.FC = () => {
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 sm:p-6">
         <button
           onClick={() => navigate('/')}
-          className="group flex items-center gap-2 rounded-none border border-border/40 bg-background/50 backdrop-blur-md px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-background/80 hover:border-border transition-all"
+          className="group flex items-center gap-2 rounded-md border border-border/40 bg-background/50 backdrop-blur-md px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-background/80 hover:border-border transition-all"
           aria-label="Back to home"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -165,7 +208,7 @@ export const Login: React.FC = () => {
       <main className="relative flex min-h-screen items-center justify-center p-4 sm:p-6">
         {/* Card */}
         <div ref={cardRef} className="relative z-10 w-full max-w-3xl opacity-0">
-          <div className="group relative overflow-hidden rounded-none border border-black/10 dark:border-white/10 bg-white/70 dark:bg-white/10 backdrop-blur-lg shadow-2xl shadow-black/10 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/10 transition-all duration-300 hover:border-black/15 dark:hover:border-white/20 hover:ring-black/10 dark:hover:ring-white/20">
+          <div className="group relative overflow-hidden rounded-lg border border-black/10 dark:border-white/10 bg-white/70 dark:bg-white/10 backdrop-blur-lg shadow-2xl shadow-black/10 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/10 transition-all duration-300 hover:border-black/15 dark:hover:border-white/20 hover:ring-black/10 dark:hover:ring-white/20">
             {/* Top hairline */}
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/20 to-transparent" />
 
@@ -184,12 +227,12 @@ export const Login: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-tr from-black/60 via-black/30 to-transparent" />
 
                 {/* Overlay badge */}
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-none border border-white/10 bg-black/30 px-4 py-2 backdrop-blur-md">
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-md border border-white/10 bg-black/30 px-4 py-2 backdrop-blur-md">
                   <div className="flex items-center gap-2 text-xs text-white/80">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-none bg-primary/30 text-primary">
+                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/30 text-primary">
                       <Wifi className="h-3 w-3" />
                     </div>
-                    <span className="font-mono tracking-widest uppercase">System Online</span>
+                    <span className="text-xs font-medium tracking-tight">System Online</span>
                   </div>
                   <span className="text-[11px] text-white/60">TAC v4.1</span>
                 </div>
@@ -211,7 +254,7 @@ export const Login: React.FC = () => {
                     <h1 className="text-[26px] font-bold tracking-tight text-foreground uppercase">
                       Welcome back
                     </h1>
-                    <p className="mt-1.5 text-xs font-mono uppercase tracking-widest text-muted-foreground">
+                    <p className="mt-1.5 text-sm text-muted-foreground">
                       Sign in to your logistics dashboard.
                     </p>
                   </div>
@@ -222,13 +265,11 @@ export const Login: React.FC = () => {
                       data-testid="login-error-message"
                       role="alert"
                       aria-live="polite"
-                      className="mb-5 flex items-start gap-3 p-4 rounded-none border border-destructive/30 bg-destructive/10 text-destructive dark:text-destructive text-sm backdrop-blur-sm animate-in fade-in slide-in-from-top-2"
+                      className="mb-5 flex items-start gap-3 p-4 rounded-md border border-destructive/30 bg-destructive/10 text-destructive dark:text-destructive text-sm backdrop-blur-sm animate-in fade-in slide-in-from-top-2"
                     >
                       <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-mono uppercase tracking-widest text-xs font-bold">
-                          Authentication failed
-                        </p>
+                        <p className="text-xs font-semibold">Authentication failed</p>
                         <p className="text-destructive/80 text-[10px] font-mono mt-0.5">{error}</p>
                       </div>
                     </div>
@@ -240,12 +281,12 @@ export const Login: React.FC = () => {
                     <div className="space-y-2">
                       <label
                         htmlFor="login-email"
-                        className="block text-xs font-mono font-bold uppercase tracking-widest text-foreground"
+                        className="block text-xs font-semibold text-foreground"
                       >
                         Email address
                       </label>
                       <div
-                        className={`group/input relative flex items-center rounded-none border bg-background px-4 h-12 transition-all duration-200 ${
+                        className={`group/input relative flex items-center rounded-md border bg-background px-4 h-12 transition-all duration-200 ${
                           focusedField === 'email'
                             ? 'border-primary ring-2 ring-primary/10'
                             : 'border-border hover:border-border/80'
@@ -280,23 +321,19 @@ export const Login: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <label
                           htmlFor="login-password"
-                          className="block text-xs font-mono font-bold uppercase tracking-widest text-foreground"
+                          className="block text-xs font-semibold text-foreground"
                         >
                           Password
                         </label>
                         <a
-                          href="#"
-                          className="text-xs font-mono uppercase tracking-widest text-primary hover:text-primary/80 hover:underline transition-colors"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            toast.info('Password reset coming soon');
-                          }}
+                          href="mailto:support@tac-cargo.com?subject=Password%20Reset%20Request"
+                          className="text-xs text-primary hover:text-primary/80 hover:underline transition-colors"
                         >
                           Forgot password?
                         </a>
                       </div>
                       <div
-                        className={`group/input relative flex items-center rounded-none border bg-background px-4 h-12 transition-all duration-200 ${
+                        className={`group/input relative flex items-center rounded-md border bg-background px-4 h-12 transition-all duration-200 ${
                           focusedField === 'password'
                             ? 'border-primary ring-2 ring-primary/10'
                             : 'border-border hover:border-border/80'
@@ -324,7 +361,7 @@ export const Login: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="ml-2 grid h-8 w-8 shrink-0 place-items-center rounded-none text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                          className="ml-2 grid h-8 w-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                           aria-label={showPassword ? 'Hide password' : 'Show password'}
                           title={showPassword ? 'Hide password' : 'Show password'}
                         >
@@ -349,14 +386,14 @@ export const Login: React.FC = () => {
                             disabled={isLoading}
                             className="peer sr-only"
                           />
-                          <div className="w-5 h-5 rounded-none border border-border bg-background flex items-center justify-center transition-colors peer-checked:bg-primary peer-checked:border-primary peer-disabled:opacity-50 group-hover:border-primary/50">
+                          <div className="w-5 h-5 rounded-sm border border-border bg-background flex items-center justify-center transition-colors peer-checked:bg-primary peer-checked:border-primary peer-disabled:opacity-50 group-hover:border-primary/50">
                             {rememberMe && (
                               <Check className="w-3.5 h-3.5 text-primary-foreground" />
                             )}
                           </div>
                         </div>
-                        <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors">
-                          Remember me for 30 days
+                        <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                          Remember email for 30 days
                         </span>
                       </label>
 
@@ -365,9 +402,9 @@ export const Login: React.FC = () => {
                         type="submit"
                         disabled={isLoading}
                         data-testid="login-submit-button"
-                        className="group/btn relative w-full inline-flex items-center justify-center rounded-none bg-primary h-12 px-4 text-xs font-mono font-bold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 outline-none transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 overflow-hidden"
+                        className="group/btn relative w-full inline-flex items-center justify-center rounded-md bg-primary h-12 px-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 outline-none transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 overflow-hidden"
                       >
-                        <div className="absolute inset-0 h-full w-full scale-0 rounded-none transition-all duration-300 ease-out group-hover/btn:scale-100 group-hover/btn:bg-primary-foreground/10"></div>
+                        <div className="absolute inset-0 h-full w-full scale-0 rounded-md transition-all duration-300 ease-out group-hover/btn:scale-100 group-hover/btn:bg-primary-foreground/10"></div>
                         <span className="relative z-10 flex items-center">
                           {isLoading ? (
                             <>
@@ -389,7 +426,7 @@ export const Login: React.FC = () => {
             </div>
 
             {/* Bottom footer - Enhanced */}
-            <div className="flex items-center justify-between rounded-none border-t border-border/50 bg-muted/30 px-6 py-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            <div className="flex items-center justify-between border-t border-border/50 bg-muted/30 px-6 py-3 text-[10px] text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Shield className="h-4 w-4 text-status-success" />
                 <span>256-bit SSL encrypted</span>

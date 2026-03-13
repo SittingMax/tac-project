@@ -96,7 +96,7 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
 
   return (
     <div className="space-y-6 py-2">
-      <div className="inline-flex items-center gap-1 rounded-none border border-border/60 bg-muted/60 p-1 shadow-sm">
+      <div className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-muted/60 p-1 shadow-sm">
         <button
           type="button"
           onClick={() => {
@@ -104,7 +104,7 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
             setValue('awb', '');
             setValue('invoiceNumber', '');
           }}
-          className={`px-4.5 py-1.5 text-[11px] font-semibold rounded-none transition-all flex items-center gap-2 tracking-wide ${mode === 'NEW_BOOKING' ? 'bg-background shadow-sm text-foreground border border-border/60' : 'text-muted-foreground hover:text-foreground'}`}
+          className={`px-4.5 py-1.5 text-[11px] font-semibold rounded-sm transition-all flex items-center gap-2 tracking-wide ${mode === 'NEW_BOOKING' ? 'bg-background shadow-sm text-foreground border border-border/60' : 'text-muted-foreground hover:text-foreground'}`}
         >
           <Plus className="w-3.5 h-3.5" /> New Invoice
         </button>
@@ -114,14 +114,14 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
             setMode('EXISTING_SHIPMENT');
             setValue('awb', '');
           }}
-          className={`px-4.5 py-1.5 text-[11px] font-semibold rounded-none transition-all flex items-center gap-2 tracking-wide ${mode === 'EXISTING_SHIPMENT' ? 'bg-background shadow-sm text-foreground border border-border/60' : 'text-muted-foreground hover:text-foreground'}`}
+          className={`px-4.5 py-1.5 text-[11px] font-semibold rounded-sm transition-all flex items-center gap-2 tracking-wide ${mode === 'EXISTING_SHIPMENT' ? 'bg-background shadow-sm text-foreground border border-border/60' : 'text-muted-foreground hover:text-foreground'}`}
         >
           <Search className="w-3.5 h-3.5" /> Link Shipment
         </button>
       </div>
 
       {mode === 'EXISTING_SHIPMENT' && (
-        <div className="flex flex-wrap items-center gap-2 rounded-none border border-border/60 bg-muted/30 p-4 animate-in fade-in slide-in-from-top-2">
+        <div className="flex flex-wrap items-center gap-2 rounded-md border border-border/60 bg-muted/30 p-4 animate-in fade-in slide-in-from-top-2">
           <Input
             placeholder="Enter CN Number..."
             value={searchAwb}
@@ -145,7 +145,7 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
           <Label htmlFor="awb" error={errors.awb?.message}>
             CN Number
           </Label>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <Input
               id="awb"
               {...form.register('awb')}
@@ -157,7 +157,7 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
               <Button
                 type="button"
                 variant="outline"
-                className="h-11 px-4"
+                className="h-11 px-4 shrink-0 shadow-sm"
                 onClick={handleGenerateAwb}
                 disabled={isGeneratingAwb || !!watch('awb')}
               >

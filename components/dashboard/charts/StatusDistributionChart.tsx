@@ -10,6 +10,7 @@ import {
 } from '../../ui/chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { ChartSkeleton } from '../../ui/skeleton';
+import { EmptyShipments } from '../../ui/empty-state';
 import { useShipments } from '../../../hooks/useShipments';
 
 const chartConfig = {
@@ -91,13 +92,8 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
             <CardDescription>Current shipment breakdown</CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="flex flex-1 items-center justify-center pb-0">
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No shipments yet</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Create your first shipment to see statuses
-            </p>
-          </div>
+        <CardContent className="flex flex-1 items-center justify-center p-0">
+          <EmptyShipments />
         </CardContent>
       </Card>
     );
@@ -106,34 +102,30 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
   return (
     <Card
       data-chart={id}
-      className="flex flex-col h-full rounded-none border-border bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300"
+      className="flex flex-col h-full border-border bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300"
     >
       <CardHeader className="flex-row items-start space-y-0 pb-0">
         <div className="grid gap-1">
-          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
-            Status Distribution
-          </CardTitle>
-          <div className="text-2xl font-bold tracking-tighter text-foreground">
-            Current Breakdown
-          </div>
+          <CardTitle className="text-xs text-muted-foreground">Status Distribution</CardTitle>
+          <div className="text-lg font-semibold text-foreground">Current Breakdown</div>
         </div>
         <Select value={activeStatus} onValueChange={setActiveStatus}>
           <SelectTrigger
-            className="ml-auto h-8 w-[130px] rounded-none border-border bg-transparent shadow-none pl-2.5 text-xs font-mono uppercase tracking-wider"
+            className="ml-auto h-8 w-[130px] border-border bg-transparent shadow-none pl-2.5 text-xs"
             aria-label="Select a status"
           >
             <SelectValue placeholder="Select status" />
           </SelectTrigger>
-          <SelectContent align="end" className="rounded-none">
+          <SelectContent align="end">
             {statuses.map((key) => {
               const config = chartConfig[key as keyof typeof chartConfig];
               if (!config) return null;
 
               return (
-                <SelectItem key={key} value={key} className="rounded-none [&_span]:flex">
+                <SelectItem key={key} value={key} className="[&_span]:flex">
                   <div className="flex items-center gap-2 text-xs">
                     <span
-                      className="flex h-3 w-3 shrink-0 rounded-none"
+                      className="flex h-3 w-3 shrink-0 rounded-sm"
                       style={{
                         backgroundColor: `var(--color-${key})`,
                       }}
@@ -153,13 +145,15 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
           className="mx-auto aspect-square w-full max-w-[280px]"
         >
           <PieChart>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl" />} />
             <Pie
               data={statusChartData}
               dataKey="count"
               nameKey="status"
-              innerRadius={60}
-              strokeWidth={5}
+              innerRadius={70}
+              outerRadius={90}
+              strokeWidth={0}
+              paddingAngle={4}
               activeIndex={activeIndex !== -1 ? activeIndex : undefined}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               activeShape={({ outerRadius = 0, ...props }: any) => (
@@ -194,7 +188,7 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
                           <tspan
                             x={viewBox.cx}
                             y={(viewBox.cy || 0) + 24}
-                            className="fill-muted-foreground text-[10px] font-mono uppercase tracking-widest"
+                            className="fill-muted-foreground text-xs"
                           >
                             {chartConfig[activeStatus as keyof typeof chartConfig]?.label ||
                               'Shipments'}

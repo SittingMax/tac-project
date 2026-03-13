@@ -3,25 +3,38 @@ import { LabelData, ServiceLevel, TransportMode } from '@/components/domain/Labe
 import { HUBS } from '@/lib/constants';
 import { HubLocation, Shipment } from '@/types';
 
+type LabelShipmentLike = Omit<Partial<Shipment>, 'originHub' | 'destinationHub'> & {
+  originHub?: string | null;
+  destinationHub?: string | null;
+};
+
 const getTextValue = (value?: string | null): string =>
   typeof value === 'string' ? value.trim() : '';
 
-const resolveHubCode = (value?: string | null): string => {
-  if (!value) return '';
+const resolveHubRecord = (value?: string | null) => {
+  if (!value) return null;
   const hubKey = value as HubLocation;
   const direct = HUBS[hubKey];
-  if (direct) return direct.code;
-  const byCode = Object.values(HUBS).find((hub) => hub.code === value || hub.id === value);
-  return byCode?.code || value;
+  if (direct) return direct;
+  return (
+    Object.values(HUBS).find(
+      (hub) => hub.code === value || hub.id === value || hub.uuid === value
+    ) ?? null
+  );
+};
+
+const resolveHubCode = (value?: string | null): string => {
+  if (!value) return '';
+  return resolveHubRecord(value)?.code || value;
 };
 
 const resolveHubName = (value?: string | null): string => {
   if (!value) return '';
-  const hubKey = value as HubLocation;
-  const direct = HUBS[hubKey];
-  if (direct) return direct.name;
-  const byCode = Object.values(HUBS).find((hub) => hub.code === value || hub.id === value);
-  return byCode?.name || value;
+  return resolveHubRecord(value)?.name || value;
+};
+
+const resolveHubAddress = (value?: string | null): string => {
+  return resolveHubRecord(value)?.address || '';
 };
 
 const normalizeServiceLevel = (value?: string | null): ServiceLevel => {
@@ -34,7 +47,7 @@ const normalizeServiceLevel = (value?: string | null): ServiceLevel => {
 };
 
 export const generateLabelFromShipment = (
-  shipment: Partial<Shipment>,
+  shipment: LabelShipmentLike,
   invoiceData?: any
 ): LabelData => {
   const serviceLevel = normalizeServiceLevel(shipment.serviceLevel);
@@ -51,8 +64,8 @@ export const generateLabelFromShipment = (
     PRIORITY: 'PRI',
   };
 
-  const originCode = resolveHubCode(shipment.originHub || '') || 'DEL';
-  const destinationCode = resolveHubCode(shipment.destinationHub || '') || 'IMF';
+  const originCode = resolveHubCode(shipment.originHub || '') || 'UNK';
+  const destinationCode = resolveHubCode(shipment.destinationHub || '') || 'UNK';
   const destinationName = resolveHubName(shipment.destinationHub || '');
   const recipientCity =
     getTextValue(shipment.consignee?.city) || destinationName.replace(' Hub', '');
@@ -71,7 +84,7 @@ export const generateLabelFromShipment = (
     recipient: {
       name: shipment.consignee?.name || shipment.customerName || 'CONSIGNEE',
       address:
-        shipment.consignee?.address || HUBS[shipment.destinationHub as HubLocation]?.address || '',
+        shipment.consignee?.address || resolveHubAddress(shipment.destinationHub || '') || '',
       city: cityLine,
       state: shipment.consignee?.state,
     },
@@ -136,8 +149,8 @@ export const generateLabelFromFormData = (formData: any): LabelData => {
     return fallback;
   };
 
-  const originCode = resolveCodeFromCity(getTextValue(formData.consignorCity), 'DEL');
-  const destCode = resolveCodeFromCity(recipientCity, 'IMF');
+  const originCode = resolveCodeFromCity(getTextValue(formData.consignorCity), 'UNK');
+  const destCode = resolveCodeFromCity(recipientCity, 'UNK');
 
   return {
     awb: formData.awb || 'TAC-PENDING',

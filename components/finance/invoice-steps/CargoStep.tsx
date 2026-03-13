@@ -77,7 +77,7 @@ export const CargoStep = ({ form, setShowLabelPreview }: Props) => {
         </div>
       </div>
 
-      <div className="p-6 bg-muted/50 rounded-none border border-border space-y-6">
+      <div className="p-6 bg-muted/50 rounded-md border border-border space-y-6">
         {/* Dimensions Row */}
         <div className="space-y-2">
           <Label className="flex gap-2">

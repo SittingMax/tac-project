@@ -15,7 +15,7 @@ export const ShipmentDetailsPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-none animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -45,7 +45,7 @@ export const ShipmentDetailsPage: React.FC = () => {
         <PageHeader title={`Shipment ${shipment.cn_number}`} description="Detailed view" />
       </div>
 
-      <div className="bg-card rounded-none border border-border p-6 shadow-sm">
+      <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
         <ShipmentDetails shipment={adaptToShipment(shipment)} onClose={handleClose} />
       </div>
     </div>

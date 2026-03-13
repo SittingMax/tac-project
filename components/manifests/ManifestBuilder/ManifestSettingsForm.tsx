@@ -155,7 +155,7 @@ export function ManifestSettingsForm({
   });
 
   return (
-    <Card className={cn('rounded-none h-full', className)}>
+    <Card className={cn('rounded-md h-full', className)}>
       <CardHeader className="pb-4">
         <CardTitle className="text-sm tracking-wide uppercase text-muted-foreground font-semibold">
           Manifest Settings
@@ -228,12 +228,12 @@ export function ManifestSettingsForm({
           {/* Transport Type Toggle */}
           <div className="space-y-4">
             <Label>Transport Type</Label>
-            <div className="grid grid-cols-2 gap-2 bg-muted p-1 rounded-none">
+            <div className="grid grid-cols-2 gap-2 bg-muted p-1 rounded-md">
               <Button
                 type="button"
                 variant={transportType === 'AIR' ? 'default' : 'ghost'}
                 className={cn(
-                  'rounded-none',
+                  'rounded-md',
                   transportType === 'AIR' ? 'shadow-md' : 'hover:bg-background/50'
                 )}
                 onClick={() => form.setValue('type', 'AIR', { shouldValidate: true })}
@@ -245,7 +245,7 @@ export function ManifestSettingsForm({
                 type="button"
                 variant={transportType === 'TRUCK' ? 'default' : 'ghost'}
                 className={cn(
-                  'rounded-none',
+                  'rounded-md',
                   transportType === 'TRUCK' ? 'shadow-md' : 'hover:bg-background/50'
                 )}
                 onClick={() => form.setValue('type', 'TRUCK', { shouldValidate: true })}

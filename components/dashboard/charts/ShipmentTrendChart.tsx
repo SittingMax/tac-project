@@ -81,33 +81,23 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
   if (isLoading) return <ChartSkeleton />;
 
   return (
-    <Card className="pt-0 h-full flex flex-col rounded-none border-border bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300">
+    <Card className="pt-0 h-full flex flex-col border-border bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300">
       <CardHeader className="flex items-start gap-4 space-y-0 pb-4 sm:flex-row sm:items-center">
         <div className="grid flex-1 gap-1">
-          <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
-            Shipment Volume Trend
-          </CardTitle>
-          <div className="text-2xl font-bold tracking-tighter text-foreground">
-            Inbound / Outbound
-          </div>
+          <CardTitle className="text-xs text-muted-foreground">Shipment Volume Trend</CardTitle>
+          <div className="text-lg font-semibold text-foreground">Inbound / Outbound</div>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger
-            className="w-[120px] rounded-none border-border bg-transparent shadow-none text-xs font-mono uppercase tracking-wider"
+            className="w-[120px] border-border bg-transparent shadow-none text-xs"
             aria-label="Select a value"
           >
             <SelectValue placeholder="Last 3 months" />
           </SelectTrigger>
-          <SelectContent className="rounded-none">
-            <SelectItem value="90d" className="rounded-none">
-              Last 3 months
-            </SelectItem>
-            <SelectItem value="30d" className="rounded-none">
-              Last 30 days
-            </SelectItem>
-            <SelectItem value="7d" className="rounded-none">
-              Last 7 days
-            </SelectItem>
+          <SelectContent>
+            <SelectItem value="90d">Last 3 months</SelectItem>
+            <SelectItem value="30d">Last 30 days</SelectItem>
+            <SelectItem value="7d">Last 7 days</SelectItem>
           </SelectContent>
         </Select>
       </CardHeader>
@@ -122,30 +112,31 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
             </div>
           </div>
         ) : (
-          <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-            <AreaChart data={filteredData}>
+          <ChartContainer config={chartConfig} className="aspect-auto h-[300px] w-full">
+            <AreaChart data={filteredData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="fillOutbound" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="var(--color-outbound)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--color-outbound)" stopOpacity={0.1} />
+                  <stop offset="95%" stopColor="var(--color-outbound)" stopOpacity={0.0} />
                 </linearGradient>
                 <linearGradient id="fillInbound" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="var(--color-inbound)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--color-inbound)" stopOpacity={0.1} />
+                  <stop offset="95%" stopColor="var(--color-inbound)" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
               <CartesianGrid
                 vertical={false}
-                strokeDasharray="3 3"
+                strokeDasharray="4 4"
                 stroke="var(--border)"
-                opacity={0.5}
+                opacity={0.2}
               />
               <XAxis
                 dataKey="date"
                 tickLine={false}
                 axisLine={false}
-                tickMargin={8}
+                tickMargin={12}
                 minTickGap={32}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
                 tickFormatter={(value) => {
                   const date = new Date(value);
                   return date.toLocaleDateString('en-US', {
@@ -155,13 +146,15 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
                 }}
               />
               <ChartTooltip
-                cursor={false}
+                cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
                 content={
                   <ChartTooltipContent
+                    className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl"
                     labelFormatter={(value) => {
                       return new Date(value).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
+                        year: 'numeric'
                       });
                     }}
                     indicator="dot"
@@ -170,19 +163,17 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
               />
               <Area
                 dataKey="inbound"
-                type="step"
+                type="monotone"
                 fill="url(#fillInbound)"
                 stroke="var(--color-inbound)"
-                strokeWidth={2}
-                stackId="a"
+                strokeWidth={3}
               />
               <Area
                 dataKey="outbound"
-                type="step"
+                type="monotone"
                 fill="url(#fillOutbound)"
                 stroke="var(--color-outbound)"
-                strokeWidth={2}
-                stackId="a"
+                strokeWidth={3}
               />
               <ChartLegend content={<ChartLegendContent />} />
             </AreaChart>

@@ -6,6 +6,7 @@
 import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,6 +28,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { ShipmentStatus } from '@/types';
+import { HUBS } from '@/lib/constants';
+import { useAuthStore } from '@/store/authStore';
 
 // Dashboard metrics
 interface DashboardMetrics {
@@ -34,55 +37,103 @@ interface DashboardMetrics {
   pendingDispatch: number;
   inTransit: number;
   exceptions: number;
-  avgProcessingTime: number;
 }
 
 export function WarehouseDashboard() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
   const [recentScans, setRecentScans] = useState<RecentScan[]>([]);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   // Get current hub from user context (simplified for demo)
-  const currentHub = 'IMF'; // Imphal Hub
-  const hubName = 'Imphal Hub';
+  const currentHubEntry =
+    Object.values(HUBS).find((hub) => hub.uuid === user?.hubId || hub.code === user?.hubCode) ??
+    null;
+  const currentHub = currentHubEntry?.code ?? user?.hubCode ?? 'UNASSIGNED';
+  const hubName = currentHubEntry?.name ?? user?.hubCode ?? 'Unassigned Hub';
+  const currentHubId = currentHubEntry?.uuid ?? user?.hubId ?? null;
+  const hasAssignedHub = Boolean(currentHubId);
 
   // Fetch dashboard metrics
   const { data: metrics, isLoading: metricsLoading } = useQuery({
-    queryKey: ['warehouse-metrics', currentHub],
+    queryKey: ['warehouse-metrics', user?.orgId, currentHubId],
     queryFn: async (): Promise<DashboardMetrics> => {
+      if (!user?.orgId || !currentHubId) {
+        return {
+          todayScans: 0,
+          pendingDispatch: 0,
+          inTransit: 0,
+          exceptions: 0,
+        };
+      }
+
       // Get today's scans count
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const { count: todayScans } = await supabase
+      let todayScansQuery = supabase
         .from('tracking_events')
         .select('*', { count: 'exact', head: true })
+        .eq('org_id', user.orgId)
         .gte('created_at', today.toISOString());
 
+      if (currentHubId) {
+        todayScansQuery = todayScansQuery.eq('hub_id', currentHubId);
+      }
+
+      const { count: todayScans } = await todayScansQuery;
+
       // Get pending dispatch count
-      const { count: pendingDispatch } = await supabase
+      let pendingDispatchQuery = supabase
         .from('shipments')
         .select('*', { count: 'exact', head: true })
+        .eq('org_id', user.orgId)
+        .is('deleted_at', null)
         .eq('status', 'RECEIVED_AT_ORIGIN');
+
+      if (currentHubId) {
+        pendingDispatchQuery = pendingDispatchQuery.eq('origin_hub_id', currentHubId);
+      }
+
+      const { count: pendingDispatch } = await pendingDispatchQuery;
+      const hubScopeFilter = `origin_hub_id.eq.${currentHubId},destination_hub_id.eq.${currentHubId},current_hub_id.eq.${currentHubId}`;
 
       // Get in transit count
       const { count: inTransit } = await supabase
         .from('shipments')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'IN_TRANSIT');
+        .eq('org_id', user.orgId)
+        .is('deleted_at', null)
+        .eq('status', 'IN_TRANSIT')
+        .or(hubScopeFilter);
+
+      const { data: hubShipments } = await supabase
+        .from('shipments')
+        .select('id')
+        .eq('org_id', user.orgId)
+        .is('deleted_at', null)
+        .or(hubScopeFilter);
+
+      const hubShipmentIds = (hubShipments ?? []).map((shipment) => shipment.id);
 
       // Get exceptions count
-      const { count: exceptions } = await supabase
-        .from('exceptions')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'OPEN');
+      let exceptions = 0;
+      if (hubShipmentIds.length > 0) {
+        const { count } = await supabase
+          .from('exceptions')
+          .select('*', { count: 'exact', head: true })
+          .eq('org_id', user.orgId)
+          .eq('status', 'OPEN')
+          .in('shipment_id', hubShipmentIds);
+        exceptions = count || 0;
+      }
 
       return {
         todayScans: todayScans || 0,
         pendingDispatch: pendingDispatch || 0,
         inTransit: inTransit || 0,
         exceptions: exceptions || 0,
-        avgProcessingTime: 2.5, // Mock data
       };
     },
     refetchInterval: 30000, // Refresh every 30s
@@ -91,6 +142,14 @@ export function WarehouseDashboard() {
   // Scan mutation
   const scanMutation = useMutation({
     mutationFn: async (code: string): Promise<ScanResult> => {
+      if (!user?.orgId) {
+        throw new Error('No organization context available for warehouse scanning.');
+      }
+
+      if (!currentHubId) {
+        throw new Error('Assign a hub to your staff profile before using warehouse scanning.');
+      }
+
       // Try to find shipment
       const { data: shipment, error } = await supabase
         .from('shipments')
@@ -108,6 +167,7 @@ export function WarehouseDashboard() {
         `
         )
         .eq('cn_number', code)
+        .eq('org_id', user.orgId)
         .maybeSingle();
 
       if (error) throw error;
@@ -153,19 +213,21 @@ export function WarehouseDashboard() {
       // Update shipment status
       const { error: updateError } = await supabase
         .from('shipments')
-        .update({ status: newStatus, current_hub_id: '00000000-0000-0000-0000-000000000010' })
-        .eq('id', shipment.id);
+        .update({ status: newStatus, current_hub_id: currentHubId })
+        .eq('id', shipment.id)
+        .eq('org_id', user.orgId);
 
       if (updateError) throw updateError;
 
       // Create tracking event
       await supabase.from('tracking_events').insert({
-        org_id: '00000000-0000-0000-0000-000000000001',
+        org_id: user.orgId,
         shipment_id: shipment.id,
         cn_number: shipment.cn_number,
         event_code: newStatus,
         event_time: new Date().toISOString(),
-        hub_id: '00000000-0000-0000-0000-000000000010',
+        hub_id: currentHubId,
+        actor_staff_id: user.id,
         source: 'SCAN',
         location: hubName,
       });
@@ -249,7 +311,11 @@ export function WarehouseDashboard() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">{hubName}</h1>
-                <p className="text-xs text-muted-foreground">Warehouse Operations Dashboard</p>
+                <p className="text-xs text-muted-foreground">
+                  {hasAssignedHub
+                    ? 'Warehouse Operations Dashboard'
+                    : 'Assign a hub to enable warehouse scanning and hub-scoped metrics'}
+                </p>
               </div>
             </div>
 
@@ -283,6 +349,23 @@ export function WarehouseDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {!hasAssignedHub && (
+          <Card className="border-status-warning/30 bg-status-warning/10">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <AlertTriangle className="size-4 text-status-warning" />
+                Hub assignment required
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                This workspace is not linked to a hub yet. Warehouse metrics stay at zero and
+                scanning is disabled until your staff profile is assigned to a real hub.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <MetricCard
@@ -320,15 +403,29 @@ export function WarehouseDashboard() {
         </div>
 
         {/* Scan Panel */}
-        <WarehouseScanPanel
-          onScan={handleScan}
-          hubName={hubName}
-          hubCode={currentHub}
-          showRecentScans
-          recentScans={recentScans}
-          onClearRecentScans={handleClearRecentScans}
-          autoFocus
-        />
+        {hasAssignedHub ? (
+          <WarehouseScanPanel
+            onScan={handleScan}
+            hubName={hubName}
+            hubCode={currentHub}
+            showRecentScans
+            recentScans={recentScans}
+            onClearRecentScans={handleClearRecentScans}
+            autoFocus
+          />
+        ) : (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Scan Panel</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Warehouse scanning becomes available after a hub assignment is added to your staff
+                account.
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-4">
@@ -340,19 +437,35 @@ export function WarehouseDashboard() {
             </CardHeader>
             <CardContent className="pt-0">
               <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" className="justify-start gap-2">
+                <Button
+                  variant="outline"
+                  className="justify-start gap-2"
+                  onClick={() => navigate('/shipments?new=true')}
+                >
                   <Package className="size-4" />
                   New Shipment
                 </Button>
-                <Button variant="outline" className="justify-start gap-2">
+                <Button
+                  variant="outline"
+                  className="justify-start gap-2"
+                  onClick={() => navigate('/manifests')}
+                >
                   <Truck className="size-4" />
                   Create Manifest
                 </Button>
-                <Button variant="outline" className="justify-start gap-2">
+                <Button
+                  variant="outline"
+                  className="justify-start gap-2"
+                  onClick={() => navigate('/arrival-audit')}
+                >
                   <CheckCircle className="size-4" />
                   Verify Arrival
                 </Button>
-                <Button variant="outline" className="justify-start gap-2">
+                <Button
+                  variant="outline"
+                  className="justify-start gap-2"
+                  onClick={() => navigate('/shift-report')}
+                >
                   <Clock className="size-4" />
                   Shift Report
                 </Button>

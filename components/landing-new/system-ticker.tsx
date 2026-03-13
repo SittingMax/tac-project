@@ -19,7 +19,7 @@ export function SystemTicker() {
             <div key={groupIndex} className="flex items-center">
               {/* Item 1 */}
               <div className="flex items-center mx-8">
-                <span className="w-1.5 h-1.5 rounded-none bg-primary animate-pulse mr-2" />
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse mr-2" />
                 <span className="text-foreground font-bold font-mono text-xs tracking-wider mr-2">
                   PKT_8829{groupIndex}
                 </span>
@@ -29,7 +29,7 @@ export function SystemTicker() {
               </div>
               {/* Item 2 */}
               <div className="flex items-center mx-8">
-                <span className="w-1.5 h-1.5 rounded-none bg-chart-2 animate-pulse mr-2" />
+                <span className="w-1.5 h-1.5 rounded-full bg-chart-2 animate-pulse mr-2" />
                 <span className="text-foreground font-bold font-mono text-xs tracking-wider mr-2">
                   FLT_WGS-902
                 </span>
@@ -39,7 +39,7 @@ export function SystemTicker() {
               </div>
               {/* Item 3 */}
               <div className="flex items-center mx-8">
-                <span className="w-1.5 h-1.5 rounded-none bg-chart-4 animate-pulse mr-3" />
+                <span className="w-1.5 h-1.5 rounded-full bg-chart-4 animate-pulse mr-3" />
                 <span className="text-foreground font-bold font-mono text-xs tracking-wider mr-2">
                   NODE_DXB
                 </span>

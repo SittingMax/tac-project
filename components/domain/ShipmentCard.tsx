@@ -47,11 +47,11 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
       <div
         onClick={onClick}
         className={cn(
-          'flex items-center gap-4 p-4 rounded-none border border-white/5 bg-card/50 hover:bg-card hover:border-primary/30 transition-all cursor-pointer group',
+          'flex items-center gap-4 p-4 rounded-md border border-white/5 bg-card/50 hover:bg-card hover:border-primary/30 transition-all cursor-pointer group',
           className
         )}
       >
-        <div className="p-2 rounded-none bg-primary/10">
+        <div className="p-2 rounded-md bg-primary/10">
           <Package className="w-4 h-4 text-primary" />
         </div>
 
@@ -78,7 +78,7 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
     <div
       onClick={onClick}
       className={cn(
-        'relative overflow-hidden rounded-none border border-white/10 bg-card/80 backdrop-blur-sm p-4 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 cursor-pointer group',
+        'relative overflow-hidden rounded-md border border-white/10 bg-card/80 backdrop-blur-sm p-4 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 cursor-pointer group',
         className
       )}
     >
@@ -95,7 +95,7 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
         <div className="flex items-center gap-4">
           <div
             className={cn(
-              'p-2.5 rounded-none',
+              'p-2.5 rounded-md',
               shipment.mode === 'AIR' ? 'bg-primary/10' : 'bg-status-in-transit/20'
             )}
           >
@@ -117,7 +117,7 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
       </div>
 
       {/* Route */}
-      <div className="flex items-center justify-between bg-card/50 rounded-none p-4 mb-4">
+      <div className="flex items-center justify-between bg-card/50 rounded-md p-4 mb-4">
         <div className="text-center">
           <p className="text-2xl font-bold text-foreground">{origin.code}</p>
           <p className="text-xs text-muted-foreground">{origin.name}</p>
@@ -159,7 +159,7 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
       <div className="absolute top-4 right-4">
         <span
           className={cn(
-            'text-xs font-bold px-2 py-0.5 rounded-none',
+            'text-xs font-bold px-2 py-0.5 rounded-md',
             shipment.serviceLevel === 'EXPRESS'
               ? 'badge--in-transit'
               : 'bg-muted text-muted-foreground'

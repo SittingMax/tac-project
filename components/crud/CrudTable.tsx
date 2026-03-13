@@ -24,6 +24,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -65,6 +73,8 @@ export interface CrudTableProps<TData> {
   ) => void;
   /** Content to render for bulk actions (usually buttons that react to table.getSelectedRowModel()) */
   bulkActions?: (table: import('@tanstack/react-table').Table<TData>) => React.ReactNode;
+  /** Optional callback for row clicks */
+  onRowClick?: (row: TData) => void;
 }
 
 /**
@@ -91,6 +101,7 @@ export function CrudTable<TData>({
   rowSelection: controlledRowSelection,
   onRowSelectionChange,
   bulkActions,
+  onRowClick,
 }: CrudTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -230,66 +241,80 @@ export function CrudTable<TData>({
       ) : (
         <>
           {/* Table */}
-          <div className="rounded-none border border-border/40 overflow-x-auto bg-transparent text-foreground shadow-none">
-            <table className="w-full text-sm">
-              <thead className="bg-transparent border-b border-border/40">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th
-                        key={header.id}
-                        className="px-4 py-3 text-left text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70 relative group align-middle"
-                        style={{ width: header.getSize() }}
-                      >
-                        {header.isPlaceholder ? null : (
-                          <>
-                            <div
-                              className={cn(
-                                'flex items-center gap-1',
-                                header.column.getCanSort() &&
-                                  'cursor-pointer select-none hover:text-foreground'
-                              )}
-                              onClick={header.column.getToggleSortingHandler()}
-                            >
-                              {flexRender(header.column.columnDef.header, header.getContext())}
-                              {header.column.getCanSort() && <ArrowUpDown className="w-3 h-3" />}
-                            </div>
-                            {/* Column Resizer */}
-                            <div
-                              onMouseDown={header.getResizeHandler()}
-                              onTouchStart={header.getResizeHandler()}
-                              className={cn(
-                                'absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none bg-border opacity-0 group-hover:opacity-100 transition-opacity',
-                                header.column.getIsResizing() ? 'bg-primary opacity-100' : ''
-                              )}
-                            />
-                          </>
-                        )}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className="divide-y divide-border/40">
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <tr key={row.id} className="hover:bg-muted/10 transition-colors">
-                      {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="px-4 py-3 align-middle">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
+          <div className="rounded-xl border border-border/40 overflow-hidden bg-card text-foreground shadow-sm">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-muted/10">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                      {headerGroup.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          className="relative group transition-colors"
+                          style={{ width: header.getSize() }}
+                        >
+                          {header.isPlaceholder ? null : (
+                            <>
+                              <div
+                                className={cn(
+                                  'flex items-center gap-1',
+                                  header.column.getCanSort() &&
+                                    'cursor-pointer select-none text-muted-foreground hover:text-foreground transition-colors'
+                                )}
+                                onClick={header.column.getToggleSortingHandler()}
+                              >
+                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                {header.column.getCanSort() && (
+                                  <ArrowUpDown className="w-3 h-3 ml-1" />
+                                )}
+                              </div>
+                              {/* Column Resizer */}
+                              <div
+                                onMouseDown={header.getResizeHandler()}
+                                onTouchStart={header.getResizeHandler()}
+                                className={cn(
+                                  'absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none bg-border opacity-0 group-hover:opacity-100 transition-opacity',
+                                  header.column.getIsResizing() ? 'bg-primary opacity-100' : ''
+                                )}
+                              />
+                            </>
+                          )}
+                        </TableHead>
                       ))}
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={columns.length} className="h-24 text-center text-muted-foreground">
-                      {emptyMessage}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                        className={cn(
+                          'transition-colors hover:bg-muted/5',
+                          onRowClick ? 'cursor-pointer' : ''
+                        )}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow className="hover:bg-transparent">
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        {emptyMessage}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
 
           {/* Pagination */}

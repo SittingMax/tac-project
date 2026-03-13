@@ -67,12 +67,15 @@ export function TextReveal({
 
   if (splitBy === 'words') {
     return (
-      <Component ref={ref} className={cn(className, 'inline-block overflow-hidden')}>
+      <Component ref={ref} className={cn('inline-block overflow-hidden', className)}>
         <motion.div
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
           variants={containerVariants}
-          className="flex flex-wrap gap-x-[0.25em]"
+          className={cn(
+            'flex flex-wrap gap-x-[0.25em]',
+            className?.includes('text-center') && 'justify-center'
+          )}
         >
           {words.map((word, i) => (
             <span key={i} className="inline-block overflow-hidden leading-tight py-1 -my-1">
@@ -87,7 +90,7 @@ export function TextReveal({
   }
 
   return (
-    <Component ref={ref} className={cn(className, 'inline-block overflow-hidden')}>
+    <Component ref={ref} className={cn('inline-block overflow-hidden', className)}>
       <motion.div
         initial="hidden"
         animate={isInView ? 'visible' : 'hidden'}

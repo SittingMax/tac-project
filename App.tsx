@@ -15,6 +15,7 @@ import { ScanContextProvider } from './context/ScanContext';
 import { GlobalScanListener } from './components/scanning/GlobalScanListener';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { DashboardLayout } from './components/layout/DashboardLayout';
+import { ScrollToTop } from './components/shared/ScrollToTop';
 import { routes, AppRoute } from './routes/index';
 import { Login } from './components/auth/Login';
 
@@ -64,6 +65,7 @@ const App: React.FC = () => {
         <ScanContextProvider>
           <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <GlobalScanListener />
+            <ScrollToTop />
             <div className="min-h-screen">
               <Suspense
                 fallback={

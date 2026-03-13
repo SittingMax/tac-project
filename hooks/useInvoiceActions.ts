@@ -242,13 +242,14 @@ export function useInvoiceActions() {
       shipData?.consignee_phone ||
       '';
     if (!phone) {
-      alert('No customer phone number found.');
+      toast.error('No customer phone number found for this invoice.');
       return;
     }
+    const trackingUrl = `${window.location.origin}/track/${inv.awb}`;
     const text = `Hello, here is your invoice ${inv.invoiceNumber} for shipment CN ${inv.awb}.
 Amount: ${formatCurrency(inv.financials.totalAmount)}
 Status: ${inv.status}
-Track your shipment here: https://taccargo.com/track/${inv.awb}
+Track your shipment here: ${trackingUrl}
 Thank you for choosing TAC Cargo.`;
     const url = `https://wa.me/91${phone.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
@@ -258,9 +259,16 @@ Thank you for choosing TAC Cargo.`;
     const shipment = inv.awb ? await getShipment(inv.awb) : null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const email = (shipment as any)?.customer?.email || '';
+    if (!email) {
+      toast.error('No customer email found for this invoice.');
+      return;
+    }
     const subject = `Invoice ${inv.invoiceNumber} - TAC Cargo`;
-    const body = `Dear Customer,%0D%0A%0D%0APlease find details for invoice ${inv.invoiceNumber} related to shipment ${inv.awb}.%0D%0A%0D%0AAmount: ${formatCurrency(inv.financials.totalAmount)}%0D%0A%0D%0AThank you,%0D%0ATAC Cargo Team`;
-    window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+    const body = `Dear Customer,\n\nPlease find details for invoice ${inv.invoiceNumber} related to shipment ${inv.awb}.\n\nAmount: ${formatCurrency(inv.financials.totalAmount)}\nTrack: ${window.location.origin}/track/${inv.awb}\n\nThank you,\nTAC Cargo Team`;
+    window.open(
+      `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      '_blank'
+    );
   };
 
   // Helper to build Invoice object from DB row

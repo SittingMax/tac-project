@@ -10,7 +10,8 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { DialogTrigger } from '@/components/ui/dialog';
+import { SizedDialog } from '@/components/ui-core/dialog/sized-dialog';
 
 // Mock types for UI-only implementation
 type Message = {
@@ -105,7 +106,7 @@ function AiInput({
             ref={textareaRef}
             placeholder="Ask me anything..."
             className={cn(
-              'bg-muted/50 text-foreground ring-primary/20 placeholder:text-muted-foreground/70 w-full resize-none rounded-none border-none py-4 pr-12 pl-6 leading-[1.2] text-wrap',
+              'bg-muted/50 text-foreground ring-primary/20 placeholder:text-muted-foreground/70 w-full resize-none rounded-md border-none py-4 pr-12 pl-6 leading-[1.2] text-wrap',
               'focus:ring-primary/30 min-h-[56px] transition-all duration-200 focus:ring-2'
             )}
             value={value}
@@ -118,7 +119,7 @@ function AiInput({
           <button
             onClick={onSubmit}
             className={cn(
-              'bg-primary/10 hover:bg-primary/20 absolute top-1/2 right-3 -translate-y-1/2 rounded-none p-2 transition-all duration-200',
+              'bg-primary/10 hover:bg-primary/20 absolute top-1/2 right-3 -translate-y-1/2 rounded-md p-2 transition-all duration-200',
               value.trim() ? 'opacity-100' : 'cursor-not-allowed opacity-50'
             )}
             type="button"
@@ -181,25 +182,32 @@ export function TacBot() {
   }, [messages, open]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <div className="fixed bottom-6 right-6 z-50">
-          <span className="relative flex h-14 w-14 cursor-pointer">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-primary opacity-20 delay-1000"></span>
-            <Button
-              size="icon"
-              className="relative h-14 w-14 rounded-none shadow-lg hover:shadow-xl hover:shadow-primary/30 bg-background border border-border/50 text-foreground transition-all duration-500 hover:scale-110"
-            >
-              <Sparkles className="h-6 w-6 text-primary fill-primary/20" />
-            </Button>
-          </span>
-        </div>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[450px] w-[95vw] h-[600px] max-h-[85vh] p-0 gap-0 border-border/50 bg-background/95 backdrop-blur-lg shadow-2xl flex flex-col overflow-hidden data-[state=closed]:slide-out-to-bottom-[48%] data-[state=open]:slide-in-from-bottom-[48%] duration-500 rounded-none">
+    <SizedDialog
+      open={open}
+      onOpenChange={setOpen}
+      trigger={
+        <DialogTrigger asChild>
+          <div className="fixed bottom-6 right-6 z-50">
+            <span className="relative flex h-14 w-14 cursor-pointer">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-20 delay-1000"></span>
+              <Button
+                size="icon"
+                className="relative h-14 w-14 rounded-full shadow-lg hover:shadow-xl hover:shadow-primary/30 bg-background border border-border/50 text-foreground transition-all duration-500 hover:scale-110"
+              >
+                <Sparkles className="h-6 w-6 text-primary fill-primary/20" />
+              </Button>
+            </span>
+          </div>
+        </DialogTrigger>
+      }
+      title="TAC Bot"
+      size="sm"
+    >
+      <div className="flex flex-col h-[600px] max-h-[85vh] p-0 gap-0 bg-background/95 backdrop-blur-lg">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border/40 p-4 bg-muted/20">
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-none bg-primary/10 ring-1 ring-primary/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/20">
               <Bot className="h-6 w-6 text-primary" />
             </div>
             <div>
@@ -223,10 +231,10 @@ export function TacBot() {
               >
                 <div
                   className={cn(
-                    'flex w-max max-w-[85%] rounded-none px-4 py-2 text-sm shadow-sm',
+                    'flex w-max max-w-[85%] rounded-md px-4 py-2 text-sm shadow-sm',
                     m.role === 'user'
-                      ? 'ml-auto bg-primary text-primary-foreground rounded-none'
-                      : 'bg-muted/80 backdrop-blur-md text-foreground rounded-none border border-border/50'
+                      ? 'ml-auto bg-primary text-primary-foreground rounded-md'
+                      : 'bg-muted/80 backdrop-blur-md text-foreground rounded-md border border-border/50'
                   )}
                 >
                   {m.role === 'assistant' ? (
@@ -259,16 +267,16 @@ export function TacBot() {
           {isLoading && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground p-2 ml-1">
               <div className="flex gap-1">
-                <span className="w-1.5 h-1.5 bg-primary/60 rounded-none animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-1.5 h-1.5 bg-primary/60 rounded-none animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="w-1.5 h-1.5 bg-primary/60 rounded-none animate-bounce"></span>
+                <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce"></span>
               </div>
               <span className="text-primary/60 font-medium">Thinking...</span>
             </div>
           )}
 
           {error && (
-            <div className="rounded-none bg-destructive/10 p-4 text-sm text-destructive border border-destructive/20">
+            <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive border border-destructive/20">
               Something went wrong. Please try again.
             </div>
           )}
@@ -286,7 +294,7 @@ export function TacBot() {
             TAC Bot can make mistakes. Verify important info.
           </p>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </SizedDialog>
   );
 }

@@ -93,3 +93,9 @@ The skill itself tells you which.
 ## User Instructions
 
 Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows.
+
+## Workflows
+
+Workflows live in `.agents/workflows/` (or `~/.gemini/antigravity/workflows/`) as markdown files. They define a reproducible series of steps (e.g., deployment).
+- You can execute them via the `/workflow-name` slash command or reading the file if prompted.
+- **Turbo Execution**: If a workflow step has a `// turbo` annotation above a CLI command, you can set `SafeToAutoRun` to `true` for that step. If a workflow file contains `// turbo-all` anywhere, auto-run *all* CLI commands within it safely.

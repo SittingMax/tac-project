@@ -1,15 +1,10 @@
+import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '@/components/ui/table';
+import { CrudTable } from '@/components/crud/CrudTable';
+import type { ColumnDef } from '@tanstack/react-table';
 import {
   Pagination,
   PaginationContent,
@@ -18,37 +13,112 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { useShipments } from '../hooks/useShipments';
+import { useAuthStore } from '@/store/authStore';
+import { supabase } from '@/lib/supabase';
+import type { ShipmentWithRelations } from '@/hooks/useShipments';
 import { Search, Warehouse, Package } from 'lucide-react';
-import { HubLocation } from '../types';
-import { HUBS } from '../lib/constants';
-import { TableSkeleton } from '../components/ui/skeleton';
+import type { HubLocation } from '@/types';
+import { HUBS } from '@/lib/constants';
+import { IdBadge } from '@/components/ui-core/data/id-badge';
+
+const INVENTORY_STATUSES = ['RECEIVED_AT_ORIGIN', 'RECEIVED_AT_DEST', 'EXCEPTION'] as const;
 
 export const Inventory: React.FC = () => {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   const [filterHub, setFilterHub] = useState<HubLocation | 'ALL'>('ALL');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 20;
 
-  // Determine hub UUID for filtering (origin OR destination hub)
   const selectedHubId = filterHub === 'ALL' ? undefined : HUBS[filterHub]?.uuid;
+  const { data, isLoading } = useQuery({
+    queryKey: ['inventory', orgId, selectedHubId, search, page, pageSize],
+    queryFn: async () => {
+      if (!orgId) {
+        return {
+          shipments: [] as ShipmentWithRelations[],
+          totalCount: 0,
+          criticalCount: 0,
+        };
+      }
 
-  const { data: shipments = [], isLoading } = useShipments({
-    page,
-    pageSize,
-    search: search || undefined,
-    hubId: selectedHubId,
+      const inventorySelect = `
+        id,
+        org_id,
+        cn_number,
+        customer_id,
+        origin_hub_id,
+        destination_hub_id,
+        mode,
+        service_level,
+        status,
+        package_count,
+        total_weight,
+        declared_value,
+        consignee_name,
+        consignee_phone,
+        consignee_address,
+        consignor_name,
+        consignor_phone,
+        consignor_address,
+        special_instructions,
+        created_at,
+        updated_at
+      `;
+      const criticalThreshold = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const hubFilter = selectedHubId
+        ? `and(status.eq.RECEIVED_AT_ORIGIN,origin_hub_id.eq.${selectedHubId}),and(status.eq.EXCEPTION,origin_hub_id.eq.${selectedHubId}),and(status.eq.RECEIVED_AT_DEST,destination_hub_id.eq.${selectedHubId})`
+        : null;
+      const searchPattern = `%${search.trim()}%`;
+
+      let rowsQuery = supabase
+        .from('shipments')
+        .select(inventorySelect, { count: 'exact' })
+        .eq('org_id', orgId)
+        .is('deleted_at', null)
+        .in('status', [...INVENTORY_STATUSES])
+        .order('created_at', { ascending: false })
+        .range((page - 1) * pageSize, page * pageSize - 1);
+
+      let criticalQuery = supabase
+        .from('shipments')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .is('deleted_at', null)
+        .in('status', [...INVENTORY_STATUSES])
+        .lte('created_at', criticalThreshold);
+
+      if (hubFilter) {
+        rowsQuery = rowsQuery.or(hubFilter);
+        criticalQuery = criticalQuery.or(hubFilter);
+      }
+
+      if (search.trim()) {
+        rowsQuery = rowsQuery.ilike('cn_number', searchPattern);
+        criticalQuery = criticalQuery.ilike('cn_number', searchPattern);
+      }
+
+      const [
+        { data: shipments, error: rowsError, count },
+        { count: criticalCount, error: criticalError },
+      ] = await Promise.all([rowsQuery, criticalQuery]);
+
+      if (rowsError) throw rowsError;
+      if (criticalError) throw criticalError;
+
+      return {
+        shipments: (shipments ?? []) as ShipmentWithRelations[],
+        totalCount: count ?? 0,
+        criticalCount: criticalCount ?? 0,
+      };
+    },
+    enabled: !!orgId,
   });
 
-  // Calculate stats (Note: Total stats would need a separate query if we want accurate global counts with pagination)
-  // For now, we'll display counts of *loaded* items or maybe we should fetch stats separately.
-  // We'll keep the UI for stats but maybe hide values or show "Showing X items" if we don't have total count.
+  const shipments = data?.shipments ?? [];
   const stats = {
-    total: shipments.length, // This is just current page count, ideally we need total count from API
-    critical: shipments.filter((s) => {
-      const hours = (Date.now() - new Date(s.created_at).getTime()) / (1000 * 60 * 60);
-      return hours >= 24;
-    }).length,
+    total: data?.totalCount ?? 0,
+    critical: data?.criticalCount ?? 0,
   };
 
   const handlePageChange = (newPage: number) => {
@@ -98,20 +168,77 @@ export const Inventory: React.FC = () => {
     return null;
   };
 
+  const columns: ColumnDef<ShipmentWithRelations>[] = React.useMemo(
+    () => [
+      {
+        accessorKey: 'cn_number',
+        header: 'CN Number',
+        cell: ({ row }) => (
+          <IdBadge
+            entity="shipment"
+            idValue={row.original.id}
+            cnNumber={row.original.cn_number}
+            href={`/shipments/${row.original.id}`}
+          />
+        ),
+      },
+      {
+        accessorKey: 'package_count',
+        header: 'Packages',
+        cell: ({ row }) => <span className="font-mono">{row.original.package_count}</span>,
+      },
+      {
+        id: 'weight',
+        header: 'Weight',
+        cell: ({ row }) => <span className="font-mono">{row.original.total_weight} kg</span>,
+      },
+      {
+        id: 'location',
+        header: 'Location',
+        cell: ({ row }) => {
+          const location = getInventoryLocation(row.original);
+          const hubName = location ? HUBS[location]?.name || 'Unknown' : 'Unknown';
+          return (
+            <div className="flex items-center gap-2">
+              <Warehouse className="w-4 h-4 text-muted-foreground" />
+              {hubName}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => (
+          <Badge variant="outline">{row.original.status.replace(/_/g, ' ')}</Badge>
+        ),
+      },
+      {
+        id: 'aging',
+        header: 'Age',
+        cell: ({ row }) => {
+          const bucket = getAgingBucket(row.original.created_at);
+          return <span className={`font-mono font-bold ${bucketColor(bucket)}`}>{bucket}</span>;
+        },
+      },
+    ],
+    []
+  );
+
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
-      <div className="flex flex-col md:flex-row justify-between items-end border-b border-border/40 pb-4">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+      <div className="flex flex-col md:flex-row justify-between items-end pb-4">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
-            Network Inventory<span className="text-primary">.</span>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
+            Inventory
           </h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
+          <p className="text-sm text-muted-foreground mt-1">
             Real-time stock view across hub network
           </p>
         </div>
-        <div className="flex gap-1 mt-6 md:mt-0 bg-background p-1 border border-border/40">
+        <div className="flex gap-0 mt-6 md:mt-0 rounded-lg border border-border overflow-hidden">
           <button
-            className={`px-4 py-2 font-mono uppercase tracking-widest text-[10px] transition-colors ${filterHub === 'ALL' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/10'}`}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${filterHub === 'ALL' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
             onClick={() => {
               setFilterHub('ALL');
               setPage(1);
@@ -120,7 +247,7 @@ export const Inventory: React.FC = () => {
             All Hubs
           </button>
           <button
-            className={`px-4 py-2 font-mono uppercase tracking-widest text-[10px] transition-colors ${filterHub === 'IMPHAL' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/10'}`}
+            className={`px-4 py-2 text-sm font-medium transition-colors border-l border-border ${filterHub === 'IMPHAL' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
             onClick={() => {
               setFilterHub('IMPHAL');
               setPage(1);
@@ -129,7 +256,7 @@ export const Inventory: React.FC = () => {
             Imphal
           </button>
           <button
-            className={`px-4 py-2 font-mono uppercase tracking-widest text-[10px] transition-colors ${filterHub === 'NEW_DELHI' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/10'}`}
+            className={`px-4 py-2 text-sm font-medium transition-colors border-l border-border ${filterHub === 'NEW_DELHI' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
             onClick={() => {
               setFilterHub('NEW_DELHI');
               setPage(1);
@@ -140,43 +267,36 @@ export const Inventory: React.FC = () => {
         </div>
       </div>
 
-      <Card className="grid grid-cols-2 gap-px bg-border/40 border-y border-border/40 rounded-none shadow-none my-8">
-        {/* Stats are strictly for current page now, which is a trade-off until we implement aggregate API */}
-        <div className="p-6 flex items-center gap-4 bg-background">
-          <div className="p-4 bg-primary/10 text-primary rounded-none">
-            <Package className="w-6 h-6" />
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="p-6 flex items-center gap-4">
+          <div className="p-3 bg-primary/10 text-primary rounded-lg">
+            <Package className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[10px] font-mono font-semibold text-muted-foreground uppercase tracking-widest mb-1">
-              Items on Page
+            <div className="text-sm font-medium text-muted-foreground mb-0.5">
+              Inventory Backlog
             </div>
-            <div className="text-3xl font-black text-foreground tracking-tighter leading-none">
-              {stats.total}
-            </div>
+            <div className="text-2xl font-semibold text-foreground">{stats.total}</div>
           </div>
-        </div>
-        <div className="p-6 flex items-center gap-4 bg-background">
-          <div className="p-4 bg-status-error/10 text-status-error rounded-none">
-            <Warehouse className="w-6 h-6" />
+        </Card>
+        <Card className="p-6 flex items-center gap-4">
+          <div className="p-3 bg-status-error/10 text-status-error rounded-lg">
+            <Warehouse className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[10px] font-mono font-semibold text-destructive uppercase tracking-widest mb-1">
-              Critical on Page
-            </div>
-            <div className="text-3xl font-black text-destructive tracking-tighter leading-none">
-              {stats.critical}
-            </div>
+            <div className="text-sm font-medium text-destructive mb-0.5">Critical Backlog</div>
+            <div className="text-2xl font-semibold text-destructive">{stats.critical}</div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
 
-      <Card className="rounded-none border-border shadow-none">
-        <div className="flex justify-between items-center mb-0 p-4 pb-4 border-b border-border/40">
+      <Card>
+        <div className="flex justify-between items-center mb-0 p-4 pb-4 border-b border-border">
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="QUERY CN..."
-              className="pl-9 h-10 rounded-none font-mono text-xs uppercase"
+              placeholder="Search by CN number..."
+              className="pl-9 h-10"
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -186,86 +306,19 @@ export const Inventory: React.FC = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="bg-muted/5">
-              <TableRow className="border-b-2 border-border/40 hover:bg-transparent">
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
-                  cn_number
-                </TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
-                  PKG_COUNT
-                </TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
-                  WEIGHT_KG
-                </TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
-                  NODE_LOCATION
-                </TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
-                  SYSTEM_STATUS
-                </TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground py-4">
-                  AGING_INDEX
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6}>
-                    <TableSkeleton rows={5} columns={6} />
-                  </TableCell>
-                </TableRow>
-              ) : shipments.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
-                    No items found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                shipments.map((s) => {
-                  const location = getInventoryLocation(s);
-                  const hubName = location ? HUBS[location].name : 'Unknown';
-                  const bucket = getAgingBucket(s.created_at);
-
-                  return (
-                    <TableRow key={s.id}>
-                      <TableCell>
-                        <span className="font-mono text-foreground font-bold">{s.cn_number}</span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="font-mono">{s.package_count}</span>
-                      </TableCell>
-                      <TableCell className="font-mono">{s.total_weight} kg</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Warehouse className="w-4 h-4 text-muted-foreground" />
-                          {hubName}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <Badge
-                          variant="outline"
-                          className="rounded-none font-mono text-[9px] uppercase tracking-widest border-border/60"
-                        >
-                          {s.status.replace(/_/g, ' ')}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <span className={`font-mono font-bold ${bucketColor(bucket)}`}>
-                          {bucket}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
+        <div className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <CrudTable
+              columns={columns}
+              data={shipments}
+              isLoading={isLoading}
+              pageSize={100}
+              emptyMessage="No items found."
+            />
+          </div>
         </div>
 
-        <div className="p-4 border-t">
+        <div className="p-4 border-t mt-4">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
@@ -293,9 +346,8 @@ export const Inventory: React.FC = () => {
                     e.preventDefault();
                     handlePageChange(page + 1);
                   }}
-                  // Disable next if we have fewer items than page size (simple check)
-                  aria-disabled={shipments.length < pageSize}
-                  className={shipments.length < pageSize ? 'pointer-events-none opacity-50' : ''}
+                  aria-disabled={page * pageSize >= stats.total}
+                  className={page * pageSize >= stats.total ? 'pointer-events-none opacity-50' : ''}
                 />
               </PaginationItem>
             </PaginationContent>

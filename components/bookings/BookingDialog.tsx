@@ -1,12 +1,14 @@
 import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { SizedDialog } from '@/components/ui-core/dialog/sized-dialog';
 import { BookingForm } from './BookingForm';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer';
 
 interface BookingDialogProps {
   open: boolean;
@@ -14,22 +16,37 @@ interface BookingDialogProps {
 }
 
 export const BookingDialog: React.FC<BookingDialogProps> = ({ open, onOpenChange }) => {
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+  
+  if (isDesktop) {
+    return (
+      <SizedDialog
+        open={open}
+        onOpenChange={onOpenChange}
+        title="Book New Shipment"
+        description="Enter details for your new shipment booking request."
+        size="xl"
+      >
+        <div className="max-h-[80vh] overflow-y-auto pr-2">
+          <BookingForm onSuccess={() => onOpenChange(false)} onCancel={() => onOpenChange(false)} />
+        </div>
+      </SizedDialog>
+    );
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Book New Shipment</DialogTitle>
-          <DialogDescription>
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="h-[90vh]">
+        <DrawerHeader className="text-left">
+          <DrawerTitle>Book New Shipment</DrawerTitle>
+          <DrawerDescription>
             Enter details for your new shipment booking request.
-          </DialogDescription>
-        </DialogHeader>
-        <BookingForm onSuccess={() => onOpenChange(false)} onCancel={() => onOpenChange(false)} />
-        {/* <div className="p-10 text-center border-2 border-dashed text-muted-foreground text-muted-foreground/10 rounded-none">
-                    <h3 className="text-xl font-bold text-muted-foreground">Debug Mode</h3>
-                    <p className="text-muted-foreground">Booking form is temporarily disabled to isolate the redirect issue.</p>
-                    <button type="button" className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-none" onClick={() => onOpenChange(false)}>Close Dialog</button>
-                </div> */}
-      </DialogContent>
-    </Dialog>
+          </DrawerDescription>
+        </DrawerHeader>
+        <div className="overflow-y-auto p-4 pb-0 flex-1">
+          <BookingForm onSuccess={() => onOpenChange(false)} onCancel={() => onOpenChange(false)} isMobile />
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 };

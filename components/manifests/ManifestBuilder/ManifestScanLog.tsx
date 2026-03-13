@@ -23,7 +23,7 @@ const resultVariant: Record<
 
 export function ManifestScanLog({ entries, className }: ManifestScanLogProps) {
   return (
-    <div className={cn('rounded-none border bg-background', className)}>
+    <div className={cn('rounded-md border bg-background', className)}>
       <div className="flex items-center justify-between px-4 py-2 border-b">
         <div>
           <p className="text-xs font-semibold text-muted-foreground uppercase">Scan Log</p>

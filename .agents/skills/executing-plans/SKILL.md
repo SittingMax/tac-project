@@ -24,11 +24,14 @@ Load plan, review critically, execute tasks in batches, report for review betwee
 ### Step 2: Execute Batch
 **Default: First 3 tasks**
 
+*Note on Task Groups & Strict Mode:* In **Strict Mode**, terminal and browser actions will block on user review—do not assume "fire-and-forget" behavior. Ensure you wait appropriately. 
+
 For each task:
-1. Mark as in_progress
-2. Follow each step exactly (plan has bite-sized steps)
-3. Run verifications as specified
-4. Mark as completed
+1. Call `task_boundary` with a distinct `TaskName` (derived from the plan) to create a structured **Task Group** for the user's UI.
+2. Mark as in_progress
+3. Follow each step exactly (plan has bite-sized steps)
+4. Run verifications as specified
+5. Mark as completed
 
 ### Step 3: Report
 When batch complete:

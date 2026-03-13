@@ -14,13 +14,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { DialogFooter } from '@/components/ui/dialog';
+import { SizedDialog } from '@/components/ui-core/dialog/sized-dialog';
 import {
   CheckCircle,
   Camera,
@@ -576,50 +571,50 @@ export function DeliveryConfirmation({
         )}
 
         {/* Confirmation Dialog */}
-        <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirm Delivery</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Recipient</p>
-                <p className="font-semibold">{recipientName}</p>
-              </div>
-              {recipientPhone && (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Phone</p>
-                  <p className="font-mono">{recipientPhone}</p>
-                </div>
-              )}
-              {location && (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Location</p>
-                  <p className="font-mono text-sm">
-                    {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
-                  </p>
-                </div>
-              )}
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Time</p>
-                <p className="font-semibold">{format(new Date(), 'PPpp')}</p>
-              </div>
+        <SizedDialog
+          open={showConfirmDialog}
+          onOpenChange={setShowConfirmDialog}
+          title="Confirm Delivery"
+          size="sm"
+        >
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Recipient</p>
+              <p className="font-semibold">{recipientName}</p>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => confirmMutation.mutate()} disabled={confirmMutation.isPending}>
-                {confirmMutation.isPending ? (
-                  <Loader2 className="size-4 mr-2 animate-spin" />
-                ) : (
-                  <CheckCircle className="size-4 mr-2" />
-                )}
-                Confirm
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            {recipientPhone && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Phone</p>
+                <p className="font-mono">{recipientPhone}</p>
+              </div>
+            )}
+            {location && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Location</p>
+                <p className="font-mono text-sm">
+                  {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                </p>
+              </div>
+            )}
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Time</p>
+              <p className="font-semibold">{format(new Date(), 'PPpp')}</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => confirmMutation.mutate()} disabled={confirmMutation.isPending}>
+              {confirmMutation.isPending ? (
+                <Loader2 className="size-4 mr-2 animate-spin" />
+              ) : (
+                <CheckCircle className="size-4 mr-2" />
+              )}
+              Confirm
+            </Button>
+          </DialogFooter>
+        </SizedDialog>
       </CardContent>
     </Card>
   );

@@ -3,11 +3,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { LabelData, LabelGenerator } from '../components/domain/LabelGenerator';
 import { generateLabelFromShipment } from '../lib/utils/label-utils';
-import { Shipment, HubLocation, ShipmentMode, ServiceLevel, PaymentMode } from '../types';
+import { Shipment, ShipmentMode, ServiceLevel, PaymentMode } from '../types';
 import { HUBS } from '../lib/constants';
 import { logger } from '../lib/logger';
 import { supabase } from '../lib/supabase';
 import { sanitizeString } from '../lib/utils/sanitize';
+
+type LabelShipmentPayload = Omit<Partial<Shipment>, 'originHub' | 'destinationHub'> & {
+  originHub?: string;
+  destinationHub?: string;
+};
 
 const getAddressValue = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
@@ -48,12 +53,20 @@ const resolveAddressParts = (address: unknown) => {
   return normalizeAddress(address);
 };
 
-const resolveHubLocation = (row: any, type: 'origin' | 'destination'): HubLocation => {
+const resolveHubCodeForLabel = (row: any, type: 'origin' | 'destination'): string => {
   const hubId = type === 'origin' ? row.origin_hub_id : row.destination_hub_id;
   const hubCode = type === 'origin' ? row.origin_hub?.code : row.destination_hub?.code;
-  const byUuid = Object.values(HUBS).find((hub) => hub.uuid === hubId)?.id;
-  const byCode = Object.values(HUBS).find((hub) => hub.code === hubCode)?.id;
-  return (byUuid || byCode || 'IMPHAL') as HubLocation;
+
+  if (typeof hubCode === 'string' && hubCode.trim()) {
+    return hubCode.trim();
+  }
+
+  if (typeof hubId === 'string' && hubId.trim()) {
+    const matchedHub = Object.values(HUBS).find((hub) => hub.uuid === hubId || hub.id === hubId);
+    return matchedHub?.code ?? '';
+  }
+
+  return '';
 };
 
 const resolveMode = (value?: string | null): ShipmentMode => {
@@ -70,9 +83,9 @@ const resolveServiceLevel = (value?: string | null): ServiceLevel => {
   return 'STANDARD';
 };
 
-const mapShipmentRowToShipment = (row: any): Shipment => {
-  const originHub = resolveHubLocation(row, 'origin');
-  const destinationHub = resolveHubLocation(row, 'destination');
+const mapShipmentRowToShipment = (row: any): LabelShipmentPayload => {
+  const originHub = resolveHubCodeForLabel(row, 'origin');
+  const destinationHub = resolveHubCodeForLabel(row, 'destination');
   const weight = Number(row.total_weight ?? row.totalWeight ?? 0);
   // Prioritize explicit mode field for transport mode, fallback to service type
   const modeValue = row.mode || row.transport_mode || row.service_level || row.service_type;
@@ -150,7 +163,15 @@ const fetchShipmentByAwb = async (awb?: string) => {
 const validateShipmentForLabel = (shipment: unknown): shipment is Shipment => {
   if (!shipment || typeof shipment !== 'object') return false;
   const s = shipment as Record<string, unknown>;
-  return !!(s.awb && typeof s.awb === 'string' && s.destinationHub && s.originHub && s.totalWeight);
+  return !!(
+    s.awb &&
+    typeof s.awb === 'string' &&
+    typeof s.originHub === 'string' &&
+    s.originHub.trim() &&
+    typeof s.destinationHub === 'string' &&
+    s.destinationHub.trim() &&
+    s.totalWeight
+  );
 };
 
 export const PrintLabel: React.FC = () => {
@@ -162,7 +183,7 @@ export const PrintLabel: React.FC = () => {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
-      const payload = event.data as { type?: string; shipment?: Shipment };
+      const payload = event.data as { type?: string; shipment?: LabelShipmentPayload };
       if (payload?.type !== 'TAC_LABEL_PAYLOAD' || !payload.shipment) return;
       if (!validateShipmentForLabel(payload.shipment)) return;
 
@@ -274,7 +295,7 @@ export const PrintLabel: React.FC = () => {
           return;
         }
 
-        const shipment = parsed as Shipment;
+        const shipment = parsed as LabelShipmentPayload;
 
         // CRITICAL: If the CN in storage doesn't match the URL, don't use stale data.
         // Fall back to a fresh database fetch for the correct AWB.

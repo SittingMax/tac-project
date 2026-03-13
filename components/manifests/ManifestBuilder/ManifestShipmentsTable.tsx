@@ -8,17 +8,18 @@
 
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Eye, Trash2, Search, Package, Loader2 } from 'lucide-react';
+import { Search, Package, Loader2 } from 'lucide-react';
 
-import { DataTable } from '@/components/ui/data-table';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { CrudTable } from '@/components/crud/CrudTable';
+import { CrudRowActions } from '@/components/crud/CrudRowActions';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import type { ManifestItemWithShipment } from '@/lib/services/manifestService';
 import { TableBarcode } from '@/components/barcodes';
+import { IdBadge } from '@/components/ui-core/data/id-badge';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface ManifestShipmentsTableProps {
   items: ManifestItemWithShipment[];
@@ -61,14 +62,47 @@ export function ManifestShipmentsTable({
       {
         accessorKey: 'shipment.cn_number',
         header: 'CN Number',
-        cell: ({ row }) => (
-          <Link
-            to={`/tracking?cn=${row.original.shipment?.cn_number}`}
-            className="font-mono font-semibold text-foreground hover:text-primary transition-colors hover:underline"
-          >
-            {row.original.shipment?.cn_number || 'N/A'}
-          </Link>
-        ),
+        cell: ({ row }) => {
+          const shipment = row.original.shipment;
+          return (
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <div>
+                  <IdBadge
+                    entity="shipment"
+                    idValue={row.original.shipment_id}
+                    cnNumber={shipment?.cn_number || 'N/A'}
+                    href={`/shipments/${row.original.shipment_id}`}
+                  />
+                </div>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80" align="start">
+                <div className="flex justify-between space-x-4">
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-semibold">Shipment Details</h4>
+                    <p className="text-sm">
+                      <span className="font-medium text-muted-foreground mr-1">Sender:</span>
+                      {shipment?.consignor_name || 'N/A'}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-medium text-muted-foreground mr-1">Receiver:</span>
+                      {shipment?.consignee_name || 'N/A'}
+                    </p>
+                    <div className="flex items-center pt-2 gap-4">
+                      <span className="text-xs text-muted-foreground flex items-center">
+                        <Package className="mr-1 h-3 w-3" />
+                        {shipment?.package_count || shipment?.total_packages || 0} pcs
+                      </span>
+                      <span className="text-xs text-muted-foreground font-medium">
+                        {(shipment?.total_weight || 0).toFixed(1)} kg
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          );
+        },
       },
       {
         id: 'barcode',
@@ -157,38 +191,11 @@ export function ManifestShipmentsTable({
           const shipmentId = row.original.shipment_id;
           return (
             <div className="flex items-center gap-1 justify-end">
-              <TooltipProvider>
-                {onViewShipment && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => onViewShipment(shipmentId)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>View Shipment</TooltipContent>
-                  </Tooltip>
-                )}
-                {isEditable && onRemove && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive hover:text-destructive"
-                        onClick={() => onRemove(shipmentId)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Remove from Manifest</TooltipContent>
-                  </Tooltip>
-                )}
-              </TooltipProvider>
+              <CrudRowActions
+                onEdit={() => onViewShipment?.(shipmentId)}
+                editLabel="View Details"
+                onDelete={isEditable && onRemove ? () => onRemove(shipmentId) : undefined}
+              />
             </div>
           );
         },
@@ -222,13 +229,12 @@ export function ManifestShipmentsTable({
 
   if (items.length === 0) {
     return (
-      <div className={cn('flex flex-col items-center justify-center h-64 text-center', className)}>
-        <Package className="h-12 w-12 text-muted-foreground/50 mb-4" />
-        <h3 className="text-lg font-medium text-muted-foreground">No shipments yet</h3>
-        <p className="text-sm text-muted-foreground/70 mt-1">
-          Scan CN barcodes to add shipments to this manifest
-        </p>
-      </div>
+      <EmptyState
+        icon={Package}
+        title="No shipments yet"
+        description="Scan CN barcodes to add shipments to this manifest"
+        className={className}
+      />
     );
   }
 
@@ -248,13 +254,13 @@ export function ManifestShipmentsTable({
       </div>
 
       {/* Table */}
-      <div className="flex-1 overflow-auto rounded-none border">
-        <DataTable columns={columns} data={filteredItems} pageSize={50} />
+      <div className="flex-1 overflow-auto rounded-md border">
+        <CrudTable columns={columns} data={filteredItems} pageSize={50} />
       </div>
 
       {/* Summary Footer */}
       {showSummary && (
-        <div className="mt-4 flex items-center justify-between p-4 rounded-none bg-muted/50 border">
+        <div className="mt-4 flex items-center justify-between p-4 rounded-md bg-muted/50 border">
           <div className="text-sm text-muted-foreground">
             Showing {filteredItems.length} of {items.length} shipments
           </div>

@@ -76,7 +76,7 @@ export class AppErrorBoundary extends Component<Props, State> {
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
           <Card className="max-w-lg w-full">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-none bg-destructive/10">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-destructive/10">
                 <AlertTriangle className="h-6 w-6 text-destructive" />
               </div>
               <CardTitle className="text-xl">Something went wrong</CardTitle>
@@ -87,7 +87,7 @@ export class AppErrorBoundary extends Component<Props, State> {
 
             <CardContent>
               {import.meta.env.DEV && this.state.error && (
-                <div className="rounded-none bg-muted p-4 text-sm">
+                <div className="rounded-md bg-muted p-4 text-sm">
                   <p className="font-medium text-destructive mb-2">
                     {this.state.error.name}: {this.state.error.message}
                   </p>

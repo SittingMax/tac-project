@@ -37,10 +37,12 @@ import {
 } from '@/components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { TacLogo } from '@/components/shared/tac-logo';
+import { hasRoleAccess } from '@/lib/access-control';
 import { UserProfile } from './UserProfile';
-import { useStore } from '@/store';
+import { useAuthStore } from '@/store/authStore';
 import { useSidebarBadges } from '@/hooks/useSidebarBadges';
 import { UserRole } from '@/types';
+import { cn } from '@/lib/utils';
 
 const navGroups = [
   {
@@ -95,6 +97,7 @@ const navGroups = [
         label: 'Inventory',
         icon: Layers,
         url: '/inventory',
+        badgeKey: 'inventoryBacklog' as const,
         roles: ['ADMIN', 'MANAGER', 'WAREHOUSE_STAFF'],
       },
       {
@@ -127,7 +130,13 @@ const navGroups = [
   {
     title: 'System',
     items: [
-      { label: 'Messages', icon: Mail, url: '/admin/messages', roles: ['ADMIN'] },
+      {
+        label: 'Messages',
+        icon: Mail,
+        url: '/admin/messages?status=unread',
+        badgeKey: 'unreadMessages' as const,
+        roles: ['ADMIN'],
+      },
       { label: 'Shift Report', icon: ClipboardList, url: '/shift-report' },
       { label: 'Settings', icon: Settings, url: '/settings' },
     ],
@@ -136,22 +145,14 @@ const navGroups = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
-  const { user } = useStore();
+  const userRole = useAuthStore((state) => state.user?.role);
   const { data: badges } = useSidebarBadges();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
 
-  const hasAccess = (allowedRoles?: UserRole[]) => {
-    if (!allowedRoles) return true;
-    if (!user) return false;
-    if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN' || user.role === 'MANAGER')
-      return true;
-    return allowedRoles.includes(user.role as UserRole);
-  };
-
   return (
-    <Sidebar collapsible="icon" {...props} className="border-r-0">
-      <SidebarHeader className="border-b border-sidebar-border px-4 py-3 h-16 flex items-center justify-center">
+    <Sidebar collapsible="icon" {...props} className="border-r-0 shadow-sm z-50">
+      <SidebarHeader className="border-b border-sidebar-border/50 px-4 py-3 h-16 flex items-center justify-center bg-sidebar/50">
         <TacLogo
           size="sm"
           showSubtitle={!isCollapsed}
@@ -159,85 +160,129 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           linkTo="/dashboard"
         />
       </SidebarHeader>
-      <SidebarContent>
+      
+      <SidebarContent className="px-3 py-4 gap-4">
         {navGroups.map((group) => {
-          const visibleItems = group.items.filter((item) => hasAccess(item.roles as UserRole[]));
+          const visibleItems = group.items.filter((item) =>
+            hasRoleAccess(userRole, item.roles as UserRole[])
+          );
           if (visibleItems.length === 0) return null;
 
           return (
-            <SidebarGroup key={group.title}>
-              <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {visibleItems.map((item) => {
-                    const isActive = location.pathname.startsWith(item.url);
-                    const itemData = item as {
-                      badgeKey?: keyof typeof badges;
-                      items?: { title: string; url: string }[];
-                    };
-                    const badgeKey = itemData.badgeKey;
-                    const badgeCount = badgeKey && badges ? badges[badgeKey] : 0;
+            <Collapsible key={group.title} defaultOpen className="group/nav-group">
+              <SidebarGroup className="p-0">
+                <CollapsibleTrigger asChild>
+                  <SidebarGroupLabel className="h-8 text-[10px] uppercase tracking-widest text-muted-foreground/60 font-bold transition-colors hover:text-foreground cursor-pointer group-data-[collapsible=icon]:hidden px-2 mb-1">
+                    {group.title}
+                    <ChevronRight className="ml-auto w-3 h-3 transition-transform duration-200 group-data-[state=open]/nav-group:rotate-90 opacity-50" />
+                  </SidebarGroupLabel>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarMenu className="gap-1.5">
+                      {visibleItems.map((item) => {
+                        const isActive = location.pathname.startsWith(item.url.split('?')[0]);
+                        const itemData = item as {
+                          badgeKey?: keyof typeof badges;
+                          items?: { title: string; url: string }[];
+                        };
+                        const badgeKey = itemData.badgeKey;
+                        const badgeCount = badgeKey && badges ? badges[badgeKey] : 0;
 
-                    if (itemData.items) {
-                      return (
-                        <Collapsible
-                          key={item.label}
-                          asChild
-                          defaultOpen={isActive}
-                          className="group/collapsible"
-                        >
-                          <SidebarMenuItem>
-                            <CollapsibleTrigger asChild>
-                              <SidebarMenuButton tooltip={item.label} isActive={isActive}>
-                                {item.icon && <item.icon />}
+                        if (itemData.items) {
+                          return (
+                            <Collapsible
+                              key={item.label}
+                              asChild
+                              defaultOpen={isActive}
+                              className="group/collapsible"
+                            >
+                              <SidebarMenuItem>
+                                <CollapsibleTrigger asChild>
+                                  <SidebarMenuButton 
+                                    tooltip={item.label} 
+                                    isActive={isActive}
+                                    className={cn(
+                                      "h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0",
+                                      isActive 
+                                        ? "bg-primary/10 text-primary border-l-2 border-primary rounded-none rounded-r-md font-semibold"
+                                        : "hover:bg-accent/50 hover:text-accent-foreground text-muted-foreground border-l-2 border-transparent"
+                                    )}
+                                  >
+                                    {item.icon && <item.icon className="w-4 h-4 shrink-0" strokeWidth={2} />}
+                                    <span>{item.label}</span>
+                                    <ChevronRight className="ml-auto w-4 h-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 opacity-50" />
+                                  </SidebarMenuButton>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent>
+                                  <SidebarMenuSub className="border-sidebar-border ml-5 mt-1 border-l">
+                                    {itemData.items.map((subItem) => {
+                                      const isSubActive = location.pathname === subItem.url;
+                                      return (
+                                        <SidebarMenuSubItem key={subItem.title}>
+                                          <SidebarMenuSubButton 
+                                            asChild 
+                                            isActive={isSubActive}
+                                            className={cn(
+                                              "h-8 text-xs font-medium transition-all group-data-[collapsible=icon]:hidden",
+                                              isSubActive 
+                                                ? "text-primary font-bold" 
+                                                : "text-muted-foreground hover:text-foreground"
+                                            )}
+                                          >
+                                            <Link to={subItem.url}>
+                                              <span>{subItem.title}</span>
+                                            </Link>
+                                          </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+                                      );
+                                    })}
+                                  </SidebarMenuSub>
+                                </CollapsibleContent>
+                              </SidebarMenuItem>
+                            </Collapsible>
+                          );
+                        }
+
+                        // Single Item
+                        return (
+                          <SidebarMenuItem key={item.label}>
+                            <SidebarMenuButton 
+                              asChild 
+                              isActive={isActive} 
+                              tooltip={item.label}
+                              className={cn(
+                                "h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0",
+                                isActive 
+                                  ? "bg-primary/10 text-primary border-l-2 border-primary rounded-none rounded-r-md font-semibold"
+                                  : "hover:bg-accent/50 hover:text-accent-foreground text-muted-foreground border-l-2 border-transparent"
+                              )}
+                            >
+                              <Link to={item.url}>
+                                {item.icon && <item.icon className="w-4 h-4 shrink-0" strokeWidth={2} />}
                                 <span>{item.label}</span>
-                                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                              </SidebarMenuButton>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent>
-                              <SidebarMenuSub>
-                                {itemData.items.map((subItem) => {
-                                  const isSubActive = location.pathname === subItem.url;
-                                  return (
-                                    <SidebarMenuSubItem key={subItem.title}>
-                                      <SidebarMenuSubButton asChild isActive={isSubActive}>
-                                        <Link to={subItem.url}>
-                                          <span>{subItem.title}</span>
-                                        </Link>
-                                      </SidebarMenuSubButton>
-                                    </SidebarMenuSubItem>
-                                  );
-                                })}
-                              </SidebarMenuSub>
-                            </CollapsibleContent>
+                              </Link>
+                            </SidebarMenuButton>
+                            {badgeCount !== undefined && badgeCount > 0 && (
+                              <SidebarMenuBadge className={cn(
+                                "text-[10px] w-5 h-5 flex items-center justify-center rounded-md font-bold mt-2",
+                                isActive ? "bg-primary text-primary-foreground" : "bg-destructive/10 text-destructive"
+                              )}>
+                                {badgeCount > 99 ? '99+' : badgeCount}
+                              </SidebarMenuBadge>
+                            )}
                           </SidebarMenuItem>
-                        </Collapsible>
-                      );
-                    }
-
-                    return (
-                      <SidebarMenuItem key={item.label}>
-                        <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
-                          <Link to={item.url}>
-                            {item.icon && <item.icon />}
-                            <span>{item.label}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                        {badgeCount !== undefined && badgeCount > 0 && (
-                          <SidebarMenuBadge>
-                            {badgeCount > 99 ? '99+' : badgeCount}
-                          </SidebarMenuBadge>
-                        )}
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
+                        );
+                      })}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </Collapsible>
           );
         })}
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="border-t border-sidebar-border/50 p-4">
         <UserProfile />
       </SidebarFooter>
       <SidebarRail />

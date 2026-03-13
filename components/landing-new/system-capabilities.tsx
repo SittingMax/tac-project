@@ -1,11 +1,14 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Crosshair, Network, Map, Shield } from 'lucide-react';
+import { motion } from '@/lib/motion';
+import { FadeUp } from '@/components/motion/FadeUp';
+import { StaggerChildren, staggerItemVariants } from '@/components/motion/StaggerChildren';
 
 export function SystemCapabilities() {
   return (
-    <section id="system-capabilities" className="py-24 lg:py-32 relative">
+    <section id="system-capabilities" className="py-16 lg:py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header Section */}
-        <div className="flex flex-col gap-10 w-full mb-16">
+        <FadeUp className="flex flex-col gap-10 w-full mb-16">
           {/* Top label row */}
           <div className="flex items-center gap-6">
             <span className="text-xs font-mono text-primary tracking-widest font-semibold uppercase">
@@ -20,7 +23,7 @@ export function SystemCapabilities() {
           {/* Main content */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
             <div className="max-w-3xl flex flex-col gap-6">
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.1]">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.1] [text-wrap:balance]">
                 Powering Your <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70">
                   Supply Chain.
@@ -33,41 +36,28 @@ export function SystemCapabilities() {
             </div>
 
             {/* Secondary CTA */}
-            <button className="group flex items-center gap-2 px-6 py-4 border border-border bg-card/50 text-foreground text-xs uppercase tracking-widest font-mono font-bold rounded-none hover:bg-muted transition-colors whitespace-nowrap shadow-sm">
+            <a
+              href="#global-fleet"
+              className="group flex items-center gap-2 px-6 py-4 border border-border bg-card/50 text-foreground text-sm font-semibold rounded-md hover:bg-muted transition-colors whitespace-nowrap shadow-sm"
+            >
               <span>Explore Capabilities</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </button>
+            </a>
           </div>
-        </div>
+        </FadeUp>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 w-full gap-6">
-          {/* Card 1: Express Air Cargo */}
-          <div className="group flex flex-col overflow-hidden hover:border-primary/50 transition-all duration-500 md:col-span-1 bg-card border-border border rounded-none p-8 relative justify-between min-h-[400px] shadow-sm">
-            <style>{`
-              @keyframes orbit-slow {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-              }
-              @keyframes breathe-glow {
-                0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); }
-                50% { transform: scale(1.05); box-shadow: 0 0 35px rgba(59, 130, 246, 0.3); }
-              }
-              @keyframes ripple-expand {
-                0% { transform: scale(0.8); opacity: 0.6; border-width: 1px; }
-                100% { transform: scale(2.5); opacity: 0; border-width: 0px; }
-              }
-              @keyframes dot-handoff {
-                0%, 100% { opacity: 0.3; r: 2px; fill: hsl(var(--primary) / 0.6); }
-                50% { opacity: 1; r: 3.5px; fill: hsl(var(--primary)); }
-              }
-            `}</style>
-
+        <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 w-full gap-6">
+          {/* Card 1: Live GPS Tracking */}
+          <motion.div
+            variants={staggerItemVariants}
+            className="group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 md:col-span-1 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-md"
+          >
             {/* Visual */}
             <div className="relative h-48 w-full flex items-center justify-center mb-6 overflow-visible">
-              <div className="absolute inset-0 bg-primary/5 rounded-none blur-3xl transform scale-75"></div>
+              <div className="absolute inset-0 bg-primary/5 rounded-full blur-3xl transform scale-75"></div>
               <div
-                className="absolute w-16 h-16 rounded-none border border-primary/30 z-0"
+                className="absolute w-16 h-16 rounded-full border border-primary/30 z-0"
                 style={{ animation: 'ripple-expand 4s cubic-bezier(0, 0, 0.2, 1) infinite' }}
               ></div>
 
@@ -97,7 +87,7 @@ export function SystemCapabilities() {
                     cy="20"
                     r="3"
                     fill="hsl(var(--primary))"
-                    className="drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]"
+                    className="drop-shadow-[0_0_8px_hsl(var(--primary)/0.8)]"
                   ></circle>
                   <circle
                     cx="180"
@@ -153,57 +143,32 @@ export function SystemCapabilities() {
               </svg>
 
               <div
-                className="absolute flex items-center justify-center w-16 h-16 bg-background rounded-none border border-border z-20"
+                className="absolute flex items-center justify-center w-16 h-16 bg-background rounded-md border border-border z-20"
                 style={{ animation: 'breathe-glow 4s ease-in-out infinite' }}
               >
-                <div className="absolute inset-0 bg-primary/10 rounded-none blur-sm"></div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  stroke="none"
-                  className="text-foreground relative z-10"
-                >
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
+                <div className="absolute inset-0 bg-primary/10 rounded-md blur-sm"></div>
+                <Crosshair className="text-foreground relative z-10 w-7 h-7" />
               </div>
             </div>
 
             {/* Content */}
             <div className="relative z-10 mt-auto">
-              <h3 className="text-2xl font-bold text-foreground tracking-tight">
-                Express Air Cargo
+              <h3 className="text-2xl font-bold font-sans text-foreground tracking-tight">
+                Live GPS Tracking
               </h3>
               <p className="leading-relaxed text-muted-foreground mt-2 font-mono text-sm">
-                Ensure your most urgent shipments are prioritized with our dedicated air freight
-                solutions.
+                Pinpoint accuracy for your cargo with 24/7 real-time monitoring across all transit
+                routes.
               </p>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Card 2: Surface Transport */}
-          <div className="md:col-span-2 group flex flex-col overflow-hidden hover:border-primary/50 transition-all duration-500 bg-card border-border border rounded-none p-8 relative justify-between min-h-[400px] shadow-sm">
-            <style>{`
-              @keyframes flowData {
-                0% { stroke-dashoffset: 120; opacity: 0; }
-                15% { opacity: 1; }
-                85% { opacity: 1; }
-                100% { stroke-dashoffset: 0; opacity: 0; }
-              }
-              @keyframes breatheDiamond {
-                0%, 100% { transform: rotate(45deg) scale(1); box-shadow: 0 0 30px rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); }
-                50% { transform: rotate(45deg) scale(1.05); box-shadow: 0 0 50px rgba(59,130,246,0.3); border-color: rgba(59,130,246,0.4); }
-              }
-              @keyframes orbitSpin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-              }
-            `}</style>
-
-            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/10 blur-[100px] rounded-none -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/20 transition-colors duration-700"></div>
+          {/* Card 2: Smart Routing */}
+          <motion.div
+            variants={staggerItemVariants}
+            className="md:col-span-2 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-lg"
+          >
+            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/20 transition-colors duration-700"></div>
 
             {/* Visual */}
             <div className="relative h-48 w-full flex items-center justify-center mb-6 overflow-visible">
@@ -246,7 +211,7 @@ export function SystemCapabilities() {
                   strokeLinecap="round"
                   strokeDasharray="120"
                   strokeDashoffset="120"
-                  style={{ animation: 'flowData 3s cubic-bezier(0.4, 0, 0.2, 1) infinite' }}
+                  style={{ animation: 'flow-data 3s cubic-bezier(0.4, 0, 0.2, 1) infinite' }}
                 ></path>
                 <path
                   d="M350 100 L280 100 L250 130"
@@ -256,7 +221,7 @@ export function SystemCapabilities() {
                   strokeDasharray="120"
                   strokeDashoffset="120"
                   style={{
-                    animation: 'flowData 3s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+                    animation: 'flow-data 3s cubic-bezier(0.4, 0, 0.2, 1) infinite',
                     animationDelay: '1.5s',
                   }}
                 ></path>
@@ -300,113 +265,69 @@ export function SystemCapabilities() {
               <div className="relative flex items-center justify-center">
                 <div className="absolute inset-0 bg-primary blur-[40px] opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
                 <div
-                  className="w-24 h-24 border border-primary/30 bg-background/80 backdrop-blur-md rounded-none flex items-center justify-center z-10 relative overflow-hidden"
-                  style={{ animation: 'breatheDiamond 4s ease-in-out infinite' }}
+                  className="w-24 h-24 border border-primary/30 bg-background/80 backdrop-blur-md rounded-md flex items-center justify-center z-10 relative overflow-hidden"
+                  style={{ animation: 'breathe-diamond 4s ease-in-out infinite' }}
                 >
-                  <div className="w-12 h-12 border border-primary/50 rounded-none flex items-center justify-center bg-primary/5 relative z-20">
-                    <div className="w-1.5 h-1.5 bg-primary rounded-none shadow-[0_0_10px_hsl(var(--primary))]"></div>
+                  <div className="w-12 h-12 border border-primary/50 rounded-md flex items-center justify-center bg-primary/5 relative z-20">
+                    <Map className="text-primary w-6 h-6 z-20" />
                   </div>
                   <div
                     className="absolute inset-0 z-10 opacity-30"
-                    style={{ animation: 'orbitSpin 8s linear infinite' }}
+                    style={{ animation: 'orbit-spin 8s linear infinite' }}
                   >
-                    <div className="w-full h-full rounded-none border-t border-r border-primary/40"></div>
+                    <div className="w-full h-full border-t border-r border-primary/40"></div>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="relative z-10 mt-auto">
-              <h3 className="text-2xl font-bold text-foreground tracking-tight">
-                Surface Transport
+              <h3 className="text-2xl font-bold font-sans text-foreground tracking-tight">
+                Smart Routing Algorithms
               </h3>
-              <p className="leading-relaxed text-muted-foreground mt-2 max-w-xl">
-                Cost-effective and secure ground shipping options. We handle both full truckload
-                (FTL) and part truckload (PTL) across our established routes.
+              <p className="leading-relaxed text-muted-foreground mt-2 font-mono text-sm max-w-xl">
+                Our system calculates the most efficient transit paths, minimizing delays and
+                optimizing fuel usage across established corridors.
               </p>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Card 3: Pick & Drop Services */}
-          <div className="md:col-span-2 group flex flex-col overflow-hidden hover:border-primary/50 transition-all duration-500 bg-card border-border border rounded-none p-8 relative justify-between min-h-[400px] shadow-sm">
-            <style>{`
-              @keyframes shimmer-lock {
-                0%, 100% { opacity: 0.4; transform: scale(1); }
-                50% { opacity: 0.8; transform: scale(1.05); }
-              }
-              @keyframes active-pulse-2 {
-                0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); transform: scale(1); }
-                50% { box-shadow: 0 0 35px rgba(59, 130, 246, 0.4); transform: scale(1.02); }
-              }
-              @keyframes scan-sweep {
-                0% { transform: translateY(-150%) rotate(15deg); opacity: 0; }
-                20% { opacity: 1; }
-                80% { opacity: 1; }
-                100% { transform: translateY(250%) rotate(15deg); opacity: 0; }
-              }
-              @keyframes progress-spin {
-                0% { stroke-dashoffset: 100; }
-                100% { stroke-dashoffset: 25; }
-              }
-            `}</style>
-
+          {/* Card 3: Automated Dispatch */}
+          <motion.div
+            variants={staggerItemVariants}
+            className="md:col-span-2 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-lg"
+          >
             <div className="flex w-full h-48 mb-6 relative items-center justify-center">
               <div className="flex items-center gap-4 relative">
                 <div
-                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/10 blur-[60px] rounded-none pointer-events-none"
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/10 blur-[60px] rounded-full pointer-events-none"
                   style={{ animation: 'breathe-glow 4s ease-in-out infinite' }}
                 ></div>
 
                 <div
-                  className="w-12 h-12 rounded-none border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
+                  className="w-12 h-12 rounded-md border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
                   style={{
                     animation: 'shimmer-lock 4s ease-in-out infinite',
                     animationDelay: '0s',
                   }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                  >
-                    <rect width="18" height="11" x="3" y="11" rx="0" ry="0"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
+                  <Network className="w-5 h-5" />
                 </div>
                 <div
-                  className="w-12 h-12 rounded-none border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
+                  className="w-12 h-12 rounded-md border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
                   style={{
                     animation: 'shimmer-lock 4s ease-in-out infinite',
                     animationDelay: '1s',
                   }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                  >
-                    <rect width="18" height="11" x="3" y="11" rx="0" ry="0"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
+                  <Network className="w-5 h-5" />
                 </div>
 
                 <div
-                  className="relative w-20 h-20 rounded-none bg-primary flex items-center justify-center text-primary-foreground shadow-lg z-10 border border-primary/20 ring-4 ring-background"
+                  className="relative w-20 h-20 rounded-md bg-primary flex items-center justify-center text-primary-foreground shadow-lg z-10 border border-primary/20 ring-4 ring-background"
                   style={{ animation: 'active-pulse-2 3s ease-in-out infinite' }}
                 >
-                  <div className="absolute inset-0 overflow-hidden rounded-none">
+                  <div className="absolute inset-0 overflow-hidden rounded-md">
                     <div
                       className="w-full h-1/3 bg-gradient-to-b from-white/0 via-white/20 to-white/0 absolute top-0 left-0"
                       style={{ animation: 'scan-sweep 3s ease-in-out infinite' }}
@@ -425,7 +346,7 @@ export function SystemCapabilities() {
                       strokeWidth="2"
                     ></path>
                     <path
-                      className="text-primary-foreground drop-shadow-[0_0_2px_rgba(255,255,255,0.8)]"
+                      className="text-primary-foreground drop-shadow-[0_0_2px_oklch(100%_0_0deg/0.8)]"
                       strokeDasharray="100 100"
                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                       fill="none"
@@ -435,110 +356,54 @@ export function SystemCapabilities() {
                     ></path>
                   </svg>
 
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                    className="relative z-10"
-                  >
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                  </svg>
+                  <Shield className="w-8 h-8 relative z-10" />
 
-                  <div className="absolute -bottom-3 bg-background text-foreground border border-border px-2 py-0.5 rounded-none flex items-center gap-1.5 shadow-md">
+                  <div className="absolute -bottom-3 bg-background text-foreground border border-border px-2 py-0.5 rounded-md flex items-center gap-1.5 shadow-md">
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-status-success opacity-75"></span>
-                      <span className="relative inline-flex rounded-none h-2 w-2 bg-status-success"></span>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success"></span>
                     </span>
                     <span className="text-[10px] font-mono tracking-wider font-semibold">LIVE</span>
                   </div>
                 </div>
 
                 <div
-                  className="w-12 h-12 rounded-none border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
+                  className="w-12 h-12 rounded-md border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
                   style={{
                     animation: 'shimmer-lock 4s ease-in-out infinite',
                     animationDelay: '2s',
                   }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                  >
-                    <rect width="18" height="11" x="3" y="11" rx="0" ry="0"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
+                  <Network className="w-5 h-5" />
                 </div>
                 <div
-                  className="w-12 h-12 rounded-none border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
+                  className="w-12 h-12 rounded-md border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
                   style={{
                     animation: 'shimmer-lock 4s ease-in-out infinite',
                     animationDelay: '3s',
                   }}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="square"
-                    strokeLinejoin="miter"
-                  >
-                    <rect width="18" height="11" x="3" y="11" rx="0" ry="0"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
+                  <Network className="w-5 h-5" />
                 </div>
               </div>
             </div>
 
             <div className="relative z-10 mt-auto">
-              <h3 className="text-2xl font-bold text-foreground tracking-tight">
-                Pick & Drop Services
+              <h3 className="text-2xl font-bold font-sans text-foreground tracking-tight">
+                Automated Dispatch
               </h3>
-              <p className="leading-relaxed text-muted-foreground mt-2 max-w-xl">
-                Enjoy the convenience of complete door-to-door services. We handle the heavy lifting
-                from your doorstep to the final destination.
+              <p className="leading-relaxed text-muted-foreground mt-2 font-mono text-sm max-w-xl">
+                Seamless handover protocols and automated alerts ensure zero downtime from warehouse
+                sorting to final delivery.
               </p>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Card 4: Packing */}
-          <div className="md:col-span-1 group flex flex-col overflow-hidden hover:border-primary/50 transition-all duration-500 bg-card border-border border rounded-none p-8 relative justify-between min-h-[400px] shadow-sm">
-            <style>{`
-              @keyframes drift-vertical-slow {
-                0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(-8px); }
-              }
-              @keyframes drift-vertical-reverse {
-                0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(8px); }
-              }
-              @keyframes signal-flow {
-                0% { stroke-dashoffset: 20; opacity: 0.3; }
-                100% { stroke-dashoffset: 0; opacity: 0.8; }
-              }
-              @keyframes node-activate {
-                0%, 90%, 100% { fill: currentColor; r: 3px; filter: none; }
-                92% { fill: hsl(var(--primary)); r: 4.5px; filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.8)); }
-                95% { fill: hsl(var(--primary) / 0.8); r: 4px; }
-              }
-            `}</style>
-
+          {/* Card 4: Enterprise Scalability */}
+          <motion.div
+            variants={staggerItemVariants}
+            className="md:col-span-1 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-md"
+          >
             <div
               className="absolute inset-0 opacity-[0.03] pointer-events-none"
               style={{
@@ -667,16 +532,16 @@ export function SystemCapabilities() {
             </div>
 
             <div className="relative z-10 mt-auto">
-              <h3 className="text-2xl font-bold text-foreground tracking-tight">
+              <h3 className="text-2xl font-bold font-sans text-foreground tracking-tight">
                 Enterprise Scalability
               </h3>
-              <p className="leading-relaxed text-muted-foreground mt-2">
+              <p className="leading-relaxed text-muted-foreground mt-2 font-mono text-sm">
                 TAC grows with you, effortlessly handling thousands of daily shipments and complex
                 logistics networks.
               </p>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </StaggerChildren>
       </div>
     </section>
   );

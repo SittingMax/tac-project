@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { BarcodeScanner } from '@/components/scanning/BarcodeScanner';
 import { cn } from '@/lib/utils';
 import { useScanInput } from '@/hooks/useManifestScan';
 import type { ScanResponse } from '@/lib/services/manifestService';
@@ -96,7 +97,7 @@ export function StepAddShipments({
     <div className="space-y-4">
       {/* Route Banner */}
       {fromHub && toHub && (
-        <div className="flex items-center gap-4 px-4 py-2 rounded-none bg-primary/10 border border-primary/20">
+        <div className="flex items-center gap-4 px-4 py-2 rounded-md bg-primary/10 border border-primary/20">
           <span className="text-xs font-semibold uppercase text-muted-foreground">Route</span>
           <div className="flex items-center gap-2 text-sm font-bold">
             <span className="font-mono">{fromHub.code}</span>
@@ -153,7 +154,7 @@ export function StepAddShipments({
                           />
                           <div className="absolute right-3 top-1/2 -translate-y-1/2">
                             {scanner.isScanning ? (
-                              <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-none animate-spin" />
+                              <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                             ) : (
                               getResultIcon(scanner.lastResult)
                             )}
@@ -175,7 +176,7 @@ export function StepAddShipments({
                 </TabsContent>
 
                 <TabsContent value="scanner" className="mt-4">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground p-4 bg-muted/50 rounded-none">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground p-4 bg-muted/50 rounded-md">
                     <Keyboard className="h-4 w-4" />
                     USB scanner active. Keep input focused.
                   </div>
@@ -193,9 +194,16 @@ export function StepAddShipments({
                 </TabsContent>
 
                 <TabsContent value="camera" className="mt-4">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground p-4 bg-muted/50 rounded-none">
-                    <Camera className="h-4 w-4" />
-                    Camera scanning feature coming soon.
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground p-4 bg-muted/50 rounded-md">
+                      <Camera className="h-4 w-4" />
+                      Use the camera or upload a barcode image to add shipments.
+                    </div>
+                    <BarcodeScanner
+                      onScan={scanner.scanCamera}
+                      active={scanMode === 'camera'}
+                      className="h-64 border border-border"
+                    />
                   </div>
                 </TabsContent>
               </Tabs>
@@ -316,7 +324,7 @@ export function StepAddShipments({
                 onRemove={onRemove}
                 onViewShipment={onViewShipment}
                 showSummary={false}
-                className="h-full border-0 rounded-none"
+                className="h-full border-0"
               />
             </CardContent>
           </Card>

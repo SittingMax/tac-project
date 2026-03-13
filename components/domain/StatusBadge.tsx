@@ -69,7 +69,7 @@ export function StatusBadge({ status, size = 'md', className, showDot = true }: 
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-none font-medium',
+        'inline-flex items-center gap-1.5 rounded-md font-medium whitespace-nowrap',
         config.class,
         SIZE_CLASSES[size],
         className
@@ -77,7 +77,7 @@ export function StatusBadge({ status, size = 'md', className, showDot = true }: 
     >
       {showDot && (
         <span
-          className={cn('w-1.5 h-1.5 rounded-none bg-current', config.animate && 'animate-pulse')}
+          className={cn('w-1.5 h-1.5 rounded-full bg-current', config.animate && 'animate-pulse')}
         />
       )}
       <span className="capitalize">{displayText.toLowerCase()}</span>

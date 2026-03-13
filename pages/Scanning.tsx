@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { BarcodeScanner } from '@/components/scanning/BarcodeScanner';
@@ -29,6 +30,11 @@ import { ScannerDebug } from '@/components/scanning/ScannerDebug';
 import { UniversalBarcode } from '@/components/barcodes';
 import { useScanningLogic, type ScanMode } from '@/hooks/useScanningLogic';
 import { useScanQueue } from '@/store/scanQueueStore';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '@/components/ui/resizable';
 
 /* ── Mode Metadata ──────────────────────────────────────────── */
 const MODE_META: Record<
@@ -154,29 +160,29 @@ export const Scanning: React.FC = () => {
           {/* Title + Mode Indicator */}
           <div className="flex items-center gap-4">
             <div>
-              <h1 className="text-2xl font-black uppercase tracking-tighter text-foreground leading-none">
-                Terminal<span className={meta.color}>.</span>
+              <h1 className="text-xl font-semibold tracking-tight text-foreground leading-none">
+                Scanner
               </h1>
               <div className="flex items-center gap-2 mt-1">
-                <span className={`inline-block w-1.5 h-1.5 ${meta.bg} animate-pulse`} />
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                  {meta.sub}
-                </span>
+                <span
+                  className={`inline-block w-1.5 h-1.5 rounded-full ${meta.bg} animate-pulse`}
+                />
+                <span className="text-xs text-muted-foreground">{meta.sub}</span>
               </div>
             </div>
           </div>
 
           {/* KPIs */}
           <div className="hidden md:flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-muted/50 border border-border">
+            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-muted/50 border border-border rounded-md">
               <Activity className="w-3 h-3 text-muted-foreground" />
               <span className="text-xs font-mono text-muted-foreground">{totalScans}</span>
             </div>
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-status-success/10 border border-status-success/20">
+            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-status-success/10 border border-status-success/20 rounded-md">
               <Check className="w-3 h-3 text-status-success" />
               <span className="text-xs font-mono text-status-success">{scanCount.success}</span>
             </div>
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-status-error/10 border border-status-error/20">
+            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-status-error/10 border border-status-error/20 rounded-md">
               <X className="w-3 h-3 text-status-error" />
               <span className="text-xs font-mono text-status-error">{scanCount.error}</span>
             </div>
@@ -188,7 +194,7 @@ export const Scanning: React.FC = () => {
           </div>
 
           {/* Mode Selector */}
-          <div className="flex gap-0 bg-muted/30 border border-border">
+          <div className="flex gap-0 bg-muted/30 rounded-lg border border-border overflow-hidden">
             {(Object.keys(MODE_META) as ScanMode[]).map((mode) => {
               const m = MODE_META[mode];
               const Icon = m.icon;
@@ -198,7 +204,7 @@ export const Scanning: React.FC = () => {
                   key={mode}
                   onClick={() => handleModeSwitch(mode)}
                   className={`
-                    relative flex items-center gap-1.5 px-2 py-2.5 font-mono uppercase tracking-widest text-[10px]
+                    relative flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium
                     transition-all duration-200 border-b-2
                     ${
                       isActive
@@ -234,7 +240,7 @@ export const Scanning: React.FC = () => {
               }`}
             />
             <div>
-              <span className="text-sm font-bold font-mono text-foreground">
+              <span className="text-sm font-semibold font-mono text-foreground">
                 {activeManifest.manifest_no}
               </span>
               <span className="text-xs text-muted-foreground ml-2">
@@ -249,43 +255,40 @@ export const Scanning: React.FC = () => {
       )}
 
       {/* ── MAIN CONTENT ───────────────────────────────── */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_420px] min-h-0">
-        {/* Scanner Viewport */}
-        <div className="relative bg-muted/20 border-r border-border overflow-hidden flex flex-col min-h-0">
+      <div className="flex-1 min-h-0">
+        <ResizablePanelGroup orientation="horizontal" className="h-full items-stretch pb-0">
+          {/* Scanner Viewport */}
+          <ResizablePanel defaultSize={65} minSize={30} className="relative bg-muted/20 overflow-hidden flex flex-col min-h-0">
           {/* Top overlay bar */}
           <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-2 bg-gradient-to-b from-background/80 to-transparent">
             {/* Camera / Manual toggle */}
-            <div className="flex gap-1 bg-background/90 border border-border backdrop-blur-sm">
-              <button
+            <div className="flex gap-1 bg-background/90 border border-border backdrop-blur-sm rounded-md overflow-hidden">
+              <Button
+                variant={useCameraScanner ? 'default' : 'ghost'}
+                size="icon"
+                className="size-9 rounded-none"
                 onClick={() => setUseCameraScanner(true)}
-                className={`p-2 transition-all ${
-                  useCameraScanner
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted/50'
-                }`}
                 title="Camera scanner"
               >
-                <Camera className="w-4 h-4" />
-              </button>
-              <button
+                <Camera className="size-4" />
+              </Button>
+              <Button
+                variant={!useCameraScanner ? 'default' : 'ghost'}
+                size="icon"
+                className="size-9 rounded-none"
                 onClick={() => setUseCameraScanner(false)}
-                className={`p-2 transition-all ${
-                  !useCameraScanner
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted/50'
-                }`}
                 title="Manual / HID scanner"
               >
-                <Keyboard className="w-4 h-4" />
-              </button>
+                <Keyboard className="size-4" />
+              </Button>
             </div>
 
             {/* Mobile KPIs */}
             <div className="flex md:hidden items-center gap-2 text-xs font-mono">
-              <span className="bg-status-success/20 text-status-success px-2 py-1">
+              <span className="bg-status-success/20 text-status-success px-2 py-1 rounded-md">
                 ✓ {scanCount.success}
               </span>
-              <span className="bg-status-error/20 text-status-error px-2 py-1">
+              <span className="bg-status-error/20 text-status-error px-2 py-1 rounded-md">
                 ✗ {scanCount.error}
               </span>
             </div>
@@ -333,8 +336,8 @@ export const Scanning: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="px-4 py-2 bg-background/80 backdrop-blur-sm border border-border">
-                  <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground text-center">
+                <div className="px-4 py-2 bg-background/80 backdrop-blur-sm rounded-lg border border-border">
+                  <p className="text-xs text-muted-foreground text-center">
                     {needsManifest ? 'Awaiting manifest scan' : 'HID scanner ready'}
                   </p>
                   <p className="text-[10px] font-mono text-muted-foreground/60 text-center mt-1">
@@ -344,19 +347,24 @@ export const Scanning: React.FC = () => {
               </div>
             </div>
           )}
-        </div>
+          </ResizablePanel>
 
-        {/* ── RIGHT PANEL: Input + Feed ────────────────── */}
-        <div className="flex flex-col min-h-0 bg-background">
+          <ResizableHandle withHandle className="hidden lg:flex" />
+
+          {/* ── RIGHT PANEL: Input + Feed ────────────────── */}
+          <ResizablePanel defaultSize={35} minSize={25} className="flex flex-col min-h-0 bg-background border-t border-border lg:border-none">
           {/* Manual Input */}
           <div className="flex-shrink-0 p-4 border-b border-border">
-            <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2 flex items-center gap-1.5">
-              <Keyboard className="w-3 h-3" />
+            <Label
+              htmlFor="scan-input"
+              className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5"
+            >
+              <Keyboard className="size-3" />
               {needsManifest
                 ? 'Enter manifest code'
                 : `Scan ${scanMode === 'DELIVER' ? 'delivery' : 'shipment'}`}
-            </label>
-            <form onSubmit={handleScanSubmit} className="flex gap-0" data-testid="scan-form">
+            </Label>
+            <form onSubmit={handleScanSubmit} className="flex gap-2" data-testid="scan-form">
               <Input
                 ref={inputRef}
                 placeholder={needsManifest ? 'MAN-XXXX-XXXX...' : 'TAC / CN number...'}
@@ -368,15 +376,15 @@ export const Scanning: React.FC = () => {
                 aria-label="Scan input field"
                 id="scan-input"
                 name="scan-input"
-                className="flex-1 rounded-none border-r-0 font-mono text-xs uppercase h-12 bg-muted/30"
+                className="flex-1 h-12 bg-muted/30"
               />
               <Button
                 type="submit"
                 disabled={!currentCode}
                 data-testid="scan-submit-button"
-                className="rounded-none font-mono uppercase tracking-widest text-[10px] px-6 h-12"
+                className="px-6 h-12"
               >
-                Execute
+                Submit
               </Button>
             </form>
           </div>
@@ -385,7 +393,7 @@ export const Scanning: React.FC = () => {
           <div className="flex-1 overflow-y-auto min-h-0">
             <div className="px-4 py-2 border-b border-border bg-muted/20 sticky top-0 z-10">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-mono uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                <h3 className="text-xs text-muted-foreground flex items-center gap-1.5">
                   <Activity className="w-3 h-3" />
                   Scan Feed
                 </h3>
@@ -412,9 +420,7 @@ export const Scanning: React.FC = () => {
                       onClick={() => setShowDiagnostics(!showDiagnostics)}
                       className="flex items-center justify-between w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      <span className="font-mono uppercase tracking-widest text-[10px]">
-                        🧪 Scanner Diagnostics
-                      </span>
+                      <span className="text-xs">Scanner Diagnostics</span>
                       {showDiagnostics ? (
                         <ChevronUp className="w-3 h-3" />
                       ) : (
@@ -492,11 +498,12 @@ export const Scanning: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
 
       {/* ── STATUS BAR ─────────────────────────────────── */}
-      <div className="flex-shrink-0 flex items-center justify-between px-6 py-2 border-t border-border bg-muted/20 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+      <div className="flex-shrink-0 flex items-center justify-between px-6 py-2 border-t border-border bg-muted/20 text-xs text-muted-foreground">
         <div className="flex items-center gap-4">
           {/* Connection status */}
           <div className="flex items-center gap-1.5">

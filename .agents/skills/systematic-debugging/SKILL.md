@@ -119,6 +119,9 @@ You MUST complete each phase before proceeding to the next.
    - Keep tracing up until you find the source
    - Fix at source, not at symptom
 
+6. **Utilize Browser Subagent for UI/Web Bugs**
+   - If the issue is visual or browser-specific, invoke the `browser_subagent` to capture DOM state, console logs, or screenshots to gather evidence before jumping to conclusions.
+
 ### Phase 2: Pattern Analysis
 
 **Find the pattern before fixing:**

@@ -157,7 +157,7 @@ export function validateDiscount(subtotal: number, discount: number): Validation
 }
 
 /**
- * Validates TBB payment mode for enterprise customers only
+ * Validates TBB payment mode for customer-linked invoices
  */
 export function validatePaymentMode(
   paymentMode: string,
@@ -171,12 +171,6 @@ export function validatePaymentMode(
         field: 'paymentMode',
         message: 'Customer information required for TBB payment mode',
         code: 'TBB_CUSTOMER_REQUIRED',
-      });
-    } else if (customer.tier !== 'ENTERPRISE') {
-      errors.push({
-        field: 'paymentMode',
-        message: `TBB payment mode only allowed for Enterprise customers. Current tier: ${customer.tier}`,
-        code: 'TBB_ENTERPRISE_ONLY',
       });
     }
   }

@@ -38,7 +38,7 @@ export const ExpectedShipmentsList: React.FC<ExpectedShipmentsListProps> = ({ it
   const filteredItems = items.filter((i) => filter === 'ALL' || i.status === filter);
 
   return (
-    <Card className="flex flex-col h-full rounded-none border-border bg-background overflow-hidden">
+    <Card className="flex flex-col h-full border-border bg-background overflow-hidden rounded-md">
       {/* Header and Filter */}
       <div className="p-4 border-b border-border/50 flex justify-between items-center bg-muted/5 z-10">
         <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">
@@ -48,19 +48,19 @@ export const ExpectedShipmentsList: React.FC<ExpectedShipmentsListProps> = ({ it
         <div className="flex bg-muted/20 border border-border p-1">
           <button
             onClick={() => setFilter('ALL')}
-            className={`px-4 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${filter === 'ALL' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
+            className={`px-4 py-1 text-xs font-medium transition-colors rounded-sm ${filter === 'ALL' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
           >
             All
           </button>
           <button
             onClick={() => setFilter('PENDING')}
-            className={`px-4 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${filter === 'PENDING' ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
+            className={`px-4 py-1 text-xs font-medium transition-colors rounded-sm ${filter === 'PENDING' ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
           >
             Pending
           </button>
           <button
             onClick={() => setFilter('SCANNED')}
-            className={`px-4 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${filter === 'SCANNED' ? 'bg-status-success/20 text-status-success' : 'text-muted-foreground hover:bg-muted/50'}`}
+            className={`px-4 py-1 text-xs font-medium transition-colors rounded-sm ${filter === 'SCANNED' ? 'bg-status-success/20 text-status-success' : 'text-muted-foreground hover:bg-muted/50'}`}
           >
             Scanned
           </button>
@@ -106,7 +106,7 @@ export const ExpectedShipmentsList: React.FC<ExpectedShipmentsListProps> = ({ it
                     </div>
                     <div>
                       <Link
-                        to={`/tracking?cn=${item.shipment.cn_number}`}
+                        to={`/shipments/${item.shipment.id}`}
                         className="font-mono font-bold text-foreground hover:text-primary transition-colors hover:underline"
                       >
                         {item.shipment.cn_number}
@@ -127,13 +127,13 @@ export const ExpectedShipmentsList: React.FC<ExpectedShipmentsListProps> = ({ it
                     <button
                       onClick={() => handleMarkException(item.shipment.cn_number, item.shipment.id)}
                       disabled={createException.isPending}
-                      className="text-[10px] font-mono uppercase tracking-widest text-status-error opacity-50 hover:opacity-100 transition-opacity disabled:opacity-30"
+                      className="text-xs text-status-error opacity-50 hover:opacity-100 transition-opacity disabled:opacity-30"
                     >
                       {createException.isPending ? 'Creating...' : 'Mark Exception'}
                     </button>
                   )}
                   {item.status === 'SCANNED' && (
-                    <div className="text-[10px] font-mono uppercase tracking-widest text-status-success bg-status-success/10 px-2 py-1">
+                    <div className="text-xs text-status-success bg-status-success/10 px-2 py-1 rounded-sm">
                       Received
                     </div>
                   )}

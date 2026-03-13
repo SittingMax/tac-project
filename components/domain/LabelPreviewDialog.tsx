@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { SizedDialog } from '@/components/ui-core/dialog/sized-dialog';
+import { DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -140,90 +132,87 @@ export const LabelPreviewDialog: React.FC<LabelPreviewDialogProps> = ({
   }, [shipmentData]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+    <SizedDialog
+      open={open}
+      onOpenChange={setOpen}
+      trigger={trigger}
+      title="Shipping Label Preview"
+      description="Customize and print your shipping label"
+      size="xl"
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-4">
+        {/* Left Side: Customization */}
+        <div className="space-y-6 flex flex-col">
+          <div className="bg-muted px-4 py-3 border rounded-md">
+            <h4 className="font-semibold text-sm mb-1">Label Settings</h4>
+            <p className="text-xs text-muted-foreground">
+              Adjust the transport mode and service level for this label.
+            </p>
+          </div>
 
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto z-[100]">
-        <DialogHeader>
-          <DialogTitle>Shipping Label Preview</DialogTitle>
-          <DialogDescription>Customize and print your shipping label</DialogDescription>
-        </DialogHeader>
-
-        <Tabs defaultValue="preview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="preview">
-              <Eye className="w-4 h-4 mr-2" />
-              Preview
-            </TabsTrigger>
-            <TabsTrigger value="customize">Customize</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="preview" className="space-y-4">
-            <div className="max-h-[calc(90vh-280px)] overflow-y-auto overflow-x-hidden border rounded-none p-4 bg-muted/30">
-              <LabelGenerator data={labelData} onPrint={handlePrint} />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="customize" className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="transport-mode">Transport Mode</Label>
-                <Select
-                  value={transportMode}
-                  onValueChange={(v) => setTransportMode(v as TransportMode)}
-                >
-                  <SelectTrigger id="transport-mode">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="AIR">Air Cargo</SelectItem>
-                    <SelectItem value="TRUCK">Surface / Truck</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="service-level">Service Level</Label>
-                <Select
-                  value={serviceLevel}
-                  onValueChange={(v) => setServiceLevel(v as ServiceLevel)}
-                >
-                  <SelectTrigger id="service-level">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="STANDARD">Standard (3-5 Days)</SelectItem>
-                    <SelectItem value="EXPRESS">Express (1-2 Days)</SelectItem>
-                    <SelectItem value="PRIORITY">Priority (Same Day)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <div className="space-y-4 flex-1">
+            <div className="space-y-2">
+              <Label htmlFor="transport-mode">Transport Mode</Label>
+              <Select
+                value={transportMode}
+                onValueChange={(v) => setTransportMode(v as TransportMode)}
+              >
+                <SelectTrigger id="transport-mode">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="AIR">Air Cargo</SelectItem>
+                  <SelectItem value="TRUCK">Surface / Truck</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="p-4 bg-muted rounded-none">
-              <h4 className="font-semibold mb-2">Preview Changes</h4>
-              <p className="text-sm text-muted-foreground">
-                Switch to the Preview tab to see your customizations applied to the label.
-              </p>
+            <div className="space-y-2">
+              <Label htmlFor="service-level">Service Level</Label>
+              <Select
+                value={serviceLevel}
+                onValueChange={(v) => setServiceLevel(v as ServiceLevel)}
+              >
+                <SelectTrigger id="service-level">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="STANDARD">Standard (3-5 Days)</SelectItem>
+                  <SelectItem value="EXPRESS">Express (1-2 Days)</SelectItem>
+                  <SelectItem value="PRIORITY">Priority (Same Day)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
 
-        <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button variant="outline" onClick={handleDownload}>
-            <Download className="w-4 h-4 mr-2" />
-            Download PDF
-          </Button>
-          <Button onClick={handlePrint}>
-            <Printer className="w-4 h-4 mr-2" />
-            Print Label
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        {/* Right Side: Live Preview */}
+        <div className="flex flex-col border rounded-md overflow-hidden bg-background">
+          <div className="bg-muted px-4 py-2 border-b flex items-center justify-between">
+            <h4 className="font-semibold text-sm flex items-center gap-2">
+              <Eye className="w-4 h-4" /> Live Preview
+            </h4>
+          </div>
+          <div className="p-4 bg-muted/10 overflow-y-auto max-h-[calc(80vh-200px)] flex justify-center items-start">
+            <LabelGenerator data={labelData} hidePrintButton />
+          </div>
+        </div>
+      </div>
+
+      <DialogFooter className="gap-2">
+        <Button variant="outline" onClick={() => setOpen(false)}>
+          Cancel
+        </Button>
+        <Button variant="outline" onClick={handleDownload}>
+          <Download className="w-4 h-4 mr-2" />
+          Download PDF
+        </Button>
+        <Button onClick={handlePrint}>
+          <Printer className="w-4 h-4 mr-2" />
+          Print Label
+        </Button>
+      </DialogFooter>
+    </SizedDialog>
   );
 };
 

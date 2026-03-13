@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,6 +40,7 @@ const defaultTemplates: LabelTemplate[] = [
 export const LabelTemplateManager: React.FC = () => {
   const [templates, setTemplates] = useState<LabelTemplate[]>(defaultTemplates);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleSetDefault = (templateId: string) => {
     setTemplates((prev) =>
@@ -91,11 +92,89 @@ export const LabelTemplateManager: React.FC = () => {
   };
 
   const handleImport = () => {
-    toast.info('Import functionality coming soon');
+    fileInputRef.current?.click();
+  };
+
+  const handleImportFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const rawContent = await file.text();
+      const parsed = JSON.parse(rawContent) as Partial<LabelTemplate>;
+
+      const type =
+        parsed.type === 'AIR' || parsed.type === 'SURFACE' || parsed.type === 'CUSTOM'
+          ? parsed.type
+          : null;
+
+      if (
+        !type ||
+        typeof parsed.name !== 'string' ||
+        !parsed.name.trim() ||
+        typeof parsed.description !== 'string' ||
+        !parsed.description.trim()
+      ) {
+        throw new Error('Template file must include a valid name, description, and type.');
+      }
+
+      const normalizedName = parsed.name.trim();
+      const normalizedDescription = parsed.description.trim();
+
+      const importedTemplate: LabelTemplate = {
+        id:
+          typeof parsed.id === 'string' && parsed.id.trim()
+            ? parsed.id.trim()
+            : `${type.toLowerCase()}-custom-${Date.now()}`,
+        name: normalizedName,
+        description: normalizedDescription,
+        type,
+        isDefault: false,
+        createdAt:
+          typeof parsed.createdAt === 'string' && parsed.createdAt.trim()
+            ? parsed.createdAt
+            : new Date().toISOString(),
+        usageCount:
+          typeof parsed.usageCount === 'number' && Number.isFinite(parsed.usageCount)
+            ? parsed.usageCount
+            : 0,
+      };
+
+      setTemplates((prev) => {
+        const duplicateId = prev.some((template) => template.id === importedTemplate.id);
+        const nextTemplate = duplicateId
+          ? {
+              ...importedTemplate,
+              id: `${importedTemplate.id}-${Date.now()}`,
+            }
+          : importedTemplate;
+
+        setSelectedTemplate(nextTemplate.id);
+        return [...prev, nextTemplate];
+      });
+
+      toast.success('Template imported successfully');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to import template');
+    } finally {
+      event.target.value = '';
+    }
   };
 
   return (
     <div className="space-y-6">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/json,.json"
+        className="hidden"
+        onChange={(event) => {
+          void handleImportFileChange(event);
+        }}
+      />
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Label Templates</h2>

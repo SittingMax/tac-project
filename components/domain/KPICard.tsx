@@ -36,12 +36,12 @@ export function KPICard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-none border border-white/10 bg-card/80 backdrop-blur-sm p-6 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5',
+        'relative overflow-hidden rounded-lg border border-border bg-card/80 backdrop-blur-sm p-6 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5',
         className
       )}
     >
       {/* Gradient accent */}
-      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/10 to-transparent rounded-none" />
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-3xl" />
 
       <div className="flex items-start justify-between relative z-10">
         <div className="space-y-2">
@@ -52,7 +52,7 @@ export function KPICard({
           {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
         </div>
 
-        {icon && <div className="p-4 rounded-none bg-primary/10 text-primary">{icon}</div>}
+        {icon && <div className="p-4 rounded-lg bg-primary/10 text-primary">{icon}</div>}
       </div>
 
       {change !== undefined && (

@@ -18,13 +18,13 @@ export function MockCargoControlCenter() {
       style={{ perspective: '1000px' }}
     >
       {/* Outer Glow */}
-      <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-none blur-2xl opacity-50" />
+      <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-md blur-2xl opacity-50" />
 
       {/* Main Container */}
-      <div className="relative rounded-none border border-border bg-card/80 backdrop-blur-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row h-[400px] md:h-[500px]">
+      <div className="relative rounded-md border border-border bg-card/80 backdrop-blur-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row h-[400px] md:h-[500px]">
         {/* Fake Sidebar */}
         <div className="hidden md:flex flex-col w-16 border-r border-border bg-foreground/[0.02] items-center py-6 gap-6 z-10">
-          <div className="w-8 h-8 rounded-none bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
+          <div className="w-8 h-8 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
             <Box className="w-4 h-4 text-primary" />
           </div>
           <Globe className="w-5 h-5 text-foreground/40 hover:text-foreground transition-colors cursor-pointer" />
@@ -38,21 +38,21 @@ export function MockCargoControlCenter() {
           {/* Fake Header */}
           <div className="h-14 border-b border-border flex items-center justify-between px-4 lg:px-6 bg-foreground/[0.01]">
             <div className="flex gap-2.5 items-center">
-              <div className="w-3 h-3 rounded-none bg-destructive/20 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-none bg-destructive" />
+              <div className="w-3 h-3 rounded-full bg-destructive/20 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
               </div>
-              <div className="w-3 h-3 rounded-none bg-orange-500/20 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-none bg-orange-500" />
+              <div className="w-3 h-3 rounded-full bg-orange-500/20 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
               </div>
-              <div className="w-3 h-3 rounded-none bg-primary/20 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-none bg-primary" />
+              <div className="w-3 h-3 rounded-full bg-primary/20 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
               </div>
             </div>
 
-            <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-none px-4 py-1">
+            <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-md px-4 py-1">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-none h-2 w-2 bg-primary"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
               <span className="text-[10px] font-mono text-primary uppercase tracking-wider">
                 Live Connected
@@ -72,7 +72,7 @@ export function MockCargoControlCenter() {
               ].map((stat, i) => (
                 <div
                   key={i}
-                  className="rounded-none border border-border bg-foreground/[0.02] p-4 flex flex-col gap-1 backdrop-blur-md"
+                  className="rounded-md border border-border bg-foreground/[0.02] p-4 flex flex-col gap-1 backdrop-blur-md"
                 >
                   <span className="text-xs font-mono text-foreground/40 uppercase">
                     {stat.label}
@@ -87,7 +87,7 @@ export function MockCargoControlCenter() {
             </div>
 
             {/* Main Graph Area */}
-            <div className="flex-1 rounded-none border border-border bg-foreground/[0.01] overflow-hidden relative group">
+            <div className="flex-1 rounded-md border border-border bg-foreground/[0.01] overflow-hidden relative group">
               <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
                 <Activity className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium text-foreground/80">

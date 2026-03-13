@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
-import { getOrCreateDefaultOrg } from '../lib/org-helper';
+import { useAuthStore } from '../store/authStore';
 
 // Direct supabase usage - types from database.types.ts
 
@@ -24,12 +24,16 @@ export interface Staff {
   email: string;
   full_name: string;
   role:
+    | 'SUPER_ADMIN'
     | 'ADMIN'
     | 'MANAGER'
     | 'WAREHOUSE_IMPHAL'
     | 'WAREHOUSE_DELHI'
+    | 'WAREHOUSE_STAFF'
     | 'OPS'
+    | 'OPS_STAFF'
     | 'INVOICE'
+    | 'FINANCE_STAFF'
     | 'SUPPORT';
   hub_id: string | null;
   is_active: boolean;
@@ -39,9 +43,11 @@ export interface Staff {
 }
 
 export function useStaff(options?: { hubId?: string }) {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useQuery({
     queryKey: ['staff', options],
     queryFn: async () => {
+      if (!orgId) return [];
       let query = supabase
         .from('staff')
         .select(
@@ -50,6 +56,7 @@ export function useStaff(options?: { hubId?: string }) {
           hub:hubs(code, name)
         `
         )
+        .eq('org_id', orgId)
         .order('full_name', { ascending: true });
 
       if (options?.hubId) {
@@ -60,11 +67,13 @@ export function useStaff(options?: { hubId?: string }) {
       if (error) throw error;
       return data as Staff[];
     },
+    enabled: !!orgId,
   });
 }
 
 export function useCreateStaff() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async (staff: {
@@ -73,7 +82,9 @@ export function useCreateStaff() {
       role: Staff['role'];
       hub_id?: string;
     }) => {
-      const orgId = await getOrCreateDefaultOrg();
+      if (!orgId) {
+        throw new Error('No organization context available for staff creation.');
+      }
 
       const { data, error } = await supabase
         .from('staff')
@@ -100,13 +111,18 @@ export function useCreateStaff() {
 
 export function useUpdateStaff() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Staff> }) => {
+      if (!orgId) {
+        throw new Error('No organization context available for staff updates.');
+      }
       const { data: result, error } = await supabase
         .from('staff')
         .update({ ...data, updated_at: new Date().toISOString() })
         .eq('id', id)
+        .eq('org_id', orgId)
         .select()
         .single();
 
@@ -125,13 +141,18 @@ export function useUpdateStaff() {
 
 export function useToggleStaffStatus() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      if (!orgId) {
+        throw new Error('No organization context available for staff updates.');
+      }
       const { data, error } = await supabase
         .from('staff')
         .update({ is_active: !isActive, updated_at: new Date().toISOString() })
         .eq('id', id)
+        .eq('org_id', orgId)
         .select()
         .single();
 
@@ -153,16 +174,21 @@ export function useToggleStaffStatus() {
  */
 export function useDeleteStaff() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async (id: string) => {
+      if (!orgId) {
+        throw new Error('No organization context available for staff deletion.');
+      }
       const { error } = await supabase
         .from('staff')
         .update({
           deleted_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
-        .eq('id', id);
+        .eq('id', id)
+        .eq('org_id', orgId);
 
       if (error) throw error;
     },

@@ -164,6 +164,11 @@ Final reviewer: All requirements met, ready to merge
 Done!
 ```
 
+## Environment Awareness
+
+- **Strict Mode:** If strict mode is enabled, remember that terminal commands and browser Javascript execution will pause to prompt the user. Subagents MUST set explicit `WaitMsBeforeAsync` and handle terminal waits gracefully without freezing.
+- **Browser Subagent:** For web UI or E2E tasks, inform the implementer subagent that they can invoke the `browser_subagent` to independently verify DOM states or visual renders.
+
 ## Advantages
 
 **vs. Manual execution:**

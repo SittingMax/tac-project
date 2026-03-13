@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { useStore } from '../../store';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { SizedDialog } from '@/components/ui-core/dialog/sized-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -96,119 +96,111 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
   if (!user) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
-        </DialogHeader>
+    <SizedDialog open={open} onOpenChange={onOpenChange} title="Edit Profile" size="sm">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="preferences">Preferences</TabsTrigger>
+        </TabsList>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="preferences">Preferences</TabsTrigger>
-          </TabsList>
+        <TabsContent value="profile" className="space-y-4 py-4">
+          <div className="flex justify-center mb-6">
+            <div className="relative group">
+              <Avatar className="h-24 w-24 border-2 border-primary/20">
+                <AvatarImage src={avatarUrl} />
+                <AvatarFallback className="text-xl bg-primary/10 text-primary">
+                  {getInitials(fullName)}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+          </div>
 
-          <TabsContent value="profile" className="space-y-4 py-4">
-            <div className="flex justify-center mb-6">
-              <div className="relative group">
-                <Avatar className="h-24 w-24 border-2 border-primary/20">
-                  <AvatarImage src={avatarUrl} />
-                  <AvatarFallback className="text-xl bg-primary/10 text-primary">
-                    {getInitials(fullName)}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Full Name
+              </label>
+              <Input
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Enter your full name"
+              />
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Full Name
-                </label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Avatar Image
+              </label>
+              <div className="flex items-center gap-4">
                 <Input
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Enter your full name"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="cursor-pointer"
+                  disabled={isUploading}
                 />
+                {isUploading && (
+                  <span className="text-xs text-muted-foreground animate-pulse">Uploading...</span>
+                )}
               </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Avatar Image
-                </label>
-                <div className="flex items-center gap-4">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="cursor-pointer"
-                    disabled={isUploading}
-                  />
-                  {isUploading && (
-                    <span className="text-xs text-muted-foreground animate-pulse">
-                      Uploading...
-                    </span>
-                  )}
-                </div>
-                <p className="text-[10px] text-muted-foreground">
-                  Upload a PNG, JPG or GIF image (max 2MB)
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none opacity-50">Email</label>
-                <Input value={user.email} disabled className="bg-muted opacity-50" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none opacity-50">Role</label>
-                <Input value={user.role} disabled className="bg-muted opacity-50" />
-              </div>
-            </div>
-
-            <div className="flex justify-end pt-4">
-              <Button onClick={handleSaveProfile} disabled={isLoading}>
-                {isLoading ? 'Saving...' : 'Save Changes'}
-              </Button>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="preferences" className="space-y-6 py-4">
-            <div className="space-y-4">
-              <h4 className="text-sm font-medium">Theme</h4>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => setTheme('light')}
-                  className={`flex flex-col items-center justify-center p-4 rounded-none border-2 transition-all ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
-                >
-                  <Sun className="w-5 h-5 mb-2" />
-                  <span className="text-xs">Light</span>
-                </button>
-                <button
-                  onClick={() => setTheme('dark')}
-                  className={`flex flex-col items-center justify-center p-4 rounded-none border-2 transition-all ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
-                >
-                  <Moon className="w-5 h-5 mb-2" />
-                  <span className="text-xs">Dark</span>
-                </button>
-                <button
-                  onClick={() => setTheme('system')}
-                  className={`flex flex-col items-center justify-center p-4 rounded-none border-2 transition-all ${theme === 'system' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
-                >
-                  <Monitor className="w-5 h-5 mb-2" />
-                  <span className="text-xs">System</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t">
-              <p className="text-xs text-muted-foreground text-center">
-                Theme settings are saved securely to your profile.
+              <p className="text-[10px] text-muted-foreground">
+                Upload a PNG, JPG or GIF image (max 2MB)
               </p>
             </div>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none opacity-50">Email</label>
+              <Input value={user.email} disabled className="bg-muted opacity-50" />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none opacity-50">Role</label>
+              <Input value={user.role} disabled className="bg-muted opacity-50" />
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4">
+            <Button onClick={handleSaveProfile} disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="preferences" className="space-y-6 py-4">
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium">Theme</h4>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => setTheme('light')}
+                className={`flex flex-col items-center justify-center p-4 rounded-md border-2 transition-all ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
+              >
+                <Sun className="w-5 h-5 mb-2" />
+                <span className="text-xs">Light</span>
+              </button>
+              <button
+                onClick={() => setTheme('dark')}
+                className={`flex flex-col items-center justify-center p-4 rounded-md border-2 transition-all ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
+              >
+                <Moon className="w-5 h-5 mb-2" />
+                <span className="text-xs">Dark</span>
+              </button>
+              <button
+                onClick={() => setTheme('system')}
+                className={`flex flex-col items-center justify-center p-4 rounded-md border-2 transition-all ${theme === 'system' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
+              >
+                <Monitor className="w-5 h-5 mb-2" />
+                <span className="text-xs">System</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t">
+            <p className="text-xs text-muted-foreground text-center">
+              Theme settings are saved on this device for your workspace.
+            </p>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </SizedDialog>
   );
 };

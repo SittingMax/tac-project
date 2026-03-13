@@ -1,6 +1,9 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type ElementType } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { hasRoleAccess } from '@/lib/access-control';
 import { useShipments } from '@/hooks/useShipments';
+import { useAuthStore } from '@/store/authStore';
+import type { UserRole } from '@/types';
 import {
   Command,
   CommandEmpty,
@@ -33,34 +36,102 @@ interface CommandPaletteProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-const NAVIGATION_ITEMS = [
+interface NavigationItem {
+  name: string;
+  path: string;
+  icon: ElementType;
+  shortcut?: string;
+  roles?: UserRole[];
+}
+
+interface QuickActionItem {
+  name: string;
+  action: string;
+  icon: ElementType;
+  roles?: UserRole[];
+}
+
+const NAVIGATION_ITEMS: NavigationItem[] = [
   { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, shortcut: '⌘D' },
   { name: 'Shipments', path: '/shipments', icon: Package, shortcut: '⌘S' },
-  { name: 'Scanning', path: '/scanning', icon: ScanLine, shortcut: '⌘K' },
-  { name: 'Manifests', path: '/manifests', icon: Truck },
+  {
+    name: 'Scanning',
+    path: '/scanning',
+    icon: ScanLine,
+    shortcut: '⌘K',
+    roles: ['ADMIN', 'MANAGER', 'WAREHOUSE_STAFF'],
+  },
+  { name: 'Manifests', path: '/manifests', icon: Truck, roles: ['ADMIN', 'MANAGER', 'OPS_STAFF'] },
   { name: 'Tracking', path: '/tracking', icon: Search },
-  { name: 'Inventory', path: '/inventory', icon: Warehouse },
-  { name: 'Invoices', path: '/finance', icon: FileText },
-  { name: 'Exceptions', path: '/exceptions', icon: AlertTriangle },
-  { name: 'Customers', path: '/customers', icon: Users },
-  { name: 'Analytics', path: '/analytics', icon: BarChart3 },
+  {
+    name: 'Inventory',
+    path: '/inventory',
+    icon: Warehouse,
+    roles: ['ADMIN', 'MANAGER', 'WAREHOUSE_STAFF'],
+  },
+  {
+    name: 'Invoices',
+    path: '/finance',
+    icon: FileText,
+    roles: ['ADMIN', 'MANAGER', 'FINANCE_STAFF'],
+  },
+  {
+    name: 'Exceptions',
+    path: '/exceptions',
+    icon: AlertTriangle,
+    roles: ['ADMIN', 'MANAGER', 'OPS_STAFF', 'WAREHOUSE_STAFF'],
+  },
+  {
+    name: 'Customers',
+    path: '/customers',
+    icon: Users,
+    roles: ['ADMIN', 'MANAGER', 'FINANCE_STAFF', 'OPS_STAFF'],
+  },
+  {
+    name: 'Analytics',
+    path: '/analytics',
+    icon: BarChart3,
+    roles: ['ADMIN', 'MANAGER', 'FINANCE_STAFF'],
+  },
   { name: 'Settings', path: '/settings', icon: Settings },
 ];
 
-const QUICK_ACTIONS = [
+const QUICK_ACTIONS: QuickActionItem[] = [
   { name: 'Create Shipment', action: 'create-shipment', icon: Plus },
-  { name: 'Scan Package', action: 'scan-package', icon: ScanLine },
-  { name: 'Create Invoice', action: 'create-invoice', icon: FileText },
-  { name: 'New Manifest', action: 'new-manifest', icon: Truck },
+  {
+    name: 'Scan Package',
+    action: 'scan-package',
+    icon: ScanLine,
+    roles: ['ADMIN', 'MANAGER', 'WAREHOUSE_STAFF'],
+  },
+  {
+    name: 'Create Invoice',
+    action: 'create-invoice',
+    icon: FileText,
+    roles: ['ADMIN', 'MANAGER', 'FINANCE_STAFF'],
+  },
+  {
+    name: 'New Manifest',
+    action: 'new-manifest',
+    icon: Truck,
+    roles: ['ADMIN', 'MANAGER', 'OPS_STAFF'],
+  },
 ];
 
 export function CommandPalette({ open: controlledOpen, onOpenChange }: CommandPaletteProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const navigate = useNavigate();
   const { data: shipments = [] } = useShipments();
+  const userRole = useAuthStore((state) => state.user?.role);
 
   const open = controlledOpen ?? internalOpen;
   const setOpen = onOpenChange ?? setInternalOpen;
+  const visibleNavigationItems = NAVIGATION_ITEMS.filter((item) =>
+    hasRoleAccess(userRole, item.roles)
+  );
+  const visibleQuickActions = QUICK_ACTIONS.filter((action) =>
+    hasRoleAccess(userRole, action.roles)
+  );
 
   // Keyboard shortcut handler
   useEffect(() => {
@@ -88,7 +159,7 @@ export function CommandPalette({ open: controlledOpen, onOpenChange }: CommandPa
       // Handle quick actions
       switch (value) {
         case 'create-shipment':
-          navigate('/shipments?action=create');
+          navigate('/shipments?new=true');
           break;
         case 'scan-package':
           navigate('/scanning');
@@ -99,14 +170,25 @@ export function CommandPalette({ open: controlledOpen, onOpenChange }: CommandPa
         case 'new-manifest':
           navigate('/manifests?action=create');
           break;
-        default:
-          // If it looks like a CN, navigate to tracking
-          if (value.startsWith('WGS') || value.match(/^[A-Z]{2,3}\d+/)) {
-            navigate(`/tracking?awb=${value}`);
+        default: {
+          const normalizedValue = value.trim().toUpperCase();
+          const shipmentMatch = shipments.find(
+            (shipment) => shipment.cn_number.toUpperCase() === normalizedValue
+          );
+
+          if (shipmentMatch) {
+            navigate(`/shipments/${shipmentMatch.id}`);
+            return;
           }
+
+          // If it looks like a CN, route through shared search so shipment results land in shipment workflows
+          if (normalizedValue.startsWith('WGS') || normalizedValue.match(/^[A-Z]{2,3}\d+/)) {
+            navigate(`/search?q=${encodeURIComponent(normalizedValue)}`);
+          }
+        }
       }
     },
-    [navigate, setOpen]
+    [navigate, setOpen, shipments]
   );
 
   // Get recent shipments for quick access
@@ -152,7 +234,7 @@ export function CommandPalette({ open: controlledOpen, onOpenChange }: CommandPa
             <CommandSeparator />
 
             <CommandGroup heading="Quick Actions">
-              {QUICK_ACTIONS.map((action) => (
+              {visibleQuickActions.map((action) => (
                 <CommandItem
                   key={action.action}
                   value={action.action}
@@ -167,7 +249,7 @@ export function CommandPalette({ open: controlledOpen, onOpenChange }: CommandPa
             <CommandSeparator />
 
             <CommandGroup heading="Navigation">
-              {NAVIGATION_ITEMS.map((item) => (
+              {visibleNavigationItems.map((item) => (
                 <CommandItem
                   key={item.path}
                   value={item.path}

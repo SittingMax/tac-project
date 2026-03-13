@@ -18,7 +18,7 @@ export function TrackingResultCard({ data, className, onClose }: TrackingResultC
   return (
     <motion.div
       className={cn(
-        'w-full font-sans rounded-none overflow-hidden shadow-2xl bg-card dark:bg-black/40 border border-border dark:border-border/50 backdrop-blur-lg relative group',
+        'w-full font-sans rounded-md overflow-hidden shadow-2xl bg-card dark:bg-black/40 border border-border dark:border-border/50 backdrop-blur-lg relative group',
         className
       )}
       initial={{ opacity: 0, y: 30 }}
@@ -26,17 +26,17 @@ export function TrackingResultCard({ data, className, onClose }: TrackingResultC
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
       {/* Neon Glow Effect */}
-      <div className="absolute -inset-[1px] bg-gradient-to-br from-primary/30 via-transparent to-secondary/10 rounded-none opacity-50 blur-lg pointer-events-none" />
+      <div className="absolute -inset-[1px] bg-gradient-to-br from-primary/30 via-transparent to-secondary/10 rounded-md opacity-50 blur-lg pointer-events-none" />
 
       {/* Main Content Wrapper */}
-      <div className="relative h-full rounded-none overflow-hidden border border-border/20 bg-card/10">
+      <div className="relative h-full rounded-md overflow-hidden border border-border/20 bg-card/10">
         {/* Header Status Bar */}
         <div className="absolute top-0 left-0 right-0 h-16 border-b border-border/20 flex justify-between items-center px-6 bg-muted/20 dark:bg-black/20 z-20">
           <div className="flex gap-2">
-            <div className="pl-2 pr-3 py-1 rounded-none bg-status-live/10 border border-status-live/20 text-status-live text-[10px] font-mono font-bold flex items-center gap-2 backdrop-blur-md">
+            <div className="pl-2 pr-3 py-1 rounded-md bg-status-live/10 border border-status-live/20 text-status-live text-[10px] font-mono font-bold flex items-center gap-2 backdrop-blur-md">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-status-live opacity-75"></span>
-                <span className="relative inline-flex rounded-none h-1.5 w-1.5 bg-status-live"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-live opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-status-live"></span>
               </span>
               LIVE_TRACKING
             </div>
@@ -63,13 +63,13 @@ export function TrackingResultCard({ data, className, onClose }: TrackingResultC
         {/* Map Visualization Area (Abstract) */}
         <div className="relative h-48 w-full overflow-hidden bg-muted/20 dark:bg-black/40 mt-16">
           {/* Grid Overlay */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px]" />
+          <div className="absolute inset-0 bg-[linear-gradient(oklch(100%_0_0deg/0.03)_1px,transparent_1px),linear-gradient(90deg,oklch(100%_0_0deg/0.03)_1px,transparent_1px)] bg-[size:20px_20px]" />
 
           {/* Flight Path Graphic */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-full px-12 flex items-center justify-between opacity-80">
               <div className="flex flex-col items-center gap-2">
-                <div className="w-3 h-3 rounded-none bg-muted-foreground/50" />
+                <div className="w-3 h-3 rounded-full bg-muted-foreground/50" />
                 <span className="text-[10px] font-mono text-muted-foreground">
                   {shipment.origin}
                 </span>
@@ -89,7 +89,7 @@ export function TrackingResultCard({ data, className, onClose }: TrackingResultC
                 </motion.div>
               </div>
               <div className="flex flex-col items-center gap-2">
-                <div className="w-3 h-3 rounded-none bg-primary shadow-[0_0_10px_var(--primary)]" />
+                <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_10px_var(--primary)]" />
                 <span className="text-[10px] font-mono text-primary font-bold">
                   {shipment.destination}
                 </span>
@@ -112,7 +112,7 @@ export function TrackingResultCard({ data, className, onClose }: TrackingResultC
           </div>
 
           {/* Latest Event */}
-          <div className="rounded-none bg-muted/20 dark:bg-white/5 border border-border/20 dark:border-white/5 p-4">
+          <div className="rounded-md bg-muted/20 dark:bg-white/5 border border-border/20 dark:border-white/5 p-4">
             <div className="flex justify-between items-start mb-1">
               <span className="text-[10px] uppercase text-muted-foreground font-mono">
                 Latest Event

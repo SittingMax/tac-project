@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
-import { getOrCreateDefaultOrg } from '../lib/org-helper';
 import type { Json } from '../lib/database.types';
+import { useAuthStore } from '../store/authStore';
 
 /**
  * Address structure for customers
@@ -60,12 +60,15 @@ export interface Customer {
 }
 
 export function useCustomers(options?: { search?: string; limit?: number }) {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useQuery({
     queryKey: customerKeys.list(options),
     queryFn: async () => {
+      if (!orgId) return [];
       let query = supabase
         .from('customers')
         .select('*')
+        .eq('org_id', orgId)
         .is('deleted_at', null)
         .order('name', { ascending: true });
 
@@ -81,24 +84,35 @@ export function useCustomers(options?: { search?: string; limit?: number }) {
       if (error) throw error;
       return data as Customer[];
     },
+    enabled: !!orgId,
   });
 }
 
 export function useCustomer(id: string | null) {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useQuery({
     queryKey: customerKeys.detail(id ?? ''),
     queryFn: async () => {
-      const { data, error } = await supabase.from('customers').select('*').eq('id', id!).single();
+      if (!orgId) {
+        throw new Error('No organization context available for customer lookup.');
+      }
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', id!)
+        .eq('org_id', orgId)
+        .single();
 
       if (error) throw error;
       return data as Customer;
     },
-    enabled: !!id,
+    enabled: !!id && !!orgId,
   });
 }
 
 export function useCreateCustomer() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async (customer: {
@@ -112,7 +126,9 @@ export function useCreateCustomer() {
       billing_address?: CustomerAddress | Json;
       credit_limit?: number;
     }) => {
-      const orgId = await getOrCreateDefaultOrg();
+      if (!orgId) {
+        throw new Error('No organization context available for customer creation.');
+      }
 
       const insertData = {
         ...customer,
@@ -138,9 +154,13 @@ export function useCreateCustomer() {
 
 export function useUpdateCustomer() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Customer> }) => {
+      if (!orgId) {
+        throw new Error('No organization context available for customer updates.');
+      }
       // Extract only valid update fields
       const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
       const allowedFields = [
@@ -163,6 +183,7 @@ export function useUpdateCustomer() {
         .from('customers')
         .update(updateData)
         .eq('id', id)
+        .eq('org_id', orgId)
         .select()
         .single();
 
@@ -185,14 +206,19 @@ export function useUpdateCustomer() {
  */
 export function useDeleteCustomer() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async (id: string) => {
+      if (!orgId) {
+        throw new Error('No organization context available for customer deletion.');
+      }
       // Type assertion needed due to Supabase client type inference limitations
       const { error } = await supabase
         .from('customers')
         .update({ deleted_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-        .eq('id', id);
+        .eq('id', id)
+        .eq('org_id', orgId);
 
       if (error) throw error;
     },

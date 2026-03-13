@@ -29,22 +29,20 @@ export const AuditStatsPanel: React.FC<AuditStatsPanelProps> = ({ stats }) => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-4 rounded-none border border-border bg-background flex flex-col items-center justify-center text-center">
+        <Card className="p-4 rounded-md border border-border bg-background flex flex-col items-center justify-center text-center">
           <Package className="w-6 h-6 text-muted-foreground mb-2" />
-          <div className="text-3xl font-black font-mono tracking-tighter text-foreground">
-            {stats.total}
-          </div>
+          <div className="text-3xl font-semibold tracking-tight text-foreground">{stats.total}</div>
           <div className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
             Expected
           </div>
         </Card>
 
-        <Card className="p-4 rounded-none border border-border bg-background flex flex-col items-center justify-center text-center relative overflow-hidden">
+        <Card className="p-4 rounded-md border border-border bg-background flex flex-col items-center justify-center text-center relative overflow-hidden">
           {stats.scanned > 0 && (
             <div className="absolute inset-0 bg-status-success/5 border-b-2 border-status-success pointer-events-none" />
           )}
           <CheckCircle2 className="w-6 h-6 text-status-success mb-2 relative z-10" />
-          <div className="text-3xl font-black font-mono tracking-tighter text-status-success relative z-10">
+          <div className="text-3xl font-semibold tracking-tight text-status-success relative z-10">
             {stats.scanned}
           </div>
           <div className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1 relative z-10">
@@ -52,9 +50,9 @@ export const AuditStatsPanel: React.FC<AuditStatsPanelProps> = ({ stats }) => {
           </div>
         </Card>
 
-        <Card className="p-4 rounded-none border border-border bg-background flex flex-col items-center justify-center text-center">
+        <Card className="p-4 rounded-md border border-border bg-background flex flex-col items-center justify-center text-center">
           <Box className="w-6 h-6 text-muted-foreground mb-2 opacity-50" />
-          <div className="text-3xl font-black font-mono tracking-tighter text-foreground">
+          <div className="text-3xl font-semibold tracking-tight text-foreground">
             {stats.missing}
           </div>
           <div className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
@@ -62,7 +60,7 @@ export const AuditStatsPanel: React.FC<AuditStatsPanelProps> = ({ stats }) => {
           </div>
         </Card>
 
-        <Card className="p-4 rounded-none border border-border bg-background flex flex-col items-center justify-center text-center relative overflow-hidden">
+        <Card className="p-4 rounded-md border border-border bg-background flex flex-col items-center justify-center text-center relative overflow-hidden">
           {stats.exceptions > 0 && (
             <div className="absolute inset-0 bg-status-error/5 border-b-2 border-status-error pointer-events-none" />
           )}
@@ -70,7 +68,7 @@ export const AuditStatsPanel: React.FC<AuditStatsPanelProps> = ({ stats }) => {
             className={`w-6 h-6 mb-2 relative z-10 ${stats.exceptions > 0 ? 'text-status-error' : 'text-muted-foreground opacity-50'}`}
           />
           <div
-            className={`text-3xl font-black font-mono tracking-tighter relative z-10 ${stats.exceptions > 0 ? 'text-status-error' : 'text-foreground'}`}
+            className={`text-3xl font-semibold tracking-tight relative z-10 ${stats.exceptions > 0 ? 'text-status-error' : 'text-foreground'}`}
           >
             {stats.exceptions}
           </div>

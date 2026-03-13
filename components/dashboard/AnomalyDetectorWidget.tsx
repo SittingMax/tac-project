@@ -24,9 +24,9 @@ export const AnomalyDetectorWidget: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <Skeleton className="w-full h-16 rounded-none" />
-            <Skeleton className="w-full h-16 rounded-none" />
-            <Skeleton className="w-full h-16 rounded-none" />
+            <Skeleton className="w-full h-16 rounded-md" />
+            <Skeleton className="w-full h-16 rounded-md" />
+            <Skeleton className="w-full h-16 rounded-md" />
           </div>
         </CardContent>
       </Card>
@@ -68,16 +68,16 @@ export const AnomalyDetectorWidget: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <BrainCircuit className="w-5 h-5 text-primary" />
-            <CardTitle className="text-xl">AI Anomaly Detector</CardTitle>
+            <CardTitle className="text-xl">Shipment Alert Monitor</CardTitle>
           </div>
           <CardDescription>
-            Monitoring {stats.totalAnalyzed} active shipments for irregularities using predictive
-            heuristics.
+            Reviewing {stats.totalAnalyzed} active shipments with rule-based checks for delay,
+            stalling, and route conflicts.
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex flex-col items-end">
-            <span className="text-sm font-medium text-muted-foreground">Detected Issues</span>
+            <span className="text-sm font-medium text-muted-foreground">Open Alerts</span>
             <span className="text-2xl font-bold leading-none mt-1">{stats.anomalyCount}</span>
           </div>
           {stats.criticalCount > 0 && (
@@ -94,26 +94,25 @@ export const AnomalyDetectorWidget: React.FC = () => {
       <CardContent className="relative z-10 flex-1 overflow-auto p-0">
         {error ? (
           <div className="flex flex-col items-center justify-center p-8 text-center h-48">
-            <div className="w-12 h-12 rounded-none bg-destructive/10 flex items-center justify-center mb-4">
+            <div className="w-12 h-12 rounded-lg bg-destructive/10 flex items-center justify-center mb-4">
               <AlertTriangle className="w-6 h-6 text-destructive" />
             </div>
-            <p className="text-sm font-medium text-foreground">Analysis Failed</p>
+            <p className="text-sm font-medium text-foreground">Alert Check Failed</p>
             <p className="text-xs text-muted-foreground mt-1 max-w-[250px] mb-4">
-              Failed to analyze shipments. Our neural net requires recalibration.
+              Unable to refresh shipment alert checks right now. Please try again.
             </p>
             <Button variant="outline" size="sm" onClick={() => refetch()}>
-              Retry analysis
+              Retry checks
             </Button>
           </div>
         ) : anomalies.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center h-48">
-            <div className="w-12 h-12 rounded-none bg-status-success/20 flex items-center justify-center mb-4">
+            <div className="w-12 h-12 rounded-lg bg-status-success/20 flex items-center justify-center mb-4">
               <BrainCircuit className="w-6 h-6 text-status-success" />
             </div>
             <p className="text-sm font-medium text-foreground">All Clear</p>
             <p className="text-xs text-muted-foreground mt-1 max-w-[250px]">
-              No anomalies detected across {stats.totalAnalyzed} active shipments. Operations are
-              nominal.
+              No rule-based alerts detected across {stats.totalAnalyzed} active shipments.
             </p>
           </div>
         ) : (
@@ -146,22 +145,6 @@ export const AnomalyDetectorWidget: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-4 w-full sm:w-auto mt-2 sm:mt-0 justify-between sm:justify-end">
-                  <div className="flex flex-col items-start sm:items-end">
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                      AI Confidence
-                    </span>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <div className="w-16 h-1.5 bg-muted rounded-none overflow-hidden">
-                        <div
-                          className="h-full bg-primary transition-all duration-1000 ease-out"
-                          style={{ width: `${anomaly.confidenceScore}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-mono font-medium">
-                        {anomaly.confidenceScore}%
-                      </span>
-                    </div>
-                  </div>
                   <Button
                     size="sm"
                     variant="secondary"

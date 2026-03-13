@@ -9,13 +9,31 @@ import { Staff } from '@/hooks/useStaff';
 
 // Role color mapping using semantic badge classes
 const ROLE_COLORS: Record<string, string> = {
+  SUPER_ADMIN: 'bg-primary text-primary-foreground border-transparent',
   ADMIN: 'bg-primary text-primary-foreground border-transparent',
   MANAGER: 'badge--manifested',
   OPS: 'badge--created',
+  OPS_STAFF: 'badge--created',
   WAREHOUSE_IMPHAL: 'badge--in-transit',
   WAREHOUSE_DELHI: 'badge--in-transit',
+  WAREHOUSE_STAFF: 'badge--in-transit',
   INVOICE: 'badge--delivered',
+  FINANCE_STAFF: 'badge--delivered',
   SUPPORT: 'badge--cancelled',
+};
+
+const ROLE_LABELS: Record<string, string> = {
+  SUPER_ADMIN: 'Super Admin',
+  ADMIN: 'Administrator',
+  MANAGER: 'Manager',
+  OPS: 'Operations (Legacy)',
+  OPS_STAFF: 'Operations Staff',
+  WAREHOUSE_IMPHAL: 'Warehouse (Imphal)',
+  WAREHOUSE_DELHI: 'Warehouse (Delhi)',
+  WAREHOUSE_STAFF: 'Warehouse Staff',
+  INVOICE: 'Finance (Legacy)',
+  FINANCE_STAFF: 'Finance Staff',
+  SUPPORT: 'Support',
 };
 
 export interface StaffColumnsParams {
@@ -35,7 +53,7 @@ export function getStaffColumns(params: StaffColumnsParams): ColumnDef<Staff>[] 
       header: 'Staff Member',
       cell: ({ row }) => (
         <div className="flex items-center gap-4">
-          <div className="w-8 h-8 rounded-none bg-muted flex items-center justify-center border border-white/10">
+          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center border border-white/10">
             <UserIcon className="w-4 h-4 text-muted-foreground" />
           </div>
           <div>
@@ -50,7 +68,7 @@ export function getStaffColumns(params: StaffColumnsParams): ColumnDef<Staff>[] 
       header: 'Role',
       cell: ({ row }) => (
         <Badge className={ROLE_COLORS[row.original.role] || ROLE_COLORS.SUPPORT}>
-          {row.original.role.replace(/_/g, ' ')}
+          {ROLE_LABELS[row.original.role] || row.original.role.replace(/_/g, ' ')}
         </Badge>
       ),
     },
@@ -74,7 +92,7 @@ export function getStaffColumns(params: StaffColumnsParams): ColumnDef<Staff>[] 
           }`}
         >
           <span
-            className={`w-1.5 h-1.5 rounded-none ${
+            className={`w-1.5 h-1.5 rounded-full ${
               row.original.is_active ? 'bg-status-active' : 'bg-muted'
             }`}
           />

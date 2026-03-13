@@ -6,14 +6,8 @@ import { useForm, UseFormReturn, DefaultValues } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { DialogFooter } from '@/components/ui/dialog';
+import { SizedDialog, type DialogSize } from '@/components/ui-core/dialog/sized-dialog';
 import { Form } from '@/components/ui/form';
 import { logger } from '@/lib/logger';
 
@@ -33,6 +27,7 @@ export interface CrudUpsertDialogProps<TSchema extends z.ZodTypeAny> {
   children: (form: UseFormReturn<z.infer<TSchema>>) => React.ReactNode;
   submitLabel?: string;
   cancelLabel?: string;
+  size?: DialogSize;
 }
 
 /**
@@ -69,6 +64,7 @@ export function CrudUpsertDialog<TSchema extends z.ZodTypeAny>({
   children,
   submitLabel,
   cancelLabel = 'Cancel',
+  size = 'md',
 }: CrudUpsertDialogProps<TSchema>) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -101,37 +97,33 @@ export function CrudUpsertDialog<TSchema extends z.ZodTypeAny>({
   const buttonLabel = submitLabel ?? (mode === 'create' ? 'Create' : 'Save Changes');
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="sm:max-w-xl max-h-[90vh] overflow-y-auto"
-        data-testid={`${mode}-dialog`}
-      >
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
-        </DialogHeader>
+    <SizedDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={title}
+      description={description}
+      size={size}
+    >
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          {children(form)}
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            {children(form)}
-
-            <DialogFooter className="pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isLoading}
-                data-testid="dialog-cancel-button"
-              >
-                {cancelLabel}
-              </Button>
-              <Button type="submit" disabled={isLoading} data-testid="dialog-submit-button">
-                {isLoading ? 'Saving...' : buttonLabel}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter className="pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+              data-testid="dialog-cancel-button"
+            >
+              {cancelLabel}
+            </Button>
+            <Button type="submit" disabled={isLoading} data-testid="dialog-submit-button">
+              {isLoading ? 'Saving...' : buttonLabel}
+            </Button>
+          </DialogFooter>
+        </form>
+      </Form>
+    </SizedDialog>
   );
 }

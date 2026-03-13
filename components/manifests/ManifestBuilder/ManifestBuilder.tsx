@@ -206,7 +206,7 @@ export function ManifestBuilder({
                 />
 
                 {builder.manifest && (
-                  <div className="rounded-none border p-4 space-y-4">
+                  <div className="rounded-md border p-4 space-y-4">
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase">
                       Manifest Details
                     </h3>
@@ -229,7 +229,7 @@ export function ManifestBuilder({
                   </div>
                 )}
 
-                <div className="rounded-none border p-4 space-y-2">
+                <div className="rounded-md border p-4 space-y-2">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase">
                     Active Rules
                   </h3>

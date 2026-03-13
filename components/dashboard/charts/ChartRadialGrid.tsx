@@ -1,8 +1,10 @@
 'use client';
 
+import * as React from 'react';
 import { TrendingUp } from 'lucide-react';
 import { PolarGrid, RadialBar, RadialBarChart } from 'recharts';
 
+import { useShipments } from '@/hooks/useShipments';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ChartContainer,
@@ -10,67 +12,112 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart';
+import { ChartSkeleton } from '@/components/ui/skeleton';
 
 export const description = 'A radial chart with a grid';
 
-const chartData = [
-  { browser: 'hubA', visitors: 4275, fill: 'var(--color-hubA)' },
-  { browser: 'hubB', visitors: 3200, fill: 'var(--color-hubB)' },
-  { browser: 'hubC', visitors: 2187, fill: 'var(--color-hubC)' },
-  { browser: 'hubD', visitors: 1173, fill: 'var(--color-hubD)' },
-];
-
-const chartConfig = {
-  visitors: {
-    label: 'Throughput',
-  },
-  hubA: {
-    label: 'Delhi Hub',
-    color: 'var(--chart-1)',
-  },
-  hubB: {
-    label: 'Mumbai Hub',
-    color: 'var(--chart-2)',
-  },
-  hubC: {
-    label: 'Bengaluru Hub',
-    color: 'var(--chart-3)',
-  },
-  hubD: {
-    label: 'Chennai Hub',
-    color: 'var(--chart-4)',
-  },
-} satisfies ChartConfig;
-
 export function ChartRadialGrid() {
+  const { data: shipments = [], isLoading } = useShipments({ limit: 1000 });
+
+  const radialProfile = React.useMemo(() => {
+    const hubMap = new Map<string, { label: string; shipments: number }>();
+    const colors = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)'];
+
+    shipments.forEach((shipment) => {
+      const hubCode = shipment.origin_hub?.code;
+      if (!hubCode) {
+        return;
+      }
+
+      const existing = hubMap.get(hubCode) ?? {
+        label: shipment.origin_hub?.name || hubCode,
+        shipments: 0,
+      };
+
+      existing.shipments += 1;
+      hubMap.set(hubCode, existing);
+    });
+
+    const topHubs = Array.from(hubMap.entries())
+      .map(([code, summary]) => ({ code, ...summary }))
+      .sort((a, b) => b.shipments - a.shipments)
+      .slice(0, 4);
+
+    const chartConfig: ChartConfig = {
+      shipments: {
+        label: 'Shipments',
+      },
+    };
+
+    topHubs.forEach((hub, index) => {
+      chartConfig[`hub${index + 1}`] = {
+        label: hub.label,
+        color: colors[index],
+      };
+    });
+
+    const chartData = topHubs.map((hub, index) => ({
+      hubKey: `hub${index + 1}`,
+      shipments: hub.shipments,
+      fill: `var(--color-hub${index + 1})`,
+    }));
+
+    return {
+      chartConfig,
+      chartData,
+      leadHub: topHubs[0] ?? null,
+      hasData: chartData.length > 0,
+    };
+  }, [shipments]);
+
+  if (isLoading) {
+    return <ChartSkeleton height={250} />;
+  }
+
+  if (!radialProfile.hasData) {
+    return (
+      <Card className="flex flex-col h-full border border-border bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300">
+        <CardHeader className="items-center pb-4 border-b border-border">
+          <CardTitle className="text-xs text-muted-foreground">Origin Hub Share</CardTitle>
+          <div className="text-lg font-semibold text-foreground mt-1">Relative Shipment Volume</div>
+        </CardHeader>
+        <CardContent className="flex flex-1 items-center justify-center pb-0">
+          <p className="text-sm text-muted-foreground py-12">
+            No origin hub shipment data available
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="flex flex-col h-full rounded-none border border-border/40 bg-transparent shadow-none hover:bg-muted/5 transition-colors duration-300">
-      <CardHeader className="items-center pb-4 border-b border-border/40">
-        <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
-          Hub Efficiency Index
-        </CardTitle>
-        <div className="text-xl font-bold tracking-tighter text-foreground mt-1">
-          Relative Throughput
-        </div>
+    <Card className="flex flex-col h-full border border-border bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300">
+      <CardHeader className="items-center pb-4 border-b border-border">
+        <CardTitle className="text-xs text-muted-foreground">Origin Hub Share</CardTitle>
+        <div className="text-lg font-semibold text-foreground mt-1">Relative Shipment Volume</div>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
-          <RadialBarChart data={chartData} innerRadius={30} outerRadius={100}>
+        <ChartContainer
+          config={radialProfile.chartConfig}
+          className="mx-auto aspect-square max-h-[250px]"
+        >
+          <RadialBarChart data={radialProfile.chartData} innerRadius={30} outerRadius={100}>
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel nameKey="browser" />}
+              content={<ChartTooltipContent hideLabel nameKey="hubKey" />}
             />
             <PolarGrid gridType="circle" stroke="var(--border)" opacity={0.3} />
-            <RadialBar dataKey="visitors" cornerRadius={0} />
+            <RadialBar dataKey="shipments" cornerRadius={0} />
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 pt-4 border-t border-border/40">
-        <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-foreground">
-          Delhi Hub leads efficiency <TrendingUp className="h-3 w-3 text-emerald-500" />
+      <CardFooter className="flex-col gap-2 pt-4 border-t border-border">
+        <div className="flex items-center gap-2 text-xs font-medium text-foreground">
+          {radialProfile.leadHub?.label ?? 'Origin hub'} leads shipment share{' '}
+          <TrendingUp className="h-3 w-3 text-primary" />
         </div>
-        <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/50 text-center">
-          Showing volume index based on processed unit count
+        <div className="text-xs text-muted-foreground text-center">
+          Showing relative shipment share by origin hub
         </div>
       </CardFooter>
     </Card>

@@ -10,14 +10,13 @@ export const OperationalHealth = () => {
   const { data, isLoading } = useDashboardKPIs();
 
   const healthData = useMemo(() => {
-    // Mocking a composite score calculation based on the KPIs
-    // In a real app, this would be computed server-side or more rigorously
     const deliveryScore = data?.slaCompliance ?? 0;
-    const exceptionPenalty = Math.min((data?.exceptions || 0) * 2, 20);
-    const speedScore = Math.max(100 - (data?.deliveryTime || 0) * 10, 50);
+    const deliveryTime = Number((data?.deliveryTime ?? 0).toFixed(1));
+    const exceptions = data?.exceptions ?? 0;
+    const speedScore = Math.max(0, Math.min(100, 100 - deliveryTime * 10));
+    const exceptionScore = Math.max(0, Math.min(100, 100 - exceptions * 5));
 
-    const compositeScore = Math.round(deliveryScore * 0.5 + speedScore * 0.5 - exceptionPenalty);
-    const normalizedScore = Math.max(0, Math.min(100, compositeScore));
+    const normalizedScore = Math.max(0, Math.min(100, deliveryScore));
 
     let status: 'healthy' | 'warning' | 'critical' | 'loading' = 'healthy'; // Add 'loading' to type
     let color = 'text-status-success';
@@ -44,14 +43,29 @@ export const OperationalHealth = () => {
       bgLayer,
       strokeColor,
       metrics: [
-        { label: 'SLA Output', value: deliveryScore, icon: ShieldCheck, target: 95 },
-        { label: 'Velocity', value: speedScore, icon: Zap, target: 80 },
         {
-          label: 'Exception Drag',
-          value: exceptionPenalty,
+          label: 'SLA Output',
+          value: deliveryScore,
+          displayValue: `${deliveryScore}%`,
+          progressValue: deliveryScore,
+          icon: ShieldCheck,
+          target: 95,
+        },
+        {
+          label: 'Avg Delivery',
+          value: deliveryTime,
+          displayValue: `${deliveryTime.toFixed(1)}d`,
+          progressValue: speedScore,
+          icon: Zap,
+          target: 80,
+        },
+        {
+          label: 'Open Exceptions',
+          value: exceptions,
+          displayValue: `${exceptions}`,
+          progressValue: exceptionScore,
           icon: AlertCircle,
           target: 0,
-          invert: true,
         },
       ],
     };
@@ -68,7 +82,7 @@ export const OperationalHealth = () => {
 
   return (
     <Card className="h-[420px] border-border/50 flex flex-col p-6 bg-card relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-none blur-3xl -translate-y-12 translate-x-12 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-12 translate-x-12 pointer-events-none" />
 
       <div className="flex items-center gap-2 mb-6">
         <Activity className="w-5 h-5 text-primary" />
@@ -108,26 +122,26 @@ export const OperationalHealth = () => {
           {/* Center Value */}
           <div className="text-center z-10 flex flex-col items-center justify-center">
             {isLoading ? (
-              <div className="w-24 h-12 bg-muted animate-pulse rounded-none" />
+              <div className="w-24 h-12 bg-muted animate-pulse rounded-md" />
             ) : (
               <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.5, type: 'spring' }}
-                className={cn('text-5xl font-black font-mono tracking-tighter', healthData.color)}
+                className={cn('text-5xl font-semibold tracking-tight', healthData.color)}
               >
                 {healthData.score}
               </motion.div>
             )}
             <div className="text-sm font-medium text-muted-foreground uppercase tracking-widest mt-1">
-              Score
+              SLA %
             </div>
           </div>
         </div>
 
         <div
           className={cn(
-            'mt-6 px-4 py-1.5 rounded-none text-sm font-semibold border flex items-center gap-2',
+            'mt-6 px-4 py-1.5 rounded-md text-sm font-semibold border flex items-center gap-2',
             healthData.bgLayer,
             healthData.color,
             'border-current/20'
@@ -136,7 +150,7 @@ export const OperationalHealth = () => {
           {healthData.status === 'healthy' && <ShieldCheck className="w-4 h-4" />}
           {healthData.status === 'warning' && <AlertCircle className="w-4 h-4" />}
           {healthData.status === 'critical' && <AlertCircle className="w-4 h-4" />}
-          System {healthData.status.charAt(0).toUpperCase() + healthData.status.slice(1)}
+          SLA {healthData.status.charAt(0).toUpperCase() + healthData.status.slice(1)}
         </div>
       </div>
 
@@ -153,15 +167,9 @@ export const OperationalHealth = () => {
                 <metric.icon className="w-4 h-4 opacity-70" />
                 <span>{metric.label}</span>
               </div>
-              <span className="font-semibold font-mono">
-                {metric.value}
-                {metric.invert ? ` pts` : '%'}
-              </span>
+              <span className="font-semibold font-mono">{metric.displayValue}</span>
             </div>
-            <Progress
-              value={metric.invert ? (metric.value / 20) * 100 : metric.value}
-              className="h-1.5 bg-muted"
-            />
+            <Progress value={metric.progressValue} className="h-1.5 bg-muted" />
           </div>
         ))}
       </div>

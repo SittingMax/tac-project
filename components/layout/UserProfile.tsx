@@ -47,8 +47,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed, className }
       legacyLogout();
       toast(
         <div className="flex items-center gap-3">
-          <div className="relative w-10 h-10 rounded-none bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden">
-            <span className="absolute inset-0 inline-flex h-full w-full rounded-none bg-primary/40 opacity-75 animate-ping"></span>
+          <div className="relative w-10 h-10 rounded-md bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden">
+            <span className="absolute inset-0 inline-flex h-full w-full rounded-md bg-primary/40 opacity-75 animate-ping"></span>
             <img
               src="/lottie/logout-success.gif"
               alt="Logout Success"
@@ -56,24 +56,21 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed, className }
             />
           </div>
           <div className="flex flex-col">
-            <span className="font-mono font-bold uppercase tracking-widest text-xs text-foreground">
-              Logged Out
-            </span>
+            <span className="text-xs font-semibold text-foreground">Logged Out</span>
             <span className="text-[10px] font-mono text-muted-foreground">
               You have been securely signed out.
             </span>
           </div>
         </div>,
         {
-          className: 'rounded-none border border-border/50 bg-background shadow-xl p-4',
+          className: 'rounded-md border border-border/50 bg-background shadow-xl p-4',
           duration: 4000,
         }
       );
     } catch (error) {
       logger.error('UserProfile', 'Sign out failed', { error });
       toast.error('Failed to sign out', {
-        className:
-          'rounded-none border border-destructive/50 bg-background shadow-xl font-mono uppercase tracking-widest text-xs',
+        className: 'rounded-md border border-destructive/50 bg-background shadow-xl text-xs',
       });
     }
   };
@@ -107,7 +104,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ collapsed, className }
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              'flex items-center gap-2 p-2 rounded-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-full border border-transparent hover:border-sidebar-border/50 group',
+              'flex items-center gap-2 p-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-full border border-transparent hover:border-sidebar-border/50 group',
               collapsed ? 'justify-center' : 'justify-between',
               className
             )}

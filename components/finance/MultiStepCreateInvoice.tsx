@@ -25,6 +25,7 @@ import { generateLabelFromFormData } from '@/lib/utils/label-utils';
 import { HUBS } from '@/lib/constants';
 import { logger } from '@/lib/logger';
 import { normalizeCustomerAddress } from '@/lib/utils/address-utils';
+import { cn } from '@/lib/utils';
 
 import { useMultiStepInvoice, steps, InvoiceFormData } from '@/hooks/useMultiStepInvoice';
 import { BasicsStep } from './invoice-steps/BasicsStep';
@@ -32,15 +33,17 @@ import { PartiesStep } from './invoice-steps/PartiesStep';
 import { CargoStep } from './invoice-steps/CargoStep';
 import { PaymentStep } from './invoice-steps/PaymentStep';
 
-// Helper to resolve city to Hub ID
-const resolveHubId = (city: string): string => {
-  if (!city) return HUBS.NEW_DELHI.uuid;
+const resolveHubId = (city: string): string | null => {
+  if (!city) return null;
   const c = city.toLowerCase();
 
   if (c.includes('imphal') || c.includes('manipur')) {
     return HUBS.IMPHAL.uuid;
   }
-  return HUBS.NEW_DELHI.uuid;
+  if (c.includes('delhi')) {
+    return HUBS.NEW_DELHI.uuid;
+  }
+  return null;
 };
 
 interface Props {
@@ -111,6 +114,24 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
 
         const originHubId = resolveHubId(data.consignorCity);
         const destHubId = resolveHubId(data.consigneeCity);
+
+        if (!originHubId || !destHubId) {
+          toast.error(
+            'Auto-created shipments currently support only Imphal and New Delhi hub cities. Choose supported cities or link an existing shipment.'
+          );
+          setDirection(-1);
+          setCurrentStep(1);
+          return;
+        }
+
+        if (originHubId === destHubId) {
+          toast.error(
+            'Consignor and consignee cannot resolve to the same hub for auto-created shipments. Choose different supported hub cities or link an existing shipment.'
+          );
+          setDirection(-1);
+          setCurrentStep(1);
+          return;
+        }
 
         const newShipment = await createShipmentMutation.mutateAsync({
           customer_id: data.customerId,
@@ -239,7 +260,7 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
           // However, invoice_number is generated in useCreateInvoice, and it doesn't take invoice_number into CreateInvoiceInput. Let's make sure it's shaped correctly:
         } as CreateInvoiceInput);
         localStorage.removeItem('invoice_draft');
-        toast.success('Invoice created securely!');
+        toast.success('Invoice created successfully!');
       }
 
       const invoiceForDialog = buildInvoiceFromRow(resultInvoice);
@@ -247,7 +268,7 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
       onSuccess(invoiceForDialog, (selectedShipment as Shipment) || undefined);
     } catch (error) {
       logger.error('MultiStepCreateInvoice', 'Submission error', { error });
-      toast.error('Failed to create invoice.');
+      toast.error(initialData?.id ? 'Failed to update invoice.' : 'Failed to create invoice.');
       throw error;
     }
   };
@@ -261,7 +282,7 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
     form.setValue('customerId', customer.id, { shouldValidate: true });
 
     const prefix = type === 'CONSIGNOR' ? 'consignor' : 'consignee';
-    form.setValue(`${prefix}Name` as keyof InvoiceFormData, customer.companyName || customer.name, {
+    form.setValue(`${prefix}Name` as keyof InvoiceFormData, customer.name, {
       shouldValidate: true,
     });
     form.setValue(`${prefix}Phone` as keyof InvoiceFormData, customer.phone, {
@@ -327,56 +348,52 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
     <Form {...form}>
       <MotionConfig transition={{ duration: 0.4, type: 'spring', bounce: 0.2 }}>
         <div className="flex flex-col h-full max-w-4xl mx-auto w-full min-h-[70vh]">
-          {/* Progress Header */}
-          <div className="mb-6">
-            <div className="flex flex-wrap items-end justify-between gap-4 mb-2">
+          {/* Vanguard Minimalist Progress Header */}
+          <div className="mb-8">
+            <div className="flex items-end justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">
                   {steps[currentStep].title}
                 </h2>
-                <p className="text-muted-foreground text-sm">{steps[currentStep].description}</p>
+                <p className="text-muted-foreground text-sm mt-1">
+                  {steps[currentStep].description}
+                </p>
               </div>
-              <div className="text-xs font-semibold tracking-wide uppercase text-muted-foreground border border-border/60 bg-muted/40 px-4 py-1 rounded-none">
-                Step {currentStep + 1} of {steps.length}
+              <div className="text-[10px] font-mono font-semibold tracking-widest uppercase text-muted-foreground">
+                Step {currentStep + 1} // {steps.length}
               </div>
             </div>
-            <div className="h-2 w-full bg-muted rounded-none overflow-hidden">
-              <motion.div
-                className="h-full bg-primary"
-                initial={{ width: 0 }}
-                animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {steps.map((step, index) => {
-                const isActive = index === currentStep;
-                const isComplete = index < currentStep;
-                const stateClasses = isActive
-                  ? 'border-primary/40 bg-primary/10 text-primary'
-                  : isComplete
-                    ? 'border-border bg-muted text-foreground'
-                    : 'border-border/40 bg-muted/40 text-muted-foreground';
-                const badgeClasses = isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : isComplete
-                    ? 'bg-primary/10 text-primary'
-                    : 'bg-muted text-muted-foreground';
-                return (
-                  <div
-                    key={step.title}
-                    className={`flex items-center gap-2 rounded-none border px-2.5 py-1 text-[11px] font-semibold tracking-wide ${stateClasses}`}
-                  >
-                    <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-none text-[10px] font-bold ${badgeClasses}`}
-                    >
-                      {index + 1}
-                    </span>
-                    <span>{step.title}</span>
-                  </div>
-                );
-              })}
-            </div>
+
+            <nav aria-label="Progress" className="w-full pb-4 border-b border-border/40">
+              <ol className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                {steps.map((step, index) => {
+                  const isActive = index === currentStep;
+                  const isComplete = index < currentStep;
+                  const isUpcoming = index > currentStep;
+
+                  return (
+                    <li key={step.title} className="flex items-center shrink-0">
+                      <div
+                        className={cn(
+                          'flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-300',
+                          isActive && 'bg-primary/10 text-primary font-semibold',
+                          isComplete && 'text-muted-foreground',
+                          isUpcoming && 'text-muted-foreground/40 opacity-70'
+                        )}
+                      >
+                        <span className="font-mono text-[10px] tracking-widest uppercase">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className="text-sm tracking-tight">{step.title}</span>
+                      </div>
+                      {index !== steps.length - 1 && (
+                        <div className="mx-2 h-[1px] w-6 shrink-0 bg-border/40" />
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </nav>
           </div>
 
           {/* Step Content Card */}

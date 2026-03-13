@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { Search, ScanBarcode } from 'lucide-react';
+import { Search, ScanBarcode, Command } from 'lucide-react';
 
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useStore } from '@/store';
@@ -16,7 +16,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Separator } from '@/components/ui/separator';
+import { Kbd } from '@/components/ui/kbd';
 
 export const Header: React.FC = () => {
   const { setTheme } = useStore();
@@ -32,7 +32,7 @@ export const Header: React.FC = () => {
       if (!cleanResult) return;
 
       if (cleanResult.startsWith('TAC')) {
-        navigate(`/finance?awb=${encodeURIComponent(cleanResult)}`);
+        navigate(`/search?q=${encodeURIComponent(cleanResult)}`);
         return;
       }
 
@@ -50,10 +50,10 @@ export const Header: React.FC = () => {
   const paths = location.pathname.split('/').filter(Boolean);
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b border-border/50 bg-background/80 backdrop-blur-md px-4">
-      <div className="flex items-center gap-2">
-        <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-4" />
+    <header className="flex h-16 shrink-0 items-center justify-between gap-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-background/95 backdrop-blur-md px-6 z-40 sticky top-0 supports-backdrop-blur:bg-background/60">
+      <div className="flex items-center gap-4">
+        <SidebarTrigger className="-ml-2 hover:bg-accent hover:text-accent-foreground transition-colors" />
+        
         {paths.length > 0 && (
           <Breadcrumb>
             <BreadcrumbList>
@@ -67,14 +67,16 @@ export const Header: React.FC = () => {
                   <React.Fragment key={path}>
                     <BreadcrumbItem className="hidden md:block">
                       {isLast ? (
-                        <BreadcrumbPage>{formattedPath}</BreadcrumbPage>
+                        <BreadcrumbPage className="font-semibold">{formattedPath}</BreadcrumbPage>
                       ) : (
                         <BreadcrumbLink asChild>
-                          <Link to={href}>{formattedPath}</Link>
+                          <Link to={href} className="text-muted-foreground/70 transition-colors hover:text-foreground">
+                            {formattedPath}
+                          </Link>
                         </BreadcrumbLink>
                       )}
                     </BreadcrumbItem>
-                    {!isLast && <BreadcrumbSeparator className="hidden md:block" />}
+                    {!isLast && <BreadcrumbSeparator className="hidden md:block opacity-50" />}
                   </React.Fragment>
                 );
               })}
@@ -83,33 +85,35 @@ export const Header: React.FC = () => {
         )}
       </div>
 
-      <div className="flex flex-1 items-center justify-end gap-2 md:gap-4 max-w-md">
+      <div className="flex flex-1 items-center justify-end gap-3 md:gap-5">
         <button
           onClick={() => setCommandOpen(true)}
-          className="hidden lg:flex w-full max-w-[300px] items-center gap-2 rounded-md border border-input bg-muted/50 px-3 py-1.5 text-sm text-muted-foreground shadow-sm transition-all hover:shadow-md hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="group hidden lg:flex h-9 w-full max-w-[280px] items-center gap-2 rounded-full border border-border/50 bg-muted/40 px-4 text-sm text-muted-foreground transition-all hover:bg-accent/80 hover:text-accent-foreground hover:border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
         >
-          <Search className="h-4 w-4" />
-          <span className="flex-1 text-left text-sm">Search...</span>
-          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
-            <span className="text-xs">⌘</span>K
-          </kbd>
+          <Search className="h-4 w-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+          <span className="flex-1 text-left text-[13px] font-medium tracking-wide">Search everywhere...</span>
+          <Kbd className="bg-background/80">
+            <Command className="h-2.5 w-2.5 mr-0.5" /> K
+          </Kbd>
         </button>
 
-        <button
-          onClick={handleManualScan}
-          className="p-2 rounded-none text-muted-foreground hover:text-primary hover:bg-primary/15 transition-all"
-          title="Scan QR/Barcode"
-        >
-          <ScanBarcode className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-1.5 border-l border-border/50 pl-3 md:pl-5">
+          <button
+            onClick={handleManualScan}
+            className="flex items-center justify-center p-2 rounded-full text-muted-foreground/70 hover:text-primary hover:bg-primary/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            title="Scan QR/Barcode"
+          >
+            <ScanBarcode className="h-[18px] w-[18px]" strokeWidth={2.5} />
+          </button>
 
-        <AnimatedThemeToggler
-          className="text-muted-foreground hover:text-primary rounded-none hover:bg-primary/15 transition-all"
-          duration={500}
-          onThemeChange={setTheme}
-        />
+          <AnimatedThemeToggler
+            className="flex items-center justify-center p-2 rounded-full text-muted-foreground/70 hover:text-foreground hover:bg-accent transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            duration={500}
+            onThemeChange={setTheme}
+          />
 
-        <NotificationBell />
+          <NotificationBell />
+        </div>
       </div>
 
       <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />

@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Box } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TacLogoProps {
@@ -26,19 +25,36 @@ export function TacLogo({
   const s = sizeMap[size];
 
   const content = (
-    <div className={cn('flex items-center gap-2.5', className)}>
+    <div className={cn('flex items-center gap-3', className)}>
       <div
         className={cn(
           s.icon,
-          'flex shrink-0 items-center justify-center rounded-none bg-primary/15 shadow-sm ring-1 ring-primary/20'
+          'flex shrink-0 items-center justify-center bg-foreground text-background rounded-sm shadow-sm'
         )}
       >
-        <Box className={cn(s.iconSvg, 'text-primary')} />
+        <svg
+          className={cn(s.iconSvg)}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="square"
+          strokeLinejoin="miter"
+        >
+          <rect x="2" y="2" width="20" height="20" />
+          <path d="M12 2v20" />
+          <path d="M2 12h10" />
+          <circle cx="17" cy="17" r="1" fill="currentColor" stroke="none" />
+        </svg>
       </div>
+
       {!collapsed && (
-        <div className="flex flex-col">
+        <div className="flex flex-col justify-center">
           {!showSubtitle && (
-            <span className={cn(s.text, 'font-bold tracking-tight leading-none text-foreground')}>
+            <span
+              className={cn(s.text, 'font-extrabold tracking-tighter leading-none text-foreground')}
+              style={{ letterSpacing: '-0.05em' }}
+            >
               TAC
             </span>
           )}
@@ -46,11 +62,15 @@ export function TacLogo({
             <span
               className={cn(
                 s.text,
-                'font-bold tracking-tight leading-none text-foreground flex flex-col'
+                'font-extrabold tracking-tighter leading-none text-foreground flex flex-col'
               )}
+              style={{ letterSpacing: '-0.05em' }}
             >
               <span>TAC</span>
-              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-1 whitespace-nowrap">
+              <span
+                className="text-[8px] font-mono font-bold uppercase tracking-[0.3em] text-muted-foreground mt-0.5 whitespace-nowrap leading-none"
+                style={{ letterSpacing: '0.3em' }}
+              >
                 Tapan Associate Cargo
               </span>
             </span>

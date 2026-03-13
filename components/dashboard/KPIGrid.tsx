@@ -15,7 +15,9 @@ import { KPIGridSkeleton } from '../ui/skeleton';
 import { useDashboardKPIs } from '@/hooks/useDashboardKPIs';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import { hasRoleAccess } from '@/lib/access-control';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/authStore';
 
 interface KPICardProps {
   label: string;
@@ -46,7 +48,7 @@ const AnimatedCounter = ({
 }) => {
   const count = useMotionValue(0);
   const rounded = useTransform(count, (latest) => {
-    if (isCurrency) return `$${(latest / 1000).toFixed(1)}k`;
+    if (isCurrency) return `₹${Math.round(latest).toLocaleString('en-IN')}`;
     if (displayValue.includes('%')) return `${Math.round(latest)}%`;
     if (displayValue.includes('d')) return `${latest.toFixed(1)}d`;
     return Math.round(latest).toLocaleString();
@@ -108,21 +110,24 @@ const KPICard = React.memo(
           onClick={handleClick}
           data-testid={`kpi-card-${label.toLowerCase().replace(/\s+/g, '-')}`}
           className={cn(
-            'relative overflow-hidden h-full flex flex-col justify-between group transition-colors duration-300',
-            'rounded-none border-none bg-background shadow-none hover:bg-muted/5',
+            'relative overflow-hidden h-full flex flex-col justify-between group transition-all duration-300',
+            'border border-border/40 bg-card hover:shadow-md hover:border-primary/40',
             path ? 'cursor-pointer' : ''
           )}
         >
+          {/* Background Icon */}
+          <div className="absolute -top-4 -right-4 p-4 opacity-[0.02] group-hover:opacity-[0.06] transition-opacity pointer-events-none transform group-hover:scale-110 duration-500 z-0">
+            <Icon className="w-32 h-32" />
+          </div>
+
           <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 z-10">
-            <CardTitle className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
-              {label}
-            </CardTitle>
+            <CardTitle className="text-xs text-muted-foreground">{label}</CardTitle>
             <Icon className="h-3.5 w-3.5 text-muted-foreground/30 transition-colors group-hover:text-foreground/50" />
           </CardHeader>
 
           <CardContent className="z-10 p-4 pt-0 pb-6">
             <div className="flex flex-col gap-1">
-              <div className="text-2xl lg:text-3xl font-black tracking-tighter text-foreground">
+              <div className="text-2xl lg:text-3xl font-semibold tracking-tight text-foreground">
                 <AnimatedCounter
                   value={value}
                   displayValue={displayValue}
@@ -189,6 +194,7 @@ interface KPIGridProps {
 export const KPIGrid: React.FC<KPIGridProps> = ({ isLoading: externalLoading = false }) => {
   const { data, isLoading: dataLoading } = useDashboardKPIs();
   const navigate = useNavigate();
+  const userRole = useAuthStore((state) => state.user?.role);
 
   const isLoading = externalLoading || dataLoading;
 
@@ -202,6 +208,8 @@ export const KPIGrid: React.FC<KPIGridProps> = ({ isLoading: externalLoading = f
   const kpis: Omit<KPICardProps, 'index' | 'onNavigate'>[] = useMemo(() => {
     if (!data) return [];
 
+    const revenueDisplay = `₹${Math.round(data.revenue).toLocaleString('en-IN')}`;
+
     return [
       {
         label: 'Total Shipments',
@@ -209,8 +217,6 @@ export const KPIGrid: React.FC<KPIGridProps> = ({ isLoading: externalLoading = f
         displayValue: data.total.toLocaleString(),
         icon: Box,
         color: 'primary',
-        trend: 12.5,
-        trendLabel: 'vs last week',
         sparklineData: data.sparklineData,
         path: '/shipments',
       },
@@ -220,8 +226,6 @@ export const KPIGrid: React.FC<KPIGridProps> = ({ isLoading: externalLoading = f
         displayValue: data.active.toLocaleString(),
         icon: Activity,
         color: 'success',
-        trend: 4.2,
-        trendLabel: 'vs last week',
         sparklineData: data.sparklineData,
         path: '/shipments?status=IN_TRANSIT',
       },
@@ -231,8 +235,6 @@ export const KPIGrid: React.FC<KPIGridProps> = ({ isLoading: externalLoading = f
         displayValue: data.delivered.toLocaleString(),
         icon: CheckCircle,
         color: 'success',
-        trend: 8.1,
-        trendLabel: 'vs last week',
         sparklineData: data.sparklineData,
         path: '/shipments?status=DELIVERED',
       },
@@ -242,9 +244,9 @@ export const KPIGrid: React.FC<KPIGridProps> = ({ isLoading: externalLoading = f
         displayValue: data.exceptions.toString(),
         icon: AlertTriangle,
         color: data.exceptions > 0 ? 'destructive' : 'warning',
-        trend: data.exceptions > 0 ? 15.0 : -2.5,
-        trendLabel: 'vs last week',
-        path: '/exceptions',
+        path: hasRoleAccess(userRole, ['ADMIN', 'MANAGER', 'OPS_STAFF', 'WAREHOUSE_STAFF'])
+          ? '/exceptions'
+          : undefined,
       },
       {
         label: 'SLA Compliance',
@@ -252,18 +254,18 @@ export const KPIGrid: React.FC<KPIGridProps> = ({ isLoading: externalLoading = f
         displayValue: `${data.slaCompliance}%`,
         icon: Percent,
         color: 'success',
-        trend: 2.1,
-        trendLabel: 'vs last month',
+        path: '/shipments?status=DELIVERED',
       },
       {
         label: 'Revenue (Today)',
         value: data.revenue,
-        displayValue: `$${(data.revenue / 1000).toFixed(1)}k`,
+        displayValue: revenueDisplay,
         icon: DollarSign,
         color: 'primary',
-        trend: 4.5,
-        trendLabel: 'vs yesterday',
         isCurrency: true,
+        path: hasRoleAccess(userRole, ['ADMIN', 'MANAGER', 'FINANCE_STAFF'])
+          ? '/finance'
+          : undefined,
       },
       {
         label: 'Avg Delivery',
@@ -271,11 +273,10 @@ export const KPIGrid: React.FC<KPIGridProps> = ({ isLoading: externalLoading = f
         displayValue: `${data.deliveryTime}d`,
         icon: Clock,
         color: 'primary',
-        trend: -0.2, // Faster delivery is negative trend, we handle this visually
-        trendLabel: 'vs last week',
+        path: '/shipments?status=DELIVERED',
       },
     ];
-  }, [data]);
+  }, [data, userRole]);
 
   if (isLoading) {
     return <KPIGridSkeleton />;
@@ -283,7 +284,7 @@ export const KPIGrid: React.FC<KPIGridProps> = ({ isLoading: externalLoading = f
 
   return (
     <div data-testid="kpi-grid" className="w-full">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-px bg-border/40 border border-border/40">
+      <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {kpis.map((kpi, index) => (
           <KPICard key={kpi.label} {...kpi} onNavigate={handleNavigate} index={index} />
         ))}

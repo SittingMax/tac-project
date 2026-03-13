@@ -107,6 +107,16 @@ export function StepManifestSetup({
     mode: 'onChange',
   });
 
+  React.useEffect(() => {
+    const currentValues = form.getValues();
+    // Prevent infinite loop by only resetting if data changed from outside
+    if (JSON.stringify(currentValues) !== JSON.stringify(data)) {
+      form.reset(data);
+    }
+    const result = manifestSettingsSchema.safeParse(data);
+    onValidationChange(result.success);
+  }, [data, form, onValidationChange]);
+
   // Sync form state with parent and validate manually
   React.useEffect(() => {
     const subscription = form.watch((value) => {
@@ -232,7 +242,7 @@ export function StepManifestSetup({
               <ToggleGroupItem
                 value="AIR"
                 className={cn(
-                  'flex-1 h-[72px] flex flex-col items-center justify-center gap-1.5 border border-border rounded-none transition-all',
+                  'flex-1 h-[72px] flex flex-col items-center justify-center gap-1.5 border border-border rounded-md transition-all',
                   'data-[state=on]:bg-feature-air/20 data-[state=on]:text-feature-air data-[state=on]:border-feature-air/50',
                   transportType === 'AIR' && 'ring-2 ring-feature-air/30'
                 )}
@@ -243,7 +253,7 @@ export function StepManifestSetup({
               <ToggleGroupItem
                 value="TRUCK"
                 className={cn(
-                  'flex-1 h-[72px] flex flex-col items-center justify-center gap-1.5 border border-border rounded-none transition-all',
+                  'flex-1 h-[72px] flex flex-col items-center justify-center gap-1.5 border border-border rounded-md transition-all',
                   'data-[state=on]:bg-feature-ground/20 data-[state=on]:text-feature-ground data-[state=on]:border-feature-ground/50',
                   transportType === 'TRUCK' && 'ring-2 ring-feature-ground/30'
                 )}
@@ -406,8 +416,8 @@ export function StepManifestSetup({
                     )}
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2 md:col-span-2">
                     <Label>Flight Date</Label>
                     <Popover>
                       <PopoverTrigger asChild>

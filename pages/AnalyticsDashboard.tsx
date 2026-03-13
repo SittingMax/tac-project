@@ -7,6 +7,8 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { exportToCSV } from '@/lib/export';
+import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -73,6 +75,36 @@ const STATUS_COLORS: Record<string, string> = {
   EXCEPTION: CHART_COLORS.error,
 };
 
+const EXCEPTION_SEVERITY_CLASSNAMES: Record<string, string> = {
+  LOW: 'border-status-info/30 bg-status-info/10 text-status-info',
+  MEDIUM: 'border-status-warning/30 bg-status-warning/10 text-status-warning',
+  HIGH: 'border-status-error/30 bg-status-error/10 text-status-error',
+  CRITICAL: 'border-status-error/30 bg-status-error/10 text-status-error',
+};
+
+const SLA_TARGET_DAYS: Record<string, number> = {
+  EXPRESS: 2,
+  STANDARD: 4,
+  PRIORITY: 1,
+};
+
+const getDeliveryDurationDays = (createdAt: string | null, deliveredAt: string | null) => {
+  if (!createdAt || !deliveredAt) return null;
+
+  const createdAtTime = new Date(createdAt).getTime();
+  const deliveredAtTime = new Date(deliveredAt).getTime();
+
+  if (
+    Number.isNaN(createdAtTime) ||
+    Number.isNaN(deliveredAtTime) ||
+    deliveredAtTime < createdAtTime
+  ) {
+    return null;
+  }
+
+  return (deliveredAtTime - createdAtTime) / (1000 * 60 * 60 * 24);
+};
+
 // Types
 interface DailyStats {
   date: string;
@@ -111,8 +143,28 @@ interface DashboardMetrics {
   };
 }
 
+interface RecentExceptionItem {
+  id: string;
+  created_at: string;
+  type: string;
+  severity: string;
+  status: string;
+  shipment?: { cn_number: string } | null;
+}
+
+interface AnalyticsExportRow {
+  section: string;
+  dimension: string;
+  metric: string;
+  value: number | string;
+  value_secondary: number | string;
+  value_tertiary: number | string;
+  notes: string;
+}
+
 export function AnalyticsDashboard() {
   const [dateRange, setDateRange] = useState<'7' | '30' | '90'>('30');
+  const orgId = useAuthStore((state) => state.user?.orgId);
 
   // Calculate date range
   const dateRangeParams = useMemo(() => {
@@ -128,68 +180,163 @@ export function AnalyticsDashboard() {
     isLoading: metricsLoading,
     refetch,
   } = useQuery({
-    queryKey: ['analytics-metrics', dateRangeParams],
+    queryKey: ['analytics-metrics', orgId, dateRangeParams],
     queryFn: async (): Promise<DashboardMetrics> => {
+      if (!orgId) {
+        return {
+          totalShipments: 0,
+          deliveredToday: 0,
+          inTransit: 0,
+          exceptions: 0,
+          avgDeliveryTime: 0,
+          onTimeRate: 0,
+          trend: {
+            shipments: 0,
+            delivery: 0,
+          },
+        };
+      }
+
       const { start, end } = dateRangeParams;
+      const previousPeriodStart = subDays(new Date(start), parseInt(dateRange)).toISOString();
 
-      // Total shipments in range
-      const { count: totalShipments } = await supabase
-        .from('shipments')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', start)
-        .lte('created_at', end);
+      const [
+        totalShipmentsRes,
+        deliveredTodayRes,
+        inTransitRes,
+        exceptionsRes,
+        prevShipmentsRes,
+        deliveredInRangeRes,
+        previousDeliveredRes,
+      ] = await Promise.all([
+        supabase
+          .from('shipments')
+          .select('*', { count: 'exact', head: true })
+          .eq('org_id', orgId)
+          .is('deleted_at', null)
+          .gte('created_at', start)
+          .lte('created_at', end),
+        supabase
+          .from('shipments')
+          .select('*', { count: 'exact', head: true })
+          .eq('org_id', orgId)
+          .is('deleted_at', null)
+          .eq('status', 'DELIVERED')
+          .gte('delivered_at', startOfDay(new Date()).toISOString()),
+        supabase
+          .from('shipments')
+          .select('*', { count: 'exact', head: true })
+          .eq('org_id', orgId)
+          .is('deleted_at', null)
+          .eq('status', 'IN_TRANSIT'),
+        supabase
+          .from('exceptions')
+          .select('*', { count: 'exact', head: true })
+          .eq('org_id', orgId)
+          .eq('status', 'OPEN'),
+        supabase
+          .from('shipments')
+          .select('*', { count: 'exact', head: true })
+          .eq('org_id', orgId)
+          .is('deleted_at', null)
+          .gte('created_at', previousPeriodStart)
+          .lt('created_at', start),
+        supabase
+          .from('shipments')
+          .select('created_at, delivered_at, service_level')
+          .eq('org_id', orgId)
+          .is('deleted_at', null)
+          .eq('status', 'DELIVERED')
+          .not('delivered_at', 'is', null)
+          .gte('delivered_at', start)
+          .lte('delivered_at', end),
+        supabase
+          .from('shipments')
+          .select('*', { count: 'exact', head: true })
+          .eq('org_id', orgId)
+          .is('deleted_at', null)
+          .eq('status', 'DELIVERED')
+          .gte('delivered_at', previousPeriodStart)
+          .lt('delivered_at', start),
+      ]);
 
-      // Delivered today
-      const today = startOfDay(new Date()).toISOString();
-      const { count: deliveredToday } = await supabase
-        .from('shipments')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'DELIVERED')
-        .gte('updated_at', today);
+      const deliveredInRange = deliveredInRangeRes.data ?? [];
+      const deliveryDurations = deliveredInRange
+        .map((shipment) => getDeliveryDurationDays(shipment.created_at, shipment.delivered_at))
+        .filter((duration): duration is number => duration !== null);
 
-      // In transit
-      const { count: inTransit } = await supabase
-        .from('shipments')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'IN_TRANSIT');
+      const avgDeliveryTime =
+        deliveryDurations.length > 0
+          ? Number(
+              (
+                deliveryDurations.reduce((sum, duration) => sum + duration, 0) /
+                deliveryDurations.length
+              ).toFixed(1)
+            )
+          : 0;
 
-      // Exceptions
-      const { count: exceptions } = await supabase
-        .from('exceptions')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'OPEN');
+      const onTimeDeliveries = deliveredInRange.filter((shipment) => {
+        const durationDays = getDeliveryDurationDays(shipment.created_at, shipment.delivered_at);
 
-      // Previous period for trend calculation
-      const prevStart = subDays(new Date(dateRangeParams.start), parseInt(dateRange)).toISOString();
-      const { count: prevShipments } = await supabase
-        .from('shipments')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', prevStart)
-        .lt('created_at', dateRangeParams.start);
+        if (durationDays === null) {
+          return false;
+        }
+
+        const targetDays =
+          SLA_TARGET_DAYS[shipment.service_level ?? 'STANDARD'] ?? SLA_TARGET_DAYS.STANDARD;
+
+        return durationDays <= targetDays;
+      });
+
+      const onTimeRate =
+        deliveredInRange.length > 0
+          ? Number(((onTimeDeliveries.length / deliveredInRange.length) * 100).toFixed(1))
+          : 0;
+
+      const totalShipments = totalShipmentsRes.count ?? 0;
+      const prevShipments = prevShipmentsRes.count ?? 0;
+      const deliveredToday = deliveredTodayRes.count ?? 0;
+      const previousDelivered = previousDeliveredRes.count ?? 0;
 
       return {
-        totalShipments: totalShipments || 0,
-        deliveredToday: deliveredToday || 0,
-        inTransit: inTransit || 0,
-        exceptions: exceptions || 0,
-        avgDeliveryTime: 2.5, // Mock - would calculate from actual data
-        onTimeRate: 94.2, // Mock
+        totalShipments,
+        deliveredToday,
+        inTransit: inTransitRes.count || 0,
+        exceptions: exceptionsRes.count || 0,
+        avgDeliveryTime,
+        onTimeRate,
         trend: {
           shipments:
-            totalShipments && prevShipments
-              ? ((totalShipments - prevShipments) / (prevShipments || 1)) * 100
+            totalShipments || prevShipments
+              ? Number(
+                  (((totalShipments - prevShipments) / Math.max(prevShipments, 1)) * 100).toFixed(1)
+                )
               : 0,
-          delivery: 5.2, // Mock
+          delivery:
+            deliveredInRange.length || previousDelivered
+              ? Number(
+                  (
+                    ((deliveredInRange.length - previousDelivered) /
+                      Math.max(previousDelivered, 1)) *
+                    100
+                  ).toFixed(1)
+                )
+              : 0,
         },
       };
     },
     refetchInterval: 60000, // Refresh every minute
+    enabled: !!orgId,
   });
 
   // Fetch daily stats for trend chart
   const { data: dailyStats, isLoading: dailyLoading } = useQuery({
-    queryKey: ['analytics-daily', dateRangeParams],
+    queryKey: ['analytics-daily', orgId, dateRangeParams],
     queryFn: async (): Promise<DailyStats[]> => {
+      if (!orgId) {
+        return [];
+      }
+
       const days = parseInt(dateRange);
       const stats: DailyStats[] = [];
 
@@ -201,19 +348,24 @@ export function AnalyticsDashboard() {
         const { count: shipments } = await supabase
           .from('shipments')
           .select('*', { count: 'exact', head: true })
+          .eq('org_id', orgId)
+          .is('deleted_at', null)
           .gte('created_at', dayStart)
           .lte('created_at', dayEnd);
 
         const { count: delivered } = await supabase
           .from('shipments')
           .select('*', { count: 'exact', head: true })
+          .eq('org_id', orgId)
+          .is('deleted_at', null)
           .eq('status', 'DELIVERED')
-          .gte('updated_at', dayStart)
-          .lte('updated_at', dayEnd);
+          .gte('delivered_at', dayStart)
+          .lte('delivered_at', dayEnd);
 
         const { count: exceptions } = await supabase
           .from('exceptions')
           .select('*', { count: 'exact', head: true })
+          .eq('org_id', orgId)
           .gte('created_at', dayStart)
           .lte('created_at', dayEnd);
 
@@ -227,13 +379,22 @@ export function AnalyticsDashboard() {
 
       return stats;
     },
+    enabled: !!orgId,
   });
 
   // Fetch status distribution
   const { data: statusDistribution, isLoading: statusLoading } = useQuery({
-    queryKey: ['analytics-status'],
+    queryKey: ['analytics-status', orgId],
     queryFn: async (): Promise<StatusDistribution[]> => {
-      const { data, error } = await supabase.from('shipments').select('status');
+      if (!orgId) {
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('shipments')
+        .select('status')
+        .eq('org_id', orgId)
+        .is('deleted_at', null);
 
       if (error) throw error;
 
@@ -250,12 +411,18 @@ export function AnalyticsDashboard() {
         percentage: (count / total) * 100,
       }));
     },
+    enabled: !!orgId,
   });
 
   // Fetch hub performance
   const { data: hubPerformance, isLoading: hubLoading } = useQuery({
-    queryKey: ['analytics-hubs'],
+    queryKey: ['analytics-hubs', orgId, dateRangeParams],
     queryFn: async (): Promise<HubPerformance[]> => {
+      if (!orgId) {
+        return [];
+      }
+
+      const { start, end } = dateRangeParams;
       const { data: hubs, error: hubsError } = await supabase.from('hubs').select('id, code, name');
 
       if (hubsError) throw hubsError;
@@ -263,46 +430,211 @@ export function AnalyticsDashboard() {
       const results: HubPerformance[] = [];
 
       for (const hub of hubs || []) {
-        const { count: total } = await supabase
-          .from('shipments')
-          .select('*', { count: 'exact', head: true })
-          .eq('origin_hub_id', hub.id);
+        const [totalRes, deliveredRes, inTransitRes] = await Promise.all([
+          supabase
+            .from('shipments')
+            .select('*', { count: 'exact', head: true })
+            .eq('org_id', orgId)
+            .is('deleted_at', null)
+            .eq('origin_hub_id', hub.id)
+            .gte('created_at', start)
+            .lte('created_at', end),
+          supabase
+            .from('shipments')
+            .select('created_at, delivered_at, service_level')
+            .eq('org_id', orgId)
+            .is('deleted_at', null)
+            .eq('origin_hub_id', hub.id)
+            .eq('status', 'DELIVERED')
+            .not('delivered_at', 'is', null)
+            .gte('delivered_at', start)
+            .lte('delivered_at', end),
+          supabase
+            .from('shipments')
+            .select('*', { count: 'exact', head: true })
+            .eq('org_id', orgId)
+            .is('deleted_at', null)
+            .eq('origin_hub_id', hub.id)
+            .eq('status', 'IN_TRANSIT')
+            .gte('created_at', start)
+            .lte('created_at', end),
+        ]);
 
-        const { count: delivered } = await supabase
-          .from('shipments')
-          .select('*', { count: 'exact', head: true })
-          .eq('origin_hub_id', hub.id)
-          .eq('status', 'DELIVERED');
+        const deliveredShipments = deliveredRes.data ?? [];
+        const hubDurations = deliveredShipments
+          .map((shipment) => getDeliveryDurationDays(shipment.created_at, shipment.delivered_at))
+          .filter((duration): duration is number => duration !== null);
 
-        const { count: inTransit } = await supabase
-          .from('shipments')
-          .select('*', { count: 'exact', head: true })
-          .eq('origin_hub_id', hub.id)
-          .eq('status', 'IN_TRANSIT');
+        const avgDeliveryTime =
+          hubDurations.length > 0
+            ? Number(
+                (
+                  hubDurations.reduce((sum, duration) => sum + duration, 0) / hubDurations.length
+                ).toFixed(1)
+              )
+            : 0;
+
+        const onTimeDeliveries = deliveredShipments.filter((shipment) => {
+          const durationDays = getDeliveryDurationDays(shipment.created_at, shipment.delivered_at);
+
+          if (durationDays === null) {
+            return false;
+          }
+
+          const targetDays =
+            SLA_TARGET_DAYS[shipment.service_level ?? 'STANDARD'] ?? SLA_TARGET_DAYS.STANDARD;
+
+          return durationDays <= targetDays;
+        });
+
+        const onTimeRate =
+          deliveredShipments.length > 0
+            ? Number(((onTimeDeliveries.length / deliveredShipments.length) * 100).toFixed(1))
+            : 0;
 
         results.push({
           hub_id: hub.id,
           hub_code: hub.code,
           hub_name: hub.name,
-          total_shipments: total || 0,
-          delivered: delivered || 0,
-          in_transit: inTransit || 0,
-          avg_delivery_time: 2.3 + Math.random() * 0.5, // Mock
-          on_time_rate: 90 + Math.random() * 8, // Mock
+          total_shipments: totalRes.count || 0,
+          delivered: deliveredShipments.length,
+          in_transit: inTransitRes.count || 0,
+          avg_delivery_time: avgDeliveryTime,
+          on_time_rate: onTimeRate,
         });
       }
 
       return results.sort((a, b) => b.total_shipments - a.total_shipments);
     },
+    enabled: !!orgId,
+  });
+
+  const { data: recentExceptions, isLoading: recentExceptionsLoading } = useQuery({
+    queryKey: ['analytics-recent-exceptions', orgId],
+    queryFn: async (): Promise<RecentExceptionItem[]> => {
+      if (!orgId) {
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('exceptions')
+        .select(
+          `
+            id,
+            created_at,
+            type,
+            severity,
+            status,
+            shipment:shipments(cn_number)
+          `
+        )
+        .eq('org_id', orgId)
+        .in('status', ['OPEN', 'IN_PROGRESS'])
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (error) {
+        throw error;
+      }
+
+      return (data ?? []) as RecentExceptionItem[];
+    },
+    enabled: !!orgId,
   });
 
   // Export data
   const handleExport = () => {
-    // Would implement CSV/Excel export
-    toast.success('Export feature coming soon');
+    if (isLoading) {
+      toast.info('Analytics data is still loading. Please try again in a moment.');
+      return;
+    }
+
+    if (!metrics && !dailyStats?.length && !statusDistribution?.length && !hubPerformance?.length) {
+      toast.error('No analytics data available to export.');
+      return;
+    }
+
+    const exportRows: AnalyticsExportRow[] = [
+      {
+        section: 'summary',
+        dimension: `${dateRange} days`,
+        metric: 'total_shipments',
+        value: metrics?.totalShipments ?? 0,
+        value_secondary: metrics?.trend.shipments ?? 0,
+        value_tertiary: 0,
+        notes: 'secondary_value=trend_percent',
+      },
+      {
+        section: 'summary',
+        dimension: `${dateRange} days`,
+        metric: 'delivered_today',
+        value: metrics?.deliveredToday ?? 0,
+        value_secondary: metrics?.trend.delivery ?? 0,
+        value_tertiary: 0,
+        notes: 'secondary_value=trend_percent',
+      },
+      {
+        section: 'summary',
+        dimension: `${dateRange} days`,
+        metric: 'in_transit',
+        value: metrics?.inTransit ?? 0,
+        value_secondary: 0,
+        value_tertiary: 0,
+        notes: '',
+      },
+      {
+        section: 'summary',
+        dimension: `${dateRange} days`,
+        metric: 'open_exceptions',
+        value: metrics?.exceptions ?? 0,
+        value_secondary: 0,
+        value_tertiary: 0,
+        notes: '',
+      },
+      {
+        section: 'summary',
+        dimension: `${dateRange} days`,
+        metric: 'avg_delivery_time_days',
+        value: metrics?.avgDeliveryTime ?? 0,
+        value_secondary: metrics?.onTimeRate ?? 0,
+        value_tertiary: 0,
+        notes: 'secondary_value=on_time_rate_percent',
+      },
+      ...(dailyStats ?? []).map((entry) => ({
+        section: 'daily_stats',
+        dimension: entry.date,
+        metric: 'shipments_delivered_exceptions',
+        value: entry.shipments,
+        value_secondary: entry.delivered,
+        value_tertiary: entry.exceptions,
+        notes: 'value=shipments,secondary_value=delivered,tertiary_value=exceptions',
+      })),
+      ...(statusDistribution ?? []).map((entry) => ({
+        section: 'status_distribution',
+        dimension: entry.status,
+        metric: 'count_percentage',
+        value: entry.count,
+        value_secondary: Number(entry.percentage.toFixed(2)),
+        value_tertiary: 0,
+        notes: 'secondary_value=percentage',
+      })),
+      ...(hubPerformance ?? []).map((entry) => ({
+        section: 'hub_performance',
+        dimension: entry.hub_code,
+        metric: 'volume_delivery_transit',
+        value: entry.total_shipments,
+        value_secondary: entry.delivered,
+        value_tertiary: entry.in_transit,
+        notes: `hub_name=${entry.hub_name}; avg_delivery_time=${entry.avg_delivery_time.toFixed(2)}; on_time_rate=${entry.on_time_rate.toFixed(2)}%`,
+      })),
+    ];
+
+    exportToCSV(exportRows, `analytics-${dateRange}d-${format(new Date(), 'yyyy-MM-dd')}`);
+    toast.success('Analytics snapshot exported successfully.');
   };
 
-  const isLoading = metricsLoading || dailyLoading || statusLoading || hubLoading;
+  const isLoading =
+    metricsLoading || dailyLoading || statusLoading || hubLoading || recentExceptionsLoading;
 
   return (
     <div className="min-h-screen bg-background">
@@ -595,10 +927,47 @@ export function AnalyticsDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              <AlertTriangle className="size-8 mx-auto mb-2 opacity-50" />
-              <p>No active exceptions requiring attention</p>
-            </div>
+            {recentExceptions && recentExceptions.length > 0 ? (
+              <div className="space-y-3">
+                {recentExceptions.map((exception) => (
+                  <div
+                    key={exception.id}
+                    className="flex flex-col gap-2 rounded-lg border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-sm font-semibold">
+                          {exception.shipment?.cn_number ?? 'Unknown CN'}
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className={
+                            EXCEPTION_SEVERITY_CLASSNAMES[exception.severity] ??
+                            'border-border bg-muted/40 text-foreground'
+                          }
+                        >
+                          {exception.severity}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-foreground">
+                        {exception.type.replaceAll('_', ' ')}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {format(new Date(exception.created_at), 'MMM d, yyyy HH:mm')}
+                      </div>
+                    </div>
+                    <Badge variant={exception.status === 'OPEN' ? 'default' : 'secondary'}>
+                      {exception.status.replaceAll('_', ' ')}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <AlertTriangle className="size-8 mx-auto mb-2 opacity-50" />
+                <p>No active exceptions requiring attention</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </main>

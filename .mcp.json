@@ -1,7 +1,17 @@
 {
   "mcpServers": {
+    "greptile": {
+      "type": "http",
+      "url": "https://api.greptile.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${FyOtCfsmIdX935+uGsUBqZDmaPB7B7v59h1Aoiq/diaVIdwm}"
+      }
+    },
     "github-mcp-server": {
-      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
       "command": "npx",
       "disabled": false,
       "env": {

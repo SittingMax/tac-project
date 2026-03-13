@@ -37,8 +37,8 @@ export function ModernGlobe({ className }: { className?: string }) {
     width: 0,
     height: 0,
     colors: {
-      foreground: 'rgba(0,0,0,1)',
-      primary: 'rgba(0,0,0,0.1)',
+      foreground: 'currentColor',
+      primary: 'currentColor',
     },
   });
 

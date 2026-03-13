@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { BarcodeScanner } from '@/components/scanning/BarcodeScanner';
 import { cn } from '@/lib/utils';
 import { useScanInput } from '@/hooks/useManifestScan';
 import type { ScanResponse } from '@/lib/services/manifestService';
@@ -91,7 +92,7 @@ export function ManifestScanPanel({
   return (
     <Card
       className={cn(
-        'rounded-none border-2 transition-colors',
+        'border-2 transition-colors rounded-md',
         getResultColor(scanner.lastResult),
         className
       )}
@@ -126,9 +127,16 @@ export function ManifestScanPanel({
             </div>
           </TabsContent>
           <TabsContent value="camera" className="pt-2">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Camera className="h-3.5 w-3.5" />
-              Camera scanning will be enabled when browser permissions are available.
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Camera className="h-3.5 w-3.5" />
+                Use the camera or upload a barcode image to add shipments.
+              </div>
+              <BarcodeScanner
+                onScan={scanner.scanCamera}
+                active={scanMode === 'camera' && !disabled}
+                className="h-64 border border-border"
+              />
             </div>
           </TabsContent>
         </Tabs>
@@ -152,7 +160,7 @@ export function ManifestScanPanel({
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 {scanner.isScanning ? (
-                  <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-none animate-spin" />
+                  <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                 ) : (
                   getResultIcon(scanner.lastResult)
                 )}
@@ -171,7 +179,7 @@ export function ManifestScanPanel({
         {scanner.lastResult && (
           <div
             className={cn(
-              'rounded-none p-4 text-sm',
+              'rounded-md p-4 text-sm',
               scanner.lastResult.success &&
                 !scanner.lastResult.duplicate &&
                 'bg-status-success/10 text-status-success',
@@ -222,21 +230,21 @@ export function ManifestScanPanel({
         <div className="flex items-center justify-between pt-2 border-t">
           <div className="flex gap-4 text-xs">
             <div className="flex items-center gap-1.5">
-              <div className="h-2 w-2 rounded-none bg-status-success" />
+              <div className="h-2 w-2 rounded-full bg-status-success" />
               <span className="text-muted-foreground">Added:</span>
               <Badge variant="secondary" className="h-5 px-1.5 text-xs font-mono">
                 {scanner.successCount}
               </Badge>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="h-2 w-2 rounded-none bg-status-warning" />
+              <div className="h-2 w-2 rounded-full bg-status-warning" />
               <span className="text-muted-foreground">Duplicates:</span>
               <Badge variant="secondary" className="h-5 px-1.5 text-xs font-mono">
                 {scanner.duplicateCount}
               </Badge>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="h-2 w-2 rounded-none bg-status-error" />
+              <div className="h-2 w-2 rounded-full bg-status-error" />
               <span className="text-muted-foreground">Errors:</span>
               <Badge variant="secondary" className="h-5 px-1.5 text-xs font-mono">
                 {scanner.errorCount}

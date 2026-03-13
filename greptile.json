@@ -1,0 +1,84 @@
+{
+  "standards": [
+    {
+      "title": "No hardcoded Tailwind slate/gray color classes",
+      "description": "Never use hardcoded Tailwind color classes like text-slate-*, bg-gray-*, text-gray-*, etc. Use semantic CSS tokens from globals.css instead (e.g., bg-background, text-foreground, text-muted-foreground). This is enforced by CI and will fail the build.",
+      "severity": "error"
+    },
+    {
+      "title": "Use UniversalBarcode wrapper — never import JsBarcode directly",
+      "description": "All barcode rendering must go through the UniversalBarcode wrapper component. Direct imports of JsBarcode are blocked by CI guards.",
+      "severity": "error"
+    },
+    {
+      "title": "Sanitize all dangerouslySetInnerHTML with DOMPurify",
+      "description": "Any use of dangerouslySetInnerHTML must wrap the content with DOMPurify.sanitize(). Raw HTML injection without sanitization is a security violation enforced by CI.",
+      "severity": "error"
+    },
+    {
+      "title": "No Supabase service role key in client code",
+      "description": "The Supabase service role key must never appear in client-side code or VITE_* environment variables. Only VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are allowed in client code.",
+      "severity": "error"
+    },
+    {
+      "title": "No mock or seed data in production code",
+      "description": "Mock data, hardcoded fixtures, or seeded test arrays must not exist in components/, pages/, hooks/, lib/, or store/. This is enforced by the guard:no-mock-data CI check.",
+      "severity": "error"
+    },
+    {
+      "title": "Use @/ path alias for all imports",
+      "description": "Always use the @/ path alias for internal imports. Never use relative paths that escape the current directory (e.g., ../../lib/). Order: external packages → @/lib → @/store → @/hooks → @/components → @/types.",
+      "severity": "warning"
+    },
+    {
+      "title": "Use no-console rule — only console.warn and console.error allowed",
+      "description": "console.log and console.info are not allowed in app code. Use console.warn or console.error only. In lib/ and store/ directories, avoid any console usage in favor of structured error handling.",
+      "severity": "warning"
+    },
+    {
+      "title": "Avoid any type in lib/ and store/",
+      "description": "@typescript-eslint/no-explicit-any is an error in lib/ and store/ directories. Use proper type narrowing instead of 'as unknown as' casts. In components/ it is only a warning.",
+      "severity": "warning"
+    },
+    {
+      "title": "Prefix unused function parameters with underscore",
+      "description": "Unused function parameters should be prefixed with _ to satisfy the noUnusedParameters TypeScript strict rule. Do not suppress or remove unused param errors without this convention.",
+      "severity": "warning"
+    },
+    {
+      "title": "Use shadcn/ui primitives — do not build custom modal/dropdown/button from scratch",
+      "description": "This project uses shadcn/ui (new-york style) + Radix UI. Always use existing library primitives for modals, dropdowns, buttons, tooltips, etc. Only wrap or extend — never replace with custom implementations.",
+      "severity": "warning"
+    },
+    {
+      "title": "TanStack Query v5 — use query key factories from lib/queryKeys.ts",
+      "description": "All useQuery and useMutation hooks must use key factories from lib/queryKeys.ts (e.g., queryKeys.shipments.detail(id)). Never inline raw string array keys.",
+      "severity": "warning"
+    },
+    {
+      "title": "Forms must use react-hook-form + Zod",
+      "description": "All forms must be built with react-hook-form and validated with Zod schemas resolved via @hookform/resolvers/zod. Do not use uncontrolled inputs or custom form state management.",
+      "severity": "warning"
+    },
+    {
+      "title": "Error handling — use domain error classes from lib/errors.ts",
+      "description": "Throw typed errors (ValidationError, NotFoundError, ConflictError, etc.) from lib/errors.ts. Map Supabase errors with mapSupabaseError(). Show user feedback with showErrorToast()/showSuccessToast() from lib/errors.ts.",
+      "severity": "warning"
+    },
+    {
+      "title": "Feature flags — use isModuleEnabled() / isFeatureEnabled()",
+      "description": "All feature gating must use isModuleEnabled() or isFeatureEnabled() from config/features.ts. Never conditionally render features based on hardcoded boolean flags or environment checks.",
+      "severity": "info"
+    },
+    {
+      "title": "Pages must be lazy-loaded via React.lazy()",
+      "description": "All page components must be lazy-loaded using React.lazy() in routes/index.tsx. Top-level page imports without lazy loading will increase the initial bundle size.",
+      "severity": "info"
+    },
+    {
+      "title": "Animations — use Motion (not framer-motion) or GSAP",
+      "description": "This project uses the Motion library (framer-motion successor) and GSAP for animations. Do not add framer-motion as a dependency since Motion is already installed.",
+      "severity": "info"
+    }
+  ]
+}

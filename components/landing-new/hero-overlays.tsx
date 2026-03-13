@@ -43,7 +43,7 @@ export function HeroOverlays() {
           variant="outline"
           className="bg-background/20 backdrop-blur-md border-primary/20 text-primary gap-2"
         >
-          <div className="w-2 h-2 rounded-none bg-status-live animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-status-live animate-pulse" />
           SYSTEM_OPTIMAL
         </Badge>
         <div className="flex items-center gap-4 text-muted-foreground/60">

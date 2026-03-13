@@ -195,6 +195,12 @@ Keep tests green. Don't add behavior.
 
 Next failing test for next feature.
 
+## UI and Browser Testing
+
+For frontend UI updates where automated unit tests don't fully capture visual states, use the **Browser Subagent** (`browser_subagent` tool).
+- **RED**: Use the subagent to visually confirm the feature is missing or broken.
+- **GREEN**: Use the subagent to interact with the UI and visually confirm the feature is now working.
+
 ## Good Tests
 
 | Quality | Good | Bad |

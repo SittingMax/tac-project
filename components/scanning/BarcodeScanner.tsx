@@ -280,7 +280,7 @@ export function BarcodeScanner({
     return (
       <div
         className={cn(
-          'flex flex-col items-center justify-center bg-card/50 rounded-none border border-white/10 p-8',
+          'flex flex-col items-center justify-center bg-card/50 rounded-lg border border-white/10 p-8',
           className
         )}
       >
@@ -301,18 +301,18 @@ export function BarcodeScanner({
 
   return (
     <div
-      className={cn('relative overflow-hidden rounded-none bg-background dark:bg-black', className)}
+      className={cn('relative overflow-hidden rounded-lg bg-background dark:bg-black', className)}
     >
       <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
 
       {/* Overlay */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Corner brackets */}
-        <div className="absolute inset-8 border-2 border-primary/30 rounded-none">
-          <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-primary rounded-none" />
-          <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-primary rounded-none" />
-          <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-primary rounded-none" />
-          <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-primary rounded-none" />
+        <div className="absolute inset-8 border-2 border-primary/30 rounded-md">
+          <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-primary rounded-tl-md" />
+          <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-primary rounded-tr-md" />
+          <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-primary rounded-bl-md" />
+          <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-primary rounded-br-md" />
         </div>
 
         {/* Scanning line animation */}
@@ -324,18 +324,18 @@ export function BarcodeScanner({
         <div className="absolute top-4 left-4 flex items-center gap-2">
           <span
             className={cn(
-              'w-3 h-3 rounded-none',
+              'w-3 h-3 rounded-full',
               isScanning ? 'bg-status-success animate-pulse' : 'bg-status-warning'
             )}
           />
-          <span className="text-xs font-medium text-foreground bg-background/60 backdrop-blur-sm px-2 py-1 rounded-none">
+          <span className="text-xs font-medium text-foreground bg-background/60 backdrop-blur-sm px-2 py-1 rounded-md">
             {isScanning ? 'Scanning...' : 'Initializing...'}
           </span>
         </div>
 
         {/* Last scan indicator */}
         {lastScanned && (
-          <div className="absolute bottom-4 left-4 right-4 bg-status-success/90 text-primary-foreground px-4 py-2 rounded-none text-center font-mono text-sm animate-pulse">
+          <div className="absolute bottom-4 left-4 right-4 bg-status-success/90 text-primary-foreground px-4 py-2 rounded-md text-center font-mono text-sm animate-pulse">
             ✓ {lastScanned}
           </div>
         )}
@@ -345,7 +345,7 @@ export function BarcodeScanner({
       <div className="absolute bottom-6 inset-x-0 flex flex-col items-center gap-4 pointer-events-auto px-4">
         {/* Zoom Slider */}
         {supportsZoom && (
-          <div className="w-full max-w-xs flex items-center gap-2 bg-background/40 backdrop-blur rounded-none px-4 py-1">
+          <div className="w-full max-w-xs flex items-center gap-2 bg-background/40 backdrop-blur rounded-md px-4 py-1">
             <ZoomOut className="w-4 h-4 text-foreground" />
             <Slider
               value={[zoomLevel]}
@@ -364,7 +364,7 @@ export function BarcodeScanner({
           <Button
             size="icon"
             variant="secondary"
-            className="rounded-none bg-muted/30 hover:bg-muted/50 text-foreground backdrop-blur-md"
+            className="rounded-md bg-muted/30 hover:bg-muted/50 text-foreground backdrop-blur-md"
             onClick={() => fileInputRef.current?.click()}
             title="Scan Image"
           >
@@ -382,7 +382,7 @@ export function BarcodeScanner({
             <Button
               size="icon"
               variant="secondary"
-              className="rounded-none bg-muted/30 hover:bg-muted/50 text-foreground backdrop-blur-md"
+              className="rounded-md bg-muted/30 hover:bg-muted/50 text-foreground backdrop-blur-md"
               onClick={switchCamera}
             >
               <RefreshCw className="w-5 h-5" />
@@ -393,7 +393,7 @@ export function BarcodeScanner({
             <Button
               size="icon"
               variant={torchEnabled ? 'default' : 'secondary'}
-              className={`rounded-none backdrop-blur-md ${torchEnabled ? 'bg-status-warning text-primary-foreground hover:bg-status-warning/80' : 'bg-muted/30 text-foreground hover:bg-muted/50'}`}
+              className={`rounded-md backdrop-blur-md ${torchEnabled ? 'bg-status-warning text-primary-foreground hover:bg-status-warning/80' : 'bg-muted/30 text-foreground hover:bg-muted/50'}`}
               onClick={toggleTorch}
             >
               {torchEnabled ? (
@@ -407,7 +407,7 @@ export function BarcodeScanner({
           <Button
             size="icon"
             variant="secondary"
-            className="rounded-none bg-muted/30 hover:bg-muted/50 text-foreground backdrop-blur-md"
+            className="rounded-md bg-muted/30 hover:bg-muted/50 text-foreground backdrop-blur-md"
             onClick={() => setSoundEnabled(!soundEnabled)}
           >
             {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}

@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { Json } from '../lib/database.types';
-import { getOrCreateDefaultOrg } from '../lib/org-helper';
 import { useAuthStore } from '../store/authStore';
 import { logger } from '../lib/logger';
 
@@ -20,6 +19,7 @@ export const shipmentKeys = {
     status?: string;
     orgId?: string;
     search?: string;
+    deliveredSince?: string;
     page?: number;
     pageSize?: number;
   }) => [...shipmentKeys.lists(), filters] as const,
@@ -49,6 +49,7 @@ export interface ShipmentWithRelations {
   consignor_address?: Json;
   special_instructions: string | null;
   created_at: string;
+  delivered_at?: string | null;
   updated_at: string;
   customer?: { name: string; phone: string };
   origin_hub?: { code: string; name: string };
@@ -59,6 +60,7 @@ export function useShipments(options?: {
   limit?: number;
   status?: string;
   search?: string;
+  deliveredSince?: string;
   page?: number;
   pageSize?: number;
   orgId?: string;
@@ -115,6 +117,10 @@ export function useShipments(options?: {
 
         if (options?.status) {
           query = query.eq('status', options.status);
+        }
+
+        if (options?.deliveredSince) {
+          query = query.gte('delivered_at', options.deliveredSince);
         }
 
         if (options?.hubId) {
@@ -213,17 +219,12 @@ export function useCreateShipment() {
     mutationFn: async (shipment: CreateShipmentInput) => {
       // eslint-disable-next-line no-console
       console.debug('Starting createShipment mutation...', shipment);
-      let orgId = staffUser?.orgId;
+      const orgId = staffUser?.orgId;
       if (!orgId) {
-        // eslint-disable-next-line no-console
-        console.debug('No orgId in auth store, fetching default...');
-        orgId = await getOrCreateDefaultOrg();
-        // eslint-disable-next-line no-console
-        console.debug('Resolved orgId:', orgId);
-      } else {
-        // eslint-disable-next-line no-console
-        console.debug('Using auth store orgId:', orgId);
+        throw new Error('No organization context available for shipment creation.');
       }
+      // eslint-disable-next-line no-console
+      console.debug('Using auth store orgId:', orgId);
 
       // eslint-disable-next-line no-console
       console.debug('Calling generate_cn_number RPC...');
@@ -293,13 +294,18 @@ export function useCreateShipment() {
 
 export function useUpdateShipmentStatus() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status }: { id: string; status: string; silent?: boolean }) => {
+      if (!orgId) {
+        throw new Error('No organization context available for shipment status updates.');
+      }
       const { data, error } = await supabase
         .from('shipments')
         .update({ status, updated_at: new Date().toISOString() })
         .eq('id', id)
+        .eq('org_id', orgId)
         .select()
         .single();
 
@@ -321,13 +327,17 @@ export function useUpdateShipmentStatus() {
 
       return shipmentData;
     },
-    onSuccess: (data: ShipmentWithRelations) => {
+    onSuccess: (data: ShipmentWithRelations, variables) => {
       queryClient.invalidateQueries({ queryKey: ['shipments'] });
       queryClient.invalidateQueries({ queryKey: ['tracking-events', data.cn_number] });
-      toast.success(`Status updated to ${data.status}`);
+      if (!variables.silent) {
+        toast.success(`Status updated to ${data.status}`);
+      }
     },
-    onError: (error: Error) => {
-      toast.error(`Failed to update status: ${error.message}`);
+    onError: (error: Error, variables) => {
+      if (!variables.silent) {
+        toast.error(`Failed to update status: ${error.message}`);
+      }
     },
   });
 }
@@ -337,16 +347,21 @@ export function useUpdateShipmentStatus() {
  */
 export function useDeleteShipment() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async (id: string) => {
+      if (!orgId) {
+        throw new Error('No organization context available for shipment deletion.');
+      }
       const { error } = await supabase
         .from('shipments')
         .update({
           deleted_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
-        .eq('id', id);
+        .eq('id', id)
+        .eq('org_id', orgId);
 
       if (error) throw error;
     },
@@ -373,9 +388,12 @@ export interface ShipmentScanResult {
 }
 
 export function useFindShipmentByCN() {
+  const orgId = useAuthStore((s) => s.user?.orgId);
   return useMutation({
     mutationFn: async (awb: string): Promise<ShipmentScanResult | null> => {
-      const orgId = await getOrCreateDefaultOrg();
+      if (!orgId) {
+        throw new Error('No organization context available for shipment lookup.');
+      }
       const { data, error } = await supabase
         .from('shipments')
         .select('id, cn_number, status, origin_hub_id, destination_hub_id')
@@ -395,10 +413,14 @@ export function useFindShipmentByCN() {
  */
 export function useHardDeleteShipment() {
   const queryClient = useQueryClient();
+  const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('shipments').delete().eq('id', id);
+      if (!orgId) {
+        throw new Error('No organization context available for shipment deletion.');
+      }
+      const { error } = await supabase.from('shipments').delete().eq('id', id).eq('org_id', orgId);
 
       if (error) throw error;
     },

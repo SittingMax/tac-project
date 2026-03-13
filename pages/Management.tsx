@@ -6,8 +6,8 @@ import { toast } from 'sonner';
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { PageHeader } from '@/components/ui/page-header';
 import { useAuthStore } from '@/store/authStore';
 import { supabase } from '@/lib/supabase';
 import { queryClient } from '@/lib/query-client';
@@ -28,7 +29,6 @@ import { CrudDeleteDialog } from '@/components/crud/CrudDeleteDialog';
 // Hooks & Data
 import {
   useStaff,
-  useCreateStaff,
   useUpdateStaff,
   useToggleStaffStatus,
   useDeleteStaff,
@@ -45,10 +45,14 @@ const staffFormSchema = z.object({
   role: z.enum([
     'ADMIN',
     'MANAGER',
+    'SUPER_ADMIN',
     'WAREHOUSE_IMPHAL',
     'WAREHOUSE_DELHI',
+    'WAREHOUSE_STAFF',
     'OPS',
+    'OPS_STAFF',
     'INVOICE',
+    'FINANCE_STAFF',
     'SUPPORT',
   ]),
   hub_id: z.string().optional(),
@@ -56,45 +60,35 @@ const staffFormSchema = z.object({
 
 type StaffFormValues = z.infer<typeof staffFormSchema>;
 
-// Sentinel value for "no hub" / global access
 const GLOBAL_HUB_VALUE = '__GLOBAL__';
 
 const defaultFormValues: StaffFormValues = {
   full_name: '',
   email: '',
-  role: 'OPS',
+  role: 'OPS_STAFF',
   hub_id: GLOBAL_HUB_VALUE,
 };
 
 export const Management: React.FC = () => {
-  // Data fetching
   const { data: staff = [], isLoading } = useStaff();
-  const createMutation = useCreateStaff();
   const updateMutation = useUpdateStaff();
   const toggleStatusMutation = useToggleStaffStatus();
   const deleteMutation = useDeleteStaff();
 
-  // Dialog state
   const [upsertOpen, setUpsertOpen] = useState(false);
-  const [mode, setMode] = useState<'create' | 'edit'>('create');
   const [activeRow, setActiveRow] = useState<Staff | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<Staff | null>(null);
 
-  // Table columns with callbacks
   const columns = useMemo(
     () =>
       getStaffColumns({
         onEdit: (row) => {
-          setMode('edit');
           setActiveRow(row);
           setUpsertOpen(true);
         },
         onToggleStatus: (row) => {
-          toggleStatusMutation.mutate({
-            id: row.id,
-            isActive: row.is_active,
-          });
+          toggleStatusMutation.mutate({ id: row.id, isActive: row.is_active });
         },
         onDelete: (row) => {
           setRowToDelete(row);
@@ -104,35 +98,24 @@ export const Management: React.FC = () => {
     [toggleStatusMutation]
   );
 
-  // Form default values for editing
   const formDefaultValues: StaffFormValues = activeRow
     ? {
         full_name: activeRow.full_name,
         email: activeRow.email,
-        role: activeRow.role,
+        role: activeRow.role as StaffFormValues['role'],
         hub_id: activeRow.hub_id || GLOBAL_HUB_VALUE,
       }
     : defaultFormValues;
 
-  // Handlers
   const handleUpsert = async (values: StaffFormValues) => {
-    // Convert sentinel value back to null/undefined for database
     const hubId = values.hub_id === GLOBAL_HUB_VALUE ? undefined : values.hub_id;
-
-    if (mode === 'create') {
-      await createMutation.mutateAsync({
-        full_name: values.full_name,
-        email: values.email,
-        role: values.role,
-        hub_id: hubId,
-      });
-    } else if (activeRow) {
+    if (activeRow) {
       await updateMutation.mutateAsync({
         id: activeRow.id,
         data: {
           full_name: values.full_name,
           email: values.email,
-          role: values.role,
+          role: values.role as Staff['role'],
           hub_id: hubId || null,
         },
       });
@@ -155,7 +138,7 @@ export const Management: React.FC = () => {
     email: '',
     password: '',
     fullName: '',
-    role: 'OPS',
+    role: 'OPS_STAFF',
     hubCode: '',
   });
 
@@ -165,21 +148,12 @@ export const Management: React.FC = () => {
       const { data, error } = await supabase.functions.invoke('create-user', {
         body: createUserForm,
       });
-
       if (error) throw error;
       if (data.error) throw new Error(data.error);
 
       toast.success('User created successfully!');
       setCreateUserOpen(false);
-      // Reset form
-      setCreateUserForm({
-        email: '',
-        password: '',
-        fullName: '',
-        role: 'OPS',
-        hubCode: '',
-      });
-      // Refresh list
+      setCreateUserForm({ email: '', password: '', fullName: '', role: 'OPS_STAFF', hubCode: '' });
       queryClient.invalidateQueries({ queryKey: ['staff'] });
     } catch (error) {
       logger.error('Management', 'Create user failed', { error });
@@ -188,39 +162,25 @@ export const Management: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Staff & Hubs</h1>
-          <p className="text-muted-foreground text-sm">Manage access control and personnel.</p>
-        </div>
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+      <PageHeader
+        title="Staff & Hubs"
+        description="Manage access control and personnel"
+      >
         {isSuperAdmin && (
           <Button onClick={() => setCreateUserOpen(true)} variant="destructive">
-            <Plus className="w-4 h-4 mr-2" /> Super Admin: Create User
+            <Plus data-icon="inline-start" /> Create User
           </Button>
         )}
-      </div>
+      </PageHeader>
 
-      {/* Table with CRUD */}
       <CrudTable
         columns={columns}
         data={staff}
         searchKey="full_name"
         searchPlaceholder="Search staff..."
         isLoading={isLoading}
-        emptyMessage="No staff members found. Invite your first team member to get started."
-        toolbar={
-          <Button
-            onClick={() => {
-              setMode('create');
-              setActiveRow(null);
-              setUpsertOpen(true);
-            }}
-          >
-            <Plus className="w-4 h-4 mr-2" /> Invite User
-          </Button>
-        }
+        emptyMessage="No staff members found."
       />
 
       {/* Super Admin Create User Modal */}
@@ -229,19 +189,21 @@ export const Management: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Super Admin: Create User</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleCreateUser} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Email</Label>
+          <form onSubmit={handleCreateUser} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="create-email">Email</Label>
               <Input
+                id="create-email"
                 type="email"
                 required
                 value={createUserForm.email}
                 onChange={(e) => setCreateUserForm((prev) => ({ ...prev, email: e.target.value }))}
               />
             </div>
-            <div className="space-y-2">
-              <Label>Password</Label>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="create-password">Password</Label>
               <Input
+                id="create-password"
                 type="password"
                 required
                 value={createUserForm.password}
@@ -250,9 +212,10 @@ export const Management: React.FC = () => {
                 }
               />
             </div>
-            <div className="space-y-2">
-              <Label>Full Name</Label>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="create-fullname">Full Name</Label>
               <Input
+                id="create-fullname"
                 required
                 value={createUserForm.fullName}
                 onChange={(e) =>
@@ -261,27 +224,29 @@ export const Management: React.FC = () => {
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Role</Label>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="create-role">Role</Label>
                 <Select
                   value={createUserForm.role}
                   onValueChange={(val) => setCreateUserForm((prev) => ({ ...prev, role: val }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="create-role">
                     <SelectValue placeholder="Select Role" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ADMIN">Admin</SelectItem>
                     <SelectItem value="MANAGER">Manager</SelectItem>
-                    <SelectItem value="OPS">Operations</SelectItem>
-                    <SelectItem value="INVOICE">Finance</SelectItem>
+                    <SelectItem value="OPS_STAFF">Operations Staff</SelectItem>
+                    <SelectItem value="WAREHOUSE_STAFF">Warehouse Staff</SelectItem>
+                    <SelectItem value="FINANCE_STAFF">Finance Staff</SelectItem>
                     <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label>Hub Code (Optional)</Label>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="create-hub">Hub Code (Optional)</Label>
                 <Input
+                  id="create-hub"
                   placeholder="e.g. IMF, DEL"
                   value={createUserForm.hubCode}
                   onChange={(e) =>
@@ -290,7 +255,7 @@ export const Management: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="flex justify-end gap-2 pt-4">
+            <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setCreateUserOpen(false)}>
                 Cancel
               </Button>
@@ -304,20 +269,16 @@ export const Management: React.FC = () => {
       <CrudUpsertDialog
         open={upsertOpen}
         onOpenChange={setUpsertOpen}
-        mode={mode}
-        title={mode === 'create' ? 'Invite New Staff' : 'Edit Staff Member'}
-        description={
-          mode === 'create'
-            ? 'Add a new team member to your organization.'
-            : 'Update staff member information.'
-        }
+        mode="edit"
+        title="Edit Staff Member"
+        description="Update staff member information."
         schema={staffFormSchema}
         defaultValues={formDefaultValues}
         onSubmit={handleUpsert}
-        submitLabel={mode === 'create' ? 'Send Invite' : 'Save Changes'}
+        submitLabel="Save Changes"
       >
         {(form) => (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <FormField
               control={form.control}
               name="full_name"
@@ -360,13 +321,17 @@ export const Management: React.FC = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="OPS">Operations Staff</SelectItem>
-                        <SelectItem value="WAREHOUSE_IMPHAL">Warehouse (Imphal)</SelectItem>
-                        <SelectItem value="WAREHOUSE_DELHI">Warehouse (Delhi)</SelectItem>
-                        <SelectItem value="INVOICE">Finance</SelectItem>
+                        <SelectItem value="OPS_STAFF">Operations Staff</SelectItem>
+                        <SelectItem value="WAREHOUSE_STAFF">Warehouse Staff</SelectItem>
+                        <SelectItem value="FINANCE_STAFF">Finance Staff</SelectItem>
                         <SelectItem value="SUPPORT">Support</SelectItem>
                         <SelectItem value="MANAGER">Manager</SelectItem>
                         <SelectItem value="ADMIN">Administrator</SelectItem>
+                        <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                        <SelectItem value="OPS">Operations (Legacy)</SelectItem>
+                        <SelectItem value="WAREHOUSE_IMPHAL">Warehouse (Imphal)</SelectItem>
+                        <SelectItem value="WAREHOUSE_DELHI">Warehouse (Delhi)</SelectItem>
+                        <SelectItem value="INVOICE">Finance (Legacy)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

@@ -11,8 +11,22 @@ export const BookingForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const [sender, setConsignor] = useState({ name: '', phone: '', address: '' });
-  const [receiver, setConsignee] = useState({ name: '', phone: '', address: '' });
+  const [sender, setConsignor] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: '',
+  });
+  const [receiver, setConsignee] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: '',
+  });
   const [whatsapp, setWhatsapp] = useState('');
 
   const [packages, setPackages] = useState([
@@ -41,17 +55,19 @@ export const BookingForm: React.FC = () => {
           name: sender.name,
           phone: sender.phone,
           address: sender.address,
-          city: 'Unspecified', // default for public form
-          state: 'Unspecified',
-          zip: '000000',
+          city: sender.city,
+          state: sender.state,
+          zip: sender.zip,
+          email: '',
         },
         consignee: {
           name: receiver.name,
           phone: receiver.phone,
           address: receiver.address,
-          city: 'Unspecified',
-          state: 'Unspecified',
-          zip: '000000',
+          city: receiver.city,
+          state: receiver.state,
+          zip: receiver.zip,
+          email: '',
         },
         whatsappNumber: whatsapp,
         volumeMatrix: packages.map((p) => ({
@@ -80,7 +96,7 @@ export const BookingForm: React.FC = () => {
   if (success) {
     return (
       <Card className="p-8 text-center bg-card/50 border-border animate-in fade-in zoom-in">
-        <div className="w-16 h-16 rounded-none bg-status-success/20 flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-lg bg-status-success/20 flex items-center justify-center mx-auto mb-4">
           <Send className="w-8 h-8 text-status-success" />
         </div>
         <h3 className="text-2xl font-bold text-foreground mb-2">Booking Received!</h3>
@@ -130,6 +146,35 @@ export const BookingForm: React.FC = () => {
               placeholder="123 Origin St, City, State"
             />
           </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Pickup City *</label>
+            <Input
+              required
+              value={sender.city}
+              onChange={(e) => setConsignor({ ...sender, city: e.target.value })}
+              placeholder="Imphal"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Pickup State *</label>
+            <Input
+              required
+              value={sender.state}
+              onChange={(e) => setConsignor({ ...sender, state: e.target.value })}
+              placeholder="Manipur"
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium text-foreground">
+              Pickup ZIP / Postal Code *
+            </label>
+            <Input
+              required
+              value={sender.zip}
+              onChange={(e) => setConsignor({ ...sender, zip: e.target.value })}
+              placeholder="795001"
+            />
+          </div>
         </div>
       </Card>
 
@@ -166,6 +211,35 @@ export const BookingForm: React.FC = () => {
               placeholder="456 Destination Ave, City, State"
             />
           </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Delivery City *</label>
+            <Input
+              required
+              value={receiver.city}
+              onChange={(e) => setConsignee({ ...receiver, city: e.target.value })}
+              placeholder="New Delhi"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Delivery State *</label>
+            <Input
+              required
+              value={receiver.state}
+              onChange={(e) => setConsignee({ ...receiver, state: e.target.value })}
+              placeholder="Delhi"
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium text-foreground">
+              Delivery ZIP / Postal Code *
+            </label>
+            <Input
+              required
+              value={receiver.zip}
+              onChange={(e) => setConsignee({ ...receiver, zip: e.target.value })}
+              placeholder="110001"
+            />
+          </div>
         </div>
       </Card>
 
@@ -182,7 +256,7 @@ export const BookingForm: React.FC = () => {
 
         <div className="space-y-4">
           {packages.map((pkg, idx) => (
-            <div key={idx} className="grid grid-cols-5 gap-3 p-4 bg-muted/30 rounded-none">
+            <div key={idx} className="grid grid-cols-5 gap-3 p-4 bg-muted/30 rounded-md">
               <div className="space-y-1">
                 <label className="text-xs text-muted-foreground">Qty</label>
                 <Input
@@ -255,7 +329,7 @@ export const BookingForm: React.FC = () => {
         </div>
       </Card>
 
-      <div className="flex justify-end pt-4">
+      <div className="sticky bottom-0 -mx-4 -mb-4 mt-6 p-4 bg-background/80 backdrop-blur-sm border-t border-border flex justify-end gap-3 z-10 md:static md:mx-0 md:bg-transparent md:border-none md:p-0">
         <Button
           type="submit"
           disabled={loading}

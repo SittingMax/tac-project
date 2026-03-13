@@ -9,7 +9,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
  * Uses shimmer animation for premium feel
  */
 function Skeleton({ className, ...props }: SkeletonProps) {
-  return <div className={cn('animate-pulse rounded-none bg-muted/50', className)} {...props} />;
+  return <div className={cn('animate-pulse rounded-md bg-muted/50', className)} {...props} />;
 }
 
 /**
@@ -17,10 +17,10 @@ function Skeleton({ className, ...props }: SkeletonProps) {
  */
 function KPICardSkeleton() {
   return (
-    <div className="bg-card border border-border rounded-none p-6 space-y-4">
+    <div className="bg-card border border-border rounded-md p-6 space-y-4">
       <div className="flex justify-between items-start">
-        <Skeleton className="h-10 w-10 rounded-none" />
-        <Skeleton className="h-6 w-16 rounded-none" />
+        <Skeleton className="h-10 w-10 rounded-md" />
+        <Skeleton className="h-6 w-16 rounded-md" />
       </div>
       <div className="space-y-2">
         <Skeleton className="h-8 w-20" />
@@ -48,15 +48,15 @@ function KPIGridSkeleton() {
  */
 function ChartSkeleton({ height = 300 }: { height?: number }) {
   return (
-    <div className="bg-card border border-border rounded-none p-6">
+    <div className="bg-card border border-border rounded-md p-6">
       <div className="flex justify-between items-center mb-6">
         <Skeleton className="h-6 w-40" />
         <div className="flex gap-2">
-          <Skeleton className="h-8 w-20 rounded-none" />
-          <Skeleton className="h-8 w-20 rounded-none" />
+          <Skeleton className="h-8 w-20 rounded-md" />
+          <Skeleton className="h-8 w-20 rounded-md" />
         </div>
       </div>
-      <Skeleton className="w-full rounded-none" style={{ height }} />
+      <Skeleton className="w-full rounded-md" style={{ height }} />
     </div>
   );
 }
@@ -69,7 +69,7 @@ function TableRowSkeleton({ columns = 5 }: { columns?: number }) {
     <tr className="border-b border-border/40">
       {Array.from({ length: columns }).map((_, i) => (
         <td key={i} className="p-4">
-          <Skeleton className="h-3 w-full max-w-[150px] rounded-none bg-muted/50" />
+          <Skeleton className="h-3 w-full max-w-[150px] rounded-md bg-muted/50" />
         </td>
       ))}
     </tr>
@@ -81,16 +81,16 @@ function TableRowSkeleton({ columns = 5 }: { columns?: number }) {
  */
 function TableSkeleton({ rows = 5, columns = 5 }: { rows?: number; columns?: number }) {
   return (
-    <div className="rounded-none border border-border/40 overflow-hidden bg-transparent">
+    <div className="rounded-xl border border-border/40 overflow-hidden bg-card text-foreground shadow-xs">
       <div className="p-4 border-b border-border/40">
-        <Skeleton className="h-4 w-40 rounded-none bg-muted/50" />
+        <Skeleton className="h-4 w-40 rounded-md bg-muted/50" />
       </div>
       <table className="w-full">
         <thead>
           <tr className="border-b border-border/40">
             {Array.from({ length: columns }).map((_, i) => (
               <th key={i} className="p-4 text-left">
-                <Skeleton className="h-3 w-20 rounded-none bg-muted/50" />
+                <Skeleton className="h-3 w-20 rounded-md bg-muted/50" />
               </th>
             ))}
           </tr>
@@ -116,8 +116,8 @@ function PageHeaderSkeleton() {
         <Skeleton className="h-4 w-64" />
       </div>
       <div className="flex gap-3">
-        <Skeleton className="h-10 w-24 rounded-none" />
-        <Skeleton className="h-10 w-32 rounded-none" />
+        <Skeleton className="h-10 w-24 rounded-md" />
+        <Skeleton className="h-10 w-32 rounded-md" />
       </div>
     </div>
   );
@@ -145,7 +145,7 @@ function PageSkeleton() {
  */
 function CardSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('bg-card border border-border rounded-none p-6', className)}>
+    <div className={cn('bg-card border border-border rounded-md p-6', className)}>
       <Skeleton className="h-6 w-1/3 mb-4" />
       <div className="space-y-3">
         <Skeleton className="h-4 w-full" />
@@ -160,7 +160,7 @@ function CardSkeleton({ className }: { className?: string }) {
  * Avatar Skeleton
  */
 function AvatarSkeleton({ size = 40 }: { size?: number }) {
-  return <Skeleton className="rounded-none" style={{ width: size, height: size }} />;
+  return <Skeleton className="rounded-md" style={{ width: size, height: size }} />;
 }
 
 export {

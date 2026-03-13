@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { EmptyCustomers } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/ui/page-header';
 
 // CRUD Components
 import { CrudTable } from '@/components/crud/CrudTable';
@@ -34,14 +35,12 @@ import { getCustomersColumns } from '@/components/customers/customers.columns';
 const customerFormSchema = z.object({
   type: z.enum(['INDIVIDUAL', 'BUSINESS', 'CORPORATE']),
   name: z.string().min(2, 'Name must be at least 2 characters'),
-  companyName: z.string().optional(),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().min(8, 'Phone must be at least 8 characters'),
   address: z.string().min(5, 'Address must be at least 5 characters'),
   city: z.string().min(2, 'City must be at least 2 characters'),
   state: z.string().min(2, 'State must be at least 2 characters'),
   zip: z.string().min(4, 'Zip / Postal code is required'),
-  tier: z.enum(['STANDARD', 'PRIORITY', 'ENTERPRISE']),
   gstin: z.string().optional(),
   credit_limit: z.number().min(0).optional(),
 });
@@ -51,14 +50,12 @@ type CustomerFormValues = z.infer<typeof customerFormSchema>;
 const defaultFormValues: CustomerFormValues = {
   type: 'BUSINESS',
   name: '',
-  companyName: '',
   email: '',
   phone: '',
   address: '',
   city: '',
   state: '',
   zip: '',
-  tier: 'STANDARD',
   gstin: '',
   credit_limit: 0,
 };
@@ -71,47 +68,35 @@ const normalizeCustomerAddressForForm = (customer: Customer | null) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const raw = customer.address as any;
 
-  if (typeof raw === 'string') {
-    return { line1: raw, city: '', state: '', zip: '' };
-  }
-
-  if (typeof raw !== 'object' || Array.isArray(raw)) {
-    return { line1: '', city: '', state: '', zip: '' };
-  }
+  if (typeof raw === 'string') return { line1: raw, city: '', state: '', zip: '' };
+  if (typeof raw !== 'object' || Array.isArray(raw)) return { line1: '', city: '', state: '', zip: '' };
 
   const line1 = (raw.line1 ?? raw.line_1 ?? raw.street ?? raw.address ?? '') as string;
   const city = (raw.city ?? '') as string;
   const state = (raw.state ?? '') as string;
-  const zip = (raw.zip ??
-    raw.postal_code ??
-    raw.postalCode ??
-    raw.pincode ??
-    raw.pin ??
-    '') as string;
+  const zip = (raw.zip ?? raw.postal_code ?? raw.postalCode ?? raw.pincode ?? raw.pin ?? '') as string;
 
-  return {
-    line1: line1.trim(),
-    city: city.trim(),
-    state: state.trim(),
-    zip: zip.trim(),
-  };
+  return { line1: line1.trim(), city: city.trim(), state: state.trim(), zip: zip.trim() };
 };
 
 export const Customers: React.FC = () => {
-  // Data fetching
   const { data: customers = [], isLoading } = useCustomers();
   const createMutation = useCreateCustomer();
   const updateMutation = useUpdateCustomer();
   const deleteMutation = useDeleteCustomer();
 
-  // Dialog state
   const [upsertOpen, setUpsertOpen] = useState(false);
   const [mode, setMode] = useState<'create' | 'edit'>('create');
   const [activeRow, setActiveRow] = useState<Customer | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<Customer | null>(null);
 
-  // Table columns with callbacks
+  const openCreate = () => {
+    setMode('create');
+    setActiveRow(null);
+    setUpsertOpen(true);
+  };
+
   const columns = useMemo(
     () =>
       getCustomersColumns({
@@ -128,28 +113,24 @@ export const Customers: React.FC = () => {
     []
   );
 
-  // Form default values for editing
   const formDefaultValues: CustomerFormValues = activeRow
     ? (() => {
         const normalized = normalizeCustomerAddressForForm(activeRow);
         return {
           type: activeRow.type as 'INDIVIDUAL' | 'BUSINESS' | 'CORPORATE',
           name: activeRow.name,
-          companyName: activeRow.companyName ?? '',
           email: activeRow.email ?? '',
           phone: activeRow.phone,
           address: normalized.line1 || '',
           city: normalized.city || '',
           state: normalized.state || '',
           zip: normalized.zip || '',
-          tier: (activeRow.tier as 'STANDARD' | 'PRIORITY' | 'ENTERPRISE') ?? 'STANDARD',
           gstin: activeRow.gstin ?? '',
           credit_limit: activeRow.credit_limit ?? 0,
         };
       })()
     : defaultFormValues;
 
-  // Handlers
   const handleUpsert = async (values: CustomerFormValues) => {
     if (mode === 'create') {
       await createMutation.mutateAsync({
@@ -196,67 +177,40 @@ export const Customers: React.FC = () => {
   };
 
   return (
-    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24">
-      <div className="flex justify-between items-end border-b border-border/40 pb-4">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-foreground flex items-center gap-2.5">
-            Client Roster<span className="text-primary">.</span>
-          </h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground mt-2">
-            Manage profiles and structured contracts
-          </p>
-        </div>
-      </div>
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+      <PageHeader
+        title="Customers"
+        description="Manage customer profiles and billing details"
+      >
+        <Button onClick={openCreate} data-testid="add-customer-button">
+          <Plus data-icon="inline-start" /> Add Customer
+        </Button>
+      </PageHeader>
 
-      {/* Table with CRUD */}
       <CrudTable
         columns={columns}
         data={customers}
         searchKey="name"
         searchPlaceholder="Search customers..."
         isLoading={isLoading}
-        emptyState={
-          <EmptyCustomers
-            onCreate={() => {
-              setMode('create');
-              setActiveRow(null);
-              setUpsertOpen(true);
-            }}
-          />
-        }
+        emptyState={<EmptyCustomers onCreate={openCreate} />}
         emptyMessage="No customers found. Create your first customer to get started."
-        toolbar={
-          <Button
-            onClick={() => {
-              setMode('create');
-              setActiveRow(null);
-              setUpsertOpen(true);
-            }}
-            data-testid="add-customer-button"
-            className="rounded-none font-mono text-xs uppercase tracking-widest px-8"
-          >
-            <Plus className="w-4 h-4 mr-2" /> Add Client
-          </Button>
-        }
       />
 
-      {/* Upsert Dialog */}
       <CrudUpsertDialog
         open={upsertOpen}
         onOpenChange={setUpsertOpen}
         mode={mode}
         title={mode === 'create' ? 'Create Customer' : 'Edit Customer'}
         description={
-          mode === 'create'
-            ? 'Add a new customer to your directory.'
-            : 'Update customer information.'
+          mode === 'create' ? 'Add a new customer to your directory.' : 'Update customer information.'
         }
         schema={customerFormSchema}
         defaultValues={formDefaultValues}
         onSubmit={handleUpsert}
       >
         {(form) => (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -280,61 +234,22 @@ export const Customers: React.FC = () => {
                   </FormItem>
                 )}
               />
+            </div>
 
+            {(form.watch('type') === 'BUSINESS' || form.watch('type') === 'CORPORATE') && (
               <FormField
                 control={form.control}
-                name="tier"
+                name="gstin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tier</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select tier" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="STANDARD">Standard</SelectItem>
-                        <SelectItem value="PRIORITY">Priority</SelectItem>
-                        <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>GSTIN</FormLabel>
+                    <FormControl>
+                      <Input placeholder="GST Number" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </div>
-
-            {(form.watch('type') === 'BUSINESS' || form.watch('type') === 'CORPORATE') && (
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="companyName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Company Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. Globex Corp" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="gstin"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>GSTIN</FormLabel>
-                      <FormControl>
-                        <Input placeholder="GST Number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
             )}
 
             <FormField
@@ -342,7 +257,7 @@ export const Customers: React.FC = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name (Contact)</FormLabel>
+                  <FormLabel>Customer Name</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g. John Doe" {...field} />
                   </FormControl>
@@ -365,7 +280,6 @@ export const Customers: React.FC = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="phone"
@@ -409,7 +323,6 @@ export const Customers: React.FC = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="state"
@@ -423,7 +336,6 @@ export const Customers: React.FC = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="zip"
@@ -461,7 +373,6 @@ export const Customers: React.FC = () => {
         )}
       </CrudUpsertDialog>
 
-      {/* Delete Confirmation Dialog */}
       <CrudDeleteDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}

@@ -79,9 +79,9 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card border border-border p-6 rounded-none shadow-sm">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card border border-border p-6 rounded-lg shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-primary/10 rounded-none">
+          <div className="p-4 bg-primary/10 rounded-lg">
             {shipment.mode === 'AIR' ? (
               <Plane className="w-8 h-8 text-primary" />
             ) : (
@@ -90,7 +90,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-3xl font-black tracking-tight font-mono text-foreground">
+              <h2 className="text-3xl font-semibold tracking-tight font-mono text-foreground">
                 {shipment.awb}
               </h2>
               <Badge className={`${STATUS_COLORS[shipment.status]} px-2 py-1 text-xs shadow-sm`}>
@@ -111,7 +111,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
         </div>
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
           <Button
-            onClick={() => navigate(`/tracking?cn=${shipment.awb}`)}
+            onClick={() => navigate(`/shipments/${shipment.id}`)}
             variant="default"
             className="flex-1 md:flex-none gap-2 shadow-sm"
           >
@@ -164,7 +164,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
 
                 {/* Origin */}
                 <div className="relative z-10 text-center bg-card px-4">
-                  <div className="w-4 h-4 rounded-none bg-primary ring-4 ring-primary/20 mx-auto mb-4" />
+                  <div className="w-4 h-4 rounded-full bg-primary ring-4 ring-primary/20 mx-auto mb-4" />
                   <div className="text-2xl font-bold text-foreground">{origin.code}</div>
                   <div className="text-xs font-medium text-muted-foreground mt-1 max-w-[120px] mx-auto truncate">
                     {origin.name}
@@ -173,7 +173,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
 
                 {/* Mode Icon (Center) */}
                 <div className="relative z-10 bg-card px-2">
-                  <div className="flex items-center gap-2 px-2 py-1.5 rounded-none bg-muted border border-border text-xs font-medium text-foreground shadow-sm">
+                  <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-muted border border-border text-xs font-medium text-foreground shadow-sm">
                     {shipment.mode === 'AIR' ? (
                       <Plane className="w-3.5 h-3.5" />
                     ) : (
@@ -185,7 +185,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
 
                 {/* Destination */}
                 <div className="relative z-10 text-center bg-card px-4">
-                  <div className="w-4 h-4 rounded-none bg-foreground ring-4 ring-foreground/10 mx-auto mb-4" />
+                  <div className="w-4 h-4 rounded-full bg-foreground ring-4 ring-foreground/10 mx-auto mb-4" />
                   <div className="text-2xl font-bold text-foreground">{dest.code}</div>
                   <div className="text-xs font-medium text-muted-foreground mt-1 max-w-[120px] mx-auto truncate">
                     {dest.name}
@@ -236,7 +236,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
                   trackingEvents.map((evt, idx) => (
                     <div key={evt.id} className="relative pl-8 group">
                       <div
-                        className={`absolute left-0 top-1.5 w-5 h-5 rounded-none border-2 border-card shadow-sm z-10 
+                        className={`absolute left-0 top-1.5 w-5 h-5 rounded-full border-2 border-card shadow-sm z-10 
                         ${idx === 0 ? 'bg-primary ring-4 ring-primary/20' : 'bg-muted-foreground/30'}`}
                       />
                       <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
@@ -258,14 +258,14 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
                         {((evt.meta as Record<string, unknown>)?.description as string) ||
                           'Event recorded'}
                       </p>
-                      <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground bg-muted/50 w-fit px-2 py-1 rounded-none">
+                      <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground bg-muted/50 w-fit px-2 py-1 rounded-md">
                         <MapPin className="w-3 h-3" />
                         {evt.hub?.name || 'Transit'}
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground bg-muted/20 rounded-none">
+                  <div className="text-center py-8 text-muted-foreground bg-muted/20 rounded-md">
                     <Clock className="w-10 h-10 mx-auto mb-2 opacity-20" />
                     <p>No tracking events recorded yet.</p>
                   </div>

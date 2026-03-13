@@ -124,7 +124,7 @@ export function ScannerDebug() {
           </span>
           <button
             onClick={() => setVisible(false)}
-            className="p-1 rounded-none hover:bg-accent transition-colors"
+            className="p-1 rounded-md hover:bg-accent transition-colors"
             aria-label="Close debug panel"
           >
             <X className="w-3.5 h-3.5" />
@@ -135,12 +135,12 @@ export function ScannerDebug() {
         {/* Keystrokes Display */}
         <div>
           <div className="text-muted-foreground mb-1">Keystrokes:</div>
-          <div className="bg-muted p-2 rounded-none min-h-[2rem] flex flex-wrap gap-1">
+          <div className="bg-muted p-2 rounded-md min-h-[2rem] flex flex-wrap gap-1">
             {keystrokes.length > 0 ? (
               keystrokes.map((k, i) => (
                 <span
                   key={i}
-                  className={`px-1 rounded-none ${
+                  className={`px-1 rounded-sm ${
                     k.delay > 0 && k.delay < 150
                       ? 'text-muted-foreground/20 text-muted-foreground dark:text-muted-foreground'
                       : 'text-muted-foreground/20 text-muted-foreground dark:text-muted-foreground'
@@ -159,7 +159,7 @@ export function ScannerDebug() {
         {/* Buffer Display */}
         <div>
           <div className="text-muted-foreground mb-1">Buffer:</div>
-          <div className="bg-muted p-2 rounded-none min-h-[2rem]">
+          <div className="bg-muted p-2 rounded-md min-h-[2rem]">
             {buffer || <span className="text-muted-foreground">Empty</span>}
           </div>
         </div>
@@ -194,7 +194,7 @@ export function ScannerDebug() {
         {/* Last Scan Result */}
         <div>
           <div className="text-muted-foreground mb-1">Last Scan:</div>
-          <div className="bg-muted p-2 rounded-none min-h-[2rem]">
+          <div className="bg-muted p-2 rounded-md min-h-[2rem]">
             {lastScan ? (
               <div className="flex items-center justify-between">
                 <span className="truncate flex-1">{lastScan.code}</span>
