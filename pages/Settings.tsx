@@ -12,16 +12,11 @@ import { ColumnDef } from '@tanstack/react-table';
 import { CrudTable } from '@/components/crud/CrudTable';
 import { HUBS, SHIPMENT_MODES, SERVICE_LEVELS, PAYMENT_MODES } from '@/lib/constants';
 
-import { SectionHeader, FieldLabel, SelectField } from '@/components/settings/SettingsComponents';
+import { FieldLabel, SelectField } from '@/components/settings/SettingsComponents';
 import { AuditLogsTab } from '@/components/settings/AuditLogsTab';
 import { settingsService } from '@/lib/services/settingsService';
 import { cn } from '@/lib/utils';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+import { FormSection, FormGrid } from '@/components/ui-core';
 import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -254,166 +249,129 @@ export const Settings = () => {
         </div>
 
         {/* ============= GENERAL TAB ============= */}
-        <TabsContent value="GENERAL" className="mt-6">
-          <Accordion
-            type="multiple"
-            defaultValue={['item-1', 'item-2', 'item-3']}
-            className="w-full space-y-4"
-          >
-            <AccordionItem
-              value="item-1"
-              className="border-none bg-card rounded-lg border border-border"
-            >
-              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
-                <SectionHeader icon={Building2} title="Organization Profile" className="mb-0" />
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6 pt-2">
-                <div className="space-y-6">
-                  <div>
-                    <FieldLabel>Terminal Name</FieldLabel>
-                    <Input
-                      value={terminalName}
-                      onChange={(e) => setTerminalName(e.target.value)}
-                      disabled={isLoading}
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors border-input"
-                    />
-                  </div>
-                  <div>
-                    <FieldLabel>Timezone</FieldLabel>
-                    <SelectField
-                      value={timezone}
-                      onChange={setTimezone}
-                      options={[
-                        { value: 'UTC', label: 'UTC' },
-                        { value: 'Asia/Kolkata', label: 'Asia/Kolkata (IST)' },
-                        { value: 'America/New_York', label: 'America/New_York (EST)' },
-                        { value: 'Europe/London', label: 'Europe/London (GMT)' },
-                        { value: 'Asia/Dubai', label: 'Asia/Dubai (GST)' },
-                        { value: 'Asia/Singapore', label: 'Asia/Singapore (SGT)' },
-                      ]}
-                    />
-                  </div>
-                  <div className="space-y-6">
-                    <div>
-                      <FieldLabel>Currency</FieldLabel>
-                      <SelectField
-                        value={currency}
-                        onChange={setCurrency}
-                        options={[
-                          { value: 'INR', label: '₹ INR' },
-                          { value: 'USD', label: '$ USD' },
-                          { value: 'EUR', label: '€ EUR' },
-                          { value: 'GBP', label: '£ GBP' },
-                        ]}
-                      />
-                    </div>
-                    <div>
-                      <FieldLabel>Date Format</FieldLabel>
-                      <SelectField
-                        value={dateFormat}
-                        onChange={setDateFormat}
-                        options={[
-                          { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY' },
-                          { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },
-                          { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD (ISO)' },
-                        ]}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+        <TabsContent value="GENERAL" className="mt-6 space-y-8">
+          <FormSection icon={Building2} title="Organization Profile">
+            <FormGrid columns={2}>
+              <div className="space-y-2">
+                <FieldLabel>Terminal Name</FieldLabel>
+                <Input
+                  value={terminalName}
+                  onChange={(e) => setTerminalName(e.target.value)}
+                  disabled={isLoading}
+                  className="h-11 bg-transparent hover:border-ring/50 transition-colors border-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Timezone</FieldLabel>
+                <SelectField
+                  value={timezone}
+                  onChange={setTimezone}
+                  options={[
+                    { value: 'UTC', label: 'UTC' },
+                    { value: 'Asia/Kolkata', label: 'Asia/Kolkata (IST)' },
+                    { value: 'America/New_York', label: 'America/New_York (EST)' },
+                    { value: 'Europe/London', label: 'Europe/London (GMT)' },
+                    { value: 'Asia/Dubai', label: 'Asia/Dubai (GST)' },
+                    { value: 'Asia/Singapore', label: 'Asia/Singapore (SGT)' },
+                  ]}
+                />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Currency</FieldLabel>
+                <SelectField
+                  value={currency}
+                  onChange={setCurrency}
+                  options={[
+                    { value: 'INR', label: '₹ INR' },
+                    { value: 'USD', label: '$ USD' },
+                    { value: 'EUR', label: '€ EUR' },
+                    { value: 'GBP', label: '£ GBP' },
+                  ]}
+                />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Date Format</FieldLabel>
+                <SelectField
+                  value={dateFormat}
+                  onChange={setDateFormat}
+                  options={[
+                    { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY' },
+                    { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },
+                    { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD (ISO)' },
+                  ]}
+                />
+              </div>
+            </FormGrid>
+          </FormSection>
 
-            <AccordionItem
-              value="item-2"
-              className="border-none bg-card rounded-lg border border-border"
-            >
-              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
-                <SectionHeader icon={Truck} title="Operational Defaults" className="mb-0" />
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6 pt-2">
-                <div className="space-y-6">
-                  <div>
-                    <FieldLabel>Default Shipment Mode</FieldLabel>
-                    <SelectField
-                      value={defaultMode}
-                      onChange={setDefaultMode}
-                      options={SHIPMENT_MODES.map((m) => ({ value: m.id, label: m.label }))}
-                    />
-                  </div>
-                  <div>
-                    <FieldLabel>Default Service Level</FieldLabel>
-                    <SelectField
-                      value={defaultServiceLevel}
-                      onChange={setDefaultServiceLevel}
-                      options={SERVICE_LEVELS.map((s) => ({ value: s.id, label: s.label }))}
-                    />
-                  </div>
-                  <div>
-                    <FieldLabel>Default Payment Mode</FieldLabel>
-                    <RadioGroup
-                      value={defaultPaymentMode}
-                      onValueChange={setDefaultPaymentMode}
-                      className="flex space-x-4 mt-2"
+          <FormSection icon={Truck} title="Operational Defaults">
+            <FormGrid columns={2}>
+              <div className="space-y-2">
+                <FieldLabel>Default Shipment Mode</FieldLabel>
+                <SelectField
+                  value={defaultMode}
+                  onChange={setDefaultMode}
+                  options={SHIPMENT_MODES.map((m) => ({ value: m.id, label: m.label }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Default Service Level</FieldLabel>
+                <SelectField
+                  value={defaultServiceLevel}
+                  onChange={setDefaultServiceLevel}
+                  options={SERVICE_LEVELS.map((s) => ({ value: s.id, label: s.label }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <FieldLabel>Export Format</FieldLabel>
+                <SelectField
+                  value={exportFormat}
+                  onChange={setExportFormat}
+                  options={[
+                    { value: 'CSV', label: 'CSV (Spreadsheet)' },
+                    { value: 'PDF', label: 'PDF (Document)' },
+                    { value: 'XLSX', label: 'Excel (XLSX)' },
+                  ]}
+                />
+              </div>
+              <div className="space-y-2 col-span-full">
+                <FieldLabel>Default Payment Mode</FieldLabel>
+                <RadioGroup
+                  value={defaultPaymentMode}
+                  onValueChange={setDefaultPaymentMode}
+                  className="flex space-x-4 mt-2"
+                >
+                  {PAYMENT_MODES.map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex items-center space-x-2 bg-muted/30 border border-border px-4 py-2 rounded-md"
                     >
-                      {PAYMENT_MODES.map((p) => (
-                        <div
-                          key={p.id}
-                          className="flex items-center space-x-2 bg-muted/30 border border-border px-4 py-2 rounded-md"
-                        >
-                          <RadioGroupItem value={p.id} id={`payment-${p.id}`} />
-                          <Label
-                            htmlFor={`payment-${p.id}`}
-                            className="cursor-pointer font-normal text-sm"
-                          >
-                            {p.label}
-                          </Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  </div>
-                  <div>
-                    <FieldLabel>Export Format</FieldLabel>
-                    <SelectField
-                      value={exportFormat}
-                      onChange={setExportFormat}
-                      options={[
-                        { value: 'CSV', label: 'CSV (Spreadsheet)' },
-                        { value: 'PDF', label: 'PDF (Document)' },
-                        { value: 'XLSX', label: 'Excel (XLSX)' },
-                      ]}
-                    />
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+                      <RadioGroupItem value={p.id} id={`payment-${p.id}`} />
+                      <Label
+                        htmlFor={`payment-${p.id}`}
+                        className="cursor-pointer font-normal text-sm"
+                      >
+                        {p.label}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+            </FormGrid>
+          </FormSection>
 
-            <AccordionItem
-              value="item-3"
-              className="border-none bg-card rounded-lg border border-border"
-            >
-              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
-                <SectionHeader
-                  icon={MapPin}
-                  title="Hub Network"
-                  color="text-primary"
-                  className="mb-0"
-                />
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6 pt-2">
-                <CrudTable
-                  columns={hubColumns}
-                  data={Object.values(HUBS)}
-                  pageSize={100}
-                  enableColumnVisibility={false}
-                />
-                <p className="text-xs text-muted-foreground mt-4">
-                  Hub configuration is managed at the infrastructure level. Contact support to add
-                  or modify hubs.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <FormSection icon={MapPin} title="Hub Network">
+            <CrudTable
+              columns={hubColumns}
+              data={Object.values(HUBS)}
+              pageSize={100}
+              enableColumnVisibility={false}
+            />
+            <p className="text-xs text-muted-foreground mt-4">
+              Hub configuration is managed at the infrastructure level. Contact support to add
+              or modify hubs.
+            </p>
+          </FormSection>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             {/* Save Button — Full width */}
@@ -426,205 +384,167 @@ export const Settings = () => {
         </TabsContent>
 
         {/* ============= SECURITY & NOTIFICATIONS TAB ============= */}
-        <TabsContent value="SECURITY" className="mt-6">
-          <Accordion
-            type="multiple"
-            defaultValue={['item-1', 'item-2', 'item-3', 'item-4']}
-            className="w-full space-y-4"
-          >
-            <AccordionItem
-              value="item-1"
-              className="border-none bg-card rounded-lg border border-border"
-            >
-              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
-                <SectionHeader icon={User} title="User Profile" className="mb-0" />
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6 pt-2">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-6 p-4 rounded-lg bg-muted/30 border border-border">
-                    <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold text-2xl">
-                      {user?.fullName
-                        ?.split(' ')
-                        .map((n) => n[0])
-                        .join('')
-                        .toUpperCase()
-                        .slice(0, 2) || '??'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-lg font-semibold text-foreground truncate">
-                        {user?.fullName || 'Unknown'}
-                      </div>
-                      <div className="text-sm text-muted-foreground truncate mt-0.5">
-                        {user?.email || '—'}
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="shrink-0 border-primary/30 text-primary">
-                      {user?.role || '—'}
-                    </Badge>
+        <TabsContent value="SECURITY" className="mt-6 space-y-8">
+          <FormSection icon={User} title="User Profile">
+            <div className="space-y-4">
+              <div className="flex items-center gap-6 p-4 rounded-lg bg-muted/30 border border-border">
+                <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-semibold text-2xl">
+                  {user?.fullName
+                    ?.split(' ')
+                    .map((n) => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2) || '??'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-lg font-semibold text-foreground truncate">
+                    {user?.fullName || 'Unknown'}
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 rounded-lg bg-muted/30">
-                      <div className="text-xs text-muted-foreground mb-1">Primary Hub</div>
-                      <div className="text-sm font-medium text-foreground">
-                        {user?.hubCode || 'All Hubs'}
-                      </div>
-                    </div>
-                    <div className="p-4 rounded-lg bg-muted/30">
-                      <div className="text-xs text-muted-foreground mb-1">Account Status</div>
-                      <div className="text-sm font-medium">
-                        {user?.isActive ? (
-                          <span className="text-status-success">Active</span>
-                        ) : (
-                          <span className="text-status-error">Inactive</span>
-                        )}
-                      </div>
-                    </div>
+                  <div className="text-sm text-muted-foreground truncate mt-0.5">
+                    {user?.email || '—'}
                   </div>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem
-              value="item-2"
-              className="border-none bg-card rounded-lg border border-border"
-            >
-              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
-                <SectionHeader icon={Moon} title="Appearance" className="mb-0" />
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6 pt-2">
-                <div className="space-y-6">
-                  <div>
-                    <FieldLabel>Theme Mode</FieldLabel>
-                    <div className="grid grid-cols-3 rounded-lg border border-border overflow-hidden">
-                      {[
-                        { id: 'light' as const, icon: Sun, label: 'Light' },
-                        { id: 'dark' as const, icon: Moon, label: 'Dark' },
-                        { id: 'system' as const, icon: Monitor, label: 'System' },
-                      ].map(({ id, icon: ThemeIcon, label }) => (
-                        <button
-                          key={id}
-                          onClick={() => setTheme(id)}
-                          className={`flex flex-col items-center justify-center p-4 transition-all duration-200 ${theme === id ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-muted border-l first:border-l-0 border-border'}`}
-                        >
-                          <ThemeIcon className="w-4 h-4 mb-2" />
-                          <span className="text-xs font-medium">{label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="pt-6 border-t border-border">
-                    <div className="text-xs text-muted-foreground mb-4">Session Details</div>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center rounded-md bg-muted/30 p-3 px-4">
-                        <span className="text-xs text-muted-foreground">Last Sign-In</span>
-                        <span className="text-xs text-foreground font-medium">
-                          {session?.user?.last_sign_in_at
-                            ? new Date(session.user.last_sign_in_at).toLocaleTimeString()
-                            : '—'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center rounded-md bg-muted/30 p-3 px-4">
-                        <span className="text-xs text-muted-foreground">User ID</span>
-                        <span className="font-mono text-xs text-foreground font-medium truncate max-w-[160px]">
-                          {session?.user?.id?.slice(0, 12) || '—'}…
-                        </span>
-                      </div>
-                    </div>
+                <Badge variant="outline" className="shrink-0 border-primary/30 text-primary">
+                  {user?.role || '—'}
+                </Badge>
+              </div>
+              <FormGrid columns={2}>
+                <div className="p-4 rounded-lg bg-muted/30">
+                  <div className="text-xs text-muted-foreground mb-1">Primary Hub</div>
+                  <div className="text-sm font-medium text-foreground">
+                    {user?.hubCode || 'All Hubs'}
                   </div>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
+                <div className="p-4 rounded-lg bg-muted/30">
+                  <div className="text-xs text-muted-foreground mb-1">Account Status</div>
+                  <div className="text-sm font-medium">
+                    {user?.isActive ? (
+                      <span className="text-status-success">Active</span>
+                    ) : (
+                      <span className="text-status-error">Inactive</span>
+                    )}
+                  </div>
+                </div>
+              </FormGrid>
+            </div>
+          </FormSection>
 
-            <AccordionItem
-              value="item-3"
-              className="border-none bg-card rounded-lg border border-border"
-            >
-              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
-                <SectionHeader icon={Bell} title="Notifications" className="mb-0" />
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6 pt-2">
-                <div className="rounded-lg border border-border overflow-hidden">
+          <FormSection icon={Moon} title="Appearance">
+            <div className="space-y-6">
+              <div>
+                <FieldLabel>Theme Mode</FieldLabel>
+                <div className="grid grid-cols-3 rounded-lg border border-border overflow-hidden">
                   {[
-                    {
-                      id: 'shipment_delays',
-                      label: 'Delay Alerts',
-                    },
-                    {
-                      id: 'new_orders',
-                      label: 'New Bookings & Orders',
-                    },
-                    {
-                      id: 'system_alerts',
-                      label: 'System Alerts',
-                    },
-                    {
-                      id: 'driver_updates',
-                      label: 'Driver & Vehicle Updates',
-                    },
-                  ].map((item, idx) => (
-                    <div
-                      key={item.id}
-                      className={`flex items-center justify-between px-4 py-3 ${idx > 0 ? 'border-t border-border' : ''}`}
+                    { id: 'light' as const, icon: Sun, label: 'Light' },
+                    { id: 'dark' as const, icon: Moon, label: 'Dark' },
+                    { id: 'system' as const, icon: Monitor, label: 'System' },
+                  ].map(({ id, icon: ThemeIcon, label }) => (
+                    <button
+                      key={id}
+                      onClick={() => setTheme(id)}
+                      className={`flex flex-col items-center justify-center p-4 transition-all duration-200 ${theme === id ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:bg-muted border-l first:border-l-0 border-border'}`}
                     >
-                      <span className="text-sm font-medium">{item.label}</span>
-                      <Switch
-                        checked={notifications[item.id as keyof typeof notifications]}
-                        onCheckedChange={() =>
-                          toggleNotification(item.id as keyof typeof notifications)
-                        }
-                        aria-label={`Toggle ${item.label}`}
-                      />
-                    </div>
+                      <ThemeIcon className="w-4 h-4 mb-2" />
+                      <span className="text-xs font-medium">{label}</span>
+                    </button>
                   ))}
                 </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem
-              value="item-4"
-              className="border-none bg-card rounded-lg border border-border"
-            >
-              <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
-                <SectionHeader icon={Shield} title="Security" className="mb-0" />
-              </AccordionTrigger>
-              <AccordionContent className="px-6 pb-6 pt-2">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center p-4 rounded-lg border border-border bg-muted/30">
-                    <div className="min-w-0 pr-4">
-                      <div className="text-sm font-medium text-foreground">MFA Infrastructure</div>
-                      <div className="text-xs text-muted-foreground mt-0.5">
-                        Identity Provider Managed
-                      </div>
-                    </div>
-                    <Badge variant="outline">Managed</Badge>
+              </div>
+              <div className="pt-6 border-t border-border">
+                <div className="text-xs text-muted-foreground mb-4">Session Details</div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center rounded-md bg-muted/30 p-3 px-4">
+                    <span className="text-xs text-muted-foreground">Last Sign-In</span>
+                    <span className="text-xs text-foreground font-medium">
+                      {session?.user?.last_sign_in_at
+                        ? new Date(session.user.last_sign_in_at).toLocaleTimeString()
+                        : '—'}
+                    </span>
                   </div>
-                  <div className="flex justify-between items-center p-4 rounded-lg border border-border bg-muted/30">
-                    <div className="min-w-0 pr-4">
-                      <div className="text-sm font-medium text-foreground">API Access Gateway</div>
-                      <div className="text-xs text-muted-foreground mt-0.5">
-                        Privileged access only
-                      </div>
-                    </div>
-                    <Badge variant="outline">Restricted</Badge>
-                  </div>
-                  <div className="flex justify-between items-center p-4 rounded-lg border border-border bg-muted/30">
-                    <div className="min-w-0 pr-4">
-                      <div className="text-sm font-medium text-foreground">Policy Enforcement</div>
-                      <div className="text-xs text-muted-foreground mt-0.5">
-                        8+ Chars / Leak Protection
-                      </div>
-                    </div>
-                    <Badge
-                      variant="default"
-                      className="bg-status-success/10 text-status-success border-status-success/30"
-                    >
-                      Active
-                    </Badge>
+                  <div className="flex justify-between items-center rounded-md bg-muted/30 p-3 px-4">
+                    <span className="text-xs text-muted-foreground">User ID</span>
+                    <span className="font-mono text-xs text-foreground font-medium truncate max-w-[160px]">
+                      {session?.user?.id?.slice(0, 12) || '—'}…
+                    </span>
                   </div>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+              </div>
+            </div>
+          </FormSection>
+
+          <FormSection icon={Bell} title="Notifications">
+            <div className="rounded-lg border border-border overflow-hidden max-w-2xl">
+              {[
+                {
+                  id: 'shipment_delays',
+                  label: 'Delay Alerts',
+                },
+                {
+                  id: 'new_orders',
+                  label: 'New Bookings & Orders',
+                },
+                {
+                  id: 'system_alerts',
+                  label: 'System Alerts',
+                },
+                {
+                  id: 'driver_updates',
+                  label: 'Driver & Vehicle Updates',
+                },
+              ].map((item, idx) => (
+                <div
+                  key={item.id}
+                  className={`flex items-center justify-between px-4 py-3 ${idx > 0 ? 'border-t border-border' : ''}`}
+                >
+                  <span className="text-sm font-medium">{item.label}</span>
+                  <Switch
+                    checked={notifications[item.id as keyof typeof notifications]}
+                    onCheckedChange={() =>
+                      toggleNotification(item.id as keyof typeof notifications)
+                    }
+                    aria-label={`Toggle ${item.label}`}
+                  />
+                </div>
+              ))}
+            </div>
+          </FormSection>
+
+          <FormSection icon={Shield} title="Security">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-4 rounded-lg border border-border bg-muted/30">
+                <div className="min-w-0 pr-4">
+                  <div className="text-sm font-medium text-foreground">MFA Infrastructure</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    Identity Provider Managed
+                  </div>
+                </div>
+                <Badge variant="outline">Managed</Badge>
+              </div>
+              <div className="flex justify-between items-center p-4 rounded-lg border border-border bg-muted/30">
+                <div className="min-w-0 pr-4">
+                  <div className="text-sm font-medium text-foreground">API Access Gateway</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    Privileged access only
+                  </div>
+                </div>
+                <Badge variant="outline">Restricted</Badge>
+              </div>
+              <div className="flex justify-between items-center p-4 rounded-lg border border-border bg-muted/30">
+                <div className="min-w-0 pr-4">
+                  <div className="text-sm font-medium text-foreground">Policy Enforcement</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    8+ Chars / Leak Protection
+                  </div>
+                </div>
+                <Badge
+                  variant="default"
+                  className="bg-status-success/10 text-status-success border-status-success/30"
+                >
+                  Active
+                </Badge>
+              </div>
+            </div>
+          </FormSection>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div className="md:col-span-2 p-8 bg-background flex justify-end">

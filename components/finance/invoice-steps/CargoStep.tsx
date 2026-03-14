@@ -11,7 +11,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Box, Ruler, Scale, CheckCircle, Printer } from 'lucide-react';
-import { SectionHeader, Label } from './shared';
+import { Label } from './shared';
+import { FormSection } from '@/components/ui-core';
 import { CONTENT_TYPES } from '@/lib/constants';
 
 interface Props {
@@ -27,9 +28,9 @@ export const CargoStep = ({ form, setShowLabelPreview }: Props) => {
 
   return (
     <div className="space-y-8 py-2 max-w-4xl mx-auto">
-      <SectionHeader icon={Box} title="Cargo Specification" />
+      <FormSection icon={Box} title="Cargo Specification">
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="md:col-span-2 space-y-2">
           <Label>
             Nature of Goods <span className="text-destructive">*</span>
@@ -191,6 +192,7 @@ export const CargoStep = ({ form, setShowLabelPreview }: Props) => {
           </div>
         </div>
       </div>
+      </FormSection>
     </div>
   );
 };

@@ -13,8 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { FormSection, FormGrid, FormFooter } from '@/components/ui-core';
 import { Trash2, Plus, Upload, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -158,12 +157,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base text-primary">Contact Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
+        <FormSection
+          title="Contact Information"
+          description="We will contact you on this number for shipment updates."
+        >
+          <FormGrid columns={1}>
+            <div className="max-w-md">
               <FormField
                 control={form.control}
                 name="whatsappNumber"
@@ -179,293 +178,258 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                         {...field}
                       />
                     </FormControl>
-                    <p className="text-xs text-muted-foreground">
-                      We will contact you on this number for shipment updates.
-                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-          </CardContent>
-        </Card>
+          </FormGrid>
+        </FormSection>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Consignor Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Consignor</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-1">
-                <FormField
-                  control={form.control}
-                  name="consignor.name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                        Name
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                          placeholder="Consignor Name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="space-y-1">
-                <FormField
-                  control={form.control}
-                  name="consignor.phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                        Phone
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                          placeholder="Consignor Phone"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="space-y-1">
-                <FormField
-                  control={form.control}
-                  name="consignor.address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                        Address
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                          placeholder="Address Line 1"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <FormField
-                    control={form.control}
-                    name="consignor.city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          City
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <FormField
-                    control={form.control}
-                    name="consignor.state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          State
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <FormField
-                    control={form.control}
-                    name="consignor.zip"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          Zip
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <FormSection title="Consignor Details">
+          <FormGrid columns={2}>
+            <FormField
+              control={form.control}
+              name="consignor.name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Name
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      placeholder="Consignor Name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="consignor.phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Phone
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      placeholder="Consignor Phone"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="md:col-span-2">
+              <FormField
+                control={form.control}
+                name="consignor.address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Address
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        placeholder="Address Line 1"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="consignor.city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      City
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="consignor.state"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      State
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="consignor.zip"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Zip
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </FormGrid>
+        </FormSection>
 
-          {/* Consignee Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Consignee</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-1">
-                <FormField
-                  control={form.control}
-                  name="consignee.name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                        Name
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                          placeholder="Consignee Name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="space-y-1">
-                <FormField
-                  control={form.control}
-                  name="consignee.phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                        Phone
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                          placeholder="Consignee Phone"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="space-y-1">
-                <FormField
-                  control={form.control}
-                  name="consignee.address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                        Address
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                          placeholder="Address Line 1"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <FormField
-                    control={form.control}
-                    name="consignee.city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          City
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <FormField
-                    control={form.control}
-                    name="consignee.state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          State
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <FormField
-                    control={form.control}
-                    name="consignee.zip"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          Zip
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Separator />
+        <FormSection title="Consignee Details">
+          <FormGrid columns={2}>
+            <FormField
+              control={form.control}
+              name="consignee.name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Name
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      placeholder="Consignee Name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="consignee.phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Phone
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      placeholder="Consignee Phone"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="md:col-span-2">
+              <FormField
+                control={form.control}
+                name="consignee.address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Address
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        placeholder="Address Line 1"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="consignee.city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      City
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="consignee.state"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      State
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="consignee.zip"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Zip
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </FormGrid>
+        </FormSection>
 
         {/* Volume Matrix */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Volume Matrix</CardTitle>
+        <FormSection
+          title="Volume Matrix"
+          action={
             <Button
               type="button"
               variant="outline"
@@ -474,8 +438,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
             >
               <Plus className="w-4 h-4 mr-2" /> Add Item
             </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          }
+        >
+          <div className="space-y-4">
             {fields.map((field, index) => (
               <div key={field.id} className="grid grid-cols-6 gap-3 items-end">
                 <div className="space-y-1">
@@ -599,74 +564,60 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                 {form.formState.errors.volumeMatrix.message}
               </p>
             )}
-          </CardContent>
-        </Card>
-
-        <Separator />
+          </div>
+        </FormSection>
 
         {/* Image Upload */}
-        <Card className={isMobile ? 'mb-6' : ''}>
-          <CardHeader>
-            <CardTitle className="text-base">Images</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-4">
-              <div className="border-2 border-dashed border-input rounded-md p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-accent/50 transition-colors relative">
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                  onChange={handleFileChange}
-                />
-                <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">Click or drag images here to upload</p>
-              </div>
-
-              {selectedFiles.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  {selectedFiles.map((file, index) => (
-                    <div key={index} className="relative group border rounded-md p-2">
-                      <div className="text-xs truncate w-full mb-1">{file.name}</div>
-                      <div className="aspect-square bg-muted rounded-md overflow-hidden relative">
-                        {/* codeql[js/xss-through-dom] - Safe object URL from file input */}
-                        {/* lgtm[js/xss-through-dom] */}
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt="preview"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="icon"
-                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => removeFile(index)}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
+        <FormSection title="Images" className={isMobile ? 'mb-6' : ''}>
+          <div className="flex flex-col gap-4">
+            <div className="border-2 border-dashed border-input rounded-md p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-accent/50 transition-colors relative">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={handleFileChange}
+              />
+              <Upload className="w-8 h-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground">Click or drag images here to upload</p>
             </div>
-          </CardContent>
-        </Card>
 
-        <div
-          className={
-            isMobile
-              ? 'sticky bottom-0 -mx-4 -mb-4 mt-6 p-4 bg-background border-t border-border flex justify-end gap-3 z-10'
-              : 'flex justify-end gap-3 pt-4'
-          }
-        >
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={form.formState.isSubmitting || uploading}>
-            {form.formState.isSubmitting || uploading ? 'Submitting...' : 'Book Shipment'}
-          </Button>
+            {selectedFiles.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {selectedFiles.map((file, index) => (
+                  <div key={index} className="relative group border rounded-md p-2">
+                    <div className="text-xs truncate w-full mb-1">{file.name}</div>
+                    <div className="aspect-square bg-muted rounded-md overflow-hidden relative">
+                      {/* codeql[js/xss-through-dom] - Safe object URL from file input */}
+                      {/* lgtm[js/xss-through-dom] */}
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt="preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => removeFile(index)}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </FormSection>
+
+        <div className={isMobile ? 'sticky bottom-0 -mx-4 -mb-4 mt-6 p-4 bg-background z-10' : ''}>
+          <FormFooter
+            onCancel={onCancel}
+            submitLabel="Book Shipment"
+            isLoading={form.formState.isSubmitting || uploading}
+          />
         </div>
       </form>
     </Form>

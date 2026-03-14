@@ -20,6 +20,8 @@ import {
 import { TacLogo } from '@/components/shared/tac-logo';
 import { AnimatedThemeToggler } from '../../components/ui/animated-theme-toggler';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { getDefaultRouteForRole } from '@/lib/access-control';
 import { gsap } from '@/lib/gsap';
 
@@ -282,7 +284,7 @@ export const Login: React.FC = () => {
                     <div className="space-y-2">
                       <Label
                         htmlFor="login-email"
-                        className="block text-xs font-semibold text-foreground"
+                        className="block text-sm font-medium text-foreground"
                       >
                         Email address
                       </Label>
@@ -298,7 +300,7 @@ export const Login: React.FC = () => {
                             focusedField === 'email' ? 'text-primary' : 'text-muted-foreground'
                           }`}
                         />
-                        <input
+                        <Input
                           id="login-email"
                           type="email"
                           inputMode="email"
@@ -311,7 +313,7 @@ export const Login: React.FC = () => {
                           disabled={isLoading}
                           data-testid="login-email-input"
                           aria-describedby={error ? 'login-error-message' : undefined}
-                          className="w-full bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none disabled:opacity-50"
+                          className="w-full border-0 bg-transparent px-0 text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-50 shadow-none"
                         />
                         {email && <Check className="ml-2 h-4 w-4 text-status-success shrink-0" />}
                       </div>
@@ -322,7 +324,7 @@ export const Login: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <Label
                           htmlFor="login-password"
-                          className="block text-xs font-semibold text-foreground"
+                          className="block text-sm font-medium text-foreground"
                         >
                           Password
                         </Label>
@@ -345,7 +347,7 @@ export const Login: React.FC = () => {
                             focusedField === 'password' ? 'text-primary' : 'text-muted-foreground'
                           }`}
                         />
-                        <input
+                        <Input
                           id="login-password"
                           type={showPassword ? 'text' : 'password'}
                           autoComplete="current-password"
@@ -357,7 +359,7 @@ export const Login: React.FC = () => {
                           disabled={isLoading}
                           data-testid="login-password-input"
                           aria-describedby={error ? 'login-error-message' : undefined}
-                          className="w-full bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none disabled:opacity-50"
+                          className="w-full border-0 bg-transparent px-0 text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-50 shadow-none"
                         />
                         <button
                           type="button"
@@ -399,27 +401,24 @@ export const Login: React.FC = () => {
                       </Label>
 
                       {/* Submit Button - Enhanced */}
-                      <button
+                      <Button
                         type="submit"
                         disabled={isLoading}
                         data-testid="login-submit-button"
-                        className="group/btn relative w-full inline-flex items-center justify-center rounded-md bg-primary h-12 px-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 outline-none transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 overflow-hidden"
+                        className="w-full h-12 text-sm font-semibold shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
                       >
-                        <div className="absolute inset-0 h-full w-full scale-0 rounded-md transition-all duration-300 ease-out group-hover/btn:scale-100 group-hover/btn:bg-primary-foreground/10"></div>
-                        <span className="relative z-10 flex items-center">
-                          {isLoading ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Authenticating...
-                            </>
-                          ) : (
-                            <>
-                              <LogIn className="mr-2 h-4 w-4" />
-                              Sign in to Dashboard
-                            </>
-                          )}
-                        </span>
-                      </button>
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Authenticating...
+                          </>
+                        ) : (
+                          <>
+                            <LogIn className="mr-2 h-4 w-4" />
+                            Sign in to Dashboard
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </form>
                 </div>

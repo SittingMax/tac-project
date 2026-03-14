@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { Package, Truck, Plane, Zap, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Form,
@@ -23,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { FormSection, FormGrid, FormFooter } from '@/components/ui-core';
 import { useCustomers } from '@/hooks/useCustomers';
 import { useCreateShipment } from '@/hooks/useShipments';
 import { HUBS, SHIPMENT_MODES, SERVICE_LEVELS } from '@/lib/constants';
@@ -193,72 +193,64 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left Column: Routing, Shipper & Service */}
-          <div className="space-y-8">
-            {/* Route Section */}
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <FormField
-                  control={form.control}
-                  name="originHub"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                        Origin Hub
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="w-full h-11 bg-transparent hover:border-ring/50 transition-colors">
-                            <SelectValue placeholder="Select Hub" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Object.values(HUBS).map((hub) => (
-                            <SelectItem key={hub.id} value={hub.id}>
-                              {hub.name} ({hub.code})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div>
-                <FormField
-                  control={form.control}
-                  name="destinationHub"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                        Destination Hub
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="w-full h-11 bg-transparent hover:border-ring/50 transition-colors">
-                            <SelectValue placeholder="Select Hub" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Object.values(HUBS).map((hub) => (
-                            <SelectItem key={hub.id} value={hub.id}>
-                              {hub.name} ({hub.code})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <FormSection title="Routing, Shipper & Service">
+          <FormGrid columns={2}>
+            <FormField
+              control={form.control}
+              name="originHub"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Origin Hub
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-full h-11 bg-transparent hover:border-ring/50 transition-colors">
+                        <SelectValue placeholder="Select Hub" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.values(HUBS).map((hub) => (
+                        <SelectItem key={hub.id} value={hub.id}>
+                          {hub.name} ({hub.code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="destinationHub"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Destination Hub
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-full h-11 bg-transparent hover:border-ring/50 transition-colors">
+                        <SelectValue placeholder="Select Hub" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.values(HUBS).map((hub) => (
+                        <SelectItem key={hub.id} value={hub.id}>
+                          {hub.name} ({hub.code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            {/* Customer */}
-            <div>
+            {/* Customer in full width row */}
+            <div className="md:col-span-2">
               <FormField
                 control={form.control}
                 name="customerId"
@@ -293,368 +285,342 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               )}
             </div>
 
-            {/* Mode & Service */}
-            <div className="grid grid-cols-2 gap-6">
+            <FormField
+              control={form.control}
+              name="mode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Transport Mode
+                  </FormLabel>
+                  <FormControl>
+                    <div className="flex bg-muted/30 p-1 border border-input rounded-md h-11">
+                      {SHIPMENT_MODES.map((mode) => (
+                        <label
+                          key={mode.id}
+                          className={`flex-1 cursor-pointer flex items-center justify-center text-sm font-medium rounded-sm transition-all
+                      ${field.value === mode.id ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
+                        >
+                          <input
+                            type="radio"
+                            value={mode.id}
+                            checked={field.value === mode.id}
+                            onChange={() => field.onChange(mode.id)}
+                            className="hidden"
+                          />
+                          {mode.id === 'AIR' ? (
+                            <Plane className="w-4 h-4 mr-2" />
+                          ) : (
+                            <Truck className="w-4 h-4 mr-2" />
+                          )}
+                          {mode.label}
+                        </label>
+                      ))}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="serviceLevel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Service Level
+                  </FormLabel>
+                  <FormControl>
+                    <div className="flex bg-muted/30 p-1 border border-input rounded-md h-11">
+                      {SERVICE_LEVELS.map((level) => (
+                        <label
+                          key={level.id}
+                          className={`flex-1 cursor-pointer flex items-center justify-center text-sm font-medium rounded-sm transition-all
+                      ${field.value === level.id ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
+                        >
+                          <input
+                            type="radio"
+                            value={level.id}
+                            checked={field.value === level.id}
+                            onChange={() => field.onChange(level.id)}
+                            className="hidden"
+                          />
+                          {level.id === 'EXPRESS' ? (
+                            <Zap className="w-4 h-4 mr-2" />
+                          ) : (
+                            <Clock className="w-4 h-4 mr-2" />
+                          )}
+                          {level.label.split(' ')[0]}
+                        </label>
+                      ))}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </FormGrid>
+        </FormSection>
+
+        <FormSection title="Consignee Details" icon={Package}>
+          <FormGrid columns={2}>
+            <FormField
+              control={form.control}
+              name="consigneeName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Name
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="consigneePhone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Phone
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="md:col-span-2">
               <FormField
                 control={form.control}
-                name="mode"
+                name="consigneeAddress"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      Transport Mode
+                      Delivery Address
                     </FormLabel>
                     <FormControl>
-                      <div className="flex bg-muted/30 p-1 border border-input rounded-md h-11">
-                        {SHIPMENT_MODES.map((mode) => (
-                          <label
-                            key={mode.id}
-                            className={`flex-1 cursor-pointer flex items-center justify-center text-sm font-medium rounded-sm transition-all
-                        ${field.value === mode.id ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
-                          >
-                            <input
-                              type="radio"
-                              value={mode.id}
-                              checked={field.value === mode.id}
-                              onChange={() => field.onChange(mode.id)}
-                              className="hidden"
-                            />
-                            {mode.id === 'AIR' ? (
-                              <Plane className="w-4 h-4 mr-2" />
-                            ) : (
-                              <Truck className="w-4 h-4 mr-2" />
-                            )}
-                            {mode.label}
-                          </label>
-                        ))}
-                      </div>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
+            <FormField
+              control={form.control}
+              name="consigneeCity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Destination City
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="consigneeState"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Destination State
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="md:col-span-2">
               <FormField
                 control={form.control}
-                name="serviceLevel"
+                name="consigneeZip"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      Service Level
+                      Destination Zip
                     </FormLabel>
                     <FormControl>
-                      <div className="flex bg-muted/30 p-1 border border-input rounded-md h-11">
-                        {SERVICE_LEVELS.map((level) => (
-                          <label
-                            key={level.id}
-                            className={`flex-1 cursor-pointer flex items-center justify-center text-sm font-medium rounded-sm transition-all
-                        ${field.value === level.id ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
-                          >
-                            <input
-                              type="radio"
-                              value={level.id}
-                              checked={field.value === level.id}
-                              onChange={() => field.onChange(level.id)}
-                              className="hidden"
-                            />
-                            {level.id === 'EXPRESS' ? (
-                              <Zap className="w-4 h-4 mr-2" />
-                            ) : (
-                              <Clock className="w-4 h-4 mr-2" />
-                            )}
-                            {level.label.split(' ')[0]}
-                          </label>
-                        ))}
-                      </div>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-          </div>
+          </FormGrid>
+        </FormSection>
 
-          {/* Right Column: Consignee & Cargo */}
-          <div className="space-y-8">
-            <div className="space-y-6">
-              <h3 className="text-base font-semibold text-foreground flex items-center gap-2 border-b border-border pb-2">
-                <Package className="w-5 h-5 text-muted-foreground" /> Consignee Details
-              </h3>
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <FormField
-                    control={form.control}
-                    name="consigneeName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          Consignee Name
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div>
-                  <FormField
-                    control={form.control}
-                    name="consigneePhone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          Consignee Phone
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="col-span-2">
-                  <FormField
-                    control={form.control}
-                    name="consigneeAddress"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          Delivery Address
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div>
-                  <FormField
-                    control={form.control}
-                    name="consigneeCity"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          Destination City
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div>
-                  <FormField
-                    control={form.control}
-                    name="consigneeState"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          Destination State
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="col-span-2">
-                  <FormField
-                    control={form.control}
-                    name="consigneeZip"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          Destination Zip
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+        <FormSection title="Package Specification" icon={Package}>
+          <FormGrid columns={2}>
+            <FormField
+              control={form.control}
+              name="packageCount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Total Pieces
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      type="number"
+                      {...field}
+                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="weightDead"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Dead Weight (KG)
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      type="number"
+                      step="0.1"
+                      {...field}
+                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="md:col-span-2">
+              <FormLabel className="text-xs font-mono text-muted-foreground uppercase mb-2 block">
+                Package Dimensions (L × W × H in cm)
+              </FormLabel>
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="dimL"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                          type="number"
+                          placeholder="Length"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          onFocus={(e) => e.target.select()}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="dimW"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                          type="number"
+                          placeholder="Width"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          onFocus={(e) => e.target.select()}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="dimH"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                          type="number"
+                          placeholder="Height"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          onFocus={(e) => e.target.select()}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
+          </FormGrid>
+        </FormSection>
 
-            {/* Package Details */}
-            <div className="space-y-6">
-              <h3 className="text-base font-semibold text-foreground flex items-center gap-2 border-b border-border pb-2">
-                <Package className="w-5 h-5 text-muted-foreground" /> Package Specification
-              </h3>
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <FormField
-                    control={form.control}
-                    name="packageCount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          Total Pieces
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            type="number"
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div>
-                  <FormField
-                    control={form.control}
-                    name="weightDead"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                          Dead Weight (KG)
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            type="number"
-                            step="0.1"
-                            {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-              <div>
-                <FormLabel className="text-xs font-mono text-muted-foreground uppercase mb-2 block">
-                  Package Dimensions (L × W × H in cm)
-                </FormLabel>
-                <div className="grid grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="dimL"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            type="number"
-                            placeholder="Length"
-                            {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                            onFocus={(e) => e.target.select()}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="dimW"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            type="number"
-                            placeholder="Width"
-                            {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                            onFocus={(e) => e.target.select()}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="dimH"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            type="number"
-                            placeholder="Height"
-                            {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                            onFocus={(e) => e.target.select()}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <FormSection title="Additional Information">
+          <FormGrid columns={1}>
+            <FormField
+              control={form.control}
+              name="specialInstructions"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Special Instructions & Branding Notes
+                  </FormLabel>
+                  <FormControl>
+                    <RichTextEditor
+                      content={field.value}
+                      onChange={field.onChange}
+                      placeholder="Add handling instructions, branding notes, etc."
+                      minHeight="100px"
+                      maxHeight="200px"
+                      toolbarVariant="minimal"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </FormGrid>
+        </FormSection>
 
-        <div className="pt-2">
-          <FormField
-            control={form.control}
-            name="specialInstructions"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                  Special Instructions & Branding Notes
-                </FormLabel>
-                <FormControl>
-                  <RichTextEditor
-                    content={field.value}
-                    onChange={field.onChange}
-                    placeholder="Add handling instructions, branding notes, etc."
-                    minHeight="100px"
-                    maxHeight="200px"
-                    toolbarVariant="minimal"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="flex justify-end gap-4 pt-4 border-t border-border">
-          <Button type="button" variant="ghost" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={createShipmentMutation.isPending}>
-            {createShipmentMutation.isPending ? 'Creating...' : 'Create Shipment'}
-          </Button>
-        </div>
+        <FormFooter
+          onCancel={onCancel}
+          submitLabel="Create Shipment"
+          isLoading={createShipmentMutation.isPending}
+        />
       </form>
     </Form>
   );

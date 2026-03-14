@@ -19,6 +19,7 @@ import { TrackingDialog } from '@/components/landing-new/tracking-dialog';
 import { PAYMENT_MODES } from '@/lib/constants';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
+import { FormSection, FormGrid } from '@/components/ui-core';
 
 interface Props {
   form: UseFormReturn<InvoiceFormData>;
@@ -132,7 +133,7 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
       </div>
 
       {mode === 'EXISTING_SHIPMENT' && (
-        <div className="flex flex-wrap items-center gap-2 rounded-md border border-border/60 bg-muted/30 p-4 animate-in fade-in slide-in-from-top-2">
+        <div className="flex flex-wrap items-center gap-2 rounded-md border border-border/60 bg-muted/30 p-4 animate-in fade-in slide-in-from-top-2 mb-8">
           <Input
             placeholder="Enter CN Number..."
             value={searchAwb}
@@ -151,7 +152,8 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+      <FormSection title="Basic Details" description="Invoice reference and booking dates.">
+        <FormGrid columns={2}>
         <div className="space-y-2">
           <Label htmlFor="awb" error={errors.awb?.message}>
             CN Number
@@ -292,7 +294,8 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
             </p>
           )}
         </div>
-      </div>
+      </FormGrid>
+      </FormSection>
     </div>
   );
 };

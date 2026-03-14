@@ -2,10 +2,10 @@
 import { UseFormReturn, Controller } from 'react-hook-form';
 import { InvoiceFormData } from '@/hooks/useMultiStepInvoice';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calculator } from 'lucide-react';
-import { SectionHeader, Label } from './shared';
+import { Label } from './shared';
+import { FormSection } from '@/components/ui-core';
 import { formatCurrency } from '@/lib/utils';
 
 interface Props {
@@ -22,9 +22,7 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
 
   return (
     <div className="space-y-8 py-2 max-w-4xl mx-auto">
-      <Card className="p-8 border-t-4 border-t-primary rounded-xl bg-background/50 shadow-sm">
-        <SectionHeader icon={Calculator} title="Freight & Charges" />
-
+      <FormSection icon={Calculator} title="Freight & Charges">
         <div className="grid grid-cols-2 gap-8 mb-8">
           <div className="space-y-3">
             <Label className="text-sm font-semibold tracking-wide">Freight Rate / KG</Label>
@@ -99,7 +97,7 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
             </div>
           </div>
         </div>
-      </Card>
+      </FormSection>
 
       {/* Summary Panel */}
       <div className="bg-gradient-to-br from-background to-muted/20 p-8 rounded-xl border border-border/50 shadow-sm relative overflow-hidden">
