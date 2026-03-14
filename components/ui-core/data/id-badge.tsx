@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { Copy01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
+import { Copy, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface IdBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -68,11 +67,11 @@ export function IdBadge({
       <span className={cn(href && 'hover:underline')}>{displayValue}</span>
       {copiable && (
         <span title="Click to copy">
-          <HugeiconsIcon
-            icon={copied ? Tick02Icon : Copy01Icon}
-            className={cn('size-3', copied && 'text-status-success')}
-            onClick={handleCopy}
-          />
+          {copied ? (
+            <Check className={cn('size-3 text-status-success')} onClick={handleCopy} />
+          ) : (
+            <Copy className="size-3" onClick={handleCopy} />
+          )}
         </span>
       )}
     </>

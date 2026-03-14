@@ -6,7 +6,7 @@ import { z } from 'zod';
  */
 
 // AWB pattern validation
-export const AWB_PATTERN = /^(TAC|WEE)\d{8,11}$/i;
+export const AWB_PATTERN = /^TAC\d{8,11}$/i;
 
 // Shipment status enum
 export const ShipmentStatus = z.enum([
@@ -48,7 +48,7 @@ export const createShipmentSchema = z
   .object({
     cn_number: z
       .string()
-      .regex(AWB_PATTERN, 'CN must match format WGS + 8-11 digits (e.g., WGS12345678)'),
+      .regex(AWB_PATTERN, 'CN must match format TAC + 8-11 digits (e.g., TAC12345678)'),
 
     // Consignor Details
     consignor_name: z.string().min(2, 'Consignor Name required'),

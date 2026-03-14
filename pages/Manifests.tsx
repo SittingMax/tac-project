@@ -3,7 +3,7 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageHeader } from '@/components/ui-core/layout';
 import { CrudTable } from '@/components/crud/CrudTable';
 import { StatusBadge } from '@/components/domain/StatusBadge';
 import { KPICard } from '@/components/domain/KPICard';

@@ -27,7 +27,7 @@ import { EmptyExceptions } from '@/components/ui/empty-state';
 import { CrudTable } from '@/components/crud/CrudTable';
 import { IdBadge } from '@/components/ui-core/data/id-badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageHeader } from '@/components/ui-core/layout';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -298,28 +298,34 @@ export const Exceptions: React.FC = () => {
 
       {/* Raise Modal */}
       <Dialog open={isRaiseModalOpen} onOpenChange={setIsRaiseModalOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Raise New Exception</DialogTitle>
+            <DialogTitle className="text-xl">Raise New Exception</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmitRaise(onRaiseSubmit)} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="raise-awb">CN Number</Label>
+          <form onSubmit={handleSubmitRaise(onRaiseSubmit)} className="flex flex-col gap-6 py-4">
+            <div className="flex flex-col gap-2">
+              <Label
+                htmlFor="raise-awb"
+                className="text-xs font-mono text-muted-foreground uppercase"
+              >
+                CN Number
+              </Label>
               <Input
                 id="raise-awb"
                 {...registerRaise('awb')}
                 placeholder="Scan or type CN Number"
+                className="h-11 bg-transparent hover:border-ring/50 transition-colors font-mono"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <Label>Type</Label>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="flex flex-col gap-2">
+                <Label className="text-xs font-mono text-muted-foreground uppercase">Type</Label>
                 <Controller
                   control={controlRaise}
                   name="type"
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-11 bg-transparent hover:border-ring/50 transition-colors">
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
@@ -335,14 +341,16 @@ export const Exceptions: React.FC = () => {
                   )}
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
-                <Label>Severity</Label>
+              <div className="flex flex-col gap-2">
+                <Label className="text-xs font-mono text-muted-foreground uppercase">
+                  Severity
+                </Label>
                 <Controller
                   control={controlRaise}
                   name="severity"
                   render={({ field }) => (
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-11 bg-transparent hover:border-ring/50 transition-colors">
                         <SelectValue placeholder="Select severity" />
                       </SelectTrigger>
                       <SelectContent>
@@ -356,19 +364,25 @@ export const Exceptions: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="raise-description">Description</Label>
+            <div className="flex flex-col gap-2">
+              <Label
+                htmlFor="raise-description"
+                className="text-xs font-mono text-muted-foreground uppercase"
+              >
+                Description
+              </Label>
               <Textarea
                 id="raise-description"
                 {...registerRaise('description')}
                 placeholder="Details of the issue..."
-                rows={3}
+                rows={4}
+                className="min-h-[120px] bg-transparent hover:border-ring/50 transition-colors resize-y"
               />
             </div>
             <Button
               type="submit"
               variant="destructive"
-              className="w-full"
+              className="w-full h-12 text-base font-semibold mt-2"
               disabled={createMutation.isPending}
             >
               {createMutation.isPending ? 'Reporting...' : 'Report Exception'}
@@ -384,27 +398,42 @@ export const Exceptions: React.FC = () => {
           if (!open) setSelectedException(null);
         }}
       >
-        <DialogContent>
+        <DialogContent className="sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>Resolve Exception</DialogTitle>
+            <DialogTitle className="text-xl">Resolve Exception</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmitResolve(onResolveSubmit)} className="flex flex-col gap-4">
-            <div className="bg-muted/50 p-4 rounded-md text-sm border border-border">
-              <div className="font-medium text-foreground">
-                Exception: {selectedException?.type}
+          <form
+            onSubmit={handleSubmitResolve(onResolveSubmit)}
+            className="flex flex-col gap-6 py-4"
+          >
+            <div className="bg-muted/30 p-5 rounded-lg border border-border/50">
+              <div className="font-semibold text-foreground text-sm flex items-center gap-2">
+                <ShieldAlert className="size-4 text-primary" /> Exception: {selectedException?.type}
               </div>
-              <div className="text-muted-foreground mt-1">{selectedException?.description}</div>
+              <div className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                {selectedException?.description}
+              </div>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="resolve-note">Resolution Note</Label>
+            <div className="flex flex-col gap-2">
+              <Label
+                htmlFor="resolve-note"
+                className="text-xs font-mono text-muted-foreground uppercase"
+              >
+                Resolution Note
+              </Label>
               <Textarea
                 id="resolve-note"
                 {...registerResolve('note')}
                 placeholder="How was this resolved?"
-                rows={3}
+                rows={4}
+                className="min-h-[120px] bg-transparent hover:border-ring/50 transition-colors resize-y"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={resolveMutation.isPending}>
+            <Button
+              type="submit"
+              className="w-full h-12 text-base font-semibold mt-2"
+              disabled={resolveMutation.isPending}
+            >
               {resolveMutation.isPending ? 'Resolving...' : 'Confirm Resolution'}
             </Button>
           </form>

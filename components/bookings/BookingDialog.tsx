@@ -25,7 +25,7 @@ export const BookingDialog: React.FC<BookingDialogProps> = ({ open, onOpenChange
         onOpenChange={onOpenChange}
         title="Book New Shipment"
         description="Enter details for your new shipment booking request."
-        size="xl"
+        size="5xl"
       >
         <div className="max-h-[80vh] overflow-y-auto pr-2">
           <BookingForm onSuccess={() => onOpenChange(false)} onCancel={() => onOpenChange(false)} />

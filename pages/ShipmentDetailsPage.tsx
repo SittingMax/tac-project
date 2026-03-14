@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useShipmentById } from '@/hooks/useShipments';
 import { ShipmentDetails } from '@/components/shipments/ShipmentDetails';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageHeader } from '@/components/ui-core/layout';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { adaptToShipment } from '@/lib/utils/shipment-adapter';

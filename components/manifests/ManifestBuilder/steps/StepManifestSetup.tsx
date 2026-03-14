@@ -11,6 +11,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -141,8 +149,7 @@ export function StepManifestSetup({
   const toHub = hubs.find((h) => h.id === form.watch('toHubId'));
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Section 1: Route & Transport */}
+    <Form {...form}>
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         {/* Route Selection */}
         <Card className="border-border bg-card/50 xl:col-span-7">
@@ -153,67 +160,87 @@ export function StepManifestSetup({
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <Label>
-                  Origin Hub <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={form.watch('fromHubId') ?? ''}
-                  onValueChange={(val) =>
-                    form.setValue('fromHubId', val, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                      shouldTouch: true,
-                    })
-                  }
-                >
-                  <SelectTrigger
-                    className={cn(form.formState.errors.fromHubId && 'border-destructive')}
-                  >
-                    <SelectValue placeholder="Select origin">
-                      {fromHub ? `${fromHub.name} (${fromHub.code})` : undefined}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {hubs.map((hub) => (
-                      <SelectItem key={hub.id} value={hub.id}>
-                        {hub.name} ({hub.code})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormField
+                  control={form.control}
+                  name="fromHubId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                        Origin Hub <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value ?? ''}
+                          onValueChange={(val) => {
+                            field.onChange(val);
+                          }}
+                        >
+                          <SelectTrigger
+                            className={cn(
+                              'h-11 bg-transparent hover:border-ring/50 transition-colors',
+                              form.formState.errors.fromHubId && 'border-destructive'
+                            )}
+                          >
+                            <SelectValue placeholder="Select origin">
+                              {fromHub ? `${fromHub.name} (${fromHub.code})` : undefined}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {hubs.map((hub) => (
+                              <SelectItem key={hub.id} value={hub.id}>
+                                {hub.name} ({hub.code})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label>
-                  Destination Hub <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={form.watch('toHubId') ?? ''}
-                  onValueChange={(val) =>
-                    form.setValue('toHubId', val, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                      shouldTouch: true,
-                    })
-                  }
-                >
-                  <SelectTrigger
-                    className={cn(form.formState.errors.toHubId && 'border-destructive')}
-                  >
-                    <SelectValue placeholder="Select destination">
-                      {toHub ? `${toHub.name} (${toHub.code})` : undefined}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {hubs
-                      .filter((h) => h.id !== form.watch('fromHubId'))
-                      .map((hub) => (
-                        <SelectItem key={hub.id} value={hub.id}>
-                          {hub.name} ({hub.code})
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
+                <FormField
+                  control={form.control}
+                  name="toHubId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                        Destination Hub <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value ?? ''}
+                          onValueChange={(val) => {
+                            field.onChange(val);
+                          }}
+                        >
+                          <SelectTrigger
+                            className={cn(
+                              'h-11 bg-transparent hover:border-ring/50 transition-colors',
+                              form.formState.errors.toHubId && 'border-destructive'
+                            )}
+                          >
+                            <SelectValue placeholder="Select destination">
+                              {toHub ? `${toHub.name} (${toHub.code})` : undefined}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {hubs
+                              .filter((h) => h.id !== form.watch('fromHubId'))
+                              .map((hub) => (
+                                <SelectItem key={hub.id} value={hub.id}>
+                                  {hub.name} ({hub.code})
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
           </CardContent>
@@ -278,13 +305,15 @@ export function StepManifestSetup({
             <CardContent className="flex flex-col gap-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-                  <Label>Dispatch Date</Label>
+                  <Label className="text-xs font-mono text-muted-foreground uppercase">
+                    Dispatch Date
+                  </Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          'w-full justify-start text-left font-normal h-10',
+                          'w-full justify-start text-left font-normal h-11 bg-transparent hover:border-ring/50 transition-colors',
                           !form.watch('dispatchDate') && 'text-muted-foreground'
                         )}
                       >
@@ -307,7 +336,9 @@ export function StepManifestSetup({
                   </Popover>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label>Dispatch Time</Label>
+                  <Label className="text-xs font-mono text-muted-foreground uppercase">
+                    Dispatch Time
+                  </Label>
                   <div className="flex gap-2">
                     <Select
                       value={form.watch('dispatchHour') ?? ''}
@@ -315,7 +346,7 @@ export function StepManifestSetup({
                         form.setValue('dispatchHour', v, { shouldDirty: true, shouldTouch: true })
                       }
                     >
-                      <SelectTrigger className="flex-1">
+                      <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
                         <SelectValue placeholder="HH" />
                       </SelectTrigger>
                       <SelectContent side="top">
@@ -332,7 +363,7 @@ export function StepManifestSetup({
                         form.setValue('dispatchMinute', v, { shouldDirty: true, shouldTouch: true })
                       }
                     >
-                      <SelectTrigger className="flex-1">
+                      <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
                         <SelectValue placeholder="MM" />
                       </SelectTrigger>
                       <SelectContent side="top">
@@ -352,7 +383,7 @@ export function StepManifestSetup({
                         })
                       }
                     >
-                      <SelectTrigger className="flex-1">
+                      <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
                         <SelectValue placeholder="AM" />
                       </SelectTrigger>
                       <SelectContent side="top">
@@ -389,42 +420,63 @@ export function StepManifestSetup({
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
-                    <Label>Airline Code</Label>
-                    <Input
-                      placeholder="AA"
-                      {...form.register('airlineCode')}
-                      className="uppercase font-mono"
-                      maxLength={3}
+                    <FormField
+                      control={form.control}
+                      name="airlineCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                            Airline Code
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="AA"
+                              className="h-11 bg-transparent hover:border-ring/50 transition-colors uppercase font-mono"
+                              maxLength={3}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Label>
-                      Flight Number <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      placeholder="1234"
-                      {...form.register('flightNumber')}
-                      className={cn(
-                        'font-mono',
-                        form.formState.errors.flightNumber && 'border-destructive'
+                    <FormField
+                      control={form.control}
+                      name="flightNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                            Flight Number <span className="text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="1234"
+                              {...field}
+                              className={cn(
+                                'h-11 bg-transparent hover:border-ring/50 transition-colors font-mono',
+                                form.formState.errors.flightNumber && 'border-destructive'
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
                     />
-                    {form.formState.errors.flightNumber && (
-                      <p className="text-xs text-destructive">
-                        {form.formState.errors.flightNumber.message}
-                      </p>
-                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2 md:col-span-2">
-                    <Label>Flight Date</Label>
+                    <Label className="text-xs font-mono text-muted-foreground uppercase">
+                      Flight Date
+                    </Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
                           className={cn(
-                            'w-full justify-start text-left font-normal h-10',
+                            'w-full justify-start text-left font-normal h-11 bg-transparent hover:border-ring/50 transition-colors',
                             !form.watch('flightDate') && 'text-muted-foreground'
                           )}
                         >
@@ -447,7 +499,7 @@ export function StepManifestSetup({
                     </Popover>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Label>ETD</Label>
+                    <Label className="text-xs font-mono text-muted-foreground uppercase">ETD</Label>
                     <div className="flex gap-2">
                       <Select
                         value={form.watch('etdHour') ?? ''}
@@ -455,7 +507,7 @@ export function StepManifestSetup({
                           form.setValue('etdHour', v, { shouldDirty: true, shouldTouch: true })
                         }
                       >
-                        <SelectTrigger className="flex-1">
+                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="HH" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -472,7 +524,7 @@ export function StepManifestSetup({
                           form.setValue('etdMinute', v, { shouldDirty: true, shouldTouch: true })
                         }
                       >
-                        <SelectTrigger className="flex-1">
+                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="MM" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -492,7 +544,7 @@ export function StepManifestSetup({
                           })
                         }
                       >
-                        <SelectTrigger className="flex-1">
+                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="AM" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -506,7 +558,7 @@ export function StepManifestSetup({
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Label>ETA</Label>
+                    <Label className="text-xs font-mono text-muted-foreground uppercase">ETA</Label>
                     <div className="flex gap-2">
                       <Select
                         value={form.watch('etaHour') ?? ''}
@@ -514,7 +566,7 @@ export function StepManifestSetup({
                           form.setValue('etaHour', v, { shouldDirty: true, shouldTouch: true })
                         }
                       >
-                        <SelectTrigger className="flex-1">
+                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="HH" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -531,7 +583,7 @@ export function StepManifestSetup({
                           form.setValue('etaMinute', v, { shouldDirty: true, shouldTouch: true })
                         }
                       >
-                        <SelectTrigger className="flex-1">
+                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="MM" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -551,7 +603,7 @@ export function StepManifestSetup({
                           })
                         }
                       >
-                        <SelectTrigger className="flex-1">
+                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="AM" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -569,31 +621,71 @@ export function StepManifestSetup({
             ) : (
               <>
                 <div className="flex flex-col gap-2">
-                  <Label>
-                    Vehicle Number <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    placeholder="TX-1234-AB"
-                    {...form.register('vehicleNumber')}
-                    className={cn(
-                      'uppercase font-mono',
-                      form.formState.errors.vehicleNumber && 'border-destructive'
+                  <FormField
+                    control={form.control}
+                    name="vehicleNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                          Vehicle Number <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="TX-1234-AB"
+                            {...field}
+                            className={cn(
+                              'h-11 bg-transparent hover:border-ring/50 transition-colors uppercase font-mono',
+                              form.formState.errors.vehicleNumber && 'border-destructive'
+                            )}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
-                  {form.formState.errors.vehicleNumber && (
-                    <p className="text-xs text-destructive">
-                      {form.formState.errors.vehicleNumber.message}
-                    </p>
-                  )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
-                    <Label>Driver Name</Label>
-                    <Input placeholder="John Smith" {...form.register('driverName')} />
+                    <FormField
+                      control={form.control}
+                      name="driverName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                            Driver Name
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                              placeholder="John Smith"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Label>Driver Phone</Label>
-                    <Input placeholder="+1 555-0123" {...form.register('driverPhone')} />
+                    <FormField
+                      control={form.control}
+                      name="driverPhone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                            Driver Phone
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                              placeholder="+1 555-0123"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </div>
               </>
@@ -601,6 +693,6 @@ export function StepManifestSetup({
           </CardContent>
         </Card>
       </div>
-    </div>
+    </Form>
   );
 }

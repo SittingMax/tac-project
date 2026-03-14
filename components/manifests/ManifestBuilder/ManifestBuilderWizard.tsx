@@ -368,7 +368,7 @@ export function ManifestBuilderWizard({
   return (
     <TooltipProvider>
       <Dialog open={open} onOpenChange={handleCancel}>
-        <DialogContent className="w-[100vw] h-[100dvh] md:w-[min(1200px,92vw)] md:h-[min(88vh,900px)] md:max-h-[90vh] lg:w-[min(1320px,88vw)] rounded-none md:rounded-lg flex flex-col gap-0 p-0 max-w-none overflow-hidden">
+        <DialogContent className="w-[100vw] h-[100dvh] md:w-[92vw] md:h-[min(88vh,900px)] md:max-h-[90vh] md:max-w-4xl rounded-none md:rounded-lg flex flex-col gap-0 p-0 overflow-hidden">
           {/* Header */}
           <DialogHeader className="px-6 py-4 border-b border-border text-left">
             <DialogTitle className="text-lg">Create Manifest</DialogTitle>

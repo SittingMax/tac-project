@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-interface PageContainerProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** Max width constraint: 'default' (1400px), 'narrow' (900px), 'wide' (1600px), 'full' */
-  size?: 'default' | 'narrow' | 'wide' | 'full';
+export interface PageContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Max width constraint for the page content */
+  maxWidth?: 'default' | 'narrow' | 'wide' | 'full';
 }
 
-const sizeMap = {
+const maxWidthMap = {
   default: 'max-w-[1400px]',
   narrow: 'max-w-[900px]',
   wide: 'max-w-[1600px]',
@@ -15,12 +15,12 @@ const sizeMap = {
 
 /**
  * Top-level page wrapper that provides consistent max-width,
- * horizontal padding, vertical spacing, and fade-in animation.
+ * horizontal padding, vertical spacing, and entry animation.
  *
  * Every authenticated page should be wrapped in <PageContainer>.
  */
 export function PageContainer({
-  size = 'default',
+  maxWidth = 'default',
   className,
   children,
   ...props
@@ -30,7 +30,7 @@ export function PageContainer({
       className={cn(
         'mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 space-y-6',
         'animate-in fade-in slide-in-from-bottom-2 duration-500',
-        sizeMap[size],
+        maxWidthMap[maxWidth],
         className
       )}
       {...props}

@@ -1,5 +1,12 @@
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export const PageHeader = ({ title, description }: { title: string; description: string }) => (
   <div className="mb-12 border-b border-border/40 pb-6">
@@ -32,9 +39,9 @@ export const SectionHeader = ({
 );
 
 export const FieldLabel = ({ children }: { children: React.ReactNode }) => (
-  <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 ml-0.5">
+  <Label className="block text-xs font-mono text-muted-foreground uppercase tracking-wider mb-2 ml-0.5">
     {children}
-  </label>
+  </Label>
 );
 
 // Custom Select styled for WGS
@@ -49,21 +56,18 @@ export const SelectField = ({
   options: { value: string; label: string }[];
   disabled?: boolean;
 }) => (
-  <div className="relative group">
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      disabled={disabled}
-      className="flex h-10 w-full rounded-md border border-border bg-background px-4 py-1.5 text-sm text-foreground transition-colors focus:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 appearance-none pr-8 hover:bg-muted/10 cursor-pointer"
-    >
+  <Select value={value} onValueChange={onChange} disabled={disabled}>
+    <SelectTrigger className="w-full h-11 bg-transparent hover:border-ring/50 transition-colors">
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent>
       {options.map((opt) => (
-        <option key={opt.value} value={opt.value} className="bg-background">
+        <SelectItem key={opt.value} value={opt.value}>
           {opt.label}
-        </option>
+        </SelectItem>
       ))}
-    </select>
-    <ChevronDown className="absolute right-2.5 top-3 w-3.5 h-3.5 text-muted-foreground pointer-events-none group-hover:text-primary transition-colors" />
-  </div>
+    </SelectContent>
+  </Select>
 );
 
 // Toggle switch component

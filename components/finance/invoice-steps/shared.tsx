@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Label as ShadcnLabel } from '@/components/ui/label';
 
 export const SectionHeader: React.FC<{
   icon: React.ElementType;
@@ -30,10 +31,10 @@ export const Label: React.FC<{
   className?: string;
 }> = ({ children, required, error, className }) => (
   <div className={`flex justify-between items-end mb-2 ${className}`}>
-    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+    <ShadcnLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
       {children}
       {required && <span className="text-destructive text-xs leading-none">*</span>}
-    </label>
+    </ShadcnLabel>
     {error && <span className="text-xs text-destructive font-medium">{error}</span>}
   </div>
 );

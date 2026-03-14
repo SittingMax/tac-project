@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { TacLogo } from '@/components/shared/tac-logo';
 import { AnimatedThemeToggler } from '../../components/ui/animated-theme-toggler';
+import { Label } from '@/components/ui/label';
 import { getDefaultRouteForRole } from '@/lib/access-control';
 import { gsap } from '@/lib/gsap';
 
@@ -279,12 +280,12 @@ export const Login: React.FC = () => {
                   <form onSubmit={handleLogin} className="space-y-4">
                     {/* Email Field - Enhanced */}
                     <div className="space-y-2">
-                      <label
+                      <Label
                         htmlFor="login-email"
                         className="block text-xs font-semibold text-foreground"
                       >
                         Email address
-                      </label>
+                      </Label>
                       <div
                         className={`group/input relative flex items-center rounded-md border bg-background px-4 h-12 transition-all duration-200 ${
                           focusedField === 'email'
@@ -319,12 +320,12 @@ export const Login: React.FC = () => {
                     {/* Password Field - Enhanced */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <label
+                        <Label
                           htmlFor="login-password"
                           className="block text-xs font-semibold text-foreground"
                         >
                           Password
-                        </label>
+                        </Label>
                         <a
                           href="mailto:support@tac-cargo.com?subject=Password%20Reset%20Request"
                           className="text-xs text-primary hover:text-primary/80 hover:underline transition-colors"
@@ -377,7 +378,7 @@ export const Login: React.FC = () => {
                     {/* Remember Me & Submit */}
                     <div className="space-y-4">
                       {/* Remember Me Checkbox */}
-                      <label className="flex items-center gap-2 cursor-pointer group">
+                      <Label className="flex items-center gap-2 cursor-pointer group">
                         <div className="relative">
                           <input
                             type="checkbox"
@@ -395,7 +396,7 @@ export const Login: React.FC = () => {
                         <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
                           Remember email for 30 days
                         </span>
-                      </label>
+                      </Label>
 
                       {/* Submit Button - Enhanced */}
                       <button

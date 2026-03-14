@@ -275,7 +275,7 @@ export const Settings = () => {
                       value={terminalName}
                       onChange={(e) => setTerminalName(e.target.value)}
                       disabled={isLoading}
-                      className="h-10"
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors border-input"
                     />
                   </div>
                   <div>
@@ -293,7 +293,7 @@ export const Settings = () => {
                       ]}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-6">
                     <div>
                       <FieldLabel>Currency</FieldLabel>
                       <SelectField

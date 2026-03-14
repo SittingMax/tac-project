@@ -140,7 +140,7 @@ export function ManifestBuilder({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-7xl w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col bg-background/95 backdrop-blur-lg border-border/40 shadow-2xl">
+      <DialogContent className="sm:max-w-5xl w-[95vw] h-[90vh] p-0 overflow-hidden flex flex-col bg-background/95 backdrop-blur-lg border-border/40 shadow-2xl">
         <div className="p-6 border-b shrink-0">
           <DialogHeader>
             <div className="flex items-center justify-between">

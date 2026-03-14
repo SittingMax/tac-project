@@ -6,9 +6,15 @@ import { FileText, CreditCard, Plus, Check, Printer, Mail, MessageCircle } from 
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { EmptyInvoices } from '@/components/ui/empty-state';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageHeader } from '@/components/ui-core/layout';
 
 // CRUD Components
 import { CrudTable } from '@/components/crud/CrudTable';
@@ -274,13 +280,14 @@ export const Finance: React.FC = () => {
 
       {/* Create Invoice Modal */}
       <Dialog open={isCreateOpen} onOpenChange={handleCreateModalChange}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent className="sm:max-w-5xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 gap-0 rounded-xl overflow-x-hidden shadow-2xl">
+          <DialogHeader className="p-8 pb-0">
+            <DialogTitle className="text-2xl font-semibold tracking-tight">
               {editingInvoice
                 ? `Edit Invoice ${editingInvoice.invoice_no}`
                 : 'Generate New Invoice'}
             </DialogTitle>
+            <DialogDescription>Fill in the details to create a new invoice.</DialogDescription>
           </DialogHeader>
           <CreateInvoiceForm
             onSuccess={onInvoiceCreated}

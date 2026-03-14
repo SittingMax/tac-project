@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageHeader } from '@/components/ui-core/layout';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -348,9 +348,11 @@ export const Shipments: React.FC = () => {
         onOpenChange={handleCreateModalChange}
         data-testid="create-shipment-modal"
       >
-        <DialogContent className="sm:max-w-[800px] w-[95vw]">
-          <DialogHeader>
-            <DialogTitle>Create New Shipment</DialogTitle>
+        <DialogContent className="sm:max-w-5xl w-[95vw] overflow-y-auto max-h-[90vh] p-0 gap-0 rounded-xl overflow-x-hidden shadow-2xl">
+          <DialogHeader className="p-8 pb-0">
+            <DialogTitle className="text-2xl font-semibold tracking-tight">
+              Create New Shipment
+            </DialogTitle>
           </DialogHeader>
           <CreateShipmentForm
             onSuccess={() => setIsCreateModalOpen(false)}

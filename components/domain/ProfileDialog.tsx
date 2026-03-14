@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Label } from '@/components/ui/label';
 import { Moon, Sun, Monitor } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
@@ -117,9 +118,9 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Full Name
-              </label>
+              </Label>
               <Input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -128,9 +129,9 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Avatar Image
-              </label>
+              </Label>
               <div className="flex items-center gap-4">
                 <Input
                   type="file"
@@ -149,12 +150,12 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none opacity-50">Email</label>
+              <Label className="text-sm font-medium leading-none opacity-50">Email</Label>
               <Input value={user.email} disabled className="bg-muted opacity-50" />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none opacity-50">Role</label>
+              <Label className="text-sm font-medium leading-none opacity-50">Role</Label>
               <Input value={user.role} disabled className="bg-muted opacity-50" />
             </div>
           </div>

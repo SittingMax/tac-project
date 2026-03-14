@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 import { useAnalyticsSummary } from '../hooks/useAnalytics';
 import { Package, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageHeader } from '@/components/ui-core/layout';
 import { AnomalyDetectorWidget } from '@/components/dashboard/AnomalyDetectorWidget';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';

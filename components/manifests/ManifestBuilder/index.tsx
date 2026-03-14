@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { StatusBadge } from '@/components/domain/status-badge';
 import {
@@ -533,7 +534,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
               <>
                 {/* Transport Type */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Transport Type</label>
+                  <Label className="text-sm font-medium">Transport Type</Label>
                   <Select
                     value={transportType}
                     onValueChange={(v) => setTransportType(v as 'SURFACE' | 'AIR')}
@@ -550,7 +551,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
 
                 {/* Destination Hub */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Destination Hub</label>
+                  <Label className="text-sm font-medium">Destination Hub</Label>
                   <Select value={destinationHubId} onValueChange={setDestinationHubId}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select destination..." />
@@ -571,7 +572,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                 {transportType === 'SURFACE' && (
                   <>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Vehicle Number</label>
+                      <Label className="text-sm font-medium">Vehicle Number</Label>
                       <Input
                         value={vehicleNumber}
                         onChange={(e) => setVehicleNumber(e.target.value)}
@@ -580,7 +581,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Driver Name</label>
+                        <Label className="text-sm font-medium">Driver Name</Label>
                         <Input
                           value={driverName}
                           onChange={(e) => setDriverName(e.target.value)}
@@ -588,7 +589,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Driver Phone</label>
+                        <Label className="text-sm font-medium">Driver Phone</Label>
                         <Input
                           value={driverPhone}
                           onChange={(e) => setDriverPhone(e.target.value)}
@@ -603,7 +604,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                 {transportType === 'AIR' && (
                   <>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Flight Number</label>
+                      <Label className="text-sm font-medium">Flight Number</Label>
                       <Input
                         value={flightNumber}
                         onChange={(e) => setFlightNumber(e.target.value)}
@@ -611,7 +612,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Flight Date</label>
+                      <Label className="text-sm font-medium">Flight Date</Label>
                       <Input
                         type="date"
                         value={flightDate}

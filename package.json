@@ -31,11 +31,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@base-ui/react": "^1.1.0",
     "@hookform/resolvers": "3.10.0",
-    "@hugeicons/core-free-icons": "^4.0.0",
-    "@hugeicons/react": "^1.1.5",
-    "@lottiefiles/dotlottie-react": "^0.18.4",
     "@openrouter/sdk": "^0.8.0",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -136,6 +132,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^17.3.0",
     "husky": "^9.1.7",
     "jsdom": "^27.4.0",

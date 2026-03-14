@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageHeader } from '@/components/ui-core/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarDays, PackageSearch, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';

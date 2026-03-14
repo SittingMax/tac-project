@@ -14,6 +14,7 @@ const sizeClasses = {
   md: 'sm:max-w-[600px]',
   lg: 'sm:max-w-[800px]',
   xl: 'sm:max-w-[1000px]',
+  '5xl': 'sm:max-w-5xl w-[95vw]',
   full: 'sm:max-w-[90vw]',
 };
 

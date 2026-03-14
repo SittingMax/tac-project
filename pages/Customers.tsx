@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { EmptyCustomers } from '@/components/ui/empty-state';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageHeader } from '@/components/ui-core/layout';
 
 // CRUD Components
 import { CrudTable } from '@/components/crud/CrudTable';
@@ -213,19 +213,22 @@ export const Customers: React.FC = () => {
         schema={customerFormSchema}
         defaultValues={formDefaultValues}
         onSubmit={handleUpsert}
+        size="xl"
       >
         {(form) => (
-          <div className="flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-6 pt-2">
+            <div className="grid grid-cols-2 gap-6">
               <FormField
                 control={form.control}
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type</FormLabel>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Type
+                    </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-11 bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                       </FormControl>
@@ -247,9 +250,15 @@ export const Customers: React.FC = () => {
                 name="gstin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>GSTIN</FormLabel>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      GSTIN
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="GST Number" {...field} />
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        placeholder="GST Number"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -262,24 +271,37 @@ export const Customers: React.FC = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Customer Name</FormLabel>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Customer Name
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. John Doe" {...field} />
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      placeholder="e.g. John Doe"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Email
+                    </FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="e.g. contact@domain.com" {...field} />
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        type="email"
+                        placeholder="e.g. contact@domain.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -290,9 +312,15 @@ export const Customers: React.FC = () => {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone</FormLabel>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Phone
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. +91 99999 88888" {...field} />
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        placeholder="e.g. +91 99999 88888"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -305,24 +333,36 @@ export const Customers: React.FC = () => {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Billing Address</FormLabel>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Billing Address
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. 123 Business Park" {...field} />
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      placeholder="e.g. 123 Business Park"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-6">
               <FormField
                 control={form.control}
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City</FormLabel>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      City
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. New Delhi" {...field} />
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        placeholder="e.g. New Delhi"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -333,9 +373,15 @@ export const Customers: React.FC = () => {
                 name="state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>State</FormLabel>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      State
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Delhi" {...field} />
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        placeholder="e.g. Delhi"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -346,9 +392,15 @@ export const Customers: React.FC = () => {
                 name="zip"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Zip / Postal Code</FormLabel>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Zip / Postal Code
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. 110003" {...field} />
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        placeholder="e.g. 110003"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -361,9 +413,12 @@ export const Customers: React.FC = () => {
               name="credit_limit"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Credit Limit (₹)</FormLabel>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Credit Limit (₹)
+                  </FormLabel>
                   <FormControl>
                     <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
                       type="number"
                       placeholder="0"
                       {...field}

@@ -7,7 +7,6 @@ import { Plane, Truck, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { HUBS } from '@/lib/constants';
 import { ShipmentWithRelations } from '@/hooks/useShipments';
-import { TableBarcode } from '@/components/barcodes';
 import { IdBadge } from '@/components/ui-core/data/id-badge';
 
 export interface ShipmentsColumnsParams {
@@ -40,19 +39,6 @@ export function getShipmentsColumns(
             cnNumber={row.original.cn_number}
             href={`/shipments/${row.original.id}`}
           />
-        </div>
-      ),
-    },
-    {
-      id: 'barcode',
-      header: 'Barcode',
-      cell: ({ row }) => (
-        <div
-          className="cursor-pointer hover:opacity-80 transition-opacity"
-          onClick={() => params.onView(row.original)}
-          title="Click to view shipment details"
-        >
-          <TableBarcode value={row.original.cn_number} />
         </div>
       ),
     },
