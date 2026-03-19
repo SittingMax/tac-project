@@ -26,36 +26,13 @@ export interface UserPermission {
 // Extend the existing Database type with RBAC tables and functions
 // We use a comprehensive intersection to ensure strict compatibility with SupabaseClient
 // Define Types for RBAC functions to be added
-type RBACFunctions = {
-  get_user_permissions: {
-    Args: Record<string, never>;
-    Returns: UserPermission[];
-  };
-  has_permission: {
-    Args: { required_permission: string };
-    Returns: boolean;
-  };
-  can_access_module: {
-    Args: { module_name: string };
-    Returns: boolean;
-  };
-};
+type RBACFunctions = Pick<
+  Database['public']['Functions'],
+  'get_user_permissions' | 'has_permission' | 'can_access_module'
+>;
 
 // Define RBAC Tables
-type RBACTables = {
-  permissions: {
-    Row: Permission;
-    Insert: Permission;
-    Update: Partial<Permission>;
-    Relationships: [];
-  };
-  role_permissions: {
-    Row: { role: string; permission_code: string };
-    Insert: { role: string; permission_code: string };
-    Update: { role?: string; permission_code?: string };
-    Relationships: [];
-  };
-};
+type RBACTables = Pick<Database['public']['Tables'], 'permissions' | 'role_permissions'>;
 
 // Create the augmented Database type
 type RBACDatabase = Omit<Database, 'public'> & {
@@ -137,8 +114,7 @@ export async function fetchUserPermissions(): Promise<UserPermission[]> {
  */
 export async function checkPermission(permission: string): Promise<boolean> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (db.rpc as any)('has_permission', {
+    const { data, error } = await db.rpc('has_permission', {
       required_permission: permission,
     });
 
@@ -158,8 +134,7 @@ export async function checkPermission(permission: string): Promise<boolean> {
  */
 export async function checkModuleAccess(module: string): Promise<boolean> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (db.rpc as any)('can_access_module', {
+    const { data, error } = await db.rpc('can_access_module', {
       module_name: module,
     });
 
@@ -182,8 +157,7 @@ export async function grantPermission(
   permissionCode: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (db.from('role_permissions') as any).insert({
+    const { error } = await db.from('role_permissions').insert({
       role,
       permission_code: permissionCode,
     });

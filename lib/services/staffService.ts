@@ -2,8 +2,6 @@
  * Staff Service
  * Handles staff/user operations
  */
-/* eslint-disable @typescript-eslint/no-explicit-any -- Supabase client requires any for complex operations */
-
 import { supabase } from '@/lib/supabase';
 import { mapSupabaseError } from '@/lib/errors';
 import { orgService } from './orgService';
@@ -136,15 +134,12 @@ export const staffService = {
 
   async create(staff: Omit<StaffInsert, 'org_id'>): Promise<Staff> {
     const orgId = orgService.getCurrentOrgId();
+    const payload: StaffInsert = {
+      ...staff,
+      org_id: orgId,
+    };
 
-    const { data, error } = await supabase
-      .from('staff')
-      .insert({
-        ...staff,
-        org_id: orgId,
-      } as any)
-      .select()
-      .single();
+    const { data, error } = await supabase.from('staff').insert(payload).select().single();
 
     if (error) throw mapSupabaseError(error);
     return data as Staff;
@@ -152,12 +147,14 @@ export const staffService = {
 
   async update(id: string, updates: StaffUpdate): Promise<Staff> {
     const orgId = orgService.getCurrentOrgId();
+    const payload: StaffUpdate = {
+      ...updates,
+      updated_at: new Date().toISOString(),
+    };
 
-    const { data, error } = await (supabase.from('staff') as any)
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
+    const { data, error } = await supabase
+      .from('staff')
+      .update(payload)
       .eq('id', id)
       .eq('org_id', orgId)
       .select()

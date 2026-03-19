@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useShipmentById } from '@/hooks/useShipments';
 import { ShipmentDetails } from '@/components/shipments/ShipmentDetails';
-import { PageHeader } from '@/components/ui-core/layout';
+import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { adaptToShipment } from '@/lib/utils/shipment-adapter';
@@ -14,21 +14,35 @@ export const ShipmentDetailsPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-      </div>
+      <PageContainer>
+        <PageHeader title="Shipment Details" description="Loading shipment details" />
+        <SectionCard>
+          <div className="flex min-h-[40vh] items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          </div>
+        </SectionCard>
+      </PageContainer>
     );
   }
 
   if (error || !shipment) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
-        <h2 className="text-xl font-bold text-destructive">Shipment not found</h2>
-        <p className="text-muted-foreground">
-          The shipment you are looking for does not exist or has been deleted.
-        </p>
-        <Button onClick={() => navigate('/shipments')}>Back to Shipments</Button>
-      </div>
+      <PageContainer>
+        <PageHeader title="Shipment Details" description="Unable to load the requested shipment">
+          <Button variant="ghost" onClick={() => navigate('/shipments')}>
+            <ArrowLeft size={16} strokeWidth={1.5} className="mr-2" /> Back
+          </Button>
+        </PageHeader>
+        <SectionCard>
+          <div className="flex min-h-[40vh] flex flex-col items-center justify-center flex flex-col gap-4 text-center">
+            <h2 className="text-xl font-bold text-destructive">Shipment not found</h2>
+            <p className="text-muted-foreground">
+              The shipment you are looking for does not exist or has been deleted.
+            </p>
+            <Button onClick={() => navigate('/shipments')}>Back to Shipments</Button>
+          </div>
+        </SectionCard>
+      </PageContainer>
     );
   }
 
@@ -37,18 +51,17 @@ export const ShipmentDetailsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex items-center gap-4">
+    <PageContainer>
+      <PageHeader title={`Shipment ${shipment.cn_number}`} description="Detailed view">
         <Button variant="ghost" onClick={handleClose}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back
+          <ArrowLeft size={16} strokeWidth={1.5} className="mr-2" /> Back
         </Button>
-        <PageHeader title={`Shipment ${shipment.cn_number}`} description="Detailed view" />
-      </div>
+      </PageHeader>
 
-      <div className="bg-card rounded-lg border border-border p-6 shadow-sm">
+      <SectionCard>
         <ShipmentDetails shipment={adaptToShipment(shipment)} onClose={handleClose} />
-      </div>
-    </div>
+      </SectionCard>
+    </PageContainer>
   );
 };
 

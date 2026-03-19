@@ -7,8 +7,11 @@ import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
+import { StatCard } from '@/components/ui-core';
 import {
   WarehouseScanPanel,
   type ScanResult,
@@ -300,105 +303,83 @@ export function WarehouseDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Package className="size-5 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">{hubName}</h1>
-                <p className="text-xs text-muted-foreground">
-                  {hasAssignedHub
-                    ? 'Warehouse Operations Dashboard'
-                    : 'Assign a hub to enable warehouse scanning and hub-scoped metrics'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              {/* Connection Status */}
-              <div
-                className={cn(
-                  'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium',
-                  isOnline
-                    ? 'bg-status-success/10 text-status-success'
-                    : 'bg-status-error/10 text-status-error'
-                )}
-              >
-                {isOnline ? <Wifi className="size-3" /> : <WifiOff className="size-3" />}
-                {isOnline ? 'Online' : 'Offline'}
-              </div>
-
-              {/* Refresh */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => queryClient.invalidateQueries()}
-                className="gap-2"
-              >
-                <RefreshCw className="size-4" />
-                Refresh
-              </Button>
-            </div>
-          </div>
+    <PageContainer>
+      <PageHeader
+        title={hubName}
+        description={
+          hasAssignedHub
+            ? 'Warehouse Operations Dashboard'
+            : 'Assign a hub to enable warehouse scanning and hub-scoped metrics'
+        }
+      >
+        {/* Connection Status */}
+        <div
+          className={cn(
+            'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium',
+            isOnline
+              ? 'bg-status-success/10 text-status-success'
+              : 'bg-status-error/10 text-status-error'
+          )}
+        >
+          {isOnline ? <Wifi className="size-3" /> : <WifiOff className="size-3" />}
+          {isOnline ? 'Online' : 'Offline'}
         </div>
-      </header>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => queryClient.invalidateQueries()}
+          className="gap-2"
+        >
+          <RefreshCw className="size-4" />
+          Refresh
+        </Button>
+      </PageHeader>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <div className="flex flex-col gap-6">
         {!hasAssignedHub && (
-          <Card className="border-status-warning/30 bg-status-warning/10">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
+          <SectionCard
+            title={
+              <span className="flex items-center gap-2">
                 <AlertTriangle className="size-4 text-status-warning" />
                 Hub assignment required
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                This workspace is not linked to a hub yet. Warehouse metrics stay at zero and
-                scanning is disabled until your staff profile is assigned to a real hub.
-              </p>
-            </CardContent>
-          </Card>
+              </span>
+            }
+            className="border-status-warning/30 bg-status-warning/10"
+          >
+            <p className="text-sm text-muted-foreground">
+              This workspace is not linked to a hub yet. Warehouse metrics stay at zero and scanning
+              is disabled until your staff profile is assigned to a real hub.
+            </p>
+          </SectionCard>
         )}
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MetricCard
+          <StatCard
             title="Today's Scans"
-            value={metrics?.todayScans ?? 0}
+            value={metricsLoading ? <Skeleton className="h-8 w-16" /> : (metrics?.todayScans ?? 0)}
             icon={Activity}
-            color="text-primary"
-            bgColor="bg-primary/10"
-            loading={metricsLoading}
+            iconColor="primary"
           />
-          <MetricCard
+          <StatCard
             title="Pending Dispatch"
-            value={metrics?.pendingDispatch ?? 0}
+            value={
+              metricsLoading ? <Skeleton className="h-8 w-16" /> : (metrics?.pendingDispatch ?? 0)
+            }
             icon={Truck}
-            color="text-status-warning"
-            bgColor="bg-status-warning/10"
-            loading={metricsLoading}
+            iconColor="warning"
           />
-          <MetricCard
+          <StatCard
             title="In Transit"
-            value={metrics?.inTransit ?? 0}
+            value={metricsLoading ? <Skeleton className="h-8 w-16" /> : (metrics?.inTransit ?? 0)}
             icon={TrendingUp}
-            color="text-status-info"
-            bgColor="bg-status-info/10"
-            loading={metricsLoading}
+            iconColor="primary"
           />
-          <MetricCard
+          <StatCard
             title="Exceptions"
-            value={metrics?.exceptions ?? 0}
+            value={metricsLoading ? <Skeleton className="h-8 w-16" /> : (metrics?.exceptions ?? 0)}
             icon={AlertTriangle}
-            color="text-status-error"
-            bgColor="bg-status-error/10"
-            loading={metricsLoading}
+            iconColor="error"
           />
         </div>
 
@@ -414,132 +395,76 @@ export function WarehouseDashboard() {
             autoFocus
           />
         ) : (
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Scan Panel</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Warehouse scanning becomes available after a hub assignment is added to your staff
-                account.
-              </p>
-            </CardContent>
-          </Card>
+          <SectionCard title="Scan Panel">
+            <p className="text-sm text-muted-foreground">
+              Warehouse scanning becomes available after a hub assignment is added to your staff
+              account.
+            </p>
+          </SectionCard>
         )}
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="py-4">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Quick Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  variant="outline"
-                  className="justify-start gap-2"
-                  onClick={() => navigate('/shipments?new=true')}
-                >
-                  <Package className="size-4" />
-                  New Shipment
-                </Button>
-                <Button
-                  variant="outline"
-                  className="justify-start gap-2"
-                  onClick={() => navigate('/manifests')}
-                >
-                  <Truck className="size-4" />
-                  Create Manifest
-                </Button>
-                <Button
-                  variant="outline"
-                  className="justify-start gap-2"
-                  onClick={() => navigate('/arrival-audit')}
-                >
-                  <CheckCircle className="size-4" />
-                  Verify Arrival
-                </Button>
-                <Button
-                  variant="outline"
-                  className="justify-start gap-2"
-                  onClick={() => navigate('/shift-report')}
-                >
-                  <Clock className="size-4" />
-                  Shift Report
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <SectionCard title="Quick Actions" contentClassName="pt-0">
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="outline"
+                className="justify-start gap-2"
+                onClick={() => navigate('/shipments?new=true')}
+              >
+                <Package className="size-4" />
+                New Shipment
+              </Button>
+              <Button
+                variant="outline"
+                className="justify-start gap-2"
+                onClick={() => navigate('/manifests')}
+              >
+                <Truck className="size-4" />
+                Create Manifest
+              </Button>
+              <Button
+                variant="outline"
+                className="justify-start gap-2"
+                onClick={() => navigate('/arrival-audit')}
+              >
+                <CheckCircle className="size-4" />
+                Verify Arrival
+              </Button>
+              <Button
+                variant="outline"
+                className="justify-start gap-2"
+                onClick={() => navigate('/shift-report')}
+              >
+                <Clock className="size-4" />
+                Shift Report
+              </Button>
+            </div>
+          </SectionCard>
 
-          <Card>
-            <CardHeader className="py-4">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Recent Activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-2">
-                {recentScans.length > 0 ? (
-                  recentScans.slice(0, 5).map((scan) => (
-                    <div
-                      key={scan.id}
-                      className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono">{scan.cn_number}</span>
-                      </div>
-                      {scan.newStatus && <StatusBadge status={scan.newStatus} size="sm" />}
+          <SectionCard title="Recent Activity" contentClassName="pt-0">
+            <div className="flex flex-col gap-2">
+              {recentScans.length > 0 ? (
+                recentScans.slice(0, 5).map((scan) => (
+                  <div
+                    key={scan.id}
+                    className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono">{scan.cn_number}</span>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground text-sm text-center py-4">No recent scans</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                    {scan.newStatus && <StatusBadge status={scan.newStatus} size="sm" />}
+                  </div>
+                ))
+              ) : (
+                <p className="text-muted-foreground text-sm text-center py-4">No recent scans</p>
+              )}
+            </div>
+          </SectionCard>
         </div>
-      </main>
-    </div>
+      </div>
+    </PageContainer>
   );
-}
-
-// Metric Card Component
-interface MetricCardProps {
-  title: string;
-  value: number;
-  icon: React.ElementType;
-  color: string;
-  bgColor: string;
-  loading?: boolean;
-}
-
-function MetricCard({ title, value, icon: Icon, color, bgColor, loading }: MetricCardProps) {
-  return (
-    <Card className="relative overflow-hidden">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">{title}</p>
-            {loading ? (
-              <div className="h-8 w-16 bg-muted animate-pulse rounded mt-1" />
-            ) : (
-              <p className={cn('text-2xl font-bold mt-1', color)}>{value.toLocaleString()}</p>
-            )}
-          </div>
-          <div className={cn('size-10 rounded-lg flex items-center justify-center', bgColor)}>
-            <Icon className={cn('size-5', color)} />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// Utility function
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
 }
 
 export default WarehouseDashboard;

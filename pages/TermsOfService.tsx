@@ -19,7 +19,7 @@ const termsSections: LegalSection[] = [
         <p className="font-semibold text-foreground mt-4">
           These Terms apply to all users including:
         </p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Consignors (senders)</li>
           <li>Consignees (receivers)</li>
           <li>Website visitors</li>
@@ -63,7 +63,7 @@ const termsSections: LegalSection[] = [
     content: (
       <>
         <p>Tapan Associate Cargo Service provides logistics services including:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Cargo transportation</li>
           <li>Parcel and package delivery</li>
           <li>Freight services</li>
@@ -87,13 +87,13 @@ const termsSections: LegalSection[] = [
     content: (
       <>
         <p>A shipment is considered officially booked only when:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Shipment details are submitted</li>
           <li>Charges are confirmed</li>
           <li>A consignment number is generated</li>
         </ul>
         <p>Customers must provide accurate information including:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Sender details</li>
           <li>Receiver details</li>
           <li>Item description</li>
@@ -149,7 +149,7 @@ const termsSections: LegalSection[] = [
           consequences.
         </p>
         <p>The company reserves the right to:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Refuse shipment</li>
           <li>Report the item to authorities</li>
           <li>Dispose of the item if required by law</li>
@@ -164,7 +164,7 @@ const termsSections: LegalSection[] = [
       <>
         <p>Proper packaging is the responsibility of the consignor.</p>
         <p>Shipments must be packed in a manner that:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Protects the item during transport</li>
           <li>Prevents leakage or damage</li>
           <li>Ensures safe handling</li>
@@ -182,7 +182,7 @@ const termsSections: LegalSection[] = [
     content: (
       <>
         <p>Fragile items including:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Glass products</li>
           <li>Electronics</li>
           <li>Instruments</li>
@@ -224,7 +224,7 @@ const termsSections: LegalSection[] = [
           </li>
         </ul>
         <p>Charges are determined based on:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Weight</li>
           <li>Volume</li>
           <li>Destination</li>
@@ -243,7 +243,7 @@ const termsSections: LegalSection[] = [
       <>
         <p>Deliveries are made to the destination office or the specified delivery address.</p>
         <p>Delivery timelines may vary depending on:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Transportation schedules</li>
           <li>Weather conditions</li>
           <li>Operational constraints</li>
@@ -277,7 +277,7 @@ const termsSections: LegalSection[] = [
         </div>
 
         <p>The company shall not be liable for damages resulting from:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Natural disasters</li>
           <li>Accidents</li>
           <li>Delays due to authorities</li>
@@ -295,7 +295,7 @@ const termsSections: LegalSection[] = [
       <>
         <p>Shipments arriving at the destination office must be collected within 7 days.</p>
         <p>If shipments remain uncollected:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Storage charges may apply</li>
           <li>Warehouse charges may be imposed</li>
         </ul>
@@ -312,7 +312,7 @@ const termsSections: LegalSection[] = [
       <>
         <p>Shipments that remain unclaimed for 45 days may be treated as abandoned.</p>
         <p>The company reserves the right to:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Auction</li>
           <li>Dispose</li>
           <li>Liquidate</li>
@@ -330,7 +330,7 @@ const termsSections: LegalSection[] = [
     content: (
       <>
         <p>Shipment tracking services may be available through:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Website</li>
           <li>Customer support</li>
           <li>Consignment number</li>
@@ -348,7 +348,7 @@ const termsSections: LegalSection[] = [
       <>
         <p>Shipment bookings may be cancelled before dispatch.</p>
         <p>Refund eligibility depends on:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Booking status</li>
           <li>Operational expenses incurred</li>
           <li>Cancellation timing</li>
@@ -363,7 +363,7 @@ const termsSections: LegalSection[] = [
     content: (
       <>
         <p>Tapan Associate Cargo Service shall not be liable for:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Indirect losses</li>
           <li>Business losses</li>
           <li>Consequential damages</li>
@@ -385,7 +385,7 @@ const termsSections: LegalSection[] = [
           The company shall not be liable for service interruptions caused by events beyond its
           control including:
         </p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Natural disasters</li>
           <li>War</li>
           <li>Strikes</li>

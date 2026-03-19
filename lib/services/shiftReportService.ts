@@ -2,15 +2,14 @@
  * Shift Handover Report Service
  * Generates comprehensive reports for shift handover
  */
-/* eslint-disable @typescript-eslint/no-explicit-any -- Supabase client requires any for complex operations */
-
 import { supabase } from '@/lib/supabase';
 import { mapSupabaseError } from '@/lib/errors';
 import { orgService } from './orgService';
 import { format, startOfDay, subHours } from 'date-fns';
+import type { Database } from '@/lib/database.types';
 
 // Type helper
-const db = supabase as any;
+const db = supabase;
 
 export interface ShiftReportFilters {
   hubId?: string;
@@ -78,6 +77,39 @@ export interface ShiftHandoverReport {
   }>;
 }
 
+type ShipmentSummaryRow = Pick<
+  Database['public']['Tables']['shipments']['Row'],
+  'id' | 'status' | 'created_at'
+>;
+
+type ManifestSummaryRow = Pick<
+  Database['public']['Tables']['manifests']['Row'],
+  'id' | 'status' | 'created_at' | 'closed_at' | 'departed_at' | 'arrived_at'
+>;
+
+type ExceptionSummaryRow = Pick<
+  Database['public']['Tables']['exceptions']['Row'],
+  'id' | 'type' | 'severity' | 'status' | 'resolved_at'
+> & {
+  shipment?: {
+    origin_hub_id?: string | null;
+    destination_hub_id?: string | null;
+  } | null;
+};
+
+type TrackingEventSummaryRow = Pick<
+  Database['public']['Tables']['tracking_events']['Row'],
+  'id' | 'source' | 'shipment_id'
+>;
+
+type AuditLogActivityRow = {
+  created_at: string;
+  action: string;
+  entity_type: string;
+  entity_id: string | null;
+  actor?: { full_name?: string | null } | null;
+};
+
 export const shiftReportService = {
   /**
    * Generate a comprehensive shift handover report
@@ -98,14 +130,14 @@ export const shiftReportService = {
       ]);
 
     // Get hub info if specified
-    let hub;
+    let hub: ShiftHandoverReport['hub'] | undefined;
     if (hubId) {
       const { data: hubData } = await db
         .from('hubs')
         .select('id, code, name')
         .eq('id', hubId)
         .single();
-      hub = hubData;
+      hub = hubData ?? undefined;
     }
 
     const durationHours = (shiftEnd.getTime() - shiftStart.getTime()) / (1000 * 60 * 60);
@@ -153,9 +185,9 @@ export const shiftReportService = {
     let delivered = 0;
     let exceptions = 0;
 
-    (shipments || []).forEach((s: any) => {
+    ((shipments || []) as ShipmentSummaryRow[]).forEach((s) => {
       byStatus[s.status] = (byStatus[s.status] || 0) + 1;
-      if (s.status === 'CREATED' && new Date(s.created_at) >= start) created++;
+      if (s.status === 'CREATED' && s.created_at && new Date(s.created_at) >= start) created++;
       if (s.status === 'DELIVERED') delivered++;
       if (s.status === 'EXCEPTION') exceptions++;
     });
@@ -194,8 +226,8 @@ export const shiftReportService = {
     let departed = 0;
     let arrived = 0;
 
-    (manifests || []).forEach((m: any) => {
-      if (new Date(m.created_at) >= start && m.status === 'OPEN') opened++;
+    ((manifests || []) as ManifestSummaryRow[]).forEach((m) => {
+      if (m.created_at && new Date(m.created_at) >= start && m.status === 'OPEN') opened++;
       if (m.closed_at && new Date(m.closed_at) >= start) closed++;
       if (m.departed_at && new Date(m.departed_at) >= start) departed++;
       if (m.arrived_at && new Date(m.arrived_at) >= start) arrived++;
@@ -229,10 +261,10 @@ export const shiftReportService = {
     if (error) throw mapSupabaseError(error);
 
     // Filter by hub if needed
-    let filtered = exceptions || [];
+    let filtered = (exceptions || []) as ExceptionSummaryRow[];
     if (hubId) {
       filtered = filtered.filter(
-        (e: any) => e.shipment?.origin_hub_id === hubId || e.shipment?.destination_hub_id === hubId
+        (e) => e.shipment?.origin_hub_id === hubId || e.shipment?.destination_hub_id === hubId
       );
     }
 
@@ -241,7 +273,7 @@ export const shiftReportService = {
     let resolved = 0;
     let pending = 0;
 
-    filtered.forEach((e: any) => {
+    filtered.forEach((e) => {
       bySeverity[e.severity] = (bySeverity[e.severity] || 0) + 1;
       byType[e.type] = (byType[e.type] || 0) + 1;
       if (e.status === 'RESOLVED' || e.status === 'CLOSED') resolved++;
@@ -280,7 +312,7 @@ export const shiftReportService = {
     const bySource: Record<string, number> = {};
     const uniqueShipments = new Set<string>();
 
-    (events || []).forEach((e: any) => {
+    ((events || []) as TrackingEventSummaryRow[]).forEach((e) => {
       bySource[e.source] = (bySource[e.source] || 0) + 1;
       if (e.shipment_id) uniqueShipments.add(e.shipment_id);
     });
@@ -349,11 +381,11 @@ export const shiftReportService = {
 
     if (error) throw mapSupabaseError(error);
 
-    return (auditLogs || []).map((log: any) => ({
+    return ((auditLogs || []) as AuditLogActivityRow[]).map((log) => ({
       time: log.created_at,
       type: log.entity_type,
       description: `${log.action} ${log.entity_type} (${log.entity_id?.slice(0, 8)}...)`,
-      actor: log.actor?.full_name,
+      actor: log.actor?.full_name ?? undefined,
     }));
   },
 

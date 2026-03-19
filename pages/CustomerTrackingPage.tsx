@@ -5,6 +5,7 @@
  */
 
 import { useState } from 'react';
+import { formatDate } from '@/lib/formatters';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
@@ -36,7 +37,6 @@ import {
 } from 'lucide-react';
 import { ShipmentStatus } from '@/types';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
 
 interface TrackingData {
   shipment: {
@@ -312,7 +312,7 @@ export function CustomerTrackingPage() {
 
         {/* Tracking Results */}
         {data && (
-          <div className="space-y-6">
+          <div className="flex flex-col gap-6">
             {/* Shipment Header */}
             <Card className="overflow-hidden">
               <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6">
@@ -388,7 +388,7 @@ export function CustomerTrackingPage() {
                       <div>
                         <p className="text-sm text-muted-foreground">Estimated Delivery</p>
                         <p className="font-semibold text-status-success">
-                          {format(new Date(data.estimated_delivery), 'EEEE, MMMM d, yyyy')}
+                          {formatDate(data.estimated_delivery)}
                         </p>
                       </div>
                     </div>
@@ -424,7 +424,7 @@ export function CustomerTrackingPage() {
             {/* Actions */}
             <Card className="print:hidden">
               <CardContent className="py-4">
-                <div className="flex flex-wrap gap-2 justify-center">
+                <div className="flex-wrap gap-2 justify-center">
                   <Button variant="outline" onClick={handleCopyLink} className="gap-2">
                     {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
                     {copied ? 'Copied!' : 'Copy Link'}
@@ -469,7 +469,7 @@ export function CustomerTrackingPage() {
                   <p className="text-sm text-muted-foreground mb-4">
                     For complete shipment details or assistance, contact our support team.
                   </p>
-                  <div className="flex flex-wrap gap-4 justify-center">
+                  <div className="flex-wrap gap-4 justify-center">
                     <a
                       href="tel:+911234567890"
                       className="flex items-center gap-2 text-sm text-primary hover:underline"

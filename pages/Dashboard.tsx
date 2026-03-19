@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PageContainer, PageHeader } from '@/components/ui-core/layout';
 
 // Dynamically import heavy charting components
 const RealtimeCorridorActivity = lazy(() =>
@@ -117,8 +118,7 @@ export const Dashboard: React.FC = () => {
 
       const { generateDashboardReport } = await import('@/lib/dashboard-report-generator');
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const inventoryCount = shipments.filter((s: any) =>
+      const inventoryCount = shipments.filter((s) =>
         ['RECEIVED_AT_ORIGIN', 'RECEIVED_AT_DEST', 'EXCEPTION'].includes(s.status)
       ).length;
 
@@ -139,48 +139,53 @@ export const Dashboard: React.FC = () => {
   const userGreetingName = user?.fullName?.split(' ')[0] || 'Team';
 
   return (
-    <div data-testid="dashboard-page" className="space-y-6 animate-in fade-in duration-300 pb-8">
+    <PageContainer
+      data-testid="dashboard-page"
+      className="flex flex-col gap-6 animate-in fade-in duration-300"
+    >
       {/* Vibrant SaaS Welcome Hero */}
       <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6 md:p-8 text-primary-foreground shadow-lg border border-primary/20">
-        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-              Good morning, {userGreetingName}
-            </h1>
-            <p className="text-primary-foreground/80 md:text-lg max-w-2xl font-medium">
-              Real-time logistics telemetry and operations health.
-              {hasRoleAccess(user?.role, ['ADMIN', 'SUPER_ADMIN'])
-                ? ' You have full administrative access.'
-                : ' Viewing operations overview.'}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="hidden xl:flex items-center gap-2 bg-black/10 backdrop-blur-md rounded-md px-4 py-2 border border-white/10 shadow-inner">
-              <Activity className="h-4 w-4 text-emerald-400 animate-pulse" />
-              <span className="text-sm font-medium text-white shadow-sm">Live Telemetry</span>
-            </div>
+        <div className="relative z-10">
+          <PageHeader
+            title={
+              <span className="text-3xl font-bold tracking-tight text-primary-foreground md:text-4xl">
+                Good morning, {userGreetingName}
+              </span>
+            }
+            description={
+              <span className="max-w-2xl text-primary-foreground/80 md:text-lg font-medium">
+                Real-time logistics telemetry and operations health.
+                {hasRoleAccess(user?.role, ['ADMIN', 'SUPER_ADMIN'])
+                  ? ' You have full administrative access.'
+                  : ' Viewing operations overview.'}
+              </span>
+            }
+            badge={
+              <Activity size={16} strokeWidth={1.5} className="animate-pulse text-emerald-400" />
+            }
+            className="mb-0"
+          >
             <DateRangeSelector />
             <Button
               data-testid="dashboard-refresh-button"
               variant="outline"
               onClick={refreshData}
-              className="h-10 bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-sm transition-all shadow-sm"
+              className="h-10 bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-sm transition shadow-sm"
             >
-              <RefreshCw className="w-4 h-4 sm:mr-2" />
+              <RefreshCw size={16} strokeWidth={1.5} className="sm:mr-2" />
               <span className="hidden sm:inline">Refresh</span>
             </Button>
             {canExportDashboardReport && (
               <Button
                 data-testid="dashboard-download-button"
-                className="h-10 bg-white text-primary hover:bg-white/90 shadow-sm transition-all font-semibold"
+                className="h-10 bg-white text-primary hover:bg-white/90 shadow-sm transition font-semibold"
                 onClick={handleDownloadReport}
               >
                 <span className="hidden sm:inline">Export Report</span>
                 <span className="sm:hidden">Export</span>
               </Button>
             )}
-          </div>
+          </PageHeader>
         </div>
 
         {/* Abstract blur background effect */}
@@ -200,7 +205,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Telemetry Charts Tier */}
-      <div className="space-y-4 pt-4">
+      <div className="flex flex-col gap-4 pt-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h2 className="text-lg font-semibold tracking-tight text-foreground">
             Network Telemetry
@@ -217,7 +222,7 @@ export const Dashboard: React.FC = () => {
             minSize={40}
             className="p-0 flex flex-col items-stretch h-full"
           >
-            <div className="flex-1 space-y-6 flex flex-col p-4 w-full h-full min-h-[600px] overflow-auto custom-scrollbar">
+            <div className="flex-1 flex flex-col gap-6 flex flex-col p-4 w-full h-full min-h-[600px] overflow-auto custom-scrollbar">
               <ErrorBoundary fallback={<InlineError message="Failed to load shipment trend" />}>
                 <Suspense fallback={<ChartSkeleton height={400} title="Volume Trend" fullHeight />}>
                   <ShipmentTrendChart />
@@ -243,7 +248,7 @@ export const Dashboard: React.FC = () => {
             className="p-0 flex flex-col items-stretch h-full bg-muted/10 border-l border-border/40"
           >
             <div className="flex-1 flex flex-col p-4 w-full h-full min-h-[600px] overflow-auto custom-scrollbar">
-              <Tabs defaultValue="status" className="flex-1 flex flex-col h-full space-y-4">
+              <Tabs defaultValue="status" className="flex-1 flex flex-col h-full flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <TabsList className="grid w-full grid-cols-3 bg-muted/50 border border-border/50">
                     <TabsTrigger value="status" className="text-xs">
@@ -260,7 +265,7 @@ export const Dashboard: React.FC = () => {
 
                 <TabsContent
                   value="status"
-                  className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0"
+                  className="flex-1 mt-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring p-0 focus-visible:ring-0"
                 >
                   <div className="h-full flex flex-col w-full">
                     <ErrorBoundary
@@ -275,7 +280,7 @@ export const Dashboard: React.FC = () => {
 
                 <TabsContent
                   value="hub"
-                  className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0"
+                  className="flex-1 mt-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring p-0 focus-visible:ring-0"
                 >
                   <div className="h-full flex flex-col w-full">
                     <ErrorBoundary
@@ -290,7 +295,7 @@ export const Dashboard: React.FC = () => {
 
                 <TabsContent
                   value="revenue"
-                  className="flex-1 mt-0 outline-none p-0 focus-visible:ring-0"
+                  className="flex-1 mt-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring p-0 focus-visible:ring-0"
                 >
                   <div className="h-full flex flex-col w-full">
                     <ErrorBoundary
@@ -321,7 +326,7 @@ export const Dashboard: React.FC = () => {
           </ErrorBoundary>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

@@ -1,8 +1,9 @@
+import { AuthError } from '@supabase/supabase-js';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useAuthStore } from '@/store/authStore';
+import { clearSensitiveStorage, getPersistedAuthState, useAuthStore } from '@/store/authStore';
 import { supabase } from '@/lib/supabase';
 import { orgService } from '@/lib/services/orgService';
-import { AuthError } from '@supabase/supabase-js';
+import { UserRole } from '@/types/domain';
 
 // Mock dependencies
 vi.mock('@/lib/supabase', () => ({
@@ -38,6 +39,7 @@ vi.mock('@/lib/services/orgService', () => ({
 describe('authStore', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
     useAuthStore.setState({
       user: null,
       session: null,
@@ -81,5 +83,61 @@ describe('authStore', () => {
     expect(orgService.clearCurrentOrg).toHaveBeenCalled();
     expect(useAuthStore.getState().session).toBeNull();
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it('persists only minimal auth state', () => {
+    useAuthStore.setState({
+      user: {
+        id: 'staff-1',
+        authUserId: 'auth-1',
+        email: 'agent@example.com',
+        fullName: 'Agent Name',
+        avatarUrl: 'https://example.com/avatar.png',
+        role: UserRole.ADMIN,
+        hubId: 'hub-1',
+        hubCode: 'IMF',
+        orgId: 'org-1',
+        isActive: true,
+      },
+      isAuthenticated: true,
+    });
+
+    const persisted = getPersistedAuthState(useAuthStore.getState());
+
+    expect(persisted).toEqual({ isAuthenticated: true });
+    expect(persisted).not.toHaveProperty('user');
+    expect(JSON.stringify(persisted)).not.toContain('agent@example.com');
+    expect(JSON.stringify(persisted)).not.toContain('Agent Name');
+  });
+
+  it('clears sensitive auth-related storage keys only', () => {
+    const storageData = new Map<string, string>([
+      ['tac-auth', 'auth'],
+      ['shipment_cache', 'shipment'],
+      ['invoice_draft_1', 'draft'],
+      ['safe_key', 'keep'],
+    ]);
+
+    const storage = {
+      get length() {
+        return storageData.size;
+      },
+      clear: () => storageData.clear(),
+      getItem: (key: string) => storageData.get(key) ?? null,
+      key: (index: number) => Array.from(storageData.keys())[index] ?? null,
+      removeItem: (key: string) => {
+        storageData.delete(key);
+      },
+      setItem: (key: string, value: string) => {
+        storageData.set(key, value);
+      },
+    } as Storage;
+
+    clearSensitiveStorage(storage);
+
+    expect(storage.getItem('tac-auth')).toBeNull();
+    expect(storage.getItem('shipment_cache')).toBeNull();
+    expect(storage.getItem('invoice_draft_1')).toBeNull();
+    expect(storage.getItem('safe_key')).toBe('keep');
   });
 });

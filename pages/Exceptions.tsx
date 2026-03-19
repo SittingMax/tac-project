@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
@@ -21,18 +20,19 @@ import { useFindShipmentByCN } from '@/hooks/useShipments';
 import { useRealtimeExceptions } from '@/hooks/useRealtime';
 import { AlertCircle, CheckCircle, Plus, ShieldAlert, Clock } from 'lucide-react';
 import { ColumnDef } from '@tanstack/react-table';
-import { StatusBadge } from '@/components/domain/StatusBadge';
-import { KPICard } from '@/components/domain/KPICard';
+import { StatusBadge } from '@/components/domain/status-badge';
+import { StatCard } from '@/components/ui-core';
 import { EmptyExceptions } from '@/components/ui/empty-state';
 import { CrudTable } from '@/components/crud/CrudTable';
 import { IdBadge } from '@/components/ui-core/data/id-badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { PageHeader } from '@/components/ui-core/layout';
+import { PageHeader, PageContainer, SectionCard } from '@/components/ui-core/layout';
+import { FieldGroup } from '@/components/ui-core';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { formatDateTime } from '@/lib/formatters';
 
 const raiseSchema = z.object({
   awb: z.string().min(1, 'CN Required'),
@@ -144,7 +144,7 @@ export const Exceptions: React.FC = () => {
         header: 'Reported',
         cell: ({ row }) => (
           <span className="text-xs text-muted-foreground">
-            {format(new Date(row.getValue('created_at')), 'dd MMM HH:mm')}
+            {formatDateTime(row.getValue('created_at'))}
           </span>
         ),
       },
@@ -220,81 +220,74 @@ export const Exceptions: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+    <PageContainer>
       <PageHeader title="Exceptions" description="Track and resolve shipment anomalies">
         <Button variant="destructive" onClick={() => setIsRaiseModalOpen(true)}>
           <Plus data-icon="inline-start" /> Raise Exception
         </Button>
       </PageHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <KPICard
-          title="Open Exceptions"
-          value={openCount}
-          icon={<AlertCircle className="size-5" />}
-          trend={openCount > 0 ? 'down' : 'neutral'}
-        />
-        <KPICard
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard title="Open Exceptions" value={openCount} icon={AlertCircle} iconColor="error" />
+        <StatCard
           title="Critical Issues"
           value={criticalCount}
-          icon={<ShieldAlert className="size-5" />}
-          trend={criticalCount > 0 ? 'down' : 'neutral'}
+          icon={ShieldAlert}
+          iconColor="error"
         />
-        <KPICard
-          title="Total Exceptions"
-          value={exceptions.length}
-          icon={<Clock className="size-5" />}
-        />
+        <StatCard title="Total Exceptions" value={exceptions.length} icon={Clock} />
       </div>
 
-      <CrudTable
-        columns={columns}
-        data={exceptions}
-        searchKey="cn_number"
-        searchPlaceholder="Search by CN..."
-        isLoading={isLoading}
-        emptyState={<EmptyExceptions />}
-        emptyMessage="No exceptions found."
-        toolbar={
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <Select
-              value={statusFilter}
-              onValueChange={(value) => updateFilterParam('status', value)}
-            >
-              <SelectTrigger className="w-full sm:w-[160px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_FILTER_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={severityFilter}
-              onValueChange={(value) => updateFilterParam('severity', value)}
-            >
-              <SelectTrigger className="w-full sm:w-[170px]">
-                <SelectValue placeholder="Severity" />
-              </SelectTrigger>
-              <SelectContent>
-                {SEVERITY_FILTER_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {(statusFilter !== 'ALL' || severityFilter !== 'ALL') && (
-              <Button variant="outline" onClick={clearFilters}>
-                Clear Filters
-              </Button>
-            )}
-          </div>
-        }
-      />
+      <SectionCard>
+        <CrudTable
+          columns={columns}
+          data={exceptions}
+          isLoading={isLoading}
+          searchKey="exceptions"
+          searchPlaceholder="Search by CN..."
+          toolbar={
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <Select
+                value={statusFilter}
+                onValueChange={(value) => updateFilterParam('status', value)}
+              >
+                <SelectTrigger className="w-full sm:w-[160px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUS_FILTER_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={severityFilter}
+                onValueChange={(value) => updateFilterParam('severity', value)}
+              >
+                <SelectTrigger className="w-full sm:w-[170px]">
+                  <SelectValue placeholder="Severity" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SEVERITY_FILTER_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {(statusFilter !== 'ALL' || severityFilter !== 'ALL') && (
+                <Button variant="outline" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+          }
+          emptyState={<EmptyExceptions />}
+          emptyMessage="No exceptions found."
+        />
+      </SectionCard>
 
       {/* Raise Modal */}
       <Dialog open={isRaiseModalOpen} onOpenChange={setIsRaiseModalOpen}>
@@ -303,86 +296,70 @@ export const Exceptions: React.FC = () => {
             <DialogTitle className="text-xl">Raise New Exception</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmitRaise(onRaiseSubmit)} className="flex flex-col gap-6 py-4">
-            <div className="flex flex-col gap-2">
-              <Label
-                htmlFor="raise-awb"
-                className="text-xs font-mono text-muted-foreground uppercase"
-              >
-                CN Number
-              </Label>
+            <FieldGroup label="CN Number" htmlFor="raise-awb">
               <Input
                 id="raise-awb"
                 {...registerRaise('awb')}
                 placeholder="Scan or type CN Number"
-                className="h-11 bg-transparent hover:border-ring/50 transition-colors font-mono"
+                className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors font-mono"
               />
-            </div>
+            </FieldGroup>
             <div className="grid grid-cols-2 gap-6">
-              <div className="flex flex-col gap-2">
-                <Label className="text-xs font-mono text-muted-foreground uppercase">Type</Label>
-                <Controller
-                  control={controlRaise}
-                  name="type"
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="h-11 bg-transparent hover:border-ring/50 transition-colors">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="DAMAGE">Damage</SelectItem>
-                        <SelectItem value="SHORTAGE">Shortage</SelectItem>
-                        <SelectItem value="MISROUTE">Misroute</SelectItem>
-                        <SelectItem value="DELAY">Delay</SelectItem>
-                        <SelectItem value="CUSTOMER_REFUSAL">Customer Refusal</SelectItem>
-                        <SelectItem value="ADDRESS_ISSUE">Address Issue</SelectItem>
-                        <SelectItem value="OTHER">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label className="text-xs font-mono text-muted-foreground uppercase">
-                  Severity
-                </Label>
-                <Controller
-                  control={controlRaise}
-                  name="severity"
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="h-11 bg-transparent hover:border-ring/50 transition-colors">
-                        <SelectValue placeholder="Select severity" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="LOW">Low</SelectItem>
-                        <SelectItem value="MEDIUM">Medium</SelectItem>
-                        <SelectItem value="HIGH">High</SelectItem>
-                        <SelectItem value="CRITICAL">Critical</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
+                <FieldGroup label="Type">
+                  <Controller
+                    control={controlRaise}
+                    name="type"
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="DAMAGE">Damage</SelectItem>
+                          <SelectItem value="SHORTAGE">Shortage</SelectItem>
+                          <SelectItem value="MISROUTE">Misroute</SelectItem>
+                          <SelectItem value="DELAY">Delay</SelectItem>
+                          <SelectItem value="CUSTOMER_REFUSAL">Customer Refusal</SelectItem>
+                          <SelectItem value="ADDRESS_ISSUE">Address Issue</SelectItem>
+                          <SelectItem value="OTHER">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </FieldGroup>
+                <FieldGroup label="Severity">
+                  <Controller
+                    control={controlRaise}
+                    name="severity"
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors">
+                          <SelectValue placeholder="Select severity" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="LOW">Low</SelectItem>
+                          <SelectItem value="MEDIUM">Medium</SelectItem>
+                          <SelectItem value="HIGH">High</SelectItem>
+                          <SelectItem value="CRITICAL">Critical</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </FieldGroup>
             </div>
-            <div className="flex flex-col gap-2">
-              <Label
-                htmlFor="raise-description"
-                className="text-xs font-mono text-muted-foreground uppercase"
-              >
-                Description
-              </Label>
+            <FieldGroup label="Description" htmlFor="raise-description">
               <Textarea
                 id="raise-description"
                 {...registerRaise('description')}
                 placeholder="Details of the issue..."
                 rows={4}
-                className="min-h-[120px] bg-transparent hover:border-ring/50 transition-colors resize-y"
+                className="min-h-[100px] bg-transparent hover:border-ring/50 transition-colors resize-y text-sm"
               />
-            </div>
+            </FieldGroup>
             <Button
               type="submit"
               variant="destructive"
-              className="w-full h-12 text-base font-semibold mt-2"
+              className="w-full h-8 text-xs font-bold mt-2"
               disabled={createMutation.isPending}
             >
               {createMutation.isPending ? 'Reporting...' : 'Report Exception'}
@@ -414,24 +391,18 @@ export const Exceptions: React.FC = () => {
                 {selectedException?.description}
               </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <Label
-                htmlFor="resolve-note"
-                className="text-xs font-mono text-muted-foreground uppercase"
-              >
-                Resolution Note
-              </Label>
+            <FieldGroup label="Resolution Note" htmlFor="resolve-note">
               <Textarea
                 id="resolve-note"
                 {...registerResolve('note')}
                 placeholder="How was this resolved?"
                 rows={4}
-                className="min-h-[120px] bg-transparent hover:border-ring/50 transition-colors resize-y"
+                className="min-h-[100px] bg-transparent hover:border-ring/50 transition-colors resize-y text-sm"
               />
-            </div>
+            </FieldGroup>
             <Button
               type="submit"
-              className="w-full h-12 text-base font-semibold mt-2"
+              className="w-full h-8 text-xs font-bold mt-2"
               disabled={resolveMutation.isPending}
             >
               {resolveMutation.isPending ? 'Resolving...' : 'Confirm Resolution'}
@@ -439,6 +410,6 @@ export const Exceptions: React.FC = () => {
           </form>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   );
 };

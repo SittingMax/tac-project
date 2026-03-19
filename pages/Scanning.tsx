@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { PageHeader, PageContainer, SectionCard } from '@/components/ui-core/layout';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -149,76 +150,69 @@ export const Scanning: React.FC = () => {
     (scanMode === 'LOAD_MANIFEST' || scanMode === 'VERIFY_MANIFEST') && !activeManifest;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] animate-in fade-in duration-500">
+    <PageContainer
+      maxWidth="full"
+      className="flex flex-col h-[calc(100vh-64px)] p-0 sm:p-0 lg:p-0 flex flex-col gap-0"
+    >
       {/* ── HEADER ─────────────────────────────────────── */}
-      <div className="flex-shrink-0 border-b border-border bg-background px-6 py-4">
-        <div className="flex items-center justify-between gap-6">
-          {/* Title + Mode Indicator */}
-          <div className="flex items-center gap-4">
-            <div>
-              <h1 className="text-xl font-semibold tracking-tight text-foreground leading-none">
-                Scanner
-              </h1>
-              <div className="flex items-center gap-2 mt-1">
-                <span
-                  className={`inline-block w-1.5 h-1.5 rounded-full ${meta.bg} animate-pulse`}
-                />
-                <span className="text-xs text-muted-foreground">{meta.sub}</span>
-              </div>
-            </div>
+      <PageHeader
+        className="flex-shrink-0 border-b border-border bg-background px-6 py-4 m-0"
+        title="Scanner"
+        description={
+          <span className="flex items-center gap-2 mt-1">
+            <span className={`inline-block w-1.5 h-1.5 rounded-full ${meta.bg} animate-pulse`} />
+            <span className="text-xs text-muted-foreground">{meta.sub}</span>
+          </span>
+        }
+      >
+        {/* KPIs */}
+        <div className="hidden md:flex items-center gap-2">
+          <div className="flex items-center gap-1.5 px-2 py-1.5 bg-muted/50 border border-border rounded-md">
+            <Activity size={12} strokeWidth={1.5} className="text-muted-foreground" />
+            <span className="text-xs font-mono text-muted-foreground">{totalScans}</span>
           </div>
-
-          {/* KPIs */}
-          <div className="hidden md:flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-muted/50 border border-border rounded-md">
-              <Activity className="w-3 h-3 text-muted-foreground" />
-              <span className="text-xs font-mono text-muted-foreground">{totalScans}</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-status-success/10 border border-status-success/20 rounded-md">
-              <Check className="w-3 h-3 text-status-success" />
-              <span className="text-xs font-mono text-status-success">{scanCount.success}</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-status-error/10 border border-status-error/20 rounded-md">
-              <X className="w-3 h-3 text-status-error" />
-              <span className="text-xs font-mono text-status-error">{scanCount.error}</span>
-            </div>
-            {totalScans > 0 && (
-              <Badge variant="outline" className="font-mono text-[10px]">
-                {successRate}% pass
-              </Badge>
-            )}
+          <div className="flex items-center gap-1.5 px-2 py-1.5 bg-status-success/10 border border-status-success/20 rounded-md">
+            <Check size={12} strokeWidth={1.5} className="text-status-success" />
+            <span className="text-xs font-mono text-status-success">{scanCount.success}</span>
           </div>
+          <div className="flex items-center gap-1.5 px-2 py-1.5 bg-status-error/10 border border-status-error/20 rounded-md">
+            <X className="w-3 h-3 text-status-error" />
+            <span className="text-xs font-mono text-status-error">{scanCount.error}</span>
+          </div>
+          {totalScans > 0 && (
+            <Badge variant="outline" className="font-mono text-[10px]">
+              {successRate}% pass
+            </Badge>
+          )}
+        </div>
 
-          {/* Mode Selector */}
-          <div className="flex gap-0 bg-muted/30 rounded-lg border border-border overflow-hidden">
-            {(Object.keys(MODE_META) as ScanMode[]).map((mode) => {
-              const m = MODE_META[mode];
-              const Icon = m.icon;
-              const isActive = scanMode === mode;
-              return (
-                <button
-                  key={mode}
-                  onClick={() => handleModeSwitch(mode)}
-                  className={`
+        {/* Mode Selector */}
+        <div className="flex gap-0 bg-muted/30 rounded-lg border border-border overflow-hidden">
+          {(Object.keys(MODE_META) as ScanMode[]).map((mode) => {
+            const m = MODE_META[mode];
+            const isActive = scanMode === mode;
+            return (
+              <button
+                key={mode}
+                onClick={() => handleModeSwitch(mode)}
+                className={`
                     relative flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium
-                    transition-all duration-200 border-b-2
+                    transition duration-200 border-b-2
                     ${
                       isActive
                         ? `${m.bg} text-white border-transparent`
                         : 'text-muted-foreground hover:bg-muted/50 border-transparent hover:border-border'
                     }
                   `}
-                  aria-pressed={isActive}
-                  title={m.sub}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span className="hidden lg:inline">{m.label}</span>
-                </button>
-              );
-            })}
-          </div>
+                aria-pressed={isActive}
+                title={m.sub}
+              >
+                <span className="hidden lg:inline">{m.label}</span>
+              </button>
+            );
+          })}
         </div>
-      </div>
+      </PageHeader>
 
       {/* ── ACTIVE MANIFEST BANNER ─────────────────────── */}
       {(scanMode === 'LOAD_MANIFEST' || scanMode === 'VERIFY_MANIFEST') && activeManifest && (
@@ -244,7 +238,7 @@ export const Scanning: React.FC = () => {
               </span>
             </div>
           </div>
-          <Button size="sm" variant="ghost" onClick={clearManifest} className="h-7 w-7 p-0">
+          <Button size="sm" variant="ghost" onClick={clearManifest} className="p-0" >
             <X className="w-3.5 h-3.5" />
           </Button>
         </div>
@@ -332,7 +326,7 @@ export const Scanning: React.FC = () => {
                       <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-primary/50" />
                       <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-primary/50" />
                       <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-primary/50" />
-                      <ScanLine className="w-10 h-10 text-primary/40 absolute inset-0 m-auto animate-pulse" />
+                      <ScanLine size={40} strokeWidth={1.5} className="text-primary/40 absolute inset-0 m-auto animate-pulse" />
                     </div>
                   </div>
 
@@ -357,151 +351,154 @@ export const Scanning: React.FC = () => {
             minSize={25}
             className="flex flex-col min-h-0 bg-background border-t border-border lg:border-none"
           >
-            {/* Manual Input */}
-            <div className="flex-shrink-0 p-4 border-b border-border">
-              <Label
-                htmlFor="scan-input"
-                className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5"
-              >
-                <Keyboard className="size-3" />
-                {needsManifest
-                  ? 'Enter manifest code'
-                  : `Scan ${scanMode === 'DELIVER' ? 'delivery' : 'shipment'}`}
-              </Label>
-              <form onSubmit={handleScanSubmit} className="flex gap-2" data-testid="scan-form">
-                <Input
-                  ref={inputRef}
-                  placeholder={needsManifest ? 'MAN-XXXX-XXXX...' : 'TAC / CN number...'}
-                  value={currentCode}
-                  onChange={(e) => setCurrentCode(e.target.value)}
-                  autoFocus
-                  autoComplete="off"
-                  data-testid="scan-input"
-                  aria-label="Scan input field"
-                  id="scan-input"
-                  name="scan-input"
-                  className="flex-1 h-12 bg-muted/30"
-                />
-                <Button
-                  type="submit"
-                  disabled={!currentCode}
-                  data-testid="scan-submit-button"
-                  className="px-6 h-12"
+            <SectionCard
+              title="Scan Console"
+              description="Manual input and live feed for this scanning session."
+              className="m-4 flex min-h-0 flex-1 flex-col"
+              contentClassName="flex min-h-0 flex-1 flex flex-col gap-4"
+            >
+              <div className="flex-shrink-0">
+                <Label
+                  htmlFor="scan-input"
+                  className="mb-2 flex items-center gap-1.5 text-xs text-muted-foreground"
                 >
-                  Submit
-                </Button>
-              </form>
-            </div>
-
-            {/* Scan Feed */}
-            <div className="flex-1 overflow-y-auto min-h-0">
-              <div className="px-4 py-2 border-b border-border bg-muted/20 sticky top-0 z-10">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <Activity className="w-3 h-3" />
-                    Scan Feed
-                  </h3>
-                  <span className="text-[10px] font-mono text-muted-foreground">
-                    {scannedItems.length} entries
-                  </span>
-                </div>
+                  <Keyboard className="size-3" />
+                  {needsManifest
+                    ? 'Enter manifest code'
+                    : `Scan ${scanMode === 'DELIVER' ? 'delivery' : 'shipment'}`}
+                </Label>
+                <form onSubmit={handleScanSubmit} className="flex gap-2" data-testid="scan-form">
+                  <Input
+                    ref={inputRef}
+                    placeholder={needsManifest ? 'MAN-XXXX-XXXX...' : 'TAC / CN number...'}
+                    value={currentCode}
+                    onChange={(e) => setCurrentCode(e.target.value)}
+                    autoFocus
+                    autoComplete="off"
+                    data-testid="scan-input"
+                    aria-label="Scan input field"
+                    id="scan-input"
+                    name="scan-input"
+                    className="h-12 flex-1 bg-muted/30"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={!currentCode}
+                    data-testid="scan-submit-button"
+                    className="h-12 px-6"
+                  >
+                    Submit
+                  </Button>
+                </form>
               </div>
 
-              <div className="divide-y divide-border">
-                {scannedItems.length === 0 ? (
-                  <div className="p-6 space-y-6">
-                    <div className="text-center py-8">
-                      <ScanLine className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">No scans this session</p>
-                      <p className="text-[10px] text-muted-foreground/60 mt-1">
-                        Point your scanner or type a code above
-                      </p>
-                    </div>
+              <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-border bg-muted/20">
+                <div className="sticky top-0 z-10 border-b border-border bg-muted/20 px-4 py-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Activity size={12} strokeWidth={1.5} />
+                      Scan Feed
+                    </h3>
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      {scannedItems.length} entries
+                    </span>
+                  </div>
+                </div>
 
-                    {/* Diagnostics (collapsible) */}
-                    <div className="border-t border-border pt-4">
-                      <button
-                        onClick={() => setShowDiagnostics(!showDiagnostics)}
-                        className="flex items-center justify-between w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <span className="text-xs">Scanner Diagnostics</span>
-                        {showDiagnostics ? (
-                          <ChevronUp className="w-3 h-3" />
-                        ) : (
-                          <ChevronDown className="w-3 h-3" />
-                        )}
-                      </button>
-                      {showDiagnostics && (
-                        <div className="mt-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
-                          <p className="text-[10px] text-muted-foreground">
-                            Scan the barcode below to test your scanner connection:
-                          </p>
-                          <div className="flex justify-center py-2 bg-white">
-                            <UniversalBarcode
-                              value="TAC123456789"
-                              mode="screen"
-                              width={5}
-                              height={80}
-                            />
-                          </div>
-                          <p className="text-[10px] text-center text-muted-foreground font-mono">
-                            TAC123456789
+                <div className="h-full overflow-y-auto">
+                  <div className="divide-y divide-border">
+                    {scannedItems.length === 0 ? (
+                      <div className="flex flex-col gap-6 p-6">
+                        <div className="py-8 text-center">
+                          <ScanLine size={32} strokeWidth={1.5} className="mx-auto mb-2 text-muted-foreground/30" />
+                          <p className="text-sm text-muted-foreground">No scans this session</p>
+                          <p className="mt-1 text-[10px] text-muted-foreground/60">
+                            Point your scanner or type a code above
                           </p>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  scannedItems.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className={`
-                      flex items-center gap-2 px-4 py-2 border-l-3
-                      animate-in slide-in-from-right-4 duration-300
-                      ${
-                        item.status === 'SUCCESS'
-                          ? 'border-l-status-success bg-status-success/5'
-                          : 'border-l-status-error bg-status-error/5'
-                      }
-                      ${idx === 0 ? 'bg-opacity-100' : ''}
-                    `}
-                      style={{ animationDelay: `${idx * 30}ms` }}
-                    >
-                      {/* Icon */}
-                      <div className="flex-shrink-0">
-                        {item.msg.includes('EXCEPTION') ? (
-                          <AlertTriangle className="w-4 h-4 text-status-error" />
-                        ) : item.status === 'SUCCESS' ? (
-                          <Check className="w-4 h-4 text-status-success" />
-                        ) : (
-                          <X className="w-4 h-4 text-status-error" />
-                        )}
-                      </div>
 
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-sm text-foreground truncate">
-                            {item.code}
-                          </span>
-                          {idx === 0 && (
-                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4">
-                              latest
-                            </Badge>
+                        <div className="border-t border-border pt-4">
+                          <button
+                            onClick={() => setShowDiagnostics(!showDiagnostics)}
+                            className="flex w-full items-center justify-between text-xs text-muted-foreground transition-colors hover:text-foreground"
+                          >
+                            <span className="text-xs">Scanner Diagnostics</span>
+                            {showDiagnostics ? (
+                              <ChevronUp size={12} strokeWidth={1.5} />
+                            ) : (
+                              <ChevronDown size={12} strokeWidth={1.5} />
+                            )}
+                          </button>
+                          {showDiagnostics && (
+                            <div className="mt-4 animate-in slide-in-from-top-2 flex flex-col gap-4 duration-200">
+                              <p className="text-[10px] text-muted-foreground">
+                                Scan the barcode below to test your scanner connection:
+                              </p>
+                              <div className="flex justify-center bg-white py-2">
+                                <UniversalBarcode
+                                  value="TAC123456789"
+                                  mode="screen"
+                                  width={5}
+                                  height={80}
+                                />
+                              </div>
+                              <p className="text-center font-mono text-[10px] text-muted-foreground">
+                                TAC123456789
+                              </p>
+                            </div>
                           )}
                         </div>
-                        <p className="text-[11px] text-muted-foreground truncate">{item.msg}</p>
                       </div>
+                    ) : (
+                      scannedItems.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className={`
+                            flex items-center gap-2 px-4 py-2 border-l-3
+                            animate-in slide-in-from-right-4 duration-300
+                            ${
+                              item.status === 'SUCCESS'
+                                ? 'border-l-status-success bg-status-success/5'
+                                : 'border-l-status-error bg-status-error/5'
+                            }
+                            ${idx === 0 ? 'bg-opacity-100' : ''}
+                          `}
+                          style={{ animationDelay: `${idx * 30}ms` }}
+                        >
+                          <div className="flex-shrink-0">
+                            {item.msg.includes('EXCEPTION') ? (
+                              <AlertTriangle size={16} strokeWidth={1.5} className="text-status-error" />
+                            ) : item.status === 'SUCCESS' ? (
+                              <Check size={16} strokeWidth={1.5} className="text-status-success" />
+                            ) : (
+                              <X className="w-4 h-4 text-status-error" />
+                            )}
+                          </div>
 
-                      {/* Timestamp */}
-                      <span className="flex-shrink-0 text-[10px] font-mono text-muted-foreground/60">
-                        {item.timestamp}
-                      </span>
-                    </div>
-                  ))
-                )}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="truncate font-mono text-sm font-bold text-foreground">
+                                {item.code}
+                              </span>
+                              {idx === 0 && (
+                                <Badge variant="outline" className="h-4 px-1.5 py-0 text-[9px]">
+                                  latest
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="truncate text-[11px] text-muted-foreground">{item.msg}</p>
+                          </div>
+
+                          <span className="flex-shrink-0 font-mono text-[10px] text-muted-foreground/60">
+                            {item.timestamp}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
+            </SectionCard>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
@@ -513,12 +510,12 @@ export const Scanning: React.FC = () => {
           <div className="flex items-center gap-1.5">
             {isOnline ? (
               <>
-                <Wifi className="w-3 h-3 text-status-success" />
+                <Wifi size={12} strokeWidth={1.5} className="text-status-success" />
                 <span className="text-status-success">Online</span>
               </>
             ) : (
               <>
-                <WifiOff className="w-3 h-3 text-status-error" />
+                <WifiOff size={12} strokeWidth={1.5} className="text-status-error" />
                 <span className="text-status-error">Offline</span>
               </>
             )}
@@ -536,7 +533,7 @@ export const Scanning: React.FC = () => {
 
           {/* Session timer */}
           <div className="flex items-center gap-1.5">
-            <Clock className="w-3 h-3" />
+            <Clock size={12} strokeWidth={1.5} />
             <span>{elapsed}</span>
           </div>
         </div>
@@ -561,6 +558,6 @@ export const Scanning: React.FC = () => {
           100% { top: 90%; opacity: 0; }
         }
       `}</style>
-    </div>
+    </PageContainer>
   );
 };

@@ -14,16 +14,25 @@ import {
   Filter,
   Trash2,
 } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { useNotificationStore } from '../lib/notifications/store';
+import { Button } from '@/components/ui/button';
+import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
+import { StatCard } from '@/components/ui-core';
+import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useNotificationStore } from '@/lib/notifications/store';
 import { useAuthStore } from '@/store/authStore';
 import type {
   Notification,
   NotificationCategory,
   NotificationType,
-} from '../lib/notifications/types';
-import { cn } from '../lib/utils';
+} from '@/lib/notifications/types';
+import { cn } from '@/lib/utils';
 
 const CATEGORY_ICONS: Record<NotificationCategory, React.ElementType> = {
   invoice: FileText,
@@ -44,10 +53,10 @@ const TYPE_COLORS: Record<NotificationType, string> = {
 
 // Type badge styles using semantic badge classes
 const TYPE_BADGE_STYLES: Record<NotificationType, string> = {
-  success: 'badge--delivered',
-  error: 'badge--exception',
-  warning: 'badge--in-transit',
-  info: 'badge--created',
+  success: 'DELIVERED',
+  error: 'EXCEPTION',
+  warning: 'IN_TRANSIT',
+  info: 'CREATED',
 };
 
 function groupNotificationsByDate(notifications: Notification[]) {
@@ -89,6 +98,7 @@ export const Notifications: React.FC = () => {
     [notifications, user?.id]
   );
   const count = unreadCount(user?.id);
+  const unreadTabCount = userNotifications.filter((n) => !n.is_read).length;
 
   const filteredNotifications = useMemo(() => {
     let result = [...userNotifications];
@@ -134,15 +144,8 @@ export const Notifications: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-end pb-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
-            Notifications
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Alerts captured for your account</p>
-        </div>
+    <PageContainer>
+      <PageHeader title="Notifications" description="Alerts captured for your account">
         <div className="flex items-center gap-3">
           <Badge variant="outline">{count} unread</Badge>
           <Button
@@ -155,7 +158,7 @@ export const Notifications: React.FC = () => {
             }}
             disabled={count === 0}
           >
-            <CheckCheck className="w-3 h-3 mr-2" />
+            <CheckCheck size={12} strokeWidth={1.5} className="mr-2" />
             Mark All Read
           </Button>
           <Button
@@ -168,200 +171,224 @@ export const Notifications: React.FC = () => {
             }}
             disabled={userNotifications.length === 0}
           >
-            <Trash2 className="w-3 h-3 mr-2" />
+            <Trash2 size={12} strokeWidth={1.5} className="mr-2" />
             Clear All
           </Button>
         </div>
+      </PageHeader>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <StatCard title="Unread" value={count} icon={CheckCheck} />
+        <StatCard
+          title="Visible"
+          value={filteredNotifications.length}
+          icon={Filter}
+          iconColor="muted"
+        />
+        <StatCard
+          title="Total Alerts"
+          value={userNotifications.length}
+          icon={Bell}
+          iconColor="primary"
+        />
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-border pb-4">
-        {/* Tabs */}
-        <div className="flex gap-0 rounded-lg border border-border overflow-hidden">
-          <button
-            onClick={() => setActiveTab('unread')}
-            className={cn(
-              'px-5 py-2 text-sm font-medium transition-colors',
-              activeTab === 'unread'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-background text-muted-foreground hover:bg-muted'
-            )}
-          >
-            Unread ({userNotifications.filter((n) => !n.is_read).length})
-          </button>
-          <button
-            onClick={() => setActiveTab('all')}
-            className={cn(
-              'px-5 py-2 text-sm font-medium transition-colors border-l border-border',
-              activeTab === 'all'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-background text-muted-foreground hover:bg-muted'
-            )}
-          >
-            All ({userNotifications.length})
-          </button>
-        </div>
-
-        {/* Dropdowns */}
-        <div className="flex gap-2 items-center">
-          <Filter className="w-4 h-4 text-muted-foreground opacity-50" />
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="border rounded-md px-3 py-2 text-sm bg-background"
-          >
-            <option value="all">All Categories</option>
-            <option value="invoice">Invoice</option>
-            <option value="shipment">Shipment</option>
-            <option value="warehouse">Warehouse</option>
-            <option value="payment">Payment</option>
-            <option value="auth">Auth</option>
-            <option value="system">System</option>
-          </select>
-
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="border rounded-md px-3 py-2 text-sm bg-background"
-          >
-            <option value="all">All Types</option>
-            <option value="success">Success</option>
-            <option value="warning">Warning</option>
-            <option value="error">Error</option>
-            <option value="info">Info</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Notification List */}
-      <div className="bg-background border border-border p-6 rounded-lg">
-        {filteredNotifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-4">
-              {activeTab === 'unread' ? (
-                <Check className="w-8 h-8 text-muted-foreground" />
-              ) : (
-                <Bell className="w-8 h-8 text-muted-foreground" />
+      <SectionCard
+        title="Activity Feed"
+        description="Filter and review alerts captured for your account."
+        contentClassName="flex flex-col gap-6"
+      >
+        {/* Filters */}
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-border pb-4">
+          {/* Tabs */}
+          <div className="flex gap-0 rounded-lg border border-border overflow-hidden">
+            <button
+              onClick={() => setActiveTab('unread')}
+              className={cn(
+                'px-5 py-2 text-sm font-medium transition-colors',
+                activeTab === 'unread'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-background text-muted-foreground hover:bg-muted'
               )}
-            </div>
-            <h3 className="text-lg font-medium text-foreground mb-1">
-              {activeTab === 'unread' ? 'All caught up!' : 'No notifications yet'}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {activeTab === 'unread'
-                ? 'You have no unread notifications.'
-                : 'Captured alerts will appear here as new events arrive.'}
-            </p>
+            >
+              Unread ({unreadTabCount})
+            </button>
+            <button
+              onClick={() => setActiveTab('all')}
+              className={cn(
+                'px-5 py-2 text-sm font-medium transition-colors border-l border-border',
+                activeTab === 'all'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-background text-muted-foreground hover:bg-muted'
+              )}
+            >
+              All ({userNotifications.length})
+            </button>
           </div>
-        ) : (
-          <div className="space-y-6">
-            {groupedNotifications.map((group) => (
-              <div key={group.label}>
-                <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
-                  {group.label}
-                </h3>
-                <div className="space-y-2">
-                  {group.items.map((notification) => {
-                    const Icon = CATEGORY_ICONS[notification.category] || Info;
-                    const timeAgo = formatDistanceToNow(new Date(notification.created_at), {
-                      addSuffix: true,
-                    });
 
-                    return (
-                      <button
-                        key={notification.id}
-                        onClick={() => handleNotificationClick(notification)}
-                        className={cn(
-                          'w-full text-left rounded-lg p-4 border transition-all hover:shadow-md',
-                          notification.is_read
-                            ? 'bg-transparent border-border opacity-70'
-                            : 'bg-accent/20 border-accent/30'
-                        )}
-                      >
-                        <div className="flex items-start gap-4">
-                          <div
-                            className={cn(
-                              'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
-                              notification.is_read ? 'bg-muted' : 'bg-primary/10'
-                            )}
-                          >
-                            <Icon
+          {/* Dropdowns */}
+          <div className="flex gap-2 items-center">
+            <Filter size={16} strokeWidth={1.5} className="text-muted-foreground opacity-50" />
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="invoice">Invoice</SelectItem>
+                <SelectItem value="shipment">Shipment</SelectItem>
+                <SelectItem value="warehouse">Warehouse</SelectItem>
+                <SelectItem value="payment">Payment</SelectItem>
+                <SelectItem value="auth">Auth</SelectItem>
+                <SelectItem value="system">System</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="success">Success</SelectItem>
+                <SelectItem value="warning">Warning</SelectItem>
+                <SelectItem value="error">Error</SelectItem>
+                <SelectItem value="info">Info</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Notification List */}
+        <div className="rounded-lg">
+          {filteredNotifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-4">
+                {activeTab === 'unread' ? (
+                  <Check size={32} strokeWidth={1.5} className="text-muted-foreground" />
+                ) : (
+                  <Bell size={32} strokeWidth={1.5} className="text-muted-foreground" />
+                )}
+              </div>
+              <h3 className="text-lg font-medium text-foreground mb-1">
+                {activeTab === 'unread' ? 'All caught up!' : 'No notifications yet'}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {activeTab === 'unread'
+                  ? 'You have no unread notifications.'
+                  : 'Captured alerts will appear here as new events arrive.'}
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-6">
+              {groupedNotifications.map((group) => (
+                <div key={group.label}>
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
+                    {group.label}
+                  </h3>
+                  <div className="flex flex-col gap-2">
+                    {group.items.map((notification) => {
+                      const Icon = CATEGORY_ICONS[notification.category] || Info;
+                      const timeAgo = formatDistanceToNow(new Date(notification.created_at), {
+                        addSuffix: true,
+                      });
+
+                      return (
+                        <button
+                          key={notification.id}
+                          onClick={() => handleNotificationClick(notification)}
+                          className={cn(
+                            'w-full text-left rounded-lg p-4 border transition hover:shadow-md',
+                            notification.is_read
+                              ? 'bg-transparent border-border opacity-70'
+                              : 'bg-accent/20 border-accent/30'
+                          )}
+                        >
+                          <div className="flex items-start gap-4">
+                            <div
                               className={cn(
-                                'w-5 h-5',
-                                notification.is_read ? 'text-muted-foreground' : 'text-primary'
+                                'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
+                                notification.is_read ? 'bg-muted' : 'bg-primary/10'
                               )}
-                            />
-                          </div>
+                            >
+                              <Icon
+                                className={cn(
+                                  'w-5 h-5',
+                                  notification.is_read ? 'text-muted-foreground' : 'text-primary'
+                                )}
+                              />
+                            </div>
 
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-4">
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <span
-                                    className={cn(
-                                      'font-medium',
-                                      !notification.is_read && 'text-foreground'
-                                    )}
-                                  >
-                                    {notification.title}
-                                  </span>
-                                  {!notification.is_read && (
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-4">
+                                <div>
+                                  <div className="flex items-center gap-2">
                                     <span
                                       className={cn(
-                                        'h-2 w-2 rounded-full',
-                                        TYPE_COLORS[notification.type]
+                                        'font-medium',
+                                        !notification.is_read && 'text-foreground'
                                       )}
-                                    />
-                                  )}
-                                </div>
-
-                                {notification.message && (
-                                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                                    {notification.message}
-                                  </p>
-                                )}
-
-                                <div className="flex items-center gap-4 mt-2">
-                                  <span className="text-xs text-muted-foreground">{timeAgo}</span>
-                                  <Badge variant="outline" className="text-[10px]">
-                                    {notification.category}
-                                  </Badge>
-                                  <Badge
-                                    className={cn(
-                                      'text-[10px]',
-                                      TYPE_BADGE_STYLES[notification.type]
+                                    >
+                                      {notification.title}
+                                    </span>
+                                    {!notification.is_read && (
+                                      <span
+                                        className={cn(
+                                          'h-2 w-2 rounded-full',
+                                          TYPE_COLORS[notification.type]
+                                        )}
+                                      />
                                     )}
-                                  >
-                                    {notification.type}
-                                  </Badge>
-                                </div>
-                              </div>
+                                  </div>
 
-                              <div className="flex items-center gap-2">
-                                {notification.href && (
-                                  <span className="text-xs text-primary underline">View →</span>
-                                )}
-                                <button
-                                  onClick={(e) => handleDelete(notification.id, e)}
-                                  className="p-1 rounded-md hover:bg-muted transition-colors"
-                                  title="Delete"
-                                >
-                                  <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
-                                </button>
+                                  {notification.message && (
+                                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                                      {notification.message}
+                                    </p>
+                                  )}
+
+                                  <div className="flex items-center gap-4 mt-2">
+                                    <span className="text-xs text-muted-foreground">{timeAgo}</span>
+                                    <Badge variant="outline" className="text-[10px]">
+                                      {notification.category}
+                                    </Badge>
+                                    <Badge
+                                      className={cn(
+                                        'text-[10px]',
+                                        TYPE_BADGE_STYLES[notification.type]
+                                      )}
+                                    >
+                                      {notification.type}
+                                    </Badge>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  {notification.href && (
+                                    <span className="text-xs text-primary underline">View →</span>
+                                  )}
+                                  <button
+                                    onClick={(e) => handleDelete(notification.id, e)}
+                                    className="p-1 rounded-md hover:bg-muted transition-colors"
+                                    title="Delete"
+                                  >
+                                    <Trash2 size={16} strokeWidth={1.5} className="text-muted-foreground hover:text-destructive" />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </button>
-                    );
-                  })}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </SectionCard>
+    </PageContainer>
   );
 };
 

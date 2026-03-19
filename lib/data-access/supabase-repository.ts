@@ -18,6 +18,7 @@ import {
   HubLocation,
   Invoice,
   InvoiceStatus,
+  PaymentMode,
 } from '../../types';
 import type { Database } from '../database.types';
 
@@ -45,6 +46,16 @@ type StaffRow = Database['public']['Tables']['staff']['Row'] & {
 
 // --- Helpers ---
 
+const asRecord = (value: unknown): Record<string, unknown> | null => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+
+  return value as Record<string, unknown>;
+};
+
+const getString = (value: unknown) => (typeof value === 'string' ? value : undefined);
+
 const getHubId = async (code: string): Promise<string> => {
   if (!code) throw new Error('Hub code is required');
   const { data, error } = await supabase.from('hubs').select('id').eq('code', code).single();
@@ -56,10 +67,8 @@ const getHubId = async (code: string): Promise<string> => {
 // --- Mappers ---
 
 const mapShipment = (row: ShipmentRow): Shipment => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const consignorAddress = row.consignor_address as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const consigneeAddress = row.consignee_address as any;
+  const consignorAddress = asRecord(row.consignor_address);
+  const consigneeAddress = asRecord(row.consignee_address);
 
   return {
     id: row.id,
@@ -90,27 +99,30 @@ const mapShipment = (row: ShipmentRow): Shipment => {
     // So Shipment -> Invoice is 1:Many or 1:1 via Invoice table.
     // We'll leave invoiceId undefined for now as it requires reverse lookup
     contentsDescription: row.special_instructions || 'General Cargo',
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    paymentMode: 'PAID' as any,
+    paymentMode: 'PAID' as PaymentMode,
     consignor: {
       name: row.consignor_name || '',
       phone: row.consignor_phone || '',
       address:
-        typeof consignorAddress === 'string' ? consignorAddress : consignorAddress?.line1 || '',
-      gstin: consignorAddress?.gstin,
-      city: consignorAddress?.city,
-      state: consignorAddress?.state,
-      zip: consignorAddress?.zip,
+        typeof row.consignor_address === 'string'
+          ? row.consignor_address
+          : getString(consignorAddress?.line1) || '',
+      gstin: getString(consignorAddress?.gstin),
+      city: getString(consignorAddress?.city),
+      state: getString(consignorAddress?.state),
+      zip: getString(consignorAddress?.zip),
     },
     consignee: {
       name: row.consignee_name,
       phone: row.consignee_phone,
       address:
-        typeof consigneeAddress === 'string' ? consigneeAddress : consigneeAddress?.line1 || '',
-      gstin: consigneeAddress?.gstin,
-      city: consigneeAddress?.city,
-      state: consigneeAddress?.state,
-      zip: consigneeAddress?.zip,
+        typeof row.consignee_address === 'string'
+          ? row.consignee_address
+          : getString(consigneeAddress?.line1) || '',
+      gstin: getString(consigneeAddress?.gstin),
+      city: getString(consigneeAddress?.city),
+      state: getString(consigneeAddress?.state),
+      zip: getString(consigneeAddress?.zip),
     },
     declaredValue: row.declared_value || 0,
   };
@@ -128,30 +140,32 @@ const mapUser = (row: StaffRow): User => ({
 
 // --- Repositories ---
 
-const mapManifest = (row: ManifestRow): Manifest => ({
-  id: row.id,
-  reference: row.manifest_no,
-  type: (row.type || 'AIR') as Manifest['type'], // Defaulting
-  originHub: (row.origin_hub?.code || 'IMPHAL') as HubLocation,
-  destinationHub: (row.destination_hub?.code || 'NEW_DELHI') as HubLocation,
-  status: row.status as Manifest['status'],
-  vehicleMeta: {
-    vehicleId: row.vehicle_number || undefined,
-    driverName: row.driver_name || undefined,
-    driverPhone: row.driver_phone || undefined,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    carrier: (row.vehicle_meta as any)?.carrier,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    flightNumber: (row.vehicle_meta as any)?.flightNumber,
-  },
-  shipmentIds: row.manifest_items?.map((i) => i.shipment_id) || [],
-  shipmentCount: row.total_shipments || 0,
-  totalWeight: row.total_weight || 0,
-  createdBy: row.created_by_staff_id || 'System', // ideally join staff name
-  createdAt: row.created_at || new Date().toISOString(),
-  departedAt: row.departed_at || undefined,
-  arrivedAt: row.arrived_at || undefined,
-});
+const mapManifest = (row: ManifestRow): Manifest => {
+  const vehicleMeta = asRecord(row.vehicle_meta);
+
+  return {
+    id: row.id,
+    reference: row.manifest_no,
+    type: (row.type || 'AIR') as Manifest['type'], // Defaulting
+    originHub: (row.origin_hub?.code || 'IMPHAL') as HubLocation,
+    destinationHub: (row.destination_hub?.code || 'NEW_DELHI') as HubLocation,
+    status: row.status as Manifest['status'],
+    vehicleMeta: {
+      vehicleId: row.vehicle_number || undefined,
+      driverName: row.driver_name || undefined,
+      driverPhone: row.driver_phone || undefined,
+      carrier: getString(vehicleMeta?.carrier),
+      flightNumber: getString(vehicleMeta?.flightNumber),
+    },
+    shipmentIds: row.manifest_items?.map((i) => i.shipment_id) || [],
+    shipmentCount: row.total_shipments || 0,
+    totalWeight: row.total_weight || 0,
+    createdBy: row.created_by_staff_id || 'System', // ideally join staff name
+    createdAt: row.created_at || new Date().toISOString(),
+    departedAt: row.departed_at || undefined,
+    arrivedAt: row.arrived_at || undefined,
+  };
+};
 
 const mapInvoice = (row: InvoiceRow): Invoice => {
   return {
@@ -162,8 +176,7 @@ const mapInvoice = (row: InvoiceRow): Invoice => {
     shipmentId: row.shipment_id || '',
     awb: row.shipment?.cn_number || 'UNKNOWN',
     status: row.status as InvoiceStatus,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    paymentMode: (row.payment_method || 'PAID') as any, // Mismatched enum names?
+    paymentMode: (row.payment_method || 'PAID') as PaymentMode, // Mismatched enum names?
     financials: {
       ratePerKg: 0, // Not in Invoice row directly, maybe in line items
       baseFreight: row.subtotal,
@@ -398,8 +411,7 @@ class SupabaseManifestRepository implements ManifestRepository {
   }
 
   async updateStatus(id: string, status: 'DEPARTED' | 'ARRIVED'): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const update: any = { status };
+    const update: Database['public']['Tables']['manifests']['Update'] = { status };
     if (status === 'DEPARTED') update.departed_at = new Date().toISOString();
     if (status === 'ARRIVED') update.arrived_at = new Date().toISOString();
 
@@ -443,8 +455,7 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (data || []).map((row) => mapInvoice(row as any));
+    return (data || []).map((row) => mapInvoice(row as InvoiceRow));
   }
 
   async create(data: Invoice): Promise<Invoice> {
@@ -456,7 +467,7 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
       .single();
     if (!staff) throw new Error('Staff context missing');
 
-    const payload = {
+    const payload: Database['public']['Tables']['invoices']['Insert'] = {
       invoice_no: data.invoiceNumber,
       customer_id: data.customerId,
       shipment_id: data.shipmentId,
@@ -466,8 +477,7 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
       total: data.financials.totalAmount,
       tax_amount: data.financials.tax.total,
       due_date: data.dueDate,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      line_items: [] as any, // Map line items if available
+      line_items: [],
     };
 
     const { data: newInvoice, error } = await supabase
@@ -477,8 +487,7 @@ class SupabaseInvoiceRepository implements InvoiceRepository {
       .single();
 
     if (error) throw error;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return mapInvoice(newInvoice as any);
+    return mapInvoice(newInvoice as InvoiceRow);
   }
 
   async updateStatus(id: string, status: InvoiceStatus): Promise<void> {

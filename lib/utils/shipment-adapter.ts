@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- Data mapping between Supabase and UI types */
 import { ShipmentWithRelations } from '@/hooks/useShipments';
-import { Shipment } from '@/types';
+import { HubLocation, Shipment } from '@/types';
 
 /**
  * Adapter: Convert ShipmentWithRelations (Supabase) to Shipment type (UI)
@@ -11,11 +10,11 @@ export function adaptToShipment(s: ShipmentWithRelations): Shipment {
     awb: s.cn_number,
     customerId: s.customer_id,
     customerName: s.customer?.name || '',
-    originHub: (s.origin_hub?.code as any) || (s.origin_hub_id as any),
-    destinationHub: (s.destination_hub?.code as any) || (s.destination_hub_id as any),
-    mode: s.mode,
-    serviceLevel: s.service_level,
-    status: s.status as any,
+    originHub: (s.origin_hub?.code || s.origin_hub_id) as HubLocation,
+    destinationHub: (s.destination_hub?.code || s.destination_hub_id) as HubLocation,
+    mode: s.mode as Shipment['mode'],
+    serviceLevel: s.service_level as Shipment['serviceLevel'],
+    status: s.status as Shipment['status'],
     totalPackageCount: s.package_count,
     totalWeight: {
       dead: s.total_weight,

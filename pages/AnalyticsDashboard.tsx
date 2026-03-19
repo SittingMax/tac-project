@@ -9,9 +9,9 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { exportToCSV } from '@/lib/export';
 import { useAuthStore } from '@/store/authStore';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -42,12 +42,11 @@ import {
   CheckCircle,
   AlertTriangle,
   MapPin,
-  ArrowUpRight,
-  ArrowDownRight,
-  Loader2,
   RefreshCw,
   Download,
 } from 'lucide-react';
+import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
+import { ChartCard, StatCard } from '@/components/ui-core';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -637,385 +636,327 @@ export function AnalyticsDashboard() {
     metricsLoading || dailyLoading || statusLoading || hubLoading || recentExceptionsLoading;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Analytics Dashboard</h1>
-              <p className="text-sm text-muted-foreground">
-                Real-time insights and performance metrics
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Select value={dateRange} onValueChange={(v) => setDateRange(v as '7' | '30' | '90')}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7">Last 7 days</SelectItem>
-                  <SelectItem value="30">Last 30 days</SelectItem>
-                  <SelectItem value="90">Last 90 days</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-2">
-                <RefreshCw className="size-4" />
-                Refresh
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
-                <Download className="size-4" />
-                Export
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <PageContainer>
+      <PageHeader
+        title="Analytics Dashboard"
+        description="Real-time insights and performance metrics"
+      >
+        <Select value={dateRange} onValueChange={(v) => setDateRange(v as '7' | '30' | '90')}>
+          <SelectTrigger className="w-32">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="7">Last 7 days</SelectItem>
+            <SelectItem value="30">Last 30 days</SelectItem>
+            <SelectItem value="90">Last 90 days</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-2">
+          <RefreshCw className="size-4" />
+          Refresh
+        </Button>
+        <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+          <Download className="size-4" />
+          Export
+        </Button>
+      </PageHeader>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <div className="flex flex-col gap-6">
         {/* Key Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MetricCard
+          <StatCard
             title="Total Shipments"
-            value={metrics?.totalShipments || 0}
+            value={isLoading ? <Skeleton className="h-8 w-20" /> : metrics?.totalShipments || 0}
             icon={Package}
-            trend={metrics?.trend.shipments}
-            loading={isLoading}
+            trend={
+              metrics
+                ? {
+                    value: `${Math.abs(metrics.trend.shipments).toFixed(1)}%`,
+                    label: 'vs prior period',
+                    direction:
+                      metrics.trend.shipments > 0
+                        ? 'up'
+                        : metrics.trend.shipments < 0
+                          ? 'down'
+                          : 'neutral',
+                  }
+                : undefined
+            }
           />
-          <MetricCard
+          <StatCard
             title="Delivered Today"
-            value={metrics?.deliveredToday || 0}
+            value={isLoading ? <Skeleton className="h-8 w-20" /> : metrics?.deliveredToday || 0}
             icon={CheckCircle}
-            trend={metrics?.trend.delivery}
-            loading={isLoading}
+            iconColor="success"
+            trend={
+              metrics
+                ? {
+                    value: `${Math.abs(metrics.trend.delivery).toFixed(1)}%`,
+                    label: 'vs prior period',
+                    direction:
+                      metrics.trend.delivery > 0
+                        ? 'up'
+                        : metrics.trend.delivery < 0
+                          ? 'down'
+                          : 'neutral',
+                  }
+                : undefined
+            }
           />
-          <MetricCard
+          <StatCard
             title="In Transit"
-            value={metrics?.inTransit || 0}
+            value={isLoading ? <Skeleton className="h-8 w-20" /> : metrics?.inTransit || 0}
             icon={Truck}
-            loading={isLoading}
+            iconColor="primary"
           />
-          <MetricCard
+          <StatCard
             title="Exceptions"
-            value={metrics?.exceptions || 0}
+            value={isLoading ? <Skeleton className="h-8 w-20" /> : metrics?.exceptions || 0}
             icon={AlertTriangle}
-            trend={-2.3}
-            trendNegative
-            loading={isLoading}
+            iconColor="error"
           />
         </div>
 
         {/* Charts Row 1 */}
         <div className="grid lg:grid-cols-2 gap-6">
-          {/* Shipment Trends */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="size-5" />
-                Shipment Trends
-              </CardTitle>
-              <CardDescription>Daily shipment volume over time</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {dailyLoading ? (
-                <div className="h-[300px] flex items-center justify-center">
-                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : (
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={dailyStats}>
-                    <defs>
-                      <linearGradient id="colorShipments" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={CHART_COLORS.primary} stopOpacity={0.3} />
-                        <stop offset="95%" stopColor={CHART_COLORS.primary} stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="shipments"
-                      stroke={CHART_COLORS.primary}
-                      fillOpacity={1}
-                      fill="url(#colorShipments)"
-                      name="Shipments"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="delivered"
-                      stroke={CHART_COLORS.success}
-                      dot={false}
-                      name="Delivered"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              )}
-            </CardContent>
-          </Card>
+          <ChartCard
+            title={
+              <span className="flex items-center gap-2">
+                <TrendingUp className="size-4" /> Shipment Trends
+              </span>
+            }
+            description="Daily shipment volume over time"
+            loading={dailyLoading}
+          >
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={dailyStats}>
+                <defs>
+                  <linearGradient id="colorShipments" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={CHART_COLORS.primary} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={CHART_COLORS.primary} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="shipments"
+                  stroke={CHART_COLORS.primary}
+                  fillOpacity={1}
+                  fill="url(#colorShipments)"
+                  name="Shipments"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="delivered"
+                  stroke={CHART_COLORS.success}
+                  dot={false}
+                  name="Delivered"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartCard>
 
-          {/* Status Distribution */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Status Distribution</CardTitle>
-              <CardDescription>Current shipment status breakdown</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {statusLoading ? (
-                <div className="h-[300px] flex items-center justify-center">
-                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : (
-                <div className="flex items-center justify-center">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={statusDistribution}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        paddingAngle={2}
-                        dataKey="count"
-                        nameKey="status"
-                      >
-                        {statusDistribution?.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={STATUS_COLORS[entry.status] || CHART_COLORS.muted}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                        }}
-                        formatter={(value: number, name: string) => [
-                          `${value} (${statusDistribution?.find((s) => s.status === name)?.percentage.toFixed(1)}%)`,
-                          name.replace(/_/g, ' '),
-                        ]}
+          <ChartCard
+            title="Status Distribution"
+            description="Current shipment status breakdown"
+            loading={statusLoading}
+          >
+            <div className="flex items-center justify-center">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={statusDistribution}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={2}
+                    dataKey="count"
+                    nameKey="status"
+                  >
+                    {statusDistribution?.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={STATUS_COLORS[entry.status] || CHART_COLORS.muted}
                       />
-                      <Legend formatter={(value) => value.replace(/_/g, ' ')} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                    }}
+                    formatter={(value: number, name: string) => [
+                      `${value} (${statusDistribution?.find((s) => s.status === name)?.percentage.toFixed(1)}%)`,
+                      name.replace(/_/g, ' '),
+                    ]}
+                  />
+                  <Legend formatter={(value) => value.replace(/_/g, ' ')} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </ChartCard>
         </div>
 
         {/* Charts Row 2 */}
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Hub Performance */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="size-5" />
-                Hub Performance
-              </CardTitle>
-              <CardDescription>Top performing hubs by volume</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {hubLoading ? (
-                <div className="h-[300px] flex items-center justify-center">
-                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : (
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={hubPerformance?.slice(0, 6)} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <YAxis
-                      type="category"
-                      dataKey="hub_code"
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                      width={60}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                      }}
-                    />
-                    <Bar
-                      dataKey="total_shipments"
-                      name="Total"
-                      fill={CHART_COLORS.primary}
-                      radius={[0, 4, 4, 0]}
-                    />
-                    <Bar
-                      dataKey="delivered"
-                      name="Delivered"
-                      fill={CHART_COLORS.success}
-                      radius={[0, 4, 4, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-            </CardContent>
-          </Card>
+          <ChartCard
+            title={
+              <span className="flex items-center gap-2">
+                <MapPin className="size-4" /> Hub Performance
+              </span>
+            }
+            description="Top performing hubs by volume"
+            loading={hubLoading}
+            className="lg:col-span-2"
+          >
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={hubPerformance?.slice(0, 6)} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis
+                  type="category"
+                  dataKey="hub_code"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  width={60}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                  }}
+                />
+                <Bar
+                  dataKey="total_shipments"
+                  name="Total"
+                  fill={CHART_COLORS.primary}
+                  radius={[0, 4, 4, 0]}
+                />
+                <Bar
+                  dataKey="delivered"
+                  name="Delivered"
+                  fill={CHART_COLORS.success}
+                  radius={[0, 4, 4, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
 
           {/* Performance Metrics */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance Metrics</CardTitle>
-              <CardDescription>Key delivery indicators</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Avg Delivery Time</span>
-                  <span className="text-lg font-semibold">{metrics?.avgDeliveryTime} days</span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full"
-                    style={{
-                      width: `${Math.min(((metrics?.avgDeliveryTime || 0) / 5) * 100, 100)}%`,
-                    }}
-                  />
-                </div>
+          <SectionCard
+            title="Performance Metrics"
+            description="Key delivery indicators"
+            contentClassName="flex flex-col gap-6"
+          >
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Avg Delivery Time</span>
+                <span className="text-lg font-semibold">{metrics?.avgDeliveryTime} days</span>
               </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">On-Time Rate</span>
-                  <span className="text-lg font-semibold text-status-success">
-                    {metrics?.onTimeRate}%
-                  </span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-status-success rounded-full"
-                    style={{ width: `${metrics?.onTimeRate}%` }}
-                  />
-                </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary rounded-full"
+                  style={{
+                    width: `${Math.min(((metrics?.avgDeliveryTime || 0) / 5) * 100, 100)}%`,
+                  }}
+                />
               </div>
+            </div>
 
-              <div className="pt-4 border-t border-border">
-                <h4 className="text-sm font-medium mb-3">Top Hubs by On-Time Rate</h4>
-                <div className="space-y-2">
-                  {hubPerformance?.slice(0, 3).map((hub) => (
-                    <div key={hub.hub_id} className="flex items-center justify-between text-sm">
-                      <span className="font-mono">{hub.hub_code}</span>
-                      <Badge variant="secondary">{hub.on_time_rate.toFixed(1)}%</Badge>
-                    </div>
-                  ))}
-                </div>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">On-Time Rate</span>
+                <span className="text-lg font-semibold text-status-success">
+                  {metrics?.onTimeRate}%
+                </span>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-status-success rounded-full"
+                  style={{ width: `${metrics?.onTimeRate}%` }}
+                />
+              </div>
+            </div>
 
-        {/* Exceptions Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-status-warning" />
-              Recent Exceptions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recentExceptions && recentExceptions.length > 0 ? (
-              <div className="space-y-3">
-                {recentExceptions.map((exception) => (
-                  <div
-                    key={exception.id}
-                    className="flex flex-col gap-2 rounded-lg border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-sm font-semibold">
-                          {exception.shipment?.cn_number ?? 'Unknown CN'}
-                        </span>
-                        <Badge
-                          variant="outline"
-                          className={
-                            EXCEPTION_SEVERITY_CLASSNAMES[exception.severity] ??
-                            'border-border bg-muted/40 text-foreground'
-                          }
-                        >
-                          {exception.severity}
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-foreground">
-                        {exception.type.replaceAll('_', ' ')}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {format(new Date(exception.created_at), 'MMM d, yyyy HH:mm')}
-                      </div>
-                    </div>
-                    <Badge variant={exception.status === 'OPEN' ? 'default' : 'secondary'}>
-                      {exception.status.replaceAll('_', ' ')}
-                    </Badge>
+            <div className="pt-4 border-t border-border">
+              <h4 className="text-sm font-medium mb-3">Top Hubs by On-Time Rate</h4>
+              <div className="flex flex-col gap-2">
+                {hubPerformance?.slice(0, 3).map((hub) => (
+                  <div key={hub.hub_id} className="flex items-center justify-between text-sm">
+                    <span className="font-mono">{hub.hub_code}</span>
+                    <Badge variant="secondary">{hub.on_time_rate.toFixed(1)}%</Badge>
                   </div>
                 ))}
               </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <AlertTriangle className="size-8 mx-auto mb-2 opacity-50" />
-                <p>No active exceptions requiring attention</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </main>
-    </div>
-  );
-}
-
-// Metric Card Component
-interface MetricCardProps {
-  title: string;
-  value: number;
-  icon: React.ElementType;
-  trend?: number;
-  trendNegative?: boolean;
-  loading?: boolean;
-}
-
-function MetricCard({ title, value, icon: Icon, trend, trendNegative, loading }: MetricCardProps) {
-  return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground">{title}</p>
-            {loading ? (
-              <div className="h-8 w-20 bg-muted animate-pulse rounded mt-1" />
-            ) : (
-              <p className="text-2xl font-bold mt-1">{value.toLocaleString()}</p>
-            )}
-            {trend !== undefined && !loading && (
-              <div
-                className={`flex items-center gap-1 mt-1 text-sm ${trendNegative ? 'text-status-error' : 'text-status-success'}`}
-              >
-                {trend >= 0 ? (
-                  <ArrowUpRight className="size-3" />
-                ) : (
-                  <ArrowDownRight className="size-3" />
-                )}
-                <span>{Math.abs(trend).toFixed(1)}%</span>
-              </div>
-            )}
-          </div>
-          <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Icon className="size-5 text-primary" />
-          </div>
+            </div>
+          </SectionCard>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Exceptions Summary */}
+        <SectionCard
+          title={
+            <span className="flex items-center gap-2">
+              <AlertTriangle className="size-5 text-status-warning" />
+              Recent Exceptions
+            </span>
+          }
+        >
+          {recentExceptions && recentExceptions.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {recentExceptions.map((exception) => (
+                <div
+                  key={exception.id}
+                  className="flex flex-col gap-2 rounded-lg border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-sm font-semibold">
+                        {exception.shipment?.cn_number ?? 'Unknown CN'}
+                      </span>
+                      <Badge
+                        variant="outline"
+                        className={
+                          EXCEPTION_SEVERITY_CLASSNAMES[exception.severity] ??
+                          'border-border bg-muted/40 text-foreground'
+                        }
+                      >
+                        {exception.severity}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-foreground">
+                      {exception.type.replaceAll('_', ' ')}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {format(new Date(exception.created_at), 'MMM d, yyyy HH:mm')}
+                    </div>
+                  </div>
+                  <Badge variant={exception.status === 'OPEN' ? 'default' : 'secondary'}>
+                    {exception.status.replaceAll('_', ' ')}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <AlertTriangle className="size-8 mx-auto mb-2 opacity-50" />
+              <p>No active exceptions requiring attention</p>
+            </div>
+          )}
+        </SectionCard>
+      </div>
+    </PageContainer>
   );
 }
 

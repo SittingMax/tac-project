@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- Label generation requires any for dynamic form/invoice data */
 import { LabelData, ServiceLevel, TransportMode } from '@/components/domain/LabelGenerator';
 import { HUBS } from '@/lib/constants';
 import { HubLocation, Shipment } from '@/types';
@@ -6,6 +5,29 @@ import { HubLocation, Shipment } from '@/types';
 type LabelShipmentLike = Omit<Partial<Shipment>, 'originHub' | 'destinationHub'> & {
   originHub?: string | null;
   destinationHub?: string | null;
+};
+
+type LabelInvoiceLike = {
+  createdAt?: string | null;
+  gstNumber?: string | null;
+};
+
+type LabelFormDataLike = {
+  awb?: string | null;
+  serviceLevel?: string | null;
+  transportMode?: string | null;
+  consignorCity?: string | null;
+  chargedWeight?: number | string | null;
+  actualWeight?: number | string | null;
+  paymentMode?: string | null;
+  consigneeName?: string | null;
+  consigneeAddress?: string | null;
+  consigneeCity?: string | null;
+  consigneeState?: string | null;
+  consigneeZip?: string | null;
+  consigneeGstin?: string | null;
+  gstNumber?: string | null;
+  bookingDate?: string | null;
 };
 
 const getTextValue = (value?: string | null): string =>
@@ -48,7 +70,7 @@ const normalizeServiceLevel = (value?: string | null): ServiceLevel => {
 
 export const generateLabelFromShipment = (
   shipment: LabelShipmentLike,
-  invoiceData?: any
+  invoiceData?: LabelInvoiceLike
 ): LabelData => {
   const serviceLevel = normalizeServiceLevel(shipment.serviceLevel);
 
@@ -119,11 +141,11 @@ export const generateLabelFromShipment = (
             year: 'numeric',
           }),
     },
-    gstNumber: shipment.consignee?.gstin || invoiceData?.gstNumber,
+    gstNumber: shipment.consignee?.gstin || invoiceData?.gstNumber || undefined,
   };
 };
 
-export const generateLabelFromFormData = (formData: any): LabelData => {
+export const generateLabelFromFormData = (formData: LabelFormDataLike): LabelData => {
   const serviceLevel = normalizeServiceLevel(formData.serviceLevel);
   const modeInput = String(formData.transportMode || '')
     .toUpperCase()
@@ -165,7 +187,7 @@ export const generateLabelFromFormData = (formData: any): LabelData => {
       name: formData.consigneeName || 'CONSIGNEE',
       address: formData.consigneeAddress || '',
       city: cityLine,
-      state: formData.consigneeState,
+      state: getTextValue(formData.consigneeState) || undefined,
     },
     routing: {
       origin: originCode,
@@ -198,6 +220,7 @@ export const generateLabelFromFormData = (formData: any): LabelData => {
             year: 'numeric',
           }),
     },
-    gstNumber: formData.consigneeGstin || formData.gstNumber,
+    gstNumber:
+      getTextValue(formData.consigneeGstin) || getTextValue(formData.gstNumber) || undefined,
   };
 };

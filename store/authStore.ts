@@ -5,10 +5,11 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { Session } from '@supabase/supabase-js';
+import { canAccessModule } from '@/lib/access-control';
+import { logger } from '@/lib/logger';
 import { supabase } from '@/lib/supabase';
 import { orgService } from '@/lib/services/orgService';
-import { logger } from '@/lib/logger';
-import type { Session } from '@supabase/supabase-js';
 import type { UserRole } from '@/types';
 
 // Singleton state to prevent concurrent initialization (React StrictMode fix)
@@ -45,6 +46,42 @@ interface AuthState {
   signOut: () => Promise<void>;
   updateProfile: (profile: Partial<StaffUser>) => Promise<void>;
   clearError: () => void;
+}
+
+const AUTH_STORAGE_NAME = 'tac-auth';
+const SENSITIVE_STORAGE_PREFIXES = ['invoice_draft', 'shipment_', 'print_', 'label_', 'tac-'];
+
+function getBrowserStorage(): Storage | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return window.localStorage;
+}
+
+export function clearSensitiveStorage(storage: Storage | null = getBrowserStorage()): void {
+  if (!storage) {
+    return;
+  }
+
+  const keys = Array.from({ length: storage.length }, (_, index) => storage.key(index)).filter(
+    (key): key is string => key !== null
+  );
+
+  keys.forEach((key) => {
+    if (
+      key === AUTH_STORAGE_NAME ||
+      SENSITIVE_STORAGE_PREFIXES.some((prefix) => key.startsWith(prefix))
+    ) {
+      storage.removeItem(key);
+    }
+  });
+}
+
+export function getPersistedAuthState(state: AuthState): Partial<AuthState> {
+  return {
+    isAuthenticated: state.isAuthenticated,
+  };
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -208,6 +245,7 @@ export const useAuthStore = create<AuthState>()(
                   logger.warn('AuthStore', 'onAuthStateChange: SIGNED_OUT or no session', {
                     event,
                   });
+                  clearSensitiveStorage();
                   orgService.clearCurrentOrg();
                   set({ session: null, user: null, isAuthenticated: false });
                   return;
@@ -342,14 +380,7 @@ export const useAuthStore = create<AuthState>()(
       signOut: async () => {
         try {
           set({ isLoading: true });
-
-          // Clear sensitive localStorage data (Issue #23 - GDPR compliance)
-          const sensitiveKeyPrefixes = ['invoice_draft', 'shipment_', 'print_', 'label_', 'tac-'];
-          Object.keys(localStorage).forEach((key) => {
-            if (sensitiveKeyPrefixes.some((prefix) => key.startsWith(prefix))) {
-              localStorage.removeItem(key);
-            }
-          });
+          clearSensitiveStorage();
 
           await supabase.auth.signOut();
           logger.warn('AuthStore', 'Signed out by user action');
@@ -364,18 +395,7 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           logger.error('AuthStore', 'Sign out error', { error });
           orgService.clearCurrentOrg();
-          // Force clear state even on error - also clear localStorage
-          Object.keys(localStorage).forEach((key) => {
-            if (
-              key.startsWith('invoice_draft') ||
-              key.startsWith('shipment_') ||
-              key.startsWith('print_') ||
-              key.startsWith('label_') ||
-              key.startsWith('tac-')
-            ) {
-              localStorage.removeItem(key);
-            }
-          });
+          clearSensitiveStorage();
           set({
             session: null,
             user: null,
@@ -388,12 +408,8 @@ export const useAuthStore = create<AuthState>()(
       clearError: () => set({ error: null }),
     }),
     {
-      name: 'tac-auth',
-      partialize: (state) => ({
-        // Only persist minimal auth state - session will be restored from Supabase
-        isAuthenticated: state.isAuthenticated,
-        user: state.user,
-      }),
+      name: AUTH_STORAGE_NAME,
+      partialize: getPersistedAuthState,
     }
   )
 );
@@ -492,22 +508,5 @@ export function useHasRole(roles: UserRole | UserRole[]): boolean {
  */
 export function useCanAccessModule(module: string): boolean {
   const user = useAuthStore((state) => state.user);
-  if (!user) return false;
-
-  const moduleAccess: Record<UserRole, string[]> = {
-    ADMIN: ['*'],
-    SUPER_ADMIN: ['*'],
-    MANAGER: ['*'],
-    OPS: ['shipments', 'manifests', 'tracking', 'customers', 'exceptions'],
-    OPS_STAFF: ['shipments', 'manifests', 'tracking', 'customers', 'exceptions'],
-    WAREHOUSE_IMPHAL: ['scanning', 'inventory', 'shipments', 'exceptions'],
-    WAREHOUSE_DELHI: ['scanning', 'inventory', 'shipments', 'exceptions'],
-    WAREHOUSE_STAFF: ['scanning', 'inventory', 'shipments', 'exceptions'],
-    INVOICE: ['finance', 'customers', 'shipments'],
-    FINANCE_STAFF: ['finance', 'customers', 'shipments'],
-    SUPPORT: ['shipments', 'tracking', 'customers'],
-  };
-
-  const allowedModules = moduleAccess[user.role] || [];
-  return allowedModules.includes('*') || allowedModules.includes(module);
+  return canAccessModule(user?.role, module);
 }

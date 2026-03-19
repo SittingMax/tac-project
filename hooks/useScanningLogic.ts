@@ -138,12 +138,8 @@ export function useScanningLogic() {
       acquireProcessingLock();
 
       let scanResult;
-      // eslint-disable-next-line no-console
-      console.debug('[Scanning Context] Processing scan:', { input, source });
       try {
         scanResult = parseScanInput(input);
-        // eslint-disable-next-line no-console
-        console.debug('[Scanning Context] Parsed result:', scanResult);
       } catch (e) {
         logger.warn('ScanningLogic', 'Parser error (using raw fallthrough)', { error: e });
         scanResult = { type: 'shipment' as const, awb: input.trim().toUpperCase(), raw: input };

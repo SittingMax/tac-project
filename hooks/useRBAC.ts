@@ -4,8 +4,14 @@
  */
 
 import { useMemo } from 'react';
-import { useStore } from '@/store';
-import { UserRole, ROLE_PERMISSIONS, hasPermission, canAccessModule } from '@/types/domain';
+import {
+  canAccessModule,
+  getRolePermissions,
+  hasPermission,
+  isWarehouseRole,
+} from '@/lib/access-control';
+import { useAuthStore } from '@/store/authStore';
+import type { UserRole } from '@/types';
 
 export interface RBACContext {
   role: UserRole | null;
@@ -22,10 +28,10 @@ export interface RBACContext {
 }
 
 export function useRBAC(): RBACContext {
-  const { user } = useStore();
+  const user = useAuthStore((state) => state.user);
 
   return useMemo(() => {
-    const role = user?.role as UserRole | null;
+    const role = user?.role ?? null;
 
     if (!role) {
       return {
@@ -43,7 +49,7 @@ export function useRBAC(): RBACContext {
       };
     }
 
-    const perms = ROLE_PERMISSIONS[role];
+    const perms = getRolePermissions(role);
 
     return {
       role,
@@ -53,11 +59,10 @@ export function useRBAC(): RBACContext {
       canViewAuditLogs: perms?.canViewAuditLogs ?? false,
       canResolveExceptions: perms?.canResolveExceptions ?? false,
       canAccessModule: (module: string) => canAccessModule(role, module),
-      hasPermission: (permission: string) =>
-        hasPermission(role, permission as keyof (typeof ROLE_PERMISSIONS)[UserRole.ADMIN]),
-      isAdmin: role === UserRole.ADMIN,
-      isManager: role === UserRole.MANAGER,
-      isWarehouse: role === UserRole.WAREHOUSE_IMPHAL || role === UserRole.WAREHOUSE_DELHI,
+      hasPermission: (permission: string) => hasPermission(role, permission),
+      isAdmin: role === 'ADMIN',
+      isManager: role === 'MANAGER',
+      isWarehouse: isWarehouseRole(role),
     };
   }, [user?.role]);
 }
