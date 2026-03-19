@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { Bar, BarChart, XAxis } from 'recharts';
 import { format, startOfDay, subDays } from 'date-fns';
+import { formatDateShort } from '@/lib/formatters';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -69,7 +70,7 @@ export function ChartTooltipDefault() {
   if (chartData.every((item) => item.created === 0 && item.delivered === 0)) {
     return (
       <Card className="flex flex-col h-full border border-border bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300 w-full">
-        <CardHeader className="pb-4 border-b border-border space-y-0">
+        <CardHeader className="pb-4 border-b border-border flex flex-col gap-0">
           <CardTitle className="text-xs text-muted-foreground">Shipment Throughput</CardTitle>
           <div className="text-lg font-semibold text-foreground mt-1">Created vs Delivered</div>
         </CardHeader>
@@ -82,7 +83,7 @@ export function ChartTooltipDefault() {
 
   return (
     <Card className="flex flex-col h-full border border-border bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300 w-full">
-      <CardHeader className="pb-4 border-b border-border space-y-0">
+      <CardHeader className="pb-4 border-b border-border flex flex-col gap-0">
         <CardTitle className="text-xs text-muted-foreground">Shipment Throughput</CardTitle>
         <div className="text-lg font-semibold text-foreground mt-1">Created vs Delivered</div>
       </CardHeader>
@@ -95,9 +96,7 @@ export function ChartTooltipDefault() {
               tickMargin={10}
               axisLine={false}
               tickFormatter={(value) => {
-                return new Date(value).toLocaleDateString('en-US', {
-                  weekday: 'short',
-                });
+                return formatDateShort(value);
               }}
             />
             <Bar dataKey="created" stackId="a" fill="var(--color-created)" radius={0} />

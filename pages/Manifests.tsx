@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- Data mapping between Supabase and UI types */
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PageHeader } from '@/components/ui-core/layout';
+import { PageHeader, PageContainer, SectionCard } from '@/components/ui-core/layout';
 import { CrudTable } from '@/components/crud/CrudTable';
-import { StatusBadge } from '@/components/domain/StatusBadge';
-import { KPICard } from '@/components/domain/KPICard';
+import { StatusBadge } from '@/components/domain/status-badge';
+import { StatCard } from '@/components/ui-core';
 import { ColumnDef } from '@tanstack/react-table';
 import {
   useManifests,
@@ -115,20 +114,35 @@ export const Manifests: React.FC = () => {
         id: 'transport',
         header: 'Transport',
         cell: ({ row }) => {
-          const meta = row.original.vehicle_meta as any;
+          const meta =
+            row.original.vehicle_meta &&
+            typeof row.original.vehicle_meta === 'object' &&
+            !Array.isArray(row.original.vehicle_meta)
+              ? (row.original.vehicle_meta as Record<string, unknown>)
+              : null;
+          const getMetaString = (value: unknown) => (typeof value === 'string' ? value : undefined);
           const flightLabel =
-            row.original.flight_number ?? meta?.flight_no ?? meta?.flightNumber ?? 'N/A';
-          const carrierLabel = row.original.airline_code ?? meta?.carrier ?? '';
+            row.original.flight_number ??
+            getMetaString(meta?.flight_no) ??
+            getMetaString(meta?.flightNumber) ??
+            'N/A';
+          const carrierLabel = row.original.airline_code ?? getMetaString(meta?.carrier) ?? '';
           const vehicleLabel =
-            row.original.vehicle_number ?? meta?.vehicle_no ?? meta?.vehicleId ?? 'N/A';
+            row.original.vehicle_number ??
+            getMetaString(meta?.vehicle_no) ??
+            getMetaString(meta?.vehicleId) ??
+            'N/A';
           const driverLabel =
-            row.original.driver_name ?? meta?.driver_name ?? meta?.driverName ?? 'N/A';
+            row.original.driver_name ??
+            getMetaString(meta?.driver_name) ??
+            getMetaString(meta?.driverName) ??
+            'N/A';
           return (
             <div className="flex items-center gap-2">
               {row.original.type === 'AIR' ? (
-                <Plane className="w-4 h-4 text-feature-air" />
+                <Plane size={16} strokeWidth={1.5} className="text-feature-air" />
               ) : (
-                <Truck className="w-4 h-4 text-feature-ground" />
+                <Truck size={16} strokeWidth={1.5} className="text-feature-ground" />
               )}
               <div>
                 <span className="font-medium text-foreground">
@@ -175,7 +189,7 @@ export const Manifests: React.FC = () => {
             <div className="flex items-center gap-1">
               {m.status === 'CLOSED' && (
                 <Button size="sm" onClick={() => handleStatusChange(m.id, 'DEPARTED')}>
-                  <Play className="w-3 h-3 mr-1" /> Depart
+                  <Play size={12} strokeWidth={1.5} className="mr-1" /> Depart
                 </Button>
               )}
               {m.status === 'DEPARTED' && (
@@ -184,7 +198,7 @@ export const Manifests: React.FC = () => {
                   variant="secondary"
                   onClick={() => handleStatusChange(m.id, 'ARRIVED')}
                 >
-                  <CheckCircle className="w-3 h-3 mr-1" /> Arrive
+                  <CheckCircle size={12} strokeWidth={1.5} className="mr-1" /> Arrive
                 </Button>
               )}
               <Button size="sm" variant="ghost" onClick={() => handleEditManifest(m.id)}>
@@ -198,7 +212,7 @@ export const Manifests: React.FC = () => {
                   className="text-destructive hover:text-destructive hover:bg-destructive/10"
                   onClick={() => handleDeleteClick(m)}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 size={16} strokeWidth={1.5} />
                 </Button>
               )}
             </div>
@@ -220,7 +234,7 @@ export const Manifests: React.FC = () => {
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <PageContainer>
         <PageHeader title="Fleet Manifests" description="Manage linehaul movements between hubs">
           <Skeleton className="h-10 w-36" />
         </PageHeader>
@@ -235,14 +249,14 @@ export const Manifests: React.FC = () => {
             <Skeleton className="h-64" />
           </div>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
   // Error state
   if (isError) {
     return (
-      <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <PageContainer>
         <PageHeader title="Fleet Manifests" description="Manage linehaul movements between hubs" />
         <Card className="p-6">
           <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -253,12 +267,12 @@ export const Manifests: React.FC = () => {
             </p>
           </div>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+    <PageContainer>
       <PageHeader title="Fleet Manifests" description="Manage linehaul movements between hubs">
         <Button onClick={openCreateManifest} data-testid="create-manifest-button">
           <Scan data-icon="inline-start" /> New Manifest
@@ -266,47 +280,31 @@ export const Manifests: React.FC = () => {
       </PageHeader>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <KPICard
-          title="Open Manifests"
-          value={openCount}
-          icon={<Package className="w-5 h-5 opacity-50" />}
-          trend="neutral"
-        />
-        <KPICard
-          title="In Transit"
-          value={transitCount}
-          icon={<Truck className="w-5 h-5 opacity-50" />}
-          trend="up"
-        />
-        <KPICard
-          title="Transit Weight"
-          value={`${transitWeight} kg`}
-          icon={<Weight className="w-5 h-5 opacity-50" />}
-        />
+        <StatCard title="Open Manifests" value={openCount} icon={Package} />
+        <StatCard title="In Transit" value={transitCount} icon={Truck} />
+        <StatCard title="Transit Weight" value={`${transitWeight} kg`} icon={Weight} />
       </div>
 
-      {/* Empty state */}
-      {manifests.length === 0 ? (
-        <Card className="p-12 flex flex-col items-center justify-center text-center">
-          <h3 className="text-lg font-medium text-foreground mb-2">No manifests yet</h3>
-          <p className="text-sm text-muted-foreground mb-6">
-            Create your first manifest to start managing linehaul movements
-          </p>
-          <Button onClick={openCreateManifest} data-testid="create-manifest-button-empty">
-            <Scan data-icon="inline-start" /> New Manifest
-          </Button>
-        </Card>
-      ) : (
-        <Card className="border-0 shadow-none bg-transparent">
-          <CrudTable
-            columns={columns}
-            data={manifests}
-            searchKey="manifest_no"
-            searchPlaceholder="Search manifests..."
-            pageSize={10}
-          />
-        </Card>
-      )}
+      <SectionCard>
+        <CrudTable
+          columns={columns}
+          data={manifests}
+          isLoading={isLoading}
+          searchKey="manifests"
+          searchPlaceholder="Search manifests..."
+          emptyState={
+            <div className="flex flex-col items-center justify-center text-center p-8 w-full border-0 bg-transparent">
+              <h3 className="text-lg font-medium text-foreground mb-2">No manifests yet</h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                Create your first manifest to start managing linehaul movements
+              </p>
+              <Button onClick={openCreateManifest} data-testid="create-manifest-button-empty">
+                <Scan size={16} strokeWidth={1.5} className="mr-2" /> New Manifest
+              </Button>
+            </div>
+          }
+        />
+      </SectionCard>
 
       <ManifestBuilderWizard
         open={isEnterpriseOpen}
@@ -326,6 +324,6 @@ export const Manifests: React.FC = () => {
         onConfirm={handleConfirmDelete}
         confirmLabel="Delete Permanently"
       />
-    </div>
+    </PageContainer>
   );
 };

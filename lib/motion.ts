@@ -28,8 +28,7 @@ import {
 
 // Simple type assertion to bypass strict type checking for motion components
 // The runtime behavior is identical, this just fixes TypeScript strict mode issues
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const motion = framerMotion as any;
+export const motion: typeof framerMotion = framerMotion;
 
 // Re-export utilities with proper types
 export {

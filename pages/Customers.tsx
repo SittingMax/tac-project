@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { EmptyCustomers } from '@/components/ui/empty-state';
-import { PageHeader } from '@/components/ui-core/layout';
+import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
 
 // CRUD Components
 import { CrudTable } from '@/components/crud/CrudTable';
@@ -65,22 +65,22 @@ const normalizeCustomerAddressForForm = (customer: Customer | null) => {
     return { line1: '', city: '', state: '', zip: '' };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw = customer.address as any;
+  const raw = customer.address;
+  const readAddressValue = (value: unknown) => (typeof value === 'string' ? value : '');
 
   if (typeof raw === 'string') return { line1: raw, city: '', state: '', zip: '' };
-  if (typeof raw !== 'object' || Array.isArray(raw))
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw))
     return { line1: '', city: '', state: '', zip: '' };
 
-  const line1 = (raw.line1 ?? raw.line_1 ?? raw.street ?? raw.address ?? '') as string;
-  const city = (raw.city ?? '') as string;
-  const state = (raw.state ?? '') as string;
-  const zip = (raw.zip ??
-    raw.postal_code ??
-    raw.postalCode ??
-    raw.pincode ??
-    raw.pin ??
-    '') as string;
+  const address = raw as Record<string, unknown>;
+  const line1 = readAddressValue(
+    address.line1 ?? address.line_1 ?? address.street ?? address.address
+  );
+  const city = readAddressValue(address.city);
+  const state = readAddressValue(address.state);
+  const zip = readAddressValue(
+    address.zip ?? address.postal_code ?? address.postalCode ?? address.pincode ?? address.pin
+  );
 
   return { line1: line1.trim(), city: city.trim(), state: state.trim(), zip: zip.trim() };
 };
@@ -183,22 +183,24 @@ export const Customers: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+    <PageContainer>
       <PageHeader title="Customers" description="Manage customer profiles and billing details">
         <Button onClick={openCreate} data-testid="add-customer-button">
           <Plus data-icon="inline-start" /> Add Customer
         </Button>
       </PageHeader>
 
-      <CrudTable
-        columns={columns}
-        data={customers}
-        searchKey="name"
-        searchPlaceholder="Search customers..."
-        isLoading={isLoading}
-        emptyState={<EmptyCustomers onCreate={openCreate} />}
-        emptyMessage="No customers found. Create your first customer to get started."
-      />
+      <SectionCard>
+        <CrudTable
+          columns={columns}
+          data={customers}
+          isLoading={isLoading}
+          searchKey="customers"
+          searchPlaceholder="Search customers..."
+          emptyState={<EmptyCustomers onCreate={openCreate} />}
+          emptyMessage="No customers found. Create your first customer to get started."
+        />
+      </SectionCard>
 
       <CrudUpsertDialog
         open={upsertOpen}
@@ -216,8 +218,8 @@ export const Customers: React.FC = () => {
         size="xl"
       >
         {(form) => (
-          <div className="flex flex-col gap-6 pt-2">
-            <div className="grid grid-cols-2 gap-6">
+          <div className="flex flex-col gap-4 pt-2">
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="type"
@@ -228,7 +230,7 @@ export const Customers: React.FC = () => {
                     </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger className="h-11 bg-transparent hover:border-ring/50 transition-colors">
+                        <SelectTrigger className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                       </FormControl>
@@ -255,7 +257,7 @@ export const Customers: React.FC = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors"
                         placeholder="GST Number"
                         {...field}
                       />
@@ -276,7 +278,7 @@ export const Customers: React.FC = () => {
                   </FormLabel>
                   <FormControl>
                     <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors"
                       placeholder="e.g. John Doe"
                       {...field}
                     />
@@ -286,7 +288,7 @@ export const Customers: React.FC = () => {
               )}
             />
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -297,7 +299,7 @@ export const Customers: React.FC = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors"
                         type="email"
                         placeholder="e.g. contact@domain.com"
                         {...field}
@@ -317,7 +319,7 @@ export const Customers: React.FC = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors"
                         placeholder="e.g. +91 99999 88888"
                         {...field}
                       />
@@ -338,7 +340,7 @@ export const Customers: React.FC = () => {
                   </FormLabel>
                   <FormControl>
                     <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors"
                       placeholder="e.g. 123 Business Park"
                       {...field}
                     />
@@ -348,7 +350,7 @@ export const Customers: React.FC = () => {
               )}
             />
 
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="city"
@@ -359,7 +361,7 @@ export const Customers: React.FC = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors"
                         placeholder="e.g. New Delhi"
                         {...field}
                       />
@@ -378,7 +380,7 @@ export const Customers: React.FC = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors"
                         placeholder="e.g. Delhi"
                         {...field}
                       />
@@ -397,7 +399,7 @@ export const Customers: React.FC = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors"
                         placeholder="e.g. 110003"
                         {...field}
                       />
@@ -418,7 +420,7 @@ export const Customers: React.FC = () => {
                   </FormLabel>
                   <FormControl>
                     <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors"
                       type="number"
                       placeholder="0"
                       {...field}
@@ -440,6 +442,6 @@ export const Customers: React.FC = () => {
         description={`This will remove "${rowToDelete?.name ?? ''}" from your customer directory. This action cannot be undone.`}
         onConfirm={handleDelete}
       />
-    </div>
+    </PageContainer>
   );
 };

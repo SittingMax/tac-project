@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- Data mapping between Supabase and UI types */
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { LabelData, LabelGenerator } from '../components/domain/LabelGenerator';
@@ -12,6 +11,51 @@ import { sanitizeString } from '../lib/utils/sanitize';
 type LabelShipmentPayload = Omit<Partial<Shipment>, 'originHub' | 'destinationHub'> & {
   originHub?: string;
   destinationHub?: string;
+};
+
+type ShipmentLabelRow = {
+  id: string;
+  cn_number?: string | null;
+  awb?: string | null;
+  customer_id?: string | null;
+  customer?: { name?: string | null } | null;
+  origin_hub_id?: string | null;
+  destination_hub_id?: string | null;
+  origin_hub?: { code?: string | null } | null;
+  destination_hub?: { code?: string | null } | null;
+  total_weight?: number | null;
+  totalWeight?: number | null;
+  mode?: string | null;
+  transport_mode?: string | null;
+  service_level?: string | null;
+  service_type?: string | null;
+  total_packages?: number | null;
+  package_count?: number | null;
+  status?: Shipment['status'] | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  consignor_name?: string | null;
+  consignor_phone?: string | null;
+  consignor_address?: unknown;
+  consignor_city?: string | null;
+  consignorCity?: string | null;
+  consignor_state?: string | null;
+  consignorState?: string | null;
+  consignor_zip?: string | null;
+  consignorZip?: string | null;
+  consignor_pincode?: string | null;
+  consignee_name?: string | null;
+  consignee_phone?: string | null;
+  consignee_address?: unknown;
+  consignee_city?: string | null;
+  consigneeCity?: string | null;
+  consignee_state?: string | null;
+  consigneeState?: string | null;
+  consignee_zip?: string | null;
+  consigneeZip?: string | null;
+  consignee_pincode?: string | null;
+  contents?: string | null;
+  payment_mode?: string | null;
 };
 
 const getAddressValue = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
@@ -53,7 +97,7 @@ const resolveAddressParts = (address: unknown) => {
   return normalizeAddress(address);
 };
 
-const resolveHubCodeForLabel = (row: any, type: 'origin' | 'destination'): string => {
+const resolveHubCodeForLabel = (row: ShipmentLabelRow, type: 'origin' | 'destination'): string => {
   const hubId = type === 'origin' ? row.origin_hub_id : row.destination_hub_id;
   const hubCode = type === 'origin' ? row.origin_hub?.code : row.destination_hub?.code;
 
@@ -83,7 +127,7 @@ const resolveServiceLevel = (value?: string | null): ServiceLevel => {
   return 'STANDARD';
 };
 
-const mapShipmentRowToShipment = (row: any): LabelShipmentPayload => {
+const mapShipmentRowToShipment = (row: ShipmentLabelRow): LabelShipmentPayload => {
   const originHub = resolveHubCodeForLabel(row, 'origin');
   const destinationHub = resolveHubCodeForLabel(row, 'destination');
   const weight = Number(row.total_weight ?? row.totalWeight ?? 0);
@@ -96,8 +140,8 @@ const mapShipmentRowToShipment = (row: any): LabelShipmentPayload => {
 
   return {
     id: row.id,
-    awb: row.cn_number || row.awb,
-    customerId: row.customer_id,
+    awb: row.cn_number || row.awb || '',
+    customerId: row.customer_id || '',
     customerName: row.customer?.name || row.consignee_name || 'Unknown',
     originHub,
     destinationHub,
@@ -117,26 +161,50 @@ const mapShipmentRowToShipment = (row: any): LabelShipmentPayload => {
       name: row.consignor_name || 'CONSIGNOR',
       phone: row.consignor_phone || '',
       address: formatAddress(row.consignor_address),
-      city: consignorAddressParts.city || row.consignor_city || row.consignorCity,
-      state: consignorAddressParts.state || row.consignor_state || row.consignorState,
+      city:
+        getAddressValue(consignorAddressParts.city) ||
+        getAddressValue(row.consignor_city) ||
+        getAddressValue(row.consignorCity) ||
+        undefined,
+      state:
+        getAddressValue(consignorAddressParts.state) ||
+        getAddressValue(row.consignor_state) ||
+        getAddressValue(row.consignorState) ||
+        undefined,
       zip:
-        consignorAddressParts.zip || row.consignor_zip || row.consignorZip || row.consignor_pincode,
+        getAddressValue(consignorAddressParts.zip) ||
+        getAddressValue(row.consignor_zip) ||
+        getAddressValue(row.consignorZip) ||
+        getAddressValue(row.consignor_pincode) ||
+        undefined,
     },
     consignee: {
       name: row.consignee_name || 'CONSIGNEE',
       phone: row.consignee_phone || '',
       address: formatAddress(row.consignee_address),
-      city: consigneeAddressParts.city || row.consignee_city || row.consigneeCity,
-      state: consigneeAddressParts.state || row.consignee_state || row.consigneeState,
+      city:
+        getAddressValue(consigneeAddressParts.city) ||
+        getAddressValue(row.consignee_city) ||
+        getAddressValue(row.consigneeCity) ||
+        undefined,
+      state:
+        getAddressValue(consigneeAddressParts.state) ||
+        getAddressValue(row.consignee_state) ||
+        getAddressValue(row.consigneeState) ||
+        undefined,
       zip:
-        consigneeAddressParts.zip || row.consignee_zip || row.consigneeZip || row.consignee_pincode,
+        getAddressValue(consigneeAddressParts.zip) ||
+        getAddressValue(row.consignee_zip) ||
+        getAddressValue(row.consigneeZip) ||
+        getAddressValue(row.consignee_pincode) ||
+        undefined,
     },
     contentsDescription: row.contents || 'General Cargo',
     paymentMode: (row.payment_mode as PaymentMode) || 'TO_PAY',
   };
 };
 
-const fetchShipmentByAwb = async (awb?: string) => {
+const fetchShipmentByAwb = async (awb?: string): Promise<ShipmentLabelRow | null> => {
   if (!awb) return null;
   const { data, error } = await supabase
     .from('shipments')
@@ -156,7 +224,7 @@ const fetchShipmentByAwb = async (awb?: string) => {
     return null;
   }
 
-  return data as any;
+  return data as ShipmentLabelRow | null;
 };
 
 // Validate shipment has required fields for label generation

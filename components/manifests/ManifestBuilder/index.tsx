@@ -7,6 +7,8 @@
 import * as React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import type { Database } from '@/lib/database.types';
+import { orgService } from '@/lib/services/orgService';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -187,7 +189,9 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
       if (selectedShipments.size === 0) throw new Error('No shipments selected');
 
       // Create manifest using direct insert (manifest_no auto-generated)
-      const insertData = {
+      const insertData: Database['public']['Tables']['manifests']['Insert'] = {
+        org_id: orgService.getCurrentOrgId(),
+        manifest_no: '',
         type: transportType,
         from_hub_id: hubId,
         to_hub_id: destinationHubId,
@@ -199,23 +203,19 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
         status: 'BUILDING',
         total_shipments: selectedShipments.size,
       };
-      const { data: newManifest, error: manifestError } = await (
-        supabase
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Auto-generated fields handled by DB
-          .from('manifests') as any
-      )
+      const { data: newManifest, error: manifestError } = await supabase
+        .from('manifests')
         .insert(insertData)
         .select()
         .single();
 
       if (manifestError) throw manifestError;
-
-      const createdManifest = newManifest as { id: string };
+      if (!newManifest) throw new Error('Manifest creation returned no data');
 
       // Assign shipments to manifest
       const { error: updateError } = await supabase
         .from('shipments')
-        .update({ manifest_id: createdManifest.id, status: 'IN_TRANSIT' })
+        .update({ manifest_id: newManifest.id, status: 'IN_TRANSIT' })
         .in('id', Array.from(selectedShipments));
 
       if (updateError) throw updateError;
@@ -358,7 +358,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
   return (
     <div className={cn('grid lg:grid-cols-3 gap-6', className)}>
       {/* Left Panel: Available Shipments */}
-      <div className="lg:col-span-2 space-y-4">
+      <div className="lg:col-span-2 flex flex-col gap-4">
         <Card>
           <CardHeader className="py-4">
             <div className="flex items-center justify-between">
@@ -399,7 +399,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                   <Loader2 className="size-6 animate-spin text-muted-foreground" />
                 </div>
               ) : filteredShipments && filteredShipments.length > 0 ? (
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   {filteredShipments.map((shipment) => (
                     <div
                       key={shipment.id}
@@ -408,7 +408,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                       onDragEnd={handleDragEnd}
                       onClick={() => toggleShipment(shipment.id)}
                       className={cn(
-                        'flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all',
+                        'flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition',
                         'hover:border-primary/50 hover:bg-muted/30',
                         selectedShipments.has(shipment.id) && 'border-primary bg-primary/5',
                         draggedItem === shipment.id && 'opacity-50'
@@ -459,7 +459,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
       </div>
 
       {/* Right Panel: Manifest Details */}
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         {/* Manifest Info */}
         <Card>
           <CardHeader className="py-4">
@@ -472,7 +472,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
               {manifest ? `Manifest ${manifest.manifest_no}` : 'New Manifest'}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-0 space-y-4">
+          <CardContent className="pt-0 flex flex-col gap-4">
             {manifest ? (
               <>
                 {/* Route Display */}
@@ -533,7 +533,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
             ) : (
               <>
                 {/* Transport Type */}
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label className="text-sm font-medium">Transport Type</Label>
                   <Select
                     value={transportType}
@@ -550,7 +550,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                 </div>
 
                 {/* Destination Hub */}
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label className="text-sm font-medium">Destination Hub</Label>
                   <Select value={destinationHubId} onValueChange={setDestinationHubId}>
                     <SelectTrigger>
@@ -571,7 +571,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                 {/* Surface Transport Details */}
                 {transportType === 'SURFACE' && (
                   <>
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
                       <Label className="text-sm font-medium">Vehicle Number</Label>
                       <Input
                         value={vehicleNumber}
@@ -580,7 +580,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="space-y-2">
+                      <div className="flex flex-col gap-2">
                         <Label className="text-sm font-medium">Driver Name</Label>
                         <Input
                           value={driverName}
@@ -588,7 +588,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                           placeholder="Driver name"
                         />
                       </div>
-                      <div className="space-y-2">
+                      <div className="flex flex-col gap-2">
                         <Label className="text-sm font-medium">Driver Phone</Label>
                         <Input
                           value={driverPhone}
@@ -603,7 +603,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                 {/* Air Transport Details */}
                 {transportType === 'AIR' && (
                   <>
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
                       <Label className="text-sm font-medium">Flight Number</Label>
                       <Input
                         value={flightNumber}
@@ -611,7 +611,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                         placeholder="AI123"
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
                       <Label className="text-sm font-medium">Flight Date</Label>
                       <Input
                         type="date"
@@ -670,7 +670,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
             <CardContent className="pt-0">
               <ScrollArea className="h-[200px]">
                 <div
-                  className="space-y-2"
+                  className="flex flex-col gap-2"
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => handleDrop('manifest')}
                 >

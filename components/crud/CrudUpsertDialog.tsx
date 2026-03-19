@@ -105,7 +105,7 @@ export function CrudUpsertDialog<TSchema extends z.ZodTypeAny>({
       size={size}
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4">
           {children(form)}
 
           <DialogFooter className="pt-4">

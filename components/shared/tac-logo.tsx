@@ -62,7 +62,7 @@ export function TacLogo({
             <span
               className={cn(
                 s.text,
-                'font-extrabold tracking-tighter leading-none text-foreground flex flex-col'
+                'font-extrabold tracking-tighter leading-none text-foreground flex-col'
               )}
               style={{ letterSpacing: '-0.05em' }}
             >
@@ -82,7 +82,10 @@ export function TacLogo({
 
   if (linkTo) {
     return (
-      <Link to={linkTo} className="flex items-center outline-none">
+      <Link
+        to={linkTo}
+        className="flex items-center focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+      >
         {content}
       </Link>
     );

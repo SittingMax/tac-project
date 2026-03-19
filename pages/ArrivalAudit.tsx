@@ -80,7 +80,7 @@ export const ArrivalAudit: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24 h-[calc(100vh-140px)] flex flex-col">
+    <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24 h-[calc(100vh-140px)] flex-col">
       {/* Header */}
       <div className="flex justify-between items-end pb-4">
         <div>
@@ -96,7 +96,7 @@ export const ArrivalAudit: React.FC = () => {
         <div className="flex flex-col gap-4 min-h-0">
           {/* Active Manifest Header Card */}
           {activeManifestId ? (
-            <Card className="p-6 border border-primary/30 bg-primary/5 flex flex-col">
+            <Card className="p-6 border border-primary/30 bg-primary/5 flex-col">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <div className="text-xs text-primary mb-1">Active Manifest</div>
@@ -128,7 +128,7 @@ export const ArrivalAudit: React.FC = () => {
           ) : (
             <Card className="p-6 border border-status-info/30 bg-status-info/5 flex flex-col border-dashed group">
               <div className="flex items-center gap-4 text-status-info/80">
-                <ScanLine className="w-8 h-8 group-hover:animate-pulse" />
+                <ScanLine size={32} strokeWidth={1.5} className="group-hover:animate-pulse" />
                 <div>
                   <div className="text-lg font-semibold">No Active Manifest</div>
                   <div className="text-xs opacity-80 mt-1">
@@ -144,17 +144,17 @@ export const ArrivalAudit: React.FC = () => {
             <div className="absolute top-4 left-4 z-20 flex gap-2">
               <button
                 onClick={() => setUseCameraScanner(true)}
-                className={`p-2 rounded-md transition-all ${useCameraScanner ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+                className={`p-2 rounded-md transition ${useCameraScanner ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
                 title="Use Webcam Scanner"
               >
-                <Camera className="w-4 h-4" />
+                <Camera size={16} strokeWidth={1.5} />
               </button>
               <button
                 onClick={() => setUseCameraScanner(false)}
-                className={`p-2 rounded-md transition-all ${!useCameraScanner ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+                className={`p-2 rounded-md transition ${!useCameraScanner ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
                 title="Use Hardware Scanner"
               >
-                <Keyboard className="w-4 h-4" />
+                <Keyboard size={16} strokeWidth={1.5} />
               </button>
             </div>
 
@@ -202,7 +202,7 @@ export const ArrivalAudit: React.FC = () => {
                   </form>
                   {errorInput && (
                     <div className="mt-2 text-xs text-status-error truncate flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3 shrink-0" />
+                      <AlertTriangle size={12} strokeWidth={1.5} className="shrink-0" />
                       {errorInput}
                     </div>
                   )}

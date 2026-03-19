@@ -109,12 +109,12 @@ export const QuickActions: React.FC = () => {
                   'hover:bg-muted/5 hover:border-border/80 hover:shadow-md',
                   // Active state
                   'active:scale-[0.98]',
-                  'transition-all duration-300 ease-out group'
+                  'transition duration-300 ease-out group'
                 )}
               >
                 <div className="flex items-start gap-4 p-4">
-                  <div className="p-2.5 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
-                    <Icon className="w-5 h-5" />
+                  <div className="p-2.5 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110 transition duration-300">
+                    <Icon size={20} strokeWidth={1.5} />
                   </div>
                   <div className="flex flex-col flex-1 items-start text-left">
                     <span className="text-base font-semibold text-foreground">{action.label}</span>
@@ -133,7 +133,7 @@ export const QuickActions: React.FC = () => {
       <div className="mt-8 border-t border-border/40 pt-8">
         <div className="max-w-md">
           <h3 className="text-xs text-muted-foreground mb-4 flex items-center gap-2">
-            <Scan className="w-3 h-3" />
+            <Scan size={12} strokeWidth={1.5} />
             Direct Telemetry Query
           </h3>
 
@@ -157,7 +157,7 @@ export const QuickActions: React.FC = () => {
 
           {/* Recent Scans */}
           {recentScans.length > 0 && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <p className="text-xs text-muted-foreground">Recent Queries:</p>
               <div className="grid gap-px bg-border/40 border border-border/40">
                 {recentScans.map((awb, index) => (

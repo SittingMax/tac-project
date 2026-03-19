@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { format } from 'date-fns';
+import { formatDateTime } from '@/lib/formatters';
 import { useLastNHoursReport, useExportShiftReport } from '@/hooks/useShiftReport';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,8 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
-import { PageHeader } from '@/components/ui-core/layout';
+import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
+import { StatCard } from '@/components/ui-core';
 import {
   Package,
   Truck,
@@ -53,7 +54,7 @@ export default function ShiftReport() {
   };
 
   return (
-    <div className="flex flex-col gap-6 pb-24">
+    <PageContainer>
       <PageHeader title="Shift Handover" description="Operations summary for designated duration">
         <Select value={shiftHours} onValueChange={(v) => setShiftHours(v as ShiftDuration)}>
           <SelectTrigger className="w-[140px] h-10">
@@ -84,24 +85,22 @@ export default function ShiftReport() {
 
       {/* Shift Period Info */}
       {report && (
-        <Card>
-          <CardContent className="py-4 px-6">
-            <div className="flex flex-wrap items-center gap-4 text-sm">
-              <Clock className="size-4 text-primary" />
-              <span className="text-muted-foreground">Period:</span>
-              <span className="font-bold text-foreground">
-                {format(new Date(report.shiftPeriod.start), 'PPp')}
-              </span>
-              <ArrowRight className="size-4 text-muted-foreground" />
-              <span className="font-bold text-foreground">
-                {format(new Date(report.shiftPeriod.end), 'PPp')}
-              </span>
-              <Badge variant="outline" className="ml-auto border-primary/30 text-primary">
-                {report.shiftPeriod.durationHours} hrs
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+        <SectionCard>
+          <div className="flex flex-wrap items-center gap-4 text-sm">
+            <Clock className="size-4 text-primary" />
+            <span className="text-muted-foreground">Period:</span>
+            <span className="font-bold text-foreground">
+              {formatDateTime(report.shiftPeriod.start)}
+            </span>
+            <ArrowRight className="size-4 text-muted-foreground" />
+            <span className="font-bold text-foreground">
+              {formatDateTime(report.shiftPeriod.end)}
+            </span>
+            <Badge variant="outline" className="ml-auto border-primary/30 text-primary">
+              {report.shiftPeriod.durationHours} hrs
+            </Badge>
+          </div>
+        </SectionCard>
       )}
 
       {isLoading ? (
@@ -121,67 +120,35 @@ export default function ShiftReport() {
         <>
           {/* Summary Cards — full shadcn/ui CardHeader / CardContent composition */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Shipments
-                </CardTitle>
-                <Package className="size-4 text-primary opacity-50" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-semibold">{report.shipments.total}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {report.shipments.created} created / {report.shipments.delivered} delivered
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Manifests
-                </CardTitle>
-                <Truck className="size-4 text-primary opacity-50" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-semibold">{report.manifests.total}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {report.manifests.closed} closed / {report.manifests.departed} departed
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-destructive">Exceptions</CardTitle>
-                <AlertTriangle className="size-4 text-destructive opacity-50" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-semibold text-destructive">
-                  {report.exceptions.total}
-                </div>
-                <p className="text-xs text-destructive/80 mt-1">
-                  {report.exceptions.resolved} resolved / {report.exceptions.pending} pending
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Scans</CardTitle>
-                <ScanLine className="size-4 text-primary opacity-50" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-semibold">{report.scans.total}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {report.scans.uniqueShipments} unique shipments
-                </p>
-              </CardContent>
-            </Card>
+            <StatCard
+              title="Shipments"
+              value={report.shipments.total}
+              subtitle={`${report.shipments.created} created / ${report.shipments.delivered} delivered`}
+              icon={Package}
+            />
+            <StatCard
+              title="Manifests"
+              value={report.manifests.total}
+              subtitle={`${report.manifests.closed} closed / ${report.manifests.departed} departed`}
+              icon={Truck}
+            />
+            <StatCard
+              title="Exceptions"
+              value={report.exceptions.total}
+              subtitle={`${report.exceptions.resolved} resolved / ${report.exceptions.pending} pending`}
+              icon={AlertTriangle}
+              iconColor="error"
+            />
+            <StatCard
+              title="Scans"
+              value={report.scans.total}
+              subtitle={`${report.scans.uniqueShipments} unique shipments`}
+              icon={ScanLine}
+            />
           </div>
 
           {/* Detailed Sections */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Shipments by Status */}
             <Card>
               <CardHeader>
@@ -213,7 +180,7 @@ export default function ShiftReport() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
                     <div className="flex items-center gap-2">
                       <AlertCircle className="size-5 text-status-warning" />
                       <span>Open Manifests</span>
@@ -226,7 +193,7 @@ export default function ShiftReport() {
                       {report.pendingActions.openManifests}
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
                     <div className="flex items-center gap-2">
                       <XCircle className="size-5 text-status-error" />
                       <span>Unresolved Exceptions</span>
@@ -239,7 +206,7 @@ export default function ShiftReport() {
                       {report.pendingActions.unresolvedExceptions}
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
                     <div className="flex items-center gap-2">
                       <Package className="size-5 text-status-info" />
                       <span>Awaiting Pickup</span>
@@ -302,7 +269,7 @@ export default function ShiftReport() {
                     {report.recentActivity.map((activity, i) => (
                       <div key={i} className="flex items-start gap-2 text-sm">
                         <span className="text-muted-foreground whitespace-nowrap">
-                          {format(new Date(activity.time), 'HH:mm')}
+                          {formatDateTime(activity.time)}
                         </span>
                         <div className="flex-1">
                           <p>{activity.description}</p>
@@ -352,6 +319,6 @@ export default function ShiftReport() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

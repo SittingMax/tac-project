@@ -17,7 +17,7 @@ const privacySections: LegalSection[] = [
         <p className="font-semibold text-foreground mt-4">
           This policy is designed in accordance with:
         </p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Information Technology Act, 2000</li>
           <li>Information Technology (Reasonable Security Practices and Procedures) Rules, 2011</li>
           <li>Applicable Indian data protection guidelines.</li>
@@ -35,7 +35,7 @@ const privacySections: LegalSection[] = [
         <h3 className="text-lg font-bold text-foreground mt-8 mb-4 border-b border-border/40 pb-2">
           Personal Information
         </h3>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Name</li>
           <li>Phone number</li>
           <li>Email address</li>
@@ -47,7 +47,7 @@ const privacySections: LegalSection[] = [
         <h3 className="text-lg font-bold text-foreground mt-8 mb-4 border-b border-border/40 pb-2">
           Shipment Information
         </h3>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Package description</li>
           <li>Weight and quantity</li>
           <li>Declared value</li>
@@ -58,7 +58,7 @@ const privacySections: LegalSection[] = [
           Technical Information
         </h3>
         <p>When using the website we may collect:</p>
-        <ul className="list-disc pl-6 space-y-2 mt-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2 mt-2">
           <li>IP address</li>
           <li>Browser type</li>
           <li>Device information</li>
@@ -73,7 +73,7 @@ const privacySections: LegalSection[] = [
     content: (
       <>
         <p>Your information may be used to:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Process shipment bookings</li>
           <li>Manage cargo deliveries</li>
           <li>Generate invoices</li>
@@ -94,7 +94,7 @@ const privacySections: LegalSection[] = [
           We do not sell personal data.
         </p>
         <p>However, information may be shared with:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Transportation partners</li>
           <li>Delivery personnel</li>
           <li>Regulatory authorities</li>
@@ -112,7 +112,7 @@ const privacySections: LegalSection[] = [
     content: (
       <>
         <p>We implement industry-standard security practices including:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Secure server storage</li>
           <li>Data encryption</li>
           <li>Access control systems</li>
@@ -130,7 +130,7 @@ const privacySections: LegalSection[] = [
     content: (
       <>
         <p>Customer information may be stored for:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Legal compliance</li>
           <li>Accounting purposes</li>
           <li>Shipment dispute resolution</li>
@@ -145,7 +145,7 @@ const privacySections: LegalSection[] = [
     content: (
       <>
         <p>Our website may use cookies to:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Improve user experience</li>
           <li>Analyze website traffic</li>
           <li>Maintain session information</li>
@@ -160,7 +160,7 @@ const privacySections: LegalSection[] = [
     content: (
       <>
         <p>Customers may request:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Access to their personal data</li>
           <li>Correction of incorrect information</li>
           <li>Deletion of personal records (where legally permissible)</li>
@@ -185,7 +185,7 @@ const privacySections: LegalSection[] = [
     content: (
       <>
         <p>This Privacy Policy may be updated periodically to reflect:</p>
-        <ul className="list-disc pl-6 space-y-2">
+        <ul className="list-disc pl-6 flex flex-col gap-2">
           <li>Legal changes</li>
           <li>Service improvements</li>
           <li>Security updates</li>
@@ -200,7 +200,7 @@ const privacySections: LegalSection[] = [
     id: 'contact',
     title: 'Contact Information',
     content: (
-      <div className="space-y-4 p-6 bg-muted/20 border border-border/50 rounded-lg relative overflow-hidden">
+      <div className="flex flex-col gap-4 p-6 bg-muted/20 border border-border/50 rounded-lg relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full" />
         <p className="font-bold text-foreground mb-6 text-lg tracking-tight">
           Tapan Associate Cargo Service

@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import type { Database, Json } from './database.types';
 import { logger } from '@/lib/logger';
 
 export interface TrackingData {
@@ -18,6 +19,41 @@ export interface TrackingData {
   }>;
 }
 
+type PublicTrackingEventRow = {
+  status: string;
+  description?: string | null;
+  created_at: string;
+};
+
+type PublicTrackingRpcRow =
+  Database['public']['Functions']['get_public_shipment_by_cn']['Returns'][number];
+
+const mapPublicTrackingEvents = (value: Json): PublicTrackingEventRow[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((item) => {
+    if (typeof item !== 'object' || item === null || Array.isArray(item)) {
+      return [];
+    }
+
+    const status = typeof item.status === 'string' ? item.status : null;
+    const createdAt = typeof item.created_at === 'string' ? item.created_at : null;
+    if (!status || !createdAt) {
+      return [];
+    }
+
+    return [
+      {
+        status,
+        description: typeof item.description === 'string' ? item.description : null,
+        created_at: createdAt,
+      },
+    ];
+  });
+};
+
 /**
  * Public tracking API - fetches shipment info by CN Number from Supabase.
  * This is used by the landing page tracking feature.
@@ -28,17 +64,15 @@ export const getTrackingInfo = async (
   const ref = trackingNumber.trim().toUpperCase();
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: shipment, error } = await supabase.rpc('get_public_shipment_by_cn' as any, {
+    const { data: shipment, error } = await supabase.rpc('get_public_shipment_by_cn', {
       cn_code: ref,
     });
 
     if (error) throw error;
+    const shipmentRows: PublicTrackingRpcRow[] = shipment ?? [];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (shipment && (shipment as any).length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const s = (shipment as any)[0]; // RPC returns a table/array
+    if (shipmentRows.length > 0) {
+      const s = shipmentRows[0];
       return {
         success: true,
         data: {
@@ -49,10 +83,9 @@ export const getTrackingInfo = async (
             consignee_city: null,
             origin: s.origin_hub_name || 'Origin Hub',
             destination: s.destination_hub_name || 'Destination Hub',
-            mode: s.mode as 'AIR' | 'TRUCK',
+            mode: s.mode === 'AIR' ? 'AIR' : 'TRUCK',
           },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          events: (s.events || []).map((e: any) => ({
+          events: mapPublicTrackingEvents(s.events).map((e) => ({
             status: e.status,
             description: e.description || '',
             created_at: e.created_at,

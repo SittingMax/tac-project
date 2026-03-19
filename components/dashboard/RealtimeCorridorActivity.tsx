@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { format, startOfDay, subDays } from 'date-fns';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+import { formatDateShort } from '@/lib/formatters';
 
 import { useShipments } from '@/hooks/useShipments';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -108,7 +109,7 @@ export function RealtimeCorridorActivity() {
   if (!corridorActivity.hasData) {
     return (
       <Card className="flex flex-col py-0 border border-border bg-card shadow-sm w-full hover:bg-muted/5 transition-colors duration-300">
-        <CardHeader className="flex flex-col items-stretch border-b border-border pb-4 sm:flex-row space-y-0">
+        <CardHeader className="flex flex-col items-stretch border-b border-border pb-4 sm:flex-row flex flex-col gap-0">
           <div className="grid flex-1 gap-1">
             <CardTitle className="text-xs text-muted-foreground">
               Corridor Shipment Activity
@@ -125,7 +126,7 @@ export function RealtimeCorridorActivity() {
 
   return (
     <Card className="flex flex-col py-0 border border-border/40 bg-card shadow-sm w-full hover:bg-muted/5 transition-colors duration-300">
-      <CardHeader className="flex flex-col items-stretch border-b border-border/40 pb-4 sm:flex-row space-y-0">
+      <CardHeader className="flex flex-col items-stretch border-b border-border/40 pb-4 sm:flex-row flex flex-col gap-0">
         <div className="grid flex-1 gap-1">
           <CardTitle className="text-xs text-muted-foreground">
             Corridor Shipment Activity
@@ -179,11 +180,7 @@ export function RealtimeCorridorActivity() {
               minTickGap={32}
               tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
               tickFormatter={(value) => {
-                const date = new Date(value);
-                return date.toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                });
+                return formatDateShort(value);
               }}
             />
             <ChartTooltip
@@ -196,10 +193,7 @@ export function RealtimeCorridorActivity() {
                 <ChartTooltipContent
                   className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl"
                   labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                    });
+                    return formatDateShort(value);
                   }}
                   indicator="dot"
                 />

@@ -168,9 +168,6 @@ export function ScanningProvider({ children }: ScanningProviderProps) {
         }
         recentSubmissionsRef.current.set(buffer, now);
 
-        // eslint-disable-next-line no-console
-        console.debug('[ScanningProvider] Scanner detected - submitting:', buffer);
-
         // If the scan landed in an input field, clear leaked characters.
         // Use native value setter to properly trigger React controlled input updates.
         if (clearInput && clearInput.tagName === 'INPUT' && clearInput !== inputRef.current) {
@@ -223,9 +220,6 @@ export function ScanningProvider({ children }: ScanningProviderProps) {
 
   // Keyboard listener for hardware scanners (HID mode) — registered ONCE (BUG 1 fix)
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.debug('[ScanningProvider] Keydown listener attached');
-
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       const isScannerInput = target === inputRef.current;
@@ -341,8 +335,6 @@ export function ScanningProvider({ children }: ScanningProviderProps) {
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown, true);
-      // eslint-disable-next-line no-console
-      console.debug('[ScanningProvider] Keydown listener removed');
       // Clean up timer on unmount
       if (autoSubmitTimerRef.current) {
         clearTimeout(autoSubmitTimerRef.current);

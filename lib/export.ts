@@ -1,24 +1,28 @@
+function getObjectEntries(row: object): Array<[string, unknown]> {
+  return Object.entries(row);
+}
+
 /**
  * Export data to CSV
  * @param data Array of objects to export
  * @param filename Name of the file to download
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function exportToCSV<T extends Record<string, any>>(data: T[], filename: string) {
+export function exportToCSV<T extends object>(data: T[], filename: string) {
   if (!data || data.length === 0) {
     return;
   }
 
   // Get headers from first object
-  const headers = Object.keys(data[0]);
+  const headers = getObjectEntries(data[0]).map(([header]) => header);
 
   // Create CSV content
   const csvContent = [
     headers.join(','), // Header row
-    ...data.map((row) =>
-      headers
+    ...data.map((row) => {
+      const rowEntries = new Map(getObjectEntries(row));
+      return headers
         .map((header) => {
-          const value = row[header];
+          const value = rowEntries.get(header);
           // Handle strings with commas, quotes, or newlines
           if (typeof value === 'string') {
             return `"${value.replace(/"/g, '""')}"`;
@@ -32,8 +36,8 @@ export function exportToCSV<T extends Record<string, any>>(data: T[], filename: 
           }
           return value;
         })
-        .join(',')
-    ),
+        .join(',');
+    }),
   ].join('\n');
 
   // Create blob and download link

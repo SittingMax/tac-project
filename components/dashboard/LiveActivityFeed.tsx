@@ -179,7 +179,7 @@ export const LiveActivityFeed: React.FC = () => {
                 navigate(row.original.link);
               }}
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight size={16} strokeWidth={1.5} />
             </Button>
           );
         },
@@ -194,7 +194,7 @@ export const LiveActivityFeed: React.FC = () => {
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-              <Activity className="w-5 h-5 text-primary" />
+              <Activity size={20} strokeWidth={1.5} className="text-primary" />
               Operations Stream
             </h3>
             <span className="flex h-2 w-2 relative ml-1">
@@ -250,11 +250,11 @@ export const LiveActivityFeed: React.FC = () => {
 
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         {isLoading ? (
-          <div className="p-4 space-y-4 flex-1 overflow-auto">
+          <div className="p-4 flex flex-col gap-4 flex-1 overflow-auto">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex gap-4 items-center">
                 <div className="w-8 h-8 rounded-md bg-muted animate-pulse" />
-                <div className="space-y-2 flex-1">
+                <div className="flex flex-col gap-2 flex-1">
                   <div className="h-4 w-1/3 bg-muted animate-pulse rounded-md" />
                   <div className="h-3 w-2/3 bg-muted animate-pulse rounded-md" />
                 </div>

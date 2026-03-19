@@ -121,7 +121,7 @@ export default function FluidExpandingGrid({
                         src={item.image}
                         alt={item.title}
                         className={cn(
-                          'absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out opacity-100 group-hover:scale-105',
+                          'absolute inset-0 w-full h-full object-cover transition duration-1000 ease-in-out opacity-100 group-hover:scale-105',
                           isSelected ? 'object-[center_35%] scale-105' : 'object-[center_50%]'
                         )}
                       />

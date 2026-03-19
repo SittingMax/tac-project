@@ -73,7 +73,7 @@ export function ContactSection() {
             <LottieSlot
               src="/lottie/envelope.json"
               className="w-24 h-24 opacity-80"
-              fallbackIcon={<Send className="h-10 w-10 text-primary opacity-50" />}
+              fallbackIcon={<Send size={40} strokeWidth={1.5} className="text-primary opacity-50" />}
             />
           </div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-card border border-border text-xs font-semibold text-primary mb-6 shadow-sm">
@@ -97,10 +97,13 @@ export function ContactSection() {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50 pointer-events-none" />
 
           {/* Contact Info */}
-          <FadeUp delay={0.1} className="space-y-10 relative z-10">
+          <FadeUp delay={0.1} className="flex flex-col gap-10 relative z-10">
             <div className="flex items-start gap-5">
-              <div className="w-12 h-12 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 shadow-sm">
-                <MapPin className="w-7 h-7" strokeWidth={1.5} />
+              <div
+                className="w-12 h-12 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 shadow-sm"
+                aria-hidden="true"
+              >
+                <MapPin size={28} strokeWidth={1.5} />
               </div>
               <div>
                 <h4 className="font-semibold text-foreground text-sm mb-2">Request Routing</h4>
@@ -112,8 +115,11 @@ export function ContactSection() {
             </div>
 
             <div className="flex items-start gap-5">
-              <div className="w-12 h-12 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 shadow-sm">
-                <Phone className="w-7 h-7" strokeWidth={1.5} />
+              <div
+                className="w-12 h-12 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 shadow-sm"
+                aria-hidden="true"
+              >
+                <Phone size={28} strokeWidth={1.5} />
               </div>
               <div>
                 <h4 className="font-semibold text-foreground text-sm mb-2">Response Channels</h4>
@@ -126,7 +132,7 @@ export function ContactSection() {
 
             <div className="p-6 rounded-md bg-muted/30 border border-border/50 backdrop-blur-sm shadow-inner">
               <h4 className="font-semibold text-foreground text-sm mb-3">What to Include</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground font-mono">
+              <ul className="flex flex-col gap-2 text-sm text-muted-foreground font-mono">
                 <li>Origin and destination cities</li>
                 <li>Shipment size, weight, or package count</li>
                 <li>Urgency, service expectations, or special handling notes</li>
@@ -155,7 +161,7 @@ export function ContactSection() {
 
           {/* Contact Form */}
           <FadeUp delay={0.2} className="relative z-10">
-            <form onSubmit={handleSubmit} className="space-y-5 lg:pl-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5 lg:pl-4">
               <div>
                 <Label
                   htmlFor="name"
@@ -167,9 +173,10 @@ export function ContactSection() {
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe"
+                  placeholder="John Doe…"
                   required
-                  className="h-12 rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 text-sm placeholder:text-muted-foreground/50 transition-all hover:bg-background"
+                  autoComplete="name"
+                  className="h-12 rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 text-sm placeholder:text-muted-foreground/50 transition hover:bg-background"
                 />
               </div>
               <div>
@@ -184,9 +191,11 @@ export function ContactSection() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="john@company.com"
+                  placeholder="john@company.com…"
                   required
-                  className="h-12 rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 text-sm placeholder:text-muted-foreground/50 transition-all hover:bg-background"
+                  autoComplete="email"
+                  spellCheck={false}
+                  className="h-12 rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 text-sm placeholder:text-muted-foreground/50 transition hover:bg-background"
                 />
               </div>
               <div>
@@ -201,9 +210,10 @@ export function ContactSection() {
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+91 98765 43210"
+                  placeholder="+91 98765 43210…"
                   required
-                  className="h-12 rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 text-sm placeholder:text-muted-foreground/50 transition-all hover:bg-background"
+                  autoComplete="tel"
+                  className="h-12 rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 text-sm placeholder:text-muted-foreground/50 transition hover:bg-background"
                 />
               </div>
               <div>
@@ -217,9 +227,9 @@ export function ContactSection() {
                   id="message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Tell us about your logistics needs..."
+                  placeholder="Tell us about your logistics needs…"
                   required
-                  className="w-full min-h-[140px] rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 resize-y p-4 text-sm placeholder:text-muted-foreground/50 transition-all hover:bg-background"
+                  className="w-full min-h-[140px] rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 resize-y p-4 text-sm placeholder:text-muted-foreground/50 transition hover:bg-background"
                 />
               </div>
 
@@ -229,7 +239,7 @@ export function ContactSection() {
                   aria-live="polite"
                   className="flex items-start gap-2 text-destructive text-sm bg-destructive/5 p-3 rounded-md border border-destructive/20"
                 >
-                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <AlertCircle size={16} strokeWidth={1.5} className="shrink-0 mt-0.5" />
                   <span className="leading-relaxed">{error}</span>
                 </div>
               )}
@@ -237,22 +247,23 @@ export function ContactSection() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-14 bg-primary text-primary-foreground rounded-md font-semibold text-sm hover:-translate-y-0.5 transition-all duration-300 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 mt-4 disabled:opacity-70 disabled:hover:translate-y-0"
+                className="w-full h-14 bg-primary text-primary-foreground rounded-md font-semibold text-sm hover:-translate-y-0.5 transition duration-300 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 mt-4 disabled:opacity-70 disabled:hover:translate-y-0 focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 aria-live="polite"
+                aria-busy={isSubmitting}
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Sending...
+                    <Loader2 size={20} strokeWidth={1.5} className="animate-spin" aria-hidden="true" />
+                    Sending…
                   </span>
                 ) : isSubmitted ? (
                   <span className="flex items-center gap-2">
-                    <Check className="h-5 w-5" />
+                    <Check size={20} strokeWidth={1.5} aria-hidden="true" />
                     Message Sent
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    <Send className="h-5 w-5" />
+                    <Send size={20} strokeWidth={1.5} aria-hidden="true" />
                     Send Message
                   </span>
                 )}

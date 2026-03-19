@@ -165,7 +165,7 @@ export const LabelTemplateManager: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <input
         ref={fileInputRef}
         type="file"
@@ -181,7 +181,7 @@ export const LabelTemplateManager: React.FC = () => {
           <p className="text-muted-foreground">Manage shipping label templates and layouts</p>
         </div>
         <Button onClick={handleImport}>
-          <Upload className="w-4 h-4 mr-2" />
+          <Upload size={16} strokeWidth={1.5} className="mr-2" />
           Import Template
         </Button>
       </div>
@@ -194,12 +194,12 @@ export const LabelTemplateManager: React.FC = () => {
           <TabsTrigger value="custom">Custom</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all" className="space-y-4 mt-6">
+        <TabsContent value="all" className="flex flex-col gap-4 mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {templates.map((template) => (
               <Card
                 key={template.id}
-                className={`cursor-pointer transition-all hover:shadow-md ${
+                className={`cursor-pointer transition hover:shadow-md ${
                   selectedTemplate === template.id ? 'ring-2 ring-primary' : ''
                 }`}
                 onClick={() => setSelectedTemplate(template.id)}
@@ -217,12 +217,12 @@ export const LabelTemplateManager: React.FC = () => {
                       </CardTitle>
                       <CardDescription className="mt-1">{template.description}</CardDescription>
                     </div>
-                    <FileText className="w-5 h-5 text-muted-foreground" />
+                    <FileText size={20} strokeWidth={1.5} className="text-muted-foreground" />
                   </div>
                 </CardHeader>
 
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="flex flex-col gap-4">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Type</span>
                       <Badge variant="outline">{template.type}</Badge>
@@ -243,7 +243,7 @@ export const LabelTemplateManager: React.FC = () => {
                             handleSetDefault(template.id);
                           }}
                         >
-                          <Check className="w-3 h-3 mr-1" />
+                          <Check size={12} strokeWidth={1.5} className="mr-1" />
                           Set Default
                         </Button>
                       )}
@@ -255,7 +255,7 @@ export const LabelTemplateManager: React.FC = () => {
                           handleDuplicate(template);
                         }}
                       >
-                        <Copy className="w-3 h-3" />
+                        <Copy size={12} strokeWidth={1.5} />
                       </Button>
                       <Button
                         size="sm"
@@ -265,7 +265,7 @@ export const LabelTemplateManager: React.FC = () => {
                           handleExport(template);
                         }}
                       >
-                        <Download className="w-3 h-3" />
+                        <Download size={12} strokeWidth={1.5} />
                       </Button>
                       {!template.isDefault && (
                         <Button
@@ -276,7 +276,7 @@ export const LabelTemplateManager: React.FC = () => {
                             handleDelete(template.id);
                           }}
                         >
-                          <Trash2 className="w-3 h-3 text-destructive" />
+                          <Trash2 size={12} strokeWidth={1.5} className="text-destructive" />
                         </Button>
                       )}
                     </div>
@@ -287,7 +287,7 @@ export const LabelTemplateManager: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="air" className="space-y-4 mt-6">
+        <TabsContent value="air" className="flex flex-col gap-4 mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {templates
               .filter((t) => t.type === 'AIR')
@@ -302,7 +302,7 @@ export const LabelTemplateManager: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="surface" className="space-y-4 mt-6">
+        <TabsContent value="surface" className="flex flex-col gap-4 mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {templates
               .filter((t) => t.type === 'SURFACE')
@@ -317,11 +317,11 @@ export const LabelTemplateManager: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="custom" className="space-y-4 mt-6">
+        <TabsContent value="custom" className="flex flex-col gap-4 mt-6">
           <div className="text-center py-12">
             <p className="text-muted-foreground">No custom templates yet</p>
             <Button className="mt-4" onClick={handleImport}>
-              <Upload className="w-4 h-4 mr-2" />
+              <Upload size={16} strokeWidth={1.5} className="mr-2" />
               Import Custom Template
             </Button>
           </div>

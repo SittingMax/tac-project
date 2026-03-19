@@ -1,6 +1,6 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { Shipment, HubLocation } from '@/types';
-import { format } from 'date-fns';
+import { formatDateTime } from '@/lib/formatters';
 import { UniversalBarcode } from '@/components/barcodes';
 
 interface ShippingLabelProps {
@@ -100,7 +100,7 @@ export function ShippingLabel({ shipment, packageIndex = 1 }: ShippingLabelProps
 
       {/* Footer */}
       <div className="absolute bottom-4 left-4 right-4 flex justify-between text-[10px] text-muted-foreground border-t border-border pt-2">
-        <span>{format(new Date(shipment.createdAt), 'dd MMM yyyy HH:mm')}</span>
+        <span>{formatDateTime(shipment.createdAt)}</span>
         <span>{shipment.serviceLevel}</span>
         <span>www.tapancargo.com</span>
       </div>

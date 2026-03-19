@@ -30,7 +30,7 @@ import {
   Navigation,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { formatDateTime } from '@/lib/formatters';
 
 // Types
 export interface DeliveryConfirmationProps {
@@ -143,7 +143,7 @@ function SignaturePad({ onSave, onClear, className }: SignaturePadProps) {
   };
 
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn('flex flex-col gap-3', className)}>
       <Label className="flex items-center gap-2">
         <PenTool className="size-4" />
         Recipient Signature
@@ -223,7 +223,7 @@ function PhotoCapture({
   };
 
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn('flex flex-col gap-3', className)}>
       <Label className="flex items-center gap-2">
         <Camera className="size-4" />
         Delivery Photo (Optional)
@@ -231,7 +231,13 @@ function PhotoCapture({
 
       {preview ? (
         <div className="relative rounded-lg overflow-hidden border border-border">
-          <img src={preview} alt="Delivery proof" className="w-full h-48 object-cover" />
+          <img
+            src={preview}
+            alt="Delivery proof"
+            className="w-full h-48 object-cover"
+            width={400}
+            height={192}
+          />
           <Button
             variant="secondary"
             size="sm"
@@ -425,16 +431,16 @@ export function DeliveryConfirmation({
           Complete delivery for <span className="font-mono font-semibold">{cnNumber}</span>
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="flex flex-col gap-6">
         {/* Recipient Details */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <h4 className="text-sm font-medium flex items-center gap-2">
             <User className="size-4" />
             Recipient Details
           </h4>
 
           <div className="grid gap-4">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="recipient-name">Recipient Name *</Label>
               <Input
                 id="recipient-name"
@@ -444,7 +450,7 @@ export function DeliveryConfirmation({
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="recipient-phone">Phone Number</Label>
               <Input
                 id="recipient-phone"
@@ -456,7 +462,7 @@ export function DeliveryConfirmation({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="id-type">ID Type</Label>
                 <Input
                   id="id-type"
@@ -465,7 +471,7 @@ export function DeliveryConfirmation({
                   placeholder="Aadhaar, PAN, etc."
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="id-number">ID Number</Label>
                 <Input
                   id="id-number"
@@ -481,7 +487,7 @@ export function DeliveryConfirmation({
         <Separator />
 
         {/* Location */}
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <Label className="flex items-center gap-2">
               <Navigation className="size-4" />
@@ -539,7 +545,7 @@ export function DeliveryConfirmation({
         <Separator />
 
         {/* Delivery Notes */}
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Label htmlFor="delivery-notes" className="flex items-center gap-2">
             <FileText className="size-4" />
             Delivery Notes
@@ -577,28 +583,28 @@ export function DeliveryConfirmation({
           title="Confirm Delivery"
           size="sm"
         >
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
+          <div className="flex flex-col gap-4 py-4">
+            <div className="flex flex-col gap-2">
               <p className="text-sm text-muted-foreground">Recipient</p>
               <p className="font-semibold">{recipientName}</p>
             </div>
             {recipientPhone && (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <p className="text-sm text-muted-foreground">Phone</p>
                 <p className="font-mono">{recipientPhone}</p>
               </div>
             )}
             {location && (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <p className="text-sm text-muted-foreground">Location</p>
                 <p className="font-mono text-sm">
                   {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
                 </p>
               </div>
             )}
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <p className="text-sm text-muted-foreground">Time</p>
-              <p className="font-semibold">{format(new Date(), 'PPpp')}</p>
+              <p className="font-semibold">{formatDateTime(new Date())}</p>
             </div>
           </div>
           <DialogFooter>

@@ -35,6 +35,15 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+type ActiveSectorShapeProps = React.ComponentProps<typeof Sector>;
+
+const renderActiveShape = ({ outerRadius = 0, ...props }: ActiveSectorShapeProps) => (
+  <g>
+    <Sector {...props} outerRadius={outerRadius + 8} />
+    <Sector {...props} outerRadius={outerRadius + 16} innerRadius={outerRadius + 10} />
+  </g>
+);
+
 export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
   isLoading: externalLoading,
 }) => {
@@ -86,13 +95,13 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
   if (statusChartData.length === 0) {
     return (
       <Card className="flex flex-col h-full border-border bg-card shadow-sm">
-        <CardHeader className="flex-row items-start space-y-0 pb-0">
+        <CardHeader className="flex-row items-start flex flex-col gap-0 pb-0">
           <div className="grid gap-1">
             <CardTitle>Status Distribution</CardTitle>
             <CardDescription>Current shipment breakdown</CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="flex flex-1 items-center justify-center p-0">
+        <CardContent className="flex-1 items-center justify-center p-0">
           <EmptyShipments />
         </CardContent>
       </Card>
@@ -104,7 +113,7 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
       data-chart={id}
       className="flex flex-col h-full border-border bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300"
     >
-      <CardHeader className="flex-row items-start space-y-0 pb-0">
+      <CardHeader className="flex-row items-start flex flex-col gap-0 pb-0">
         <div className="grid gap-1">
           <CardTitle className="text-xs text-muted-foreground">Status Distribution</CardTitle>
           <div className="text-lg font-semibold text-foreground">Current Breakdown</div>
@@ -138,7 +147,7 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
           </SelectContent>
         </Select>
       </CardHeader>
-      <CardContent className="flex flex-1 justify-center pb-0">
+      <CardContent className="flex-1 justify-center pb-0">
         <ChartContainer
           id={id}
           config={chartConfig}
@@ -163,17 +172,7 @@ export const StatusDistributionChart: React.FC<{ isLoading?: boolean }> = ({
               strokeWidth={0}
               paddingAngle={4}
               activeIndex={activeIndex !== -1 ? activeIndex : undefined}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              activeShape={({ outerRadius = 0, ...props }: any) => (
-                <g>
-                  <Sector {...props} outerRadius={outerRadius + 8} />
-                  <Sector
-                    {...props}
-                    outerRadius={outerRadius + 16}
-                    innerRadius={outerRadius + 10}
-                  />
-                </g>
-              )}
+              activeShape={renderActiveShape}
             >
               {activeIndex !== -1 && statusChartData[activeIndex] && (
                 <Label

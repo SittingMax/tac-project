@@ -64,7 +64,7 @@ const MagnifiedBento = () => {
 
   return (
     <div className="flex items-center justify-center p-4 sm:p-6 w-full not-prose">
-      <div className="group relative w-full max-w-[420px] overflow-hidden rounded-md border bg-card p-1.5 sm:p-2 shadow-2xl shadow-primary/5 transition-all duration-500 hover:shadow-primary/10 hover:-translate-y-1">
+      <div className="group relative w-full max-w-[420px] overflow-hidden rounded-md border bg-card p-1.5 sm:p-2 shadow-2xl shadow-primary/5 transition duration-500 hover:shadow-primary/10 hover:-translate-y-1">
         <div
           ref={containerRef}
           className={cn(

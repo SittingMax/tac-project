@@ -4,7 +4,7 @@ import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { TrackingTimeline } from '../components/domain/TrackingTimeline';
-import { StatusBadge } from '../components/domain/StatusBadge';
+import { StatusBadge } from '@/components/domain/status-badge';
 import { ShipmentCard } from '../components/domain/ShipmentCard';
 import { Search, MapPin, Truck, Package, Plane } from 'lucide-react';
 import { useShipmentByAWB } from '../hooks/useShipments';
@@ -94,7 +94,7 @@ export const Tracking: React.FC = () => {
   void isLoading; // Used in UI below
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
       <div className="flex justify-between items-end pb-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
@@ -107,7 +107,7 @@ export const Tracking: React.FC = () => {
       {/* Search Area */}
       <Card className="max-w-3xl mx-auto p-8">
         <label className="text-sm text-muted-foreground mb-3 block flex items-center gap-2">
-          <Search className="w-4 h-4" />
+          <Search size={16} strokeWidth={1.5} />
           Enter CN Number
         </label>
         <div className="flex gap-2">
@@ -151,7 +151,7 @@ export const Tracking: React.FC = () => {
             <div className="absolute inset-0">
               <div className="absolute top-1/2 left-1/4 -translate-y-1/2 text-center">
                 <div className="w-6 h-6 rounded-md bg-status-info mx-auto mb-2 flex items-center justify-center">
-                  <Package className="w-3 h-3 text-primary-foreground" />
+                  <Package size={12} strokeWidth={1.5} className="text-primary-foreground" />
                 </div>
                 <span className="text-xs font-medium text-foreground bg-background/70 backdrop-blur-sm px-2 py-1 rounded-md">
                   {resolveHubCode(result.shipment.originHub)}
@@ -160,7 +160,7 @@ export const Tracking: React.FC = () => {
 
               <div className="absolute top-1/2 right-1/4 -translate-y-1/2 text-center">
                 <div className="w-6 h-6 rounded-md bg-status-success mx-auto mb-2 flex items-center justify-center">
-                  <MapPin className="w-3 h-3 text-primary-foreground" />
+                  <MapPin size={12} strokeWidth={1.5} className="text-primary-foreground" />
                 </div>
                 <span className="text-xs font-medium text-foreground bg-background/70 backdrop-blur-sm px-2 py-1 rounded-md">
                   {resolveHubCode(result.shipment.destinationHub)}
@@ -175,9 +175,9 @@ export const Tracking: React.FC = () => {
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-card border-2 border-primary p-4 rounded-lg shadow-lg animate-pulse">
                   <div className="flex items-center gap-2">
                     {result.shipment.mode === 'AIR' ? (
-                      <Plane className="w-5 h-5 text-status-info" />
+                      <Plane size={20} strokeWidth={1.5} className="text-status-info" />
                     ) : (
-                      <Truck className="w-5 h-5 text-status-warning" />
+                      <Truck size={20} strokeWidth={1.5} className="text-status-warning" />
                     )}
                     <div>
                       <span className="text-sm font-bold text-foreground font-mono">

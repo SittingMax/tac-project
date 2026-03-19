@@ -48,7 +48,7 @@ export function DatePicker({
             className
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          <CalendarIcon size={16} strokeWidth={1.5} className="mr-2" />
           {value ? format(value, 'PPP') : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
@@ -141,7 +141,7 @@ export function TimePicker({
 
   return (
     <div className={cn('flex items-center gap-1', className)}>
-      <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+      <Clock size={16} strokeWidth={1.5} className="text-muted-foreground shrink-0" />
       <Select value={currentHours} onValueChange={handleHourChange}>
         <SelectTrigger className="w-[70px] font-mono" disabled={disabled}>
           <SelectValue placeholder="HH" />
@@ -245,7 +245,7 @@ export function DateTimePicker({
             className
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          <CalendarIcon size={16} strokeWidth={1.5} className="mr-2" />
           {value ? (
             showTime ? (
               format(value, "PPP 'at' p")
@@ -270,7 +270,7 @@ export function DateTimePicker({
           initialFocus
         />
         {showTime && (
-          <div className="border-t p-4 space-y-2">
+          <div className="border-t p-4 flex flex-col gap-2">
             <Label className="text-xs text-muted-foreground">Time</Label>
             <TimePicker value={timeValue} onChange={handleTimeChange} use24Hour={true} />
           </div>

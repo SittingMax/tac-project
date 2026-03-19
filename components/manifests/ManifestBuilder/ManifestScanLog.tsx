@@ -1,6 +1,5 @@
 'use client';
 
-import { format } from 'date-fns';
 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -66,7 +65,7 @@ export function ManifestScanLog({ entries, className }: ManifestScanLogProps) {
                 </div>
                 <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-1">
                   <span>{entry.message}</span>
-                  <span>{format(new Date(entry.timestamp), 'HH:mm:ss')}</span>
+                   <span>{new Date(entry.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}</span>
                 </div>
               </div>
             ))}

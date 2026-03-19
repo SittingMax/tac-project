@@ -43,24 +43,24 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 w-full sm:w-auto">
             <a
               href="#tracking"
-              className="group relative flex w-full sm:w-auto items-center justify-center gap-3 overflow-hidden rounded-full bg-primary px-8 py-4 font-bold text-black transition-all hover:scale-105 shadow-[0_0_40px_-10px_var(--primary)] text-lg"
+              className="group relative flex w-full sm:w-auto items-center justify-center gap-3 overflow-hidden rounded-full bg-primary px-8 py-4 font-bold text-black transition hover:scale-105 shadow-[0_0_40px_-10px_var(--primary)] text-lg"
             >
               <span>Start Tracking</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={20} strokeWidth={1.5} className="group-hover:translate-x-1 transition-transform" />
             </a>
 
             <button
               onClick={() => setBookingDialogOpen(true)}
-              className="group flex w-full sm:w-auto items-center justify-center gap-3 rounded-full border border-zinc-800 bg-zinc-900/50 px-8 py-4 font-bold text-zinc-100 transition-all hover:bg-zinc-800 text-lg backdrop-blur-sm"
+              className="group flex w-full sm:w-auto items-center justify-center gap-3 rounded-full border border-zinc-800 bg-zinc-900/50 px-8 py-4 font-bold text-zinc-100 transition hover:bg-zinc-800 text-lg backdrop-blur-sm"
             >
-              <PlaneTakeoff className="w-5 h-5 text-zinc-400 group-hover:text-primary transition-colors" />
+              <PlaneTakeoff size={20} strokeWidth={1.5} className="text-zinc-400 group-hover:text-primary transition-colors" />
               <span>Book a Demo</span>
             </button>
           </div>
 
           <div className="pt-8 border-t border-zinc-900">
             <p className="text-xs font-semibold text-zinc-600 mb-6">Trusted by industry leaders</p>
-            <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale filter hover:grayscale-0 transition-all duration-500">
+            <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale filter hover:grayscale-0 transition duration-500">
               {/* Placeholder for logos matching Setrex style */}
               <div className="text-xl font-bold font-serif">ACME Corp</div>
               <div className="text-xl font-bold tracking-widest">GLOBAL</div>

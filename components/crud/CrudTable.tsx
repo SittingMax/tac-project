@@ -1,19 +1,9 @@
 'use client';
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getSortedRowModel,
-  SortingState,
-  getPaginationRowModel,
-  getFilteredRowModel,
-  VisibilityState,
-  RowSelectionState,
-} from '@tanstack/react-table';
-import React, { useState, useEffect, useMemo } from 'react';
+import { ColumnDef, RowSelectionState, flexRender } from '@tanstack/react-table';
+import React, { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useTableState } from '@/hooks/useTableState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -103,9 +93,6 @@ export function CrudTable<TData>({
   bulkActions,
   onRowClick,
 }: CrudTableProps<TData>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({});
 
   const isControlledRowSelection = controlledRowSelection !== undefined;
@@ -143,46 +130,24 @@ export function CrudTable<TData>({
     return [selectColumn, ...columns];
   }, [columns, enableRowSelection]);
 
-  const table = useReactTable({
+  const { globalFilter, setGlobalFilter, table } = useTableState({
     data,
     columns: finalColumns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    enableColumnResizing: true,
     enableRowSelection: true,
-    columnResizeMode: 'onChange',
-    onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
-    onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      globalFilter,
-      columnVisibility,
-      rowSelection,
-    },
-    initialState: {
-      pagination: {
-        pageSize,
-      },
-    },
+    pageSize,
+    rowSelection,
+    searchValue,
   });
 
-  // Sync internal state with controlled prop
-  useEffect(() => {
-    if (searchValue !== undefined) {
-      setGlobalFilter(searchValue);
-    }
-  }, [searchValue]);
-
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('flex flex-col gap-4', className)}>
       {/* Toolbar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {searchKey && (
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={searchPlaceholder}
               value={globalFilter ?? ''}
@@ -202,7 +167,7 @@ export function CrudTable<TData>({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
-                  <Columns className="w-4 h-4" />
+                  <Columns size={16} strokeWidth={1.5} />
                   View
                 </Button>
               </DropdownMenuTrigger>
@@ -241,7 +206,7 @@ export function CrudTable<TData>({
       ) : (
         <>
           {/* Table */}
-          <div className="rounded-xl border border-border/40 overflow-hidden bg-card text-foreground shadow-sm">
+          <div className="border border-border/40 overflow-hidden bg-card text-foreground shadow-sm">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader className="bg-muted/10">
@@ -265,7 +230,7 @@ export function CrudTable<TData>({
                               >
                                 {flexRender(header.column.columnDef.header, header.getContext())}
                                 {header.column.getCanSort() && (
-                                  <ArrowUpDown className="w-3 h-3 ml-1" />
+                                  <ArrowUpDown size={12} strokeWidth={1.5} className="ml-1" />
                                 )}
                               </div>
                               {/* Column Resizer */}
@@ -338,7 +303,7 @@ export function CrudTable<TData>({
                   onClick={() => table.setPageIndex(0)}
                   disabled={!table.getCanPreviousPage()}
                 >
-                  <ChevronsLeft className="w-4 h-4" />
+                  <ChevronsLeft size={16} strokeWidth={1.5} />
                 </Button>
                 <Button
                   variant="outline"
@@ -346,7 +311,7 @@ export function CrudTable<TData>({
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft size={16} strokeWidth={1.5} />
                 </Button>
                 <span className="text-sm text-muted-foreground px-2">
                   Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
@@ -357,7 +322,7 @@ export function CrudTable<TData>({
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight size={16} strokeWidth={1.5} />
                 </Button>
                 <Button
                   variant="outline"
@@ -365,7 +330,7 @@ export function CrudTable<TData>({
                   onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                   disabled={!table.getCanNextPage()}
                 >
-                  <ChevronsRight className="w-4 h-4" />
+                  <ChevronsRight size={16} strokeWidth={1.5} />
                 </Button>
               </div>
             </div>

@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import {
   ArrowRight,
   CalendarDays,
@@ -13,6 +12,7 @@ import {
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import type { ManifestSettingsValues } from './StepManifestSetup';
@@ -52,18 +52,18 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         {/* Route Summary */}
         <Card className="border-border bg-card/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
-              <MapPin className="h-4 w-4" />
+              <MapPin size={16} strokeWidth={1.5} />
               Route
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-4">
               <div className="text-center flex-1">
                 <p className="text-2xl font-bold text-primary">{originHub?.code || '---'}</p>
@@ -71,7 +71,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
                   {originHub?.name || 'Origin'}
                 </p>
               </div>
-              <ArrowRight className="h-5 w-5 text-muted-foreground shrink-0" />
+              <ArrowRight size={20} strokeWidth={1.5} className="text-muted-foreground shrink-0" />
               <div className="text-center flex-1">
                 <p className="text-2xl font-bold text-primary">{destinationHub?.code || '---'}</p>
                 <p className="text-xs text-muted-foreground truncate">
@@ -83,12 +83,12 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
             <div className="flex items-center justify-center gap-2">
               {setupData.type === 'AIR' ? (
                 <Badge className="bg-status-info/20 text-status-info border-status-info/30">
-                  <Plane className="mr-1 h-3 w-3" />
+                  <Plane size={12} strokeWidth={1.5} className="mr-1" />
                   Air Cargo
                 </Badge>
               ) : (
                 <Badge className="bg-status-warning/20 text-status-warning border-status-warning/30">
-                  <Truck className="mr-1 h-3 w-3" />
+                  <Truck size={12} strokeWidth={1.5} className="mr-1" />
                   Truck
                 </Badge>
               )}
@@ -100,21 +100,21 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
         <Card className="border-border bg-card/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
-              <CalendarDays className="h-4 w-4" />
+              <CalendarDays size={16} strokeWidth={1.5} />
               Schedule
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col gap-4">
             {setupData.type === 'AIR' ? (
               <>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 border border-primary/20">
-                    <CalendarDays className="h-5 w-5 text-primary" />
+                    <CalendarDays size={20} strokeWidth={1.5} className="text-primary" />
                   </div>
                   <div>
                     <p className="text-sm font-medium">
                       {setupData.flightDate
-                        ? format(setupData.flightDate, 'MMM dd, yyyy')
+                        ? formatDate(setupData.flightDate)
                         : 'Date not set'}
                     </p>
                     <p className="text-xs text-muted-foreground">Flight Date</p>
@@ -122,7 +122,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 border border-primary/20">
-                    <Clock className="h-5 w-5 text-primary" />
+                    <Clock size={20} strokeWidth={1.5} className="text-primary" />
                   </div>
                   <div>
                     <p className="text-sm font-medium">
@@ -136,12 +136,12 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
               <>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 border border-primary/20">
-                    <CalendarDays className="h-5 w-5 text-primary" />
+                    <CalendarDays size={20} strokeWidth={1.5} className="text-primary" />
                   </div>
                   <div>
                     <p className="text-sm font-medium">
                       {setupData.dispatchDate
-                        ? format(setupData.dispatchDate, 'MMM dd, yyyy')
+                        ? formatDate(setupData.dispatchDate)
                         : 'Date not set'}
                     </p>
                     <p className="text-xs text-muted-foreground">Dispatch Date</p>
@@ -149,7 +149,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 border border-primary/20">
-                    <Clock className="h-5 w-5 text-primary" />
+                    <Clock size={20} strokeWidth={1.5} className="text-primary" />
                   </div>
                   <div>
                     <p className="text-sm font-medium">
@@ -171,7 +171,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
         <Card className="border-border bg-card/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
-              <Package className="h-4 w-4" />
+              <Package size={16} strokeWidth={1.5} />
               Manifest Totals
             </CardTitle>
           </CardHeader>
@@ -199,9 +199,9 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
             {setupData.type === 'AIR' ? (
-              <Plane className="h-4 w-4" />
+              <Plane size={16} strokeWidth={1.5} />
             ) : (
-              <Truck className="h-4 w-4" />
+              <Truck size={16} strokeWidth={1.5} />
             )}
             {setupData.type === 'AIR' ? 'Flight Details' : 'Vehicle Details'}
           </CardTitle>
@@ -211,7 +211,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-md bg-status-info/10 border border-status-info/20">
-                  <Plane className="h-5 w-5 text-status-info" />
+                  <Plane size={20} strokeWidth={1.5} className="text-status-info" />
                 </div>
                 <div>
                   <p className="text-sm font-medium">
@@ -222,7 +222,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-md bg-secondary border border-border">
-                  <Clock className="h-5 w-5 text-muted-foreground" />
+                  <Clock size={20} strokeWidth={1.5} className="text-muted-foreground" />
                 </div>
                 <div>
                   <p className="text-sm font-medium">
@@ -233,7 +233,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-md bg-secondary border border-border">
-                  <Clock className="h-5 w-5 text-muted-foreground" />
+                  <Clock size={20} strokeWidth={1.5} className="text-muted-foreground" />
                 </div>
                 <div>
                   <p className="text-sm font-medium">
@@ -247,7 +247,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-md bg-status-warning/10 border border-status-warning/20">
-                  <Hash className="h-5 w-5 text-status-warning" />
+                  <Hash size={20} strokeWidth={1.5} className="text-status-warning" />
                 </div>
                 <div>
                   <p className="text-sm font-medium">{setupData.vehicleNumber || '---'}</p>
@@ -256,7 +256,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-md bg-secondary border border-border">
-                  <User className="h-5 w-5 text-muted-foreground" />
+                  <User size={20} strokeWidth={1.5} className="text-muted-foreground" />
                 </div>
                 <div>
                   <p className="text-sm font-medium">{setupData.driverName || '---'}</p>
@@ -265,7 +265,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10 rounded-md bg-secondary border border-border">
-                  <Phone className="h-5 w-5 text-muted-foreground" />
+                  <Phone size={20} strokeWidth={1.5} className="text-muted-foreground" />
                 </div>
                 <div>
                   <p className="text-sm font-medium">{setupData.driverPhone || '---'}</p>
@@ -280,7 +280,7 @@ export function StepReviewFinalize({ setupData, shipments, hubs }: StepReviewFin
       {/* Ready State Notice */}
       <div className="rounded-md bg-primary/10 border border-primary/20 p-4">
         <div className="flex items-start gap-4">
-          <Package className="h-5 w-5 text-primary mt-0.5" />
+          <Package size={20} strokeWidth={1.5} className="text-primary mt-0.5" />
           <div>
             <p className="text-sm font-medium text-primary">Ready to Create Manifest</p>
             <p className="text-sm text-muted-foreground mt-1">

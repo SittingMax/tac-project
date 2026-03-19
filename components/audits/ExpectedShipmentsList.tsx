@@ -70,14 +70,14 @@ export const ExpectedShipmentsList: React.FC<ExpectedShipmentsListProps> = ({ it
       {/* List */}
       <div className="flex-1 overflow-y-auto p-2">
         {filteredItems.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-muted-foreground space-y-4">
-            <Filter className="w-8 h-8 opacity-20" />
+          <div className="h-full flex flex-col items-center justify-center text-muted-foreground flex flex-col gap-4">
+            <Filter size={32} strokeWidth={1.5} className="opacity-20" />
             <p className="text-xs uppercase tracking-widest font-mono">
               No {filter !== 'ALL' ? filter.toLowerCase() : ''} consignments found
             </p>
           </div>
         ) : (
-          <ul className="space-y-2 pb-4">
+          <ul className="flex flex-col gap-2 pb-4">
             <AnimatePresence>
               {filteredItems.map((item) => (
                 <motion.li
@@ -97,11 +97,11 @@ export const ExpectedShipmentsList: React.FC<ExpectedShipmentsListProps> = ({ it
                   <div className="flex items-center gap-4">
                     <div className="shrink-0">
                       {item.status === 'SCANNED' ? (
-                        <CheckCircle2 className="w-5 h-5 text-status-success" />
+                        <CheckCircle2 size={20} strokeWidth={1.5} className="text-status-success" />
                       ) : item.status === 'EXCEPTION' ? (
-                        <AlertTriangle className="w-5 h-5 text-status-error" />
+                        <AlertTriangle size={20} strokeWidth={1.5} className="text-status-error" />
                       ) : (
-                        <Box className="w-5 h-5 text-muted-foreground opacity-30" />
+                        <Box size={20} strokeWidth={1.5} className="text-muted-foreground opacity-30" />
                       )}
                     </div>
                     <div>

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { PageHeader } from '@/components/ui-core/layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader, PageContainer, SectionCard } from '@/components/ui-core/layout';
+import { StatCard } from '@/components/ui-core';
 import { CalendarDays, PackageSearch, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BookingDialog } from '@/components/bookings/BookingDialog';
 import { useBookings } from '@/hooks/useBookings';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CrudTable } from '@/components/crud/CrudTable';
-import { StatusBadge } from '@/components/domain/StatusBadge';
-import { format } from 'date-fns';
+import { StatusBadge } from '@/components/domain/status-badge';
+import { formatDateTime } from '@/lib/formatters';
 import { ColumnDef } from '@tanstack/react-table';
 import { Booking } from '@/types';
 import { IdBadge } from '@/components/ui-core/data/id-badge';
@@ -34,7 +34,7 @@ export const Bookings: React.FC = () => {
       header: 'Created',
       cell: ({ row }) => (
         <span className="text-sm">
-          {format(new Date(row.getValue('created_at')), 'dd MMM yyyy, HH:mm')}
+          {formatDateTime(row.getValue('created_at'))}
         </span>
       ),
     },
@@ -67,7 +67,7 @@ export const Bookings: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <PageContainer>
       <PageHeader
         title="Bookings"
         description="View, manage, and track all incoming logistics bookings"
@@ -81,52 +81,35 @@ export const Bookings: React.FC = () => {
       <BookingDialog open={isBookingModalOpen} onOpenChange={setIsBookingModalOpen} />
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Bookings
-            </CardTitle>
-            <CalendarDays className="size-4 text-status-warning" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-16" />
-            ) : (
-              <>
-                <div className="text-2xl font-semibold text-foreground">{pendingCount}</div>
-                <p className="text-xs text-muted-foreground mt-1">Requires attention</p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Created Today
-            </CardTitle>
-            <PackageSearch className="size-4 text-status-success" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-16" />
-            ) : (
-              <>
-                <div className="text-2xl font-semibold text-foreground">{todayCount}</div>
-                <p className="text-xs text-muted-foreground mt-1">Bookings received today</p>
-              </>
-            )}
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Pending Bookings"
+          value={isLoading ? <Skeleton className="h-8 w-16" /> : pendingCount}
+          subtitle="Requires attention"
+          icon={CalendarDays}
+          iconColor="warning"
+        />
+        <StatCard
+          title="Created Today"
+          value={isLoading ? <Skeleton className="h-8 w-16" /> : todayCount}
+          subtitle="Bookings received today"
+          icon={PackageSearch}
+          iconColor="success"
+        />
       </div>
 
-      <CrudTable
-        columns={columns}
-        data={bookings}
-        searchKey="status"
-        searchPlaceholder="Filter by status..."
-        isLoading={isLoading}
-        emptyMessage="No bookings loaded yet."
-      />
-    </div>
+      <SectionCard
+        title="Incoming Bookings"
+        description="Review and track submitted booking requests"
+      >
+        <CrudTable
+          columns={columns}
+          data={bookings}
+          searchKey="status"
+          searchPlaceholder="Filter by status..."
+          isLoading={isLoading}
+          emptyMessage="No bookings loaded yet."
+        />
+      </SectionCard>
+    </PageContainer>
   );
 };

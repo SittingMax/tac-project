@@ -43,7 +43,7 @@ export function StatCard({
   return (
     <Card className={cn('p-6', className)} {...props}>
       <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
+        <div className="flex flex-col gap-1">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
           <div className="flex items-baseline gap-2">
             <p className="text-2xl font-semibold tracking-tight">{value}</p>

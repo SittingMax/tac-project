@@ -45,7 +45,7 @@ const ScrollProgress = () => {
   return (
     <div className="fixed top-0 left-0 w-full h-1 z-50 bg-muted/30">
       <div
-        className="h-full bg-primary transition-all duration-150 ease-out"
+        className="h-full bg-primary transition duration-150 ease-out"
         style={{ width: `${progress}%` }}
       />
     </div>
@@ -105,7 +105,7 @@ export function LegalPageLayout({ title, effectiveDate, sections }: LegalPageLay
   };
 
   return (
-    <div className="min-h-screen bg-background relative text-foreground flex flex-col">
+    <div className="min-h-screen bg-background relative text-foreground flex-col">
       <ScrollProgress />
 
       {/* Background Decor */}
@@ -130,7 +130,7 @@ export function LegalPageLayout({ title, effectiveDate, sections }: LegalPageLay
 
         <div className="flex flex-col lg:flex-row gap-16 relative items-start">
           {/* Main Content */}
-          <div className="flex-1 max-w-prose space-y-8">
+          <div className="flex-1 max-w-prose flex flex-col gap-8">
             <FadeUp delay={0.1}>
               {sections.map((section, index) => (
                 <section key={section.id} id={section.id} className="scroll-mt-24">
@@ -146,10 +146,10 @@ export function LegalPageLayout({ title, effectiveDate, sections }: LegalPageLay
                       aria-label={`Link to ${section.title}`}
                       title="Copy link to section"
                     >
-                      <Link2 className="w-5 h-5" />
+                      <Link2 size={20} strokeWidth={1.5} />
                     </a>
                   </h2>
-                  <div className="space-y-4 text-muted-foreground leading-loose text-pretty">
+                  <div className="flex flex-col gap-4 text-muted-foreground leading-loose text-pretty">
                     {section.content}
                   </div>
                 </section>
@@ -162,13 +162,13 @@ export function LegalPageLayout({ title, effectiveDate, sections }: LegalPageLay
             <div className="p-6 rounded-md border border-border/50 bg-muted/10 backdrop-blur-sm">
               <h3 className="text-xs font-semibold text-foreground mb-4">Contents</h3>
               <nav aria-label="Table of contents">
-                <ul className="space-y-3 border-l border-border/40 ml-1">
+                <ul className="flex flex-col gap-3 border-l border-border/40 ml-1">
                   {sections.map((section) => (
                     <li key={section.id}>
                       <a
                         href={`#${section.id}`}
                         className={cn(
-                          'block -ml-[1px] pl-4 border-l transition-all text-sm py-1 outline-none focus-visible:bg-muted/50 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary',
+                          'block -ml-[1px] pl-4 border-l transition text-sm py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:bg-muted/50 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary',
                           activeSection === section.id
                             ? 'border-primary text-foreground font-medium'
                             : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30'

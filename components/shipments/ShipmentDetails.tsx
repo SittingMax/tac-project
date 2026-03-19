@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { STATUS_COLORS } from '@/lib/design-tokens';
+import { formatDate, formatDateTime } from '@/lib/formatters';
 import {
   Printer,
   X,
@@ -77,15 +78,15 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-6 max-w-7xl mx-auto">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card border border-border p-6 rounded-lg shadow-sm">
         <div className="flex items-center gap-4">
           <div className="p-4 bg-primary/10 rounded-lg">
             {shipment.mode === 'AIR' ? (
-              <Plane className="w-8 h-8 text-primary" />
+              <Plane size={32} strokeWidth={1.5} className="text-primary" />
             ) : (
-              <Truck className="w-8 h-8 text-primary" />
+              <Truck size={32} strokeWidth={1.5} className="text-primary" />
             )}
           </div>
           <div>
@@ -99,30 +100,29 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
             </div>
             <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5" /> Ref: {shipment.id.slice(0, 8)}...
+                <FileText size={12} strokeWidth={1.5} className=".5 .5" /> Ref: {shipment.id.slice(0, 8)}...
               </span>
               <span className="hidden md:inline">•</span>
               <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" /> Created:{' '}
-                {new Date(shipment.createdAt).toLocaleDateString()}
+                <Clock size={12} strokeWidth={1.5} className=".5 .5" /> Created: {formatDate(shipment.createdAt)}
               </span>
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2 w-full md:w-auto">
+        <div className="flex-wrap gap-2 w-full md:w-auto">
           <Button
             onClick={() => navigate(`/shipments/${shipment.id}`)}
             variant="default"
             className="flex-1 md:flex-none gap-2 shadow-sm"
           >
-            <Activity className="w-4 h-4" /> Track Shipment
+            <Activity size={16} strokeWidth={1.5} /> Track Shipment
           </Button>
           <Button
             onClick={handlePrintLabel}
             variant="outline"
             className="flex-1 md:flex-none gap-2 hover:bg-primary/5 hover:text-primary transition-colors"
           >
-            <Printer className="w-4 h-4" /> Print Label
+            <Printer size={16} strokeWidth={1.5} /> Print Label
           </Button>
           <Button
             onClick={onClose}
@@ -150,12 +150,12 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Route & Tracking */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 flex flex-col gap-6">
           {/* Route Card */}
-          <Card className="overflow-hidden border-border/60 shadow-sm hover:shadow-md transition-all duration-300">
+          <Card className="overflow-hidden border-border/60 shadow-sm hover:shadow-md transition duration-300">
             <div className="p-6">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-6 flex items-center gap-2">
-                <Map className="w-4 h-4" /> Transit Route
+                <Map size={16} strokeWidth={1.5} /> Transit Route
               </h3>
 
               <div className="relative flex items-center justify-between px-4 py-8">
@@ -175,9 +175,9 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
                 <div className="relative z-10 bg-card px-2">
                   <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-muted border border-border text-xs font-medium text-foreground shadow-sm">
                     {shipment.mode === 'AIR' ? (
-                      <Plane className="w-3.5 h-3.5" />
+                      <Plane size={12} strokeWidth={1.5} className=".5 .5" />
                     ) : (
-                      <Truck className="w-3.5 h-3.5" />
+                      <Truck size={12} strokeWidth={1.5} className=".5 .5" />
                     )}
                     <span>{shipment.serviceLevel}</span>
                   </div>
@@ -199,14 +199,14 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
               <div className="p-4 flex flex-col items-center">
                 <span className="text-xs text-muted-foreground mb-1">Weight</span>
                 <div className="flex items-center gap-1.5 font-mono font-semibold">
-                  <Scale className="w-4 h-4 text-primary" />
+                  <Scale size={16} strokeWidth={1.5} className="text-primary" />
                   {shipment.totalWeight.chargeable} kg
                 </div>
               </div>
               <div className="p-4 flex flex-col items-center">
                 <span className="text-xs text-muted-foreground mb-1">Packages</span>
                 <div className="flex items-center gap-1.5 font-mono font-semibold">
-                  <Package className="w-4 h-4 text-primary" />
+                  <Package size={16} strokeWidth={1.5} className="text-primary" />
                   {shipment.totalPackageCount}
                 </div>
               </div>
@@ -228,10 +228,10 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
           <Card className="border-border/60 shadow-sm">
             <div className="p-6">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-6 flex items-center gap-2">
-                <Clock className="w-4 h-4" /> Tracking & Events
+                <Clock size={16} strokeWidth={1.5} /> Tracking & Events
               </h3>
 
-              <div className="relative pl-2 space-y-8 before:absolute before:inset-0 before:ml-2.5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-border before:via-border/50 before:to-transparent">
+              <div className="relative pl-2 flex flex-col gap-8 before:absolute before:inset-0 before:ml-2.5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-border before:via-border/50 before:to-transparent">
                 {trackingEvents.length > 0 ? (
                   trackingEvents.map((evt, idx) => (
                     <div key={evt.id} className="relative pl-8 group">
@@ -246,12 +246,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
                           {evt.event_code.replace(/_/g, ' ')}
                         </span>
                         <span className="text-xs font-mono text-muted-foreground">
-                          {new Date(evt.event_time).toLocaleString(undefined, {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
+                          {formatDateTime(evt.event_time)}
                         </span>
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">
@@ -259,14 +254,14 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
                           'Event recorded'}
                       </p>
                       <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground bg-muted/50 w-fit px-2 py-1 rounded-md">
-                        <MapPin className="w-3 h-3" />
+                        <MapPin size={12} strokeWidth={1.5} />
                         {evt.hub?.name || 'Transit'}
                       </div>
                     </div>
                   ))
                 ) : (
                   <div className="text-center py-8 text-muted-foreground bg-muted/20 rounded-md">
-                    <Clock className="w-10 h-10 mx-auto mb-2 opacity-20" />
+                    <Clock size={40} strokeWidth={1.5} className="mx-auto mb-2 opacity-20" />
                     <p>No tracking events recorded yet.</p>
                   </div>
                 )}
@@ -276,15 +271,15 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
         </div>
 
         {/* Right Column: Customer & Notes */}
-        <div className="space-y-6 overflow-hidden min-w-0">
+        <div className="flex flex-col gap-6 overflow-hidden min-w-0">
           {/* Customer Info */}
           <Card className="border-border/60 shadow-sm">
             <div className="p-6 border-b border-border bg-muted/20">
               <h3 className="font-semibold flex items-center gap-2">
-                <User className="w-4 h-4 text-primary" /> Customer Details
+                <User size={16} strokeWidth={1.5} className="text-primary" /> Customer Details
               </h3>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 flex flex-col gap-4">
               <div>
                 <span className="text-xs text-muted-foreground uppercase tracking-wider">Name</span>
                 <div className="font-medium text-lg text-foreground">{shipment.customerName}</div>
@@ -294,7 +289,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
                   Contact
                 </span>
                 <div className="flex items-center gap-2 mt-1">
-                  <Phone className="w-3.5 h-3.5 text-muted-foreground" />
+                  <Phone size={12} strokeWidth={1.5} className=".5 .5 text-muted-foreground" />
                   <span className="text-sm font-mono">{shipment.consignor?.phone || 'N/A'}</span>
                 </div>
               </div>
@@ -303,7 +298,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
                   Destination Address
                 </span>
                 <div className="flex items-start gap-2 mt-1">
-                  <MapPin className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                  <MapPin size={12} strokeWidth={1.5} className=".5 .5 text-muted-foreground mt-0.5 shrink-0" />
                   <span className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                     {typeof shipment.consignee?.address === 'string'
                       ? shipment.consignee.address
@@ -314,7 +309,7 @@ export const ShipmentDetails: React.FC<Props> = ({ shipment, onClose }) => {
             </div>
             <div className="p-4 bg-muted/30 border-t border-border">
               <Button variant="ghost" size="sm" className="w-full text-xs h-8">
-                View Full Profile <ArrowRight className="w-3 h-3 ml-1" />
+                View Full Profile <ArrowRight size={12} strokeWidth={1.5} className="ml-1" />
               </Button>
             </div>
           </Card>

@@ -79,7 +79,7 @@ export function LoadingCarousel({ tips, autoplayInterval = 5000 }: LoadingCarous
               key={index}
               onClick={() => handleDotClick(index)}
               className={cn(
-                'relative group text-left px-4 py-4 rounded-md border border-transparent transition-all duration-300 isolate overflow-hidden',
+                'relative group text-left px-4 py-4 rounded-md border border-transparent transition duration-300 isolate overflow-hidden',
                 current === index
                   ? 'bg-foreground/5 border-primary/30'
                   : 'hover:bg-foreground/5 hover:border-border'

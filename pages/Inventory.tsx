@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+
 import { Badge } from '@/components/ui/badge';
+import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
 import { CrudTable } from '@/components/crud/CrudTable';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
@@ -16,7 +17,8 @@ import {
 import { useAuthStore } from '@/store/authStore';
 import { supabase } from '@/lib/supabase';
 import type { ShipmentWithRelations } from '@/hooks/useShipments';
-import { Search, Warehouse, Package } from 'lucide-react';
+import { Warehouse, Package } from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { HubLocation } from '@/types';
 import { HUBS } from '@/lib/constants';
 import { IdBadge } from '@/components/ui-core/data/id-badge';
@@ -200,7 +202,7 @@ export const Inventory: React.FC = () => {
           const hubName = location ? HUBS[location]?.name || 'Unknown' : 'Unknown';
           return (
             <div className="flex items-center gap-2">
-              <Warehouse className="w-4 h-4 text-muted-foreground" />
+              <Warehouse size={16} strokeWidth={1.5} className="text-muted-foreground" />
               {hubName}
             </div>
           );
@@ -226,51 +228,35 @@ export const Inventory: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
-      <div className="flex flex-col md:flex-row justify-between items-end pb-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
-            Inventory
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Real-time stock view across hub network
-          </p>
-        </div>
-        <div className="flex gap-0 mt-6 md:mt-0 rounded-lg border border-border overflow-hidden">
-          <button
-            className={`px-4 py-2 text-sm font-medium transition-colors ${filterHub === 'ALL' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
-            onClick={() => {
-              setFilterHub('ALL');
+    <PageContainer>
+      <PageHeader title="Inventory" description="Real-time stock view across hub network">
+        <ToggleGroup
+          type="single"
+          value={filterHub}
+          onValueChange={(val) => {
+            if (val) {
+              setFilterHub(val as 'ALL' | 'IMPHAL' | 'NEW_DELHI');
               setPage(1);
-            }}
-          >
+            }
+          }}
+          className="mt-6 md:mt-0"
+        >
+          <ToggleGroupItem value="ALL" aria-label="All Hubs" className="text-xs px-3">
             All Hubs
-          </button>
-          <button
-            className={`px-4 py-2 text-sm font-medium transition-colors border-l border-border ${filterHub === 'IMPHAL' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
-            onClick={() => {
-              setFilterHub('IMPHAL');
-              setPage(1);
-            }}
-          >
+          </ToggleGroupItem>
+          <ToggleGroupItem value="IMPHAL" aria-label="Imphal Hub" className="text-xs px-3">
             Imphal
-          </button>
-          <button
-            className={`px-4 py-2 text-sm font-medium transition-colors border-l border-border ${filterHub === 'NEW_DELHI' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
-            onClick={() => {
-              setFilterHub('NEW_DELHI');
-              setPage(1);
-            }}
-          >
+          </ToggleGroupItem>
+          <ToggleGroupItem value="NEW_DELHI" aria-label="New Delhi Hub" className="text-xs px-3">
             New Delhi
-          </button>
-        </div>
-      </div>
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </PageHeader>
 
       <div className="grid grid-cols-2 gap-4">
-        <Card className="p-6 flex items-center gap-4">
+        <Card className="p-4 flex items-center gap-4">
           <div className="p-3 bg-primary/10 text-primary rounded-lg">
-            <Package className="w-5 h-5" />
+            <Package size={20} strokeWidth={1.5} />
           </div>
           <div>
             <div className="text-sm font-medium text-muted-foreground mb-0.5">
@@ -279,9 +265,9 @@ export const Inventory: React.FC = () => {
             <div className="text-2xl font-semibold text-foreground">{stats.total}</div>
           </div>
         </Card>
-        <Card className="p-6 flex items-center gap-4">
+        <Card className="p-4 flex items-center gap-4">
           <div className="p-3 bg-status-error/10 text-status-error rounded-lg">
-            <Warehouse className="w-5 h-5" />
+            <Warehouse size={20} strokeWidth={1.5} />
           </div>
           <div>
             <div className="text-sm font-medium text-destructive mb-0.5">Critical Backlog</div>
@@ -290,35 +276,23 @@ export const Inventory: React.FC = () => {
         </Card>
       </div>
 
-      <Card>
-        <div className="flex justify-between items-center mb-0 p-4 pb-4 border-b border-border">
-          <div className="relative w-full max-w-sm">
-            <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by CN number..."
-              className="pl-9 h-10"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-        </div>
+      <SectionCard>
+        <CrudTable
+          columns={columns}
+          data={shipments}
+          isLoading={isLoading}
+          searchKey="inventory"
+          searchPlaceholder="Search by CN number..."
+          searchValue={search}
+          onSearch={(value) => {
+            setSearch(value);
+            setPage(1);
+          }}
+          pageSize={Math.max(shipments.length, 1)}
+          emptyMessage="No items found."
+        />
 
-        <div className="overflow-hidden">
-          <div className="overflow-x-auto">
-            <CrudTable
-              columns={columns}
-              data={shipments}
-              isLoading={isLoading}
-              pageSize={100}
-              emptyMessage="No items found."
-            />
-          </div>
-        </div>
-
-        <div className="p-4 border-t mt-4">
+        <div className="pt-2 border-t mt-2">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
@@ -353,7 +327,7 @@ export const Inventory: React.FC = () => {
             </PaginationContent>
           </Pagination>
         </div>
-      </Card>
-    </div>
+      </SectionCard>
+    </PageContainer>
   );
 };

@@ -35,7 +35,7 @@ export const DateRangeSelector = () => {
             currentRange !== 'all' && 'border-solid text-foreground'
           )}
         >
-          <Calendar className="w-4 h-4" />
+          <Calendar size={16} strokeWidth={1.5} />
           <span>{activeLabel}</span>
         </Button>
       </PopoverTrigger>

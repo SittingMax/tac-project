@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { PageHeader } from '@/components/ui-core/layout';
+import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
 import { useAuthStore } from '@/store/authStore';
 import { supabase } from '@/lib/supabase';
 import { queryClient } from '@/lib/query-client';
@@ -163,7 +163,7 @@ export const Management: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+    <PageContainer>
       <PageHeader title="Staff & Hubs" description="Manage access control and personnel">
         {isSuperAdmin && (
           <Button onClick={() => setCreateUserOpen(true)} variant="destructive">
@@ -172,14 +172,16 @@ export const Management: React.FC = () => {
         )}
       </PageHeader>
 
-      <CrudTable
-        columns={columns}
-        data={staff}
-        searchKey="full_name"
-        searchPlaceholder="Search staff..."
-        isLoading={isLoading}
-        emptyMessage="No staff members found."
-      />
+      <SectionCard>
+        <CrudTable
+          columns={columns}
+          data={staff}
+          isLoading={isLoading}
+          searchKey="staff"
+          searchPlaceholder="Search staff..."
+          emptyMessage="No staff members found."
+        />
+      </SectionCard>
 
       {/* Super Admin Create User Modal */}
       <Dialog open={createUserOpen} onOpenChange={setCreateUserOpen}>
@@ -197,7 +199,9 @@ export const Management: React.FC = () => {
                     type="email"
                     required
                     value={createUserForm.email}
-                    onChange={(e) => setCreateUserForm((prev) => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) =>
+                      setCreateUserForm((prev) => ({ ...prev, email: e.target.value }))
+                    }
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -225,7 +229,7 @@ export const Management: React.FC = () => {
                 </div>
               </FormGrid>
             </FormSection>
-            
+
             <FormSection title="Access Control">
               <FormGrid columns={2}>
                 <div className="flex flex-col gap-1.5">
@@ -262,10 +266,7 @@ export const Management: React.FC = () => {
             </FormSection>
 
             <div className="mt-2">
-              <FormFooter 
-                onCancel={() => setCreateUserOpen(false)} 
-                submitLabel="Create User" 
-              />
+              <FormFooter onCancel={() => setCreateUserOpen(false)} submitLabel="Create User" />
             </div>
           </form>
         </DialogContent>
@@ -390,6 +391,6 @@ export const Management: React.FC = () => {
         onConfirm={handleDelete}
         confirmLabel="Remove"
       />
-    </div>
+    </PageContainer>
   );
 };

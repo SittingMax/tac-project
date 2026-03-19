@@ -17,7 +17,7 @@ import {
   TableSkeleton,
   PageHeaderSkeleton,
 } from '../components/ui/skeleton';
-import { StatusBadge } from '../components/domain/StatusBadge';
+import { StatusBadge } from '@/components/domain/status-badge';
 import { Package, Truck, AlertTriangle, Check, X, Info, Search } from 'lucide-react';
 import {
   playSuccessFeedback,
@@ -64,7 +64,7 @@ export const DevUIKit: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <div className="flex flex-wrap gap-2 mb-8 pb-4 border-b border-border">
+        <div className="flex-wrap gap-2 mb-8 pb-4 border-b border-border">
           {sections.map((section) => (
             <Button
               key={section.id}
@@ -78,7 +78,7 @@ export const DevUIKit: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="space-y-8">
+        <div className="flex flex-col gap-8">
           {activeSection === 'buttons' && <ButtonsSection />}
           {activeSection === 'badges' && <BadgesSection />}
           {activeSection === 'inputs' && <InputsSection />}
@@ -103,11 +103,11 @@ const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 );
 
 const ComponentGrid: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="flex flex-wrap gap-4 items-center">{children}</div>
+  <div className="flex-wrap gap-4 items-center">{children}</div>
 );
 
 const ButtonsSection: React.FC = () => (
-  <div className="space-y-8">
+  <div className="flex flex-col gap-8">
     <Card>
       <SectionTitle>Button Variants</SectionTitle>
       <ComponentGrid>
@@ -140,13 +140,13 @@ const ButtonsSection: React.FC = () => (
       <SectionTitle>Buttons with Icons</SectionTitle>
       <ComponentGrid>
         <Button>
-          <Package className="w-4 h-4" /> Create Shipment
+          <Package size={16} strokeWidth={1.5} /> Create Shipment
         </Button>
         <Button variant="secondary">
-          <Truck className="w-4 h-4" /> Manifests
+          <Truck size={16} strokeWidth={1.5} /> Manifests
         </Button>
         <Button variant="destructive">
-          <AlertTriangle className="w-4 h-4" /> Exception
+          <AlertTriangle size={16} strokeWidth={1.5} /> Exception
         </Button>
       </ComponentGrid>
     </Card>
@@ -154,7 +154,7 @@ const ButtonsSection: React.FC = () => (
 );
 
 const BadgesSection: React.FC = () => (
-  <div className="space-y-8">
+  <div className="flex flex-col gap-8">
     <Card>
       <SectionTitle>Badge Variants</SectionTitle>
       <ComponentGrid>
@@ -167,14 +167,14 @@ const BadgesSection: React.FC = () => (
 );
 
 const InputsSection: React.FC = () => (
-  <div className="space-y-8">
+  <div className="flex flex-col gap-8">
     <Card>
       <SectionTitle>Input States</SectionTitle>
-      <div className="space-y-4 max-w-md">
+      <div className="flex flex-col gap-4 max-w-md">
         <Input placeholder="Default input" />
         <Input placeholder="Disabled input" disabled />
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Search..." className="pl-10" />
         </div>
       </div>
@@ -183,7 +183,7 @@ const InputsSection: React.FC = () => (
 );
 
 const CardsSection: React.FC = () => (
-  <div className="space-y-8">
+  <div className="flex flex-col gap-8">
     <Card>
       <SectionTitle>Card Component</SectionTitle>
       <p className="text-muted-foreground">The base Card component with cyber styling.</p>
@@ -193,7 +193,7 @@ const CardsSection: React.FC = () => (
       <Card>
         <div className="flex items-center gap-4 mb-4">
           <div className="p-2 rounded-md bg-primary/10">
-            <Package className="w-5 h-5 text-primary" />
+            <Package size={20} strokeWidth={1.5} className="text-primary" />
           </div>
           <span className="font-semibold">Shipments</span>
         </div>
@@ -203,7 +203,7 @@ const CardsSection: React.FC = () => (
       <Card>
         <div className="flex items-center gap-4 mb-4">
           <div className="p-2 rounded-md bg-chart-2/10">
-            <Truck className="w-5 h-5 text-chart-2" />
+            <Truck size={20} strokeWidth={1.5} className="text-chart-2" />
           </div>
           <span className="font-semibold">In Transit</span>
         </div>
@@ -213,7 +213,7 @@ const CardsSection: React.FC = () => (
       <Card>
         <div className="flex items-center gap-4 mb-4">
           <div className="p-2 rounded-md bg-destructive/10">
-            <AlertTriangle className="w-5 h-5 text-destructive" />
+            <AlertTriangle size={20} strokeWidth={1.5} className="text-destructive" />
           </div>
           <span className="font-semibold">Exceptions</span>
         </div>
@@ -225,12 +225,12 @@ const CardsSection: React.FC = () => (
 );
 
 const SkeletonsSection: React.FC = () => (
-  <div className="space-y-8">
+  <div className="flex flex-col gap-8">
     <Card>
       <SectionTitle>Base Skeleton</SectionTitle>
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-4/5" />
+        <Skeleton className="h-4 w-4 /5" />
         <Skeleton className="h-4 w-3/5" />
       </div>
     </Card>
@@ -265,7 +265,7 @@ const SkeletonsSection: React.FC = () => (
 );
 
 const FeedbackSection: React.FC = () => (
-  <div className="space-y-8">
+  <div className="flex flex-col gap-8">
     <Card>
       <SectionTitle>Audio & Haptic Feedback</SectionTitle>
       <p className="text-muted-foreground mb-4">
@@ -273,16 +273,16 @@ const FeedbackSection: React.FC = () => (
       </p>
       <ComponentGrid>
         <Button onClick={playSuccessFeedback} variant="default">
-          <Check className="w-4 h-4" /> Success
+          <Check size={16} strokeWidth={1.5} /> Success
         </Button>
         <Button onClick={playErrorFeedback} variant="destructive">
           <X className="w-4 h-4" /> Error
         </Button>
         <Button onClick={playWarningFeedback} variant="secondary">
-          <AlertTriangle className="w-4 h-4" /> Warning
+          <AlertTriangle size={16} strokeWidth={1.5} /> Warning
         </Button>
         <Button onClick={playInfoFeedback} variant="ghost">
-          <Info className="w-4 h-4" /> Info
+          <Info size={16} strokeWidth={1.5} /> Info
         </Button>
       </ComponentGrid>
     </Card>
@@ -322,7 +322,7 @@ const ColorsSection: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col gap-8">
       <Card>
         <SectionTitle>Semantic Color Tokens</SectionTitle>
         <p className="text-muted-foreground mb-4">
@@ -330,7 +330,7 @@ const ColorsSection: React.FC = () => {
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {colorTokens.map((token) => (
-            <div key={token.name} className="space-y-2">
+            <div key={token.name} className="flex flex-col gap-2">
               <div className={`${token.var} ${token.text} p-4 rounded-md text-center font-medium`}>
                 {token.name}
               </div>
@@ -344,7 +344,7 @@ const ColorsSection: React.FC = () => {
         <SectionTitle>Chart Colors</SectionTitle>
         <div className="flex gap-4">
           {chartColors.map((color) => (
-            <div key={color.name} className="space-y-2">
+            <div key={color.name} className="flex flex-col gap-2">
               <div className={`${color.var} w-16 h-16 rounded-md`} />
               <p className="text-xs text-muted-foreground text-center font-mono">{color.name}</p>
             </div>
@@ -354,7 +354,7 @@ const ColorsSection: React.FC = () => {
 
       <Card>
         <SectionTitle>Usage Examples</SectionTitle>
-        <div className="bg-muted/50 rounded-md p-4 font-mono text-sm space-y-2">
+        <div className="bg-muted/50 rounded-md p-4 font-mono text-sm flex flex-col gap-2">
           <p className="text-muted-foreground">// ❌ Avoid hardcoded colors</p>
           <code className="text-destructive block">
             {'className="text-'}
@@ -388,7 +388,7 @@ const StatusSection: React.FC = () => {
   const invoiceStatuses = ['DRAFT', 'ISSUED', 'PAID', 'CANCELLED', 'OVERDUE'];
 
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col gap-8">
       <Card>
         <SectionTitle>Shipment Status Badges</SectionTitle>
         <ComponentGrid>
@@ -451,7 +451,7 @@ const ScannerDebugSection: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col gap-8">
       <Card>
         <SectionTitle>Scanner Input Debugger</SectionTitle>
         <p className="text-muted-foreground mb-4">

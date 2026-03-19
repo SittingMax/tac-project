@@ -16,7 +16,7 @@ export const SectionHeader: React.FC<{
   <div className="flex items-center justify-between pb-2 mb-4 border-b border-border/40">
     <div className="flex items-center gap-2.5">
       <div className="p-1.5 rounded-md bg-primary/10 text-primary border border-primary/20">
-        <Icon className="w-4 h-4" />
+        <Icon size={16} strokeWidth={1.5} />
       </div>
       <span className="text-sm font-bold tracking-wide text-foreground uppercase">{title}</span>
     </div>
@@ -99,7 +99,7 @@ export const CustomerSearch: React.FC<{
           >
             {displayLabel || placeholder}
           </span>
-          <ChevronDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
+          <ChevronDown size={12} strokeWidth={1.5} className="ml-1 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -108,7 +108,7 @@ export const CustomerSearch: React.FC<{
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <div className="flex items-center border-b border-border px-2">
-          <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+          <Search size={16} strokeWidth={1.5} className="mr-2 shrink-0 text-muted-foreground" />
           <Input
             ref={inputRef}
             placeholder="Type to filter..."
@@ -127,7 +127,7 @@ export const CustomerSearch: React.FC<{
                   key={c.id}
                   type="button"
                   onClick={() => handleSelect(c)}
-                  className="w-full text-left flex flex-col items-start gap-0.5 cursor-pointer rounded-md px-2 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground transition-colors"
+                  className="w-full text-left flex flex-col items-start gap-0.5 cursor-pointer rounded-md px-2 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
                   <div className="text-xs font-bold text-foreground flex items-center justify-between w-full">
                     <span>{c.name}</span>

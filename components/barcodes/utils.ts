@@ -7,6 +7,11 @@ import type { BarcodeMode } from './types';
 // Re-export from canonical source — single source of truth for CN validation
 export { isValidAWB } from '@/lib/scanParser';
 
+type BarcodeNavigationContext = 'dashboard' | 'scanning' | 'manifests' | 'shipments';
+
+const isBarcodeNavigationContext = (value: string): value is BarcodeNavigationContext =>
+  value === 'dashboard' || value === 'scanning' || value === 'manifests' || value === 'shipments';
+
 /**
  * Format AWB for display
  */
@@ -24,8 +29,10 @@ export function detectBarcodeMode(): BarcodeMode {
   }
 
   // Check if we're generating PDF
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (typeof window !== 'undefined' && (window as any).isPDFContext) {
+  if (
+    typeof window !== 'undefined' &&
+    (window as Window & { isPDFContext?: boolean }).isPDFContext
+  ) {
     return 'pdf';
   }
 
@@ -90,9 +97,7 @@ export function generateBarcodeFilename(awb: string, format: 'png' | 'svg' = 'pn
 /**
  * Check if barcode should be clickable (for navigation)
  */
-export function shouldBarcodeNavigate(
-  context: 'dashboard' | 'scanning' | 'manifests' | 'shipments'
-): boolean {
+export function shouldBarcodeNavigate(context: BarcodeNavigationContext): boolean {
   // Don't navigate from scanning page (local handling)
   if (context === 'scanning') {
     return false;
@@ -106,8 +111,7 @@ export function shouldBarcodeNavigate(
  * Get barcode click handler
  */
 export function getBarcodeClickHandler(awb: string, context: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!shouldBarcodeNavigate(context as any)) {
+  if (!isBarcodeNavigationContext(context) || !shouldBarcodeNavigate(context)) {
     return undefined;
   }
 

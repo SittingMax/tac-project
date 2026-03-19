@@ -570,22 +570,22 @@ export { DialogBuilder };
 // Utility: Compose Multiple Components
 // ============================================
 
-/* eslint-disable @typescript-eslint/no-explicit-any -- Generic composition requires flexible typing */
 // Helper to compose multiple components together
-function compose<T extends React.ComponentType<any>[]>(
-  ...components: T
-): React.FC<React.ComponentProps<T[number]>> {
-  return components.reduce(
+function compose<TProps extends { children?: React.ReactNode }>(
+  ...components: Array<React.ComponentType<TProps>>
+): React.FC<TProps> {
+  return components.reduce<React.FC<TProps>>(
     (Acc, Next) => {
-      return ((props: any) => (
+      const Composed: React.FC<TProps> = (props) => (
         <Acc {...props}>
           <Next {...props} />
         </Acc>
-      )) as any;
+      );
+
+      return Composed;
     },
-    (({ children }: { children?: React.ReactNode }) => <>{children}</>) as any
+    ({ children }) => <>{children}</>
   );
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export { compose };

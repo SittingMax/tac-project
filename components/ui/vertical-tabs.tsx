@@ -87,7 +87,7 @@ export default function VerticalTabs() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Left Column: Content */}
           <div className="lg:col-span-5 flex flex-col justify-center order-2 lg:order-1 pt-4">
-            <div className="space-y-1 mb-12">
+            <div className="flex flex-col gap-1 mb-12">
               <span className="text-primary/80 mb-2 block font-mono text-xs font-bold uppercase tracking-wider">
                 About Us
               </span>
@@ -102,7 +102,7 @@ export default function VerticalTabs() {
               </span>
             </div>
 
-            <div className="flex flex-col space-y-0">
+            <div className="flex flex-col flex flex-col gap-0">
               {SERVICES.map((service, index) => {
                 const isActive = activeIndex === index;
                 return (
@@ -110,7 +110,7 @@ export default function VerticalTabs() {
                     key={service.id}
                     onClick={() => handleTabClick(index)}
                     className={cn(
-                      'group relative flex items-start gap-4 py-6 md:py-8 text-left transition-all duration-500 border-t border-border/50 first:border-0',
+                      'group relative flex items-start gap-4 py-6 md:py-8 text-left transition duration-500 border-t border-border/50 first:border-0',
                       isActive
                         ? 'text-foreground'
                         : 'text-muted-foreground/60 hover:text-foreground'
@@ -208,7 +208,7 @@ export default function VerticalTabs() {
                       e.stopPropagation();
                       handlePrev();
                     }}
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-md bg-background/80 backdrop-blur-md border border-border/50 flex items-center justify-center text-foreground hover:bg-background transition-all active:scale-90"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-md bg-background/80 backdrop-blur-md border border-border/50 flex items-center justify-center text-foreground hover:bg-background transition active:scale-90"
                     aria-label="Previous"
                   >
                     <ArrowLeft size={20} />
@@ -218,7 +218,7 @@ export default function VerticalTabs() {
                       e.stopPropagation();
                       handleNext();
                     }}
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-md bg-background/80 backdrop-blur-md border border-border/50 flex items-center justify-center text-foreground hover:bg-background transition-all active:scale-90"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-md bg-background/80 backdrop-blur-md border border-border/50 flex items-center justify-center text-foreground hover:bg-background transition active:scale-90"
                     aria-label="Next"
                   >
                     <ArrowRight size={20} />

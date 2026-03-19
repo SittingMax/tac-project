@@ -77,7 +77,7 @@ export class AppErrorBoundary extends Component<Props, State> {
           <Card className="max-w-lg w-full">
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-destructive/10">
-                <AlertTriangle className="h-6 w-6 text-destructive" />
+                <AlertTriangle size={24} strokeWidth={1.5} className="text-destructive" />
               </div>
               <CardTitle className="text-xl">Something went wrong</CardTitle>
               <CardDescription>
@@ -102,11 +102,11 @@ export class AppErrorBoundary extends Component<Props, State> {
 
             <CardFooter className="flex gap-4 justify-center">
               <Button variant="outline" onClick={this.handleGoHome}>
-                <Home className="mr-2 h-4 w-4" />
+                <Home size={16} strokeWidth={1.5} className="mr-2" />
                 Go Home
               </Button>
               <Button onClick={this.handleRetry}>
-                <RefreshCw className="mr-2 h-4 w-4" />
+                <RefreshCw size={16} strokeWidth={1.5} className="mr-2" />
                 Try Again
               </Button>
             </CardFooter>
