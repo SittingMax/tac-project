@@ -14,6 +14,7 @@ import {
   Filter,
   Trash2,
 } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { Button } from '@/components/ui/button';
 import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
 import { StatCard } from '@/components/ui-core';
@@ -34,7 +35,9 @@ import type {
 } from '@/lib/notifications/types';
 import { cn } from '@/lib/utils';
 
-const CATEGORY_ICONS: Record<NotificationCategory, React.ElementType> = {
+import type { LucideIcon } from 'lucide-react';
+
+const CATEGORY_ICONS: Record<NotificationCategory, LucideIcon> = {
   invoice: FileText,
   shipment: Package,
   warehouse: Package,
@@ -158,7 +161,7 @@ export const Notifications: React.FC = () => {
             }}
             disabled={count === 0}
           >
-            <CheckCheck size={12} strokeWidth={1.5} className="mr-2" />
+            <AppIcon icon={CheckCheck} size={16} className="mr-2" />
             Mark All Read
           </Button>
           <Button
@@ -171,7 +174,7 @@ export const Notifications: React.FC = () => {
             }}
             disabled={userNotifications.length === 0}
           >
-            <Trash2 size={12} strokeWidth={1.5} className="mr-2" />
+            <AppIcon icon={Trash2} size={16} className="mr-2" />
             Clear All
           </Button>
         </div>
@@ -228,7 +231,7 @@ export const Notifications: React.FC = () => {
 
           {/* Dropdowns */}
           <div className="flex gap-2 items-center">
-            <Filter size={16} strokeWidth={1.5} className="text-muted-foreground opacity-50" />
+            <AppIcon icon={Filter} size={16} className="text-muted-foreground opacity-50" />
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="All Categories" />
@@ -265,9 +268,9 @@ export const Notifications: React.FC = () => {
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-4">
                 {activeTab === 'unread' ? (
-                  <Check size={32} strokeWidth={1.5} className="text-muted-foreground" />
+                  <AppIcon icon={Check} size={32} className="text-muted-foreground" />
                 ) : (
-                  <Bell size={32} strokeWidth={1.5} className="text-muted-foreground" />
+                  <AppIcon icon={Bell} size={32} className="text-muted-foreground" />
                 )}
               </div>
               <h3 className="text-lg font-medium text-foreground mb-1">
@@ -311,7 +314,9 @@ export const Notifications: React.FC = () => {
                                 notification.is_read ? 'bg-muted' : 'bg-primary/10'
                               )}
                             >
-                              <Icon
+                              <AppIcon
+                                icon={Icon}
+                                size={20}
                                 className={cn(
                                   'w-5 h-5',
                                   notification.is_read ? 'text-muted-foreground' : 'text-primary'
@@ -372,7 +377,11 @@ export const Notifications: React.FC = () => {
                                     className="p-1 rounded-md hover:bg-muted transition-colors"
                                     title="Delete"
                                   >
-                                    <Trash2 size={16} strokeWidth={1.5} className="text-muted-foreground hover:text-destructive" />
+                                    <AppIcon
+                                      icon={Trash2}
+                                      size={16}
+                                      className="text-muted-foreground hover:text-destructive"
+                                    />
                                   </button>
                                 </div>
                               </div>

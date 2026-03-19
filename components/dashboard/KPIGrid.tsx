@@ -10,6 +10,7 @@ import {
   DollarSign,
   Clock,
 } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { KPIGridSkeleton } from '../ui/skeleton';
 import { useDashboardKPIs } from '@/hooks/useDashboardKPIs';
@@ -117,12 +118,16 @@ const KPICard = React.memo(
         >
           {/* Background Icon */}
           <div className="absolute -top-4 -right-4 p-4 opacity-[0.02] group-hover:opacity-[0.06] transition-opacity pointer-events-none transform group-hover:scale-110 duration-500 z-0">
-            <Icon className="w-32 h-32" />
+            <AppIcon icon={Icon} size={32} className="w-32 h-32" />
           </div>
 
           <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 z-10">
             <CardTitle className="text-xs text-muted-foreground">{label}</CardTitle>
-            <Icon className="h-3.5 w-3.5 text-muted-foreground/30 transition-colors group-hover:text-foreground/50" />
+            <AppIcon
+              icon={Icon}
+              size={16}
+              className="text-muted-foreground/30 transition-colors group-hover:text-foreground/50"
+            />
           </CardHeader>
 
           <CardContent className="z-10 p-4 pt-0 pb-6">

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PackagePlus, ScanLine, FileText, Printer, Scan } from 'lucide-react';
+import { PackagePlus, ScanLine, FileText, Printer, Scan, LucideIcon } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { useNavigate } from 'react-router-dom';
 import { UniversalBarcode } from '@/components/barcodes';
 import { useScanner } from '@/context/useScanner';
@@ -15,7 +16,7 @@ import type { UserRole } from '@/types';
 interface QuickActionCard {
   label: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   onClick: () => void;
   roles?: UserRole[];
 }
@@ -114,7 +115,7 @@ export const QuickActions: React.FC = () => {
               >
                 <div className="flex items-start gap-4 p-4">
                   <div className="p-2.5 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
-                    <Icon className="w-5 h-5" />
+                    <AppIcon icon={Icon} size={20} className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col flex-1 items-start text-left">
                     <span className="text-base font-semibold text-foreground">{action.label}</span>
@@ -133,7 +134,7 @@ export const QuickActions: React.FC = () => {
       <div className="mt-8 border-t border-border/40 pt-8">
         <div className="max-w-md">
           <h3 className="text-xs text-muted-foreground mb-4 flex items-center gap-2">
-            <Scan className="w-3 h-3" />
+            <AppIcon icon={Scan} size={16} className="w-3 h-3" />
             Direct Telemetry Query
           </h3>
 

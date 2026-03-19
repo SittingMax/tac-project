@@ -17,7 +17,9 @@ import {
   TableSkeleton,
   PageHeaderSkeleton,
 } from '../components/ui/skeleton';
+import { PageContainer, PageHeader } from '@/components/ui-core/layout';
 import { StatusBadge } from '@/components/domain/status-badge';
+import { ShipmentStatus, ManifestStatus, InvoiceStatus } from '@/types';
 import { Package, Truck, AlertTriangle, Check, X, Info, Search } from 'lucide-react';
 import {
   playSuccessFeedback,
@@ -55,42 +57,40 @@ export const DevUIKit: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">WGS Portal UI Kit</h1>
-          <p className="text-muted-foreground">Internal component documentation and preview</p>
-        </div>
+    <PageContainer>
+      {/* Header */}
+      <PageHeader
+        title="WGS Portal UI Kit"
+        description="Internal component documentation and preview"
+      />
 
-        {/* Navigation */}
-        <div className="flex-wrap gap-2 mb-8 pb-4 border-b border-border">
-          {sections.map((section) => (
-            <Button
-              key={section.id}
-              variant={activeSection === section.id ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveSection(section.id)}
-            >
-              {section.label}
-            </Button>
-          ))}
-        </div>
-
-        {/* Content */}
-        <div className="flex flex-col gap-8">
-          {activeSection === 'buttons' && <ButtonsSection />}
-          {activeSection === 'badges' && <BadgesSection />}
-          {activeSection === 'inputs' && <InputsSection />}
-          {activeSection === 'cards' && <CardsSection />}
-          {activeSection === 'skeletons' && <SkeletonsSection />}
-          {activeSection === 'feedback' && <FeedbackSection />}
-          {activeSection === 'colors' && <ColorsSection />}
-          {activeSection === 'status' && <StatusSection />}
-          {activeSection === 'scanner' && <ScannerDebugSection />}
-        </div>
+      {/* Navigation */}
+      <div className="flex-wrap gap-2 mb-8 pb-4 border-b border-border">
+        {sections.map((section) => (
+          <Button
+            key={section.id}
+            variant={activeSection === section.id ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveSection(section.id)}
+          >
+            {section.label}
+          </Button>
+        ))}
       </div>
-    </div>
+
+      {/* Content */}
+      <div className="flex flex-col gap-8">
+        {activeSection === 'buttons' && <ButtonsSection />}
+        {activeSection === 'badges' && <BadgesSection />}
+        {activeSection === 'inputs' && <InputsSection />}
+        {activeSection === 'cards' && <CardsSection />}
+        {activeSection === 'skeletons' && <SkeletonsSection />}
+        {activeSection === 'feedback' && <FeedbackSection />}
+        {activeSection === 'colors' && <ColorsSection />}
+        {activeSection === 'status' && <StatusSection />}
+        {activeSection === 'scanner' && <ScannerDebugSection />}
+      </div>
+    </PageContainer>
   );
 };
 
@@ -174,7 +174,11 @@ const InputsSection: React.FC = () => (
         <Input placeholder="Default input" />
         <Input placeholder="Disabled input" disabled />
         <div className="relative">
-          <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Search
+            size={16}
+            strokeWidth={1.5}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+          />
           <Input placeholder="Search..." className="pl-10" />
         </div>
       </div>
@@ -393,7 +397,7 @@ const StatusSection: React.FC = () => {
         <SectionTitle>Shipment Status Badges</SectionTitle>
         <ComponentGrid>
           {shipmentStatuses.map((status) => (
-            <StatusBadge key={status} status={status} />
+            <StatusBadge key={status} status={status as ShipmentStatus} />
           ))}
         </ComponentGrid>
       </Card>
@@ -402,7 +406,7 @@ const StatusSection: React.FC = () => {
         <SectionTitle>Manifest Status Badges</SectionTitle>
         <ComponentGrid>
           {manifestStatuses.map((status) => (
-            <StatusBadge key={status} status={status} />
+            <StatusBadge key={status} status={status as ManifestStatus} />
           ))}
         </ComponentGrid>
       </Card>
@@ -411,7 +415,7 @@ const StatusSection: React.FC = () => {
         <SectionTitle>Invoice Status Badges</SectionTitle>
         <ComponentGrid>
           {invoiceStatuses.map((status) => (
-            <StatusBadge key={status} status={status} />
+            <StatusBadge key={status} status={status as InvoiceStatus} />
           ))}
         </ComponentGrid>
       </Card>

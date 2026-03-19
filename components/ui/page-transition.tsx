@@ -3,7 +3,7 @@
  * Provides smooth animations when navigating between pages
  */
 
-import { motion, AnimatePresence } from '@/lib/motion';
+import { motion, AnimatePresence, type Variants } from '@/lib/motion';
 import { useLocation } from 'react-router-dom';
 import { ReactNode } from 'react';
 
@@ -11,7 +11,7 @@ interface PageTransitionProps {
   children: ReactNode;
 }
 
-const pageVariants = {
+const pageVariants: Variants = {
   initial: {
     opacity: 0,
     y: 10,

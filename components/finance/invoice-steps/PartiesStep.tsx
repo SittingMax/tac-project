@@ -59,7 +59,7 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
             <Input
               className="h-11 bg-transparent hover:border-ring/50"
               placeholder="Contact Person"
-              {...form.register('consignorContact' as any)}
+              {...form.register('consignorContact')}
             />
           </div>
           <Input
@@ -174,7 +174,7 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
             <Input
               className="h-11 bg-transparent hover:border-ring/50"
               placeholder="Contact Person"
-              {...form.register('consigneeContact' as any)}
+              {...form.register('consigneeContact')}
             />
           </div>
           <Input
