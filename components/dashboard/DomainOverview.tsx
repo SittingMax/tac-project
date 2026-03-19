@@ -141,13 +141,13 @@ export const DomainOverview: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6" data-testid="domain-overview">
+    <div className="flex flex-col gap-6" data-testid="domain-overview">
       {groups.map((group) => {
         const visibleItems = group.items.filter((i) => hasRoleAccess(userRole, i.roles));
         if (visibleItems.length === 0) return null;
 
         return (
-          <div key={group.title} className="space-y-3">
+          <div key={group.title} className="flex flex-col gap-3">
             <h3 className="text-xs text-muted-foreground">{group.title}</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
               {visibleItems.map((item) => {
@@ -176,9 +176,9 @@ export const DomainOverview: React.FC = () => {
                     >
                       <CardContent className="p-4 flex items-center gap-3">
                         <div className="p-2 rounded-sm bg-primary/10 text-primary">
-                          <Icon className="w-4 h-4" />
+                          <Icon size={16} strokeWidth={1.5} />
                         </div>
-                        <div className="flex flex-col">
+                        <div className="flex-col">
                           <span className="text-sm font-semibold text-foreground">
                             {item.label}
                           </span>

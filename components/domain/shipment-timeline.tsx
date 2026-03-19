@@ -7,6 +7,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { ShipmentStatus } from '@/types';
+import { formatDateShort, formatWeekday } from '@/lib/formatters';
 import {
   Package,
   Warehouse,
@@ -186,7 +187,7 @@ export function ShipmentTimeline({
       <div className="absolute left-[15px] top-6 bottom-6 w-px bg-border" aria-hidden="true" />
 
       {/* Events */}
-      <div className="space-y-0">
+      <div className="flex flex-col gap-0">
         {sortedEvents.map((event, index) => {
           const config = TIMELINE_CONFIG[event.event_code] || TIMELINE_CONFIG.SCAN;
           const Icon = config.icon;
@@ -275,13 +276,9 @@ function formatDate(date: Date): string {
   } else if (diffDays === 1) {
     return 'Yesterday';
   } else if (diffDays < 7) {
-    return date.toLocaleDateString('en-US', { weekday: 'long' });
+    return formatWeekday(date);
   } else {
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
-    });
+    return formatDateShort(date);
   }
 }
 

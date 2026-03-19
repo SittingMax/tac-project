@@ -154,12 +154,16 @@ export function ManifestSettingsForm({
   });
 
   return (
-    <form onSubmit={handleSubmit} className={cn('space-y-6 flex flex-col h-full', className)}>
-      <div className="flex-1 space-y-6">
+    <form onSubmit={handleSubmit} className={cn('flex flex-col gap-6 flex flex-col h-full', className)}>
+      <div className="flex-1 flex flex-col gap-6">
         {/* Route Selection */}
-        <FormSection title="Route Settings" description="Select the origin and destination hubs for this manifest." icon={Route}>
+        <FormSection
+          title="Route Settings"
+          description="Select the origin and destination hubs for this manifest."
+          icon={Route}
+        >
           <FormGrid columns={2}>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label>
                 Origin Hub <span className="text-destructive">*</span>
               </Label>
@@ -187,7 +191,7 @@ export function ManifestSettingsForm({
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label>
                 Destination Hub <span className="text-destructive">*</span>
               </Label>
@@ -218,174 +222,181 @@ export function ManifestSettingsForm({
         </FormSection>
 
         {/* Transport Type Toggle */}
-        <FormSection title="Transport Details" description="Configure transport method and logistics details." icon={Settings}>
-          <div className="space-y-6">
-            <div className="space-y-4">
+        <FormSection
+          title="Transport Details"
+          description="Configure transport method and logistics details."
+          icon={Settings}
+        >
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
               <Label>Transport Type</Label>
-            <div className="grid grid-cols-2 gap-2 bg-muted p-1 rounded-md">
-              <Button
-                type="button"
-                variant={transportType === 'AIR' ? 'default' : 'ghost'}
-                className={cn(
-                  'rounded-md',
-                  transportType === 'AIR' ? 'shadow-md' : 'hover:bg-background/50'
-                )}
-                onClick={() => form.setValue('type', 'AIR', { shouldValidate: true })}
-              >
-                <Plane className="h-4 w-4 mr-2" />
-                Air
-              </Button>
-              <Button
-                type="button"
-                variant={transportType === 'TRUCK' ? 'default' : 'ghost'}
-                className={cn(
-                  'rounded-md',
-                  transportType === 'TRUCK' ? 'shadow-md' : 'hover:bg-background/50'
-                )}
-                onClick={() => form.setValue('type', 'TRUCK', { shouldValidate: true })}
-              >
-                <Truck className="h-4 w-4 mr-2" />
-                Truck
-              </Button>
+              <div className="grid grid-cols-2 gap-2 bg-muted p-1 rounded-md">
+                <Button
+                  type="button"
+                  variant={transportType === 'AIR' ? 'default' : 'ghost'}
+                  className={cn(
+                    'rounded-md',
+                    transportType === 'AIR' ? 'shadow-md' : 'hover:bg-background/50'
+                  )}
+                  onClick={() => form.setValue('type', 'AIR', { shouldValidate: true })}
+                >
+                  <Plane size={16} strokeWidth={1.5} className="mr-2" />
+                  Air
+                </Button>
+                <Button
+                  type="button"
+                  variant={transportType === 'TRUCK' ? 'default' : 'ghost'}
+                  className={cn(
+                    'rounded-md',
+                    transportType === 'TRUCK' ? 'shadow-md' : 'hover:bg-background/50'
+                  )}
+                  onClick={() => form.setValue('type', 'TRUCK', { shouldValidate: true })}
+                >
+                  <Truck size={16} strokeWidth={1.5} className="mr-2" />
+                  Truck
+                </Button>
+              </div>
+
+              {/* AIR Transport Fields */}
+              {transportType === 'AIR' && (
+                <div className="flex flex-col gap-4 pt-2 hover-card">
+                  <FormGrid columns={2}>
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Airline Code
+                      </Label>
+                      <Input
+                        placeholder="e.g. 6E"
+                        {...form.register('airlineCode')}
+                        className="uppercase font-mono"
+                        maxLength={3}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Flight No <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        placeholder="e.g. 6055"
+                        {...form.register('flightNumber')}
+                        className={cn(
+                          'font-mono',
+                          form.formState.errors.flightNumber && 'border-destructive'
+                        )}
+                      />
+                      {form.formState.errors.flightNumber && (
+                        <p className="text-xs text-destructive">
+                          {form.formState.errors.flightNumber.message}
+                        </p>
+                      )}
+                    </div>
+                  </FormGrid>
+
+                  <FormGrid columns={3}>
+                    {/* Flight Date Picker */}
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Flight Date
+                      </Label>
+                      <DatePicker
+                        value={watchedValues.flightDate}
+                        onChange={(date) => form.setValue('flightDate', date)}
+                        placeholder="Pick a date"
+                        minDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                      />
+                    </div>
+
+                    {/* ETD / ETA Time Inputs */}
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        ETD
+                      </Label>
+                      <TimePicker
+                        value={watchedValues.etd}
+                        onChange={(time) => form.setValue('etd', time)}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        ETA
+                      </Label>
+                      <TimePicker
+                        value={watchedValues.eta}
+                        onChange={(time) => form.setValue('eta', time)}
+                      />
+                    </div>
+                  </FormGrid>
+                </div>
+              )}
+
+              {/* TRUCK Transport Fields */}
+              {transportType === 'TRUCK' && (
+                <div className="flex flex-col gap-4 pt-2">
+                  <FormGrid columns={2}>
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Vehicle No <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        placeholder="e.g. MN01AB1234"
+                        {...form.register('vehicleNumber')}
+                        className={cn(
+                          'uppercase font-mono',
+                          form.formState.errors.vehicleNumber && 'border-destructive'
+                        )}
+                      />
+                      {form.formState.errors.vehicleNumber && (
+                        <p className="text-xs text-destructive">
+                          {form.formState.errors.vehicleNumber.message}
+                        </p>
+                      )}
+                    </div>
+                    {/* Dispatch DateTime */}
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Dispatch Date/Time
+                      </Label>
+                      <DateTimePicker
+                        value={watchedValues.dispatchAt}
+                        onChange={(date) => form.setValue('dispatchAt', date)}
+                        placeholder="Pick date & time"
+                        showTime={true}
+                      />
+                    </div>
+                  </FormGrid>
+
+                  <FormGrid columns={2}>
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Driver Name
+                      </Label>
+                      <Input placeholder="Driver name" {...form.register('driverName')} />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Driver Phone
+                      </Label>
+                      <Input
+                        placeholder="Phone number"
+                        {...form.register('driverPhone')}
+                        type="tel"
+                        className="font-mono"
+                      />
+                    </div>
+                  </FormGrid>
+                </div>
+              )}
             </div>
-
-            {/* AIR Transport Fields */}
-            {transportType === 'AIR' && (
-              <div className="space-y-4 pt-2 hover-card">
-                <FormGrid columns={2}>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Airline Code
-                    </Label>
-                    <Input
-                      placeholder="e.g. 6E"
-                      {...form.register('airlineCode')}
-                      className="uppercase font-mono"
-                      maxLength={3}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Flight No <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      placeholder="e.g. 6055"
-                      {...form.register('flightNumber')}
-                      className={cn(
-                        'font-mono',
-                        form.formState.errors.flightNumber && 'border-destructive'
-                      )}
-                    />
-                    {form.formState.errors.flightNumber && (
-                      <p className="text-xs text-destructive">
-                        {form.formState.errors.flightNumber.message}
-                      </p>
-                    )}
-                  </div>
-                </FormGrid>
-
-                <FormGrid columns={3}>
-                  {/* Flight Date Picker */}
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Flight Date
-                    </Label>
-                    <DatePicker
-                      value={watchedValues.flightDate}
-                      onChange={(date) => form.setValue('flightDate', date)}
-                      placeholder="Pick a date"
-                      minDate={new Date(new Date().setHours(0, 0, 0, 0))}
-                    />
-                  </div>
-                  
-                  {/* ETD / ETA Time Inputs */}
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      ETD
-                    </Label>
-                    <TimePicker
-                      value={watchedValues.etd}
-                      onChange={(time) => form.setValue('etd', time)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      ETA
-                    </Label>
-                    <TimePicker
-                      value={watchedValues.eta}
-                      onChange={(time) => form.setValue('eta', time)}
-                    />
-                  </div>
-                </FormGrid>
-              </div>
-            )}
-
-            {/* TRUCK Transport Fields */}
-            {transportType === 'TRUCK' && (
-              <div className="space-y-4 pt-2">
-                <FormGrid columns={2}>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Vehicle No <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      placeholder="e.g. MN01AB1234"
-                      {...form.register('vehicleNumber')}
-                      className={cn(
-                        'uppercase font-mono',
-                        form.formState.errors.vehicleNumber && 'border-destructive'
-                      )}
-                    />
-                    {form.formState.errors.vehicleNumber && (
-                      <p className="text-xs text-destructive">
-                        {form.formState.errors.vehicleNumber.message}
-                      </p>
-                    )}
-                  </div>
-                  {/* Dispatch DateTime */}
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Dispatch Date/Time
-                    </Label>
-                    <DateTimePicker
-                      value={watchedValues.dispatchAt}
-                      onChange={(date) => form.setValue('dispatchAt', date)}
-                      placeholder="Pick date & time"
-                      showTime={true}
-                    />
-                  </div>
-                </FormGrid>
-
-                <FormGrid columns={2}>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Driver Name
-                    </Label>
-                    <Input placeholder="Driver name" {...form.register('driverName')} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Driver Phone
-                    </Label>
-                    <Input
-                      placeholder="Phone number"
-                      {...form.register('driverPhone')}
-                      type="tel"
-                      className="font-mono"
-                    />
-                  </div>
-                </FormGrid>
-              </div>
-            )}
           </div>
-        </div>
         </FormSection>
 
         {/* Operational Scan Rules */}
-        <FormSection title="Operational Rules" description="Validation and eligibility rules for shipment scanning." icon={ShieldCheck}>
-          <div className="space-y-4">
-
+        <FormSection
+          title="Operational Rules"
+          description="Validation and eligibility rules for shipment scanning."
+          icon={ShieldCheck}
+        >
+          <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <Label className="text-sm font-medium">Only READY shipments</Label>

@@ -32,15 +32,15 @@ export function CrudRowActions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8" disabled={disabled}>
-          <MoreHorizontal className="h-4 w-4" />
+        <Button variant="ghost" size="icon" disabled={disabled}>
+          <MoreHorizontal size={16} strokeWidth={1.5} />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem onClick={onEdit} className="cursor-pointer">
-          <Pencil className="mr-2 h-4 w-4" />
+          <Pencil size={16} strokeWidth={1.5} className="mr-2" />
           {editLabel}
         </DropdownMenuItem>
 
@@ -58,7 +58,7 @@ export function CrudRowActions({
               onClick={onDelete}
               className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              <Trash2 size={16} strokeWidth={1.5} className="mr-2" />
               Delete
             </DropdownMenuItem>
           </>

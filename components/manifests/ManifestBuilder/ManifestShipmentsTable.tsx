@@ -77,8 +77,8 @@ export function ManifestShipmentsTable({
                 </div>
               </HoverCardTrigger>
               <HoverCardContent className="w-80" align="start">
-                <div className="flex justify-between space-x-4">
-                  <div className="space-y-1">
+                <div className="flex justify-between flex gap-4 items-center">
+                  <div className="flex flex-col gap-1">
                     <h4 className="text-sm font-semibold">Shipment Details</h4>
                     <p className="text-sm">
                       <span className="font-medium text-muted-foreground mr-1">Sender:</span>
@@ -90,7 +90,7 @@ export function ManifestShipmentsTable({
                     </p>
                     <div className="flex items-center pt-2 gap-4">
                       <span className="text-xs text-muted-foreground flex items-center">
-                        <Package className="mr-1 h-3 w-3" />
+                        <Package size={12} strokeWidth={1.5} className="mr-1" />
                         {shipment?.package_count || shipment?.total_packages || 0} pcs
                       </span>
                       <span className="text-xs text-muted-foreground font-medium">
@@ -127,7 +127,7 @@ export function ManifestShipmentsTable({
         cell: ({ row }) => {
           const shipment = row.original.shipment;
           return (
-            <div className="space-y-0.5">
+            <div className="flex flex-col gap-0.5">
               <div className="font-medium truncate max-w-[180px]">
                 {shipment?.consignee_name || '—'}
               </div>
@@ -144,7 +144,7 @@ export function ManifestShipmentsTable({
         cell: ({ row }) => {
           const shipment = row.original.shipment;
           return (
-            <div className="space-y-0.5">
+            <div className="flex flex-col gap-0.5">
               <div className="font-medium truncate max-w-[180px]">
                 {shipment?.consignor_name || '—'}
               </div>
@@ -222,7 +222,7 @@ export function ManifestShipmentsTable({
   if (isLoading) {
     return (
       <div className={cn('flex items-center justify-center h-64', className)}>
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 size={32} strokeWidth={1.5} className="animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -243,7 +243,7 @@ export function ManifestShipmentsTable({
       {/* Search Bar */}
       <div className="mb-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search CN, receiver, sender..."
             value={searchQuery}

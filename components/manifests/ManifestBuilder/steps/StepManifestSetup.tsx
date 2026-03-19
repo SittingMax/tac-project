@@ -2,7 +2,8 @@ import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { format } from 'date-fns';
+
+import { formatDate } from '@/lib/formatters';
 import { CalendarIcon, Plane, Truck } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -152,12 +153,12 @@ export function StepManifestSetup({
     <Form {...form}>
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
         {/* Route Selection */}
-        <Card className="border-border bg-card/50 xl:col-span-7">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold">Route Selection</CardTitle>
+        <Card className="border-border bg-card/50 xl:col-span-7 transition duration-300 hover:shadow-sm hover:border-border/80 relative">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Route Selection</CardTitle>
             <CardDescription>Define origin and destination hubs</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 pt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <FormField
@@ -177,7 +178,7 @@ export function StepManifestSetup({
                         >
                           <SelectTrigger
                             className={cn(
-                              'h-11 bg-transparent hover:border-ring/50 transition-colors',
+                              'h-8 text-sm bg-transparent hover:border-ring/50 transition-colors',
                               form.formState.errors.fromHubId && 'border-destructive'
                             )}
                           >
@@ -218,7 +219,7 @@ export function StepManifestSetup({
                         >
                           <SelectTrigger
                             className={cn(
-                              'h-11 bg-transparent hover:border-ring/50 transition-colors',
+                              'h-8 text-sm bg-transparent hover:border-ring/50 transition-colors',
                               form.formState.errors.toHubId && 'border-destructive'
                             )}
                           >
@@ -247,12 +248,12 @@ export function StepManifestSetup({
         </Card>
 
         {/* Transport Mode */}
-        <Card className="border-border bg-card/50 xl:col-span-5">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold">Transport Mode</CardTitle>
+        <Card className="border-border bg-card/50 xl:col-span-5 transition duration-300 hover:shadow-sm hover:border-border/80 relative">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Transport Mode</CardTitle>
             <CardDescription>Select transport type</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 pt-0">
             <ToggleGroup
               type="single"
               value={transportType}
@@ -269,23 +270,23 @@ export function StepManifestSetup({
               <ToggleGroupItem
                 value="AIR"
                 className={cn(
-                  'flex-1 h-[72px] flex flex-col items-center justify-center gap-1.5 border border-border rounded-md transition-all',
-                  'data-[state=on]:bg-feature-air/20 data-[state=on]:text-feature-air data-[state=on]:border-feature-air/50',
-                  transportType === 'AIR' && 'ring-2 ring-feature-air/30'
+                  'flex-1 py-2 flex flex-col items-center justify-center gap-1.5 border border-border rounded-none transition',
+                  'data-[state=on]:bg-feature-air/10 data-[state=on]:text-feature-air data-[state=on]:border-feature-air/50',
+                  transportType === 'AIR' && 'shadow-sm ring-1 ring-feature-air/20'
                 )}
               >
-                <Plane className="h-5 w-5" />
+                <Plane size={16} strokeWidth={1.5} />
                 <span className="text-sm font-medium">Air Cargo</span>
               </ToggleGroupItem>
               <ToggleGroupItem
                 value="TRUCK"
                 className={cn(
-                  'flex-1 h-[72px] flex flex-col items-center justify-center gap-1.5 border border-border rounded-md transition-all',
-                  'data-[state=on]:bg-feature-ground/20 data-[state=on]:text-feature-ground data-[state=on]:border-feature-ground/50',
-                  transportType === 'TRUCK' && 'ring-2 ring-feature-ground/30'
+                  'flex-1 py-2 flex flex-col items-center justify-center gap-1.5 border border-border rounded-none transition',
+                  'data-[state=on]:bg-feature-ground/10 data-[state=on]:text-feature-ground data-[state=on]:border-feature-ground/50',
+                  transportType === 'TRUCK' && 'shadow-sm ring-1 ring-feature-ground/20'
                 )}
               >
-                <Truck className="h-5 w-5" />
+                <Truck size={16} strokeWidth={1.5} />
                 <span className="text-sm font-medium">Truck</span>
               </ToggleGroupItem>
             </ToggleGroup>
@@ -297,12 +298,12 @@ export function StepManifestSetup({
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* Schedule (Only for TRUCK) */}
         {transportType === 'TRUCK' && (
-          <Card className="border-border bg-card/50">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base font-semibold">Dispatch Schedule</CardTitle>
+          <Card className="border-border bg-card/50 transition duration-300 hover:shadow-sm hover:border-border/80 relative">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Dispatch Schedule</CardTitle>
               <CardDescription>Set dispatch date and time</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col gap-4">
+            <CardContent className="p-3 pt-0 flex flex-col gap-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                   <Label className="text-xs font-mono text-muted-foreground uppercase">
@@ -313,14 +314,14 @@ export function StepManifestSetup({
                       <Button
                         variant="outline"
                         className={cn(
-                          'w-full justify-start text-left font-normal h-11 bg-transparent hover:border-ring/50 transition-colors',
+                          'w-full justify-start text-left font-normal h-8 text-sm bg-transparent hover:border-ring/50 transition-colors',
                           !form.watch('dispatchDate') && 'text-muted-foreground'
                         )}
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                        <CalendarIcon size={16} strokeWidth={1.5} className="mr-2 shrink-0" />
                         <span className="truncate">
                           {form.watch('dispatchDate')
-                            ? format(form.watch('dispatchDate')!, 'MMM d, yyyy')
+                            ? formatDate(form.watch('dispatchDate')!)
                             : 'Pick a date'}
                         </span>
                       </Button>
@@ -339,14 +340,14 @@ export function StepManifestSetup({
                   <Label className="text-xs font-mono text-muted-foreground uppercase">
                     Dispatch Time
                   </Label>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     <Select
                       value={form.watch('dispatchHour') ?? ''}
                       onValueChange={(v) =>
                         form.setValue('dispatchHour', v, { shouldDirty: true, shouldTouch: true })
                       }
                     >
-                      <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
+                      <SelectTrigger className="flex-1 h-8 text-sm bg-transparent hover:border-ring/50 transition-colors">
                         <SelectValue placeholder="HH" />
                       </SelectTrigger>
                       <SelectContent side="top">
@@ -363,7 +364,7 @@ export function StepManifestSetup({
                         form.setValue('dispatchMinute', v, { shouldDirty: true, shouldTouch: true })
                       }
                     >
-                      <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
+                      <SelectTrigger className="flex-1 h-8 text-sm bg-transparent hover:border-ring/50 transition-colors">
                         <SelectValue placeholder="MM" />
                       </SelectTrigger>
                       <SelectContent side="top">
@@ -383,7 +384,7 @@ export function StepManifestSetup({
                         })
                       }
                     >
-                      <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
+                      <SelectTrigger className="flex-1 h-8 text-sm bg-transparent hover:border-ring/50 transition-colors">
                         <SelectValue placeholder="AM" />
                       </SelectTrigger>
                       <SelectContent side="top">
@@ -403,10 +404,13 @@ export function StepManifestSetup({
 
         {/* Transport Details */}
         <Card
-          className={cn('border-border bg-card/50', transportType === 'AIR' ? 'xl:col-span-2' : '')}
+          className={cn(
+            'border-border bg-card/50 transition duration-300 hover:shadow-sm hover:border-border/80 relative',
+            transportType === 'AIR' ? 'xl:col-span-2' : ''
+          )}
         >
-          <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">
               {transportType === 'AIR' ? 'Flight Details' : 'Vehicle Details'}
             </CardTitle>
             <CardDescription>
@@ -415,7 +419,7 @@ export function StepManifestSetup({
                 : 'Enter vehicle and driver information'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent className="p-3 pt-0 flex flex-col gap-3">
             {transportType === 'AIR' ? (
               <>
                 <div className="grid grid-cols-2 gap-4">
@@ -431,7 +435,7 @@ export function StepManifestSetup({
                           <FormControl>
                             <Input
                               placeholder="AA"
-                              className="h-11 bg-transparent hover:border-ring/50 transition-colors uppercase font-mono"
+                              className="h-8 text-sm bg-transparent hover:border-ring/50 transition-colors uppercase font-mono"
                               maxLength={3}
                               {...field}
                             />
@@ -455,7 +459,7 @@ export function StepManifestSetup({
                               placeholder="1234"
                               {...field}
                               className={cn(
-                                'h-11 bg-transparent hover:border-ring/50 transition-colors font-mono',
+                                'h-8 text-sm bg-transparent hover:border-ring/50 transition-colors font-mono',
                                 form.formState.errors.flightNumber && 'border-destructive'
                               )}
                             />
@@ -476,14 +480,14 @@ export function StepManifestSetup({
                         <Button
                           variant="outline"
                           className={cn(
-                            'w-full justify-start text-left font-normal h-11 bg-transparent hover:border-ring/50 transition-colors',
+                            'w-full justify-start text-left font-normal h-8 text-sm bg-transparent hover:border-ring/50 transition-colors',
                             !form.watch('flightDate') && 'text-muted-foreground'
                           )}
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                          <CalendarIcon size={16} strokeWidth={1.5} className="mr-2 shrink-0" />
                           <span className="truncate">
                             {form.watch('flightDate')
-                              ? format(form.watch('flightDate')!, 'MMM d, yyyy')
+                              ? formatDate(form.watch('flightDate')!)
                               : 'Pick a date'}
                           </span>
                         </Button>
@@ -500,14 +504,14 @@ export function StepManifestSetup({
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label className="text-xs font-mono text-muted-foreground uppercase">ETD</Label>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       <Select
                         value={form.watch('etdHour') ?? ''}
                         onValueChange={(v) =>
                           form.setValue('etdHour', v, { shouldDirty: true, shouldTouch: true })
                         }
                       >
-                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
+                        <SelectTrigger className="flex-1 h-8 text-sm bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="HH" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -524,7 +528,7 @@ export function StepManifestSetup({
                           form.setValue('etdMinute', v, { shouldDirty: true, shouldTouch: true })
                         }
                       >
-                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
+                        <SelectTrigger className="flex-1 h-8 text-sm bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="MM" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -544,7 +548,7 @@ export function StepManifestSetup({
                           })
                         }
                       >
-                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
+                        <SelectTrigger className="flex-1 h-8 text-sm bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="AM" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -559,14 +563,14 @@ export function StepManifestSetup({
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label className="text-xs font-mono text-muted-foreground uppercase">ETA</Label>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       <Select
                         value={form.watch('etaHour') ?? ''}
                         onValueChange={(v) =>
                           form.setValue('etaHour', v, { shouldDirty: true, shouldTouch: true })
                         }
                       >
-                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
+                        <SelectTrigger className="flex-1 h-8 text-sm bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="HH" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -583,7 +587,7 @@ export function StepManifestSetup({
                           form.setValue('etaMinute', v, { shouldDirty: true, shouldTouch: true })
                         }
                       >
-                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
+                        <SelectTrigger className="flex-1 h-8 text-sm bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="MM" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -603,7 +607,7 @@ export function StepManifestSetup({
                           })
                         }
                       >
-                        <SelectTrigger className="flex-1 h-11 bg-transparent hover:border-ring/50 transition-colors">
+                        <SelectTrigger className="flex-1 h-8 text-sm bg-transparent hover:border-ring/50 transition-colors">
                           <SelectValue placeholder="AM" />
                         </SelectTrigger>
                         <SelectContent side="top">
@@ -656,7 +660,7 @@ export function StepManifestSetup({
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                              className="h-8 text-sm bg-transparent hover:border-ring/50 transition-colors"
                               placeholder="John Smith"
                               {...field}
                             />
@@ -677,7 +681,7 @@ export function StepManifestSetup({
                           </FormLabel>
                           <FormControl>
                             <Input
-                              className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                              className="h-8 text-sm bg-transparent hover:border-ring/50 transition-colors"
                               placeholder="+1 555-0123"
                               {...field}
                             />

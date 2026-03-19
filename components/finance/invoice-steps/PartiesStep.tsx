@@ -9,10 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
 import { User, MapPin } from 'lucide-react';
 import { CustomerSearch } from './shared';
-import { FormSection, FormGrid } from '@/components/ui-core';
+import { FormSection, FormGrid, FieldGroup } from '@/components/ui-core';
 import { Customer as CustomerDB } from '@/hooks/useCustomers';
 import { POPULAR_CITIES, HUB_PREFILL } from '@/lib/constants';
 
@@ -44,40 +43,39 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
           </div>
         }
       >
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <div className="flex flex-col gap-3">
+          <FieldGroup label="Company / Full Name" error={errors.consignorName?.message}>
             <Input
-              className="h-11 bg-transparent hover:border-ring/50"
+              className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
               placeholder="Company / Full Name"
               {...form.register('consignorName')}
             />
-            {errors.consignorName && (
-              <span className="text-xs text-destructive">{errors.consignorName.message}</span>
-            )}
-          </div>
-          <div className="space-y-2">
+          </FieldGroup>
+          <FieldGroup label="Contact Person">
             <Input
-              className="h-11 bg-transparent hover:border-ring/50"
+              className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
               placeholder="Contact Person"
-              {...form.register('consignorContact' as any)}
+              {...form.register('consignorContact')}
             />
-          </div>
-          <Input
-            className="h-11 bg-transparent hover:border-ring/50"
-            {...form.register('consignorPhone')}
-            placeholder="Phone Number"
-          />
-          <Input
-            className="h-11 bg-transparent hover:border-ring/50"
-            placeholder="Address Line"
-            {...form.register('consignorAddress')}
-          />
+          </FieldGroup>
+          <FieldGroup label="Phone Number">
+            <Input
+              className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
+              {...form.register('consignorPhone')}
+              placeholder="Phone Number"
+            />
+          </FieldGroup>
+          <FieldGroup label="Address Line">
+            <Input
+              className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
+              placeholder="Address Line"
+              {...form.register('consignorAddress')}
+            />
+          </FieldGroup>
           <FormGrid columns={2}>
-            <div className="space-y-1.5 flex flex-col justify-end">
-              <div className="flex justify-between items-center mb-1">
-                <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                  City
-                </Label>
+            <FieldGroup
+              label="City"
+              action={
                 <button
                   type="button"
                   onClick={() => {
@@ -86,9 +84,10 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
                   }}
                   className="text-[10px] text-primary hover:underline font-medium"
                 >
-                  {consignorCityMode === 'SELECT' ? 'Manual Entry' : 'Select City'}
+                  {consignorCityMode === 'SELECT' ? 'Manual' : 'Select'}
                 </button>
-              </div>
+              }
+            >
               {consignorCityMode === 'SELECT' ? (
                 <Select
                   value={
@@ -111,7 +110,7 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
                     }
                   }}
                 >
-                  <SelectTrigger className="h-11 bg-transparent hover:border-ring/50">
+                  <SelectTrigger className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -125,23 +124,20 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
                 </Select>
               ) : (
                 <Input
-                  className="h-11 bg-transparent hover:border-ring/50"
+                  className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
                   placeholder="City"
                   {...form.register('consignorCity')}
                 />
               )}
-            </div>
-            <div className="space-y-1.5 flex flex-col justify-end">
-              <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                Zip Code
-              </Label>
+            </FieldGroup>
+            <FieldGroup label="Zip Code">
               <Input
                 placeholder="Zip Code"
                 {...form.register('consignorZip')}
                 maxLength={6}
-                className="h-11 bg-transparent hover:border-ring/50"
+                className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
               />
-            </div>
+            </FieldGroup>
           </FormGrid>
         </div>
       </FormSection>
@@ -159,40 +155,39 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
           </div>
         }
       >
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <div className="flex flex-col gap-3">
+          <FieldGroup label="Company / Full Name" error={errors.consigneeName?.message}>
             <Input
-              className="h-11 bg-transparent hover:border-ring/50"
+              className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
               placeholder="Company / Full Name"
               {...form.register('consigneeName')}
             />
-            {errors.consigneeName && (
-              <span className="text-xs text-destructive">{errors.consigneeName.message}</span>
-            )}
-          </div>
-          <div className="space-y-2">
+          </FieldGroup>
+          <FieldGroup label="Contact Person">
             <Input
-              className="h-11 bg-transparent hover:border-ring/50"
+              className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
               placeholder="Contact Person"
-              {...form.register('consigneeContact' as any)}
+              {...form.register('consigneeContact')}
             />
-          </div>
-          <Input
-            className="h-11 bg-transparent hover:border-ring/50"
-            {...form.register('consigneePhone')}
-            placeholder="Phone Number"
-          />
-          <Input
-            className="h-11 bg-transparent hover:border-ring/50"
-            placeholder="Address Line"
-            {...form.register('consigneeAddress')}
-          />
+          </FieldGroup>
+          <FieldGroup label="Phone Number">
+            <Input
+              className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
+              {...form.register('consigneePhone')}
+              placeholder="Phone Number"
+            />
+          </FieldGroup>
+          <FieldGroup label="Address Line">
+            <Input
+              className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
+              placeholder="Address Line"
+              {...form.register('consigneeAddress')}
+            />
+          </FieldGroup>
           <FormGrid columns={2}>
-            <div className="space-y-1.5 flex flex-col justify-end">
-              <div className="flex justify-between items-center mb-1">
-                <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                  City
-                </Label>
+            <FieldGroup
+              label="City"
+              action={
                 <button
                   type="button"
                   onClick={() => {
@@ -201,9 +196,10 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
                   }}
                   className="text-[10px] text-primary hover:underline font-medium"
                 >
-                  {consigneeCityMode === 'SELECT' ? 'Manual Entry' : 'Select City'}
+                  {consigneeCityMode === 'SELECT' ? 'Manual' : 'Select'}
                 </button>
-              </div>
+              }
+            >
               {consigneeCityMode === 'SELECT' ? (
                 <Select
                   value={
@@ -226,7 +222,7 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
                     }
                   }}
                 >
-                  <SelectTrigger className="h-11 bg-transparent hover:border-ring/50">
+                  <SelectTrigger className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -240,23 +236,20 @@ export const PartiesStep = ({ form, customers, fillCustomerData }: Props) => {
                 </Select>
               ) : (
                 <Input
-                  className="h-11 bg-transparent hover:border-ring/50"
+                  className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
                   placeholder="City"
                   {...form.register('consigneeCity')}
                 />
               )}
-            </div>
-            <div className="space-y-1.5 flex flex-col justify-end">
-              <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                Zip Code
-              </Label>
+            </FieldGroup>
+            <FieldGroup label="Zip Code">
               <Input
                 placeholder="Zip Code"
                 {...form.register('consigneeZip')}
                 maxLength={6}
-                className="h-11 bg-transparent hover:border-ring/50"
+                className="h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
               />
-            </div>
+            </FieldGroup>
           </FormGrid>
         </div>
       </FormSection>

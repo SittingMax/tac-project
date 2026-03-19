@@ -33,20 +33,20 @@ export const LiveFleetMap = () => {
       <div className="p-6 pb-2 relative z-10 flex justify-between items-center">
         <div>
           <h3 className="text-lg font-bold flex items-center gap-2">
-            <Map className="w-5 h-5 text-primary" />
+            <Map size={20} strokeWidth={1.5} className="text-primary" />
             Live Fleet Map
           </h3>
           <p className="text-sm text-muted-foreground">Real-time corridor activity</p>
         </div>
         <div className="flex items-center gap-4 text-xs font-medium">
           <span className="flex items-center gap-1.5 opacity-80">
-            <Plane className="w-3.5 h-3.5 text-chart-2" /> Air Routes
+            <Plane size={12} strokeWidth={1.5} className=".5 .5 text-chart-2" /> Air Routes
           </span>
           <span className="flex items-center gap-1.5 opacity-80">
-            <Truck className="w-3.5 h-3.5 text-primary" /> Ground Routes
+            <Truck size={12} strokeWidth={1.5} className=".5 .5 text-primary" /> Ground Routes
           </span>
           <span className="flex items-center gap-1.5 text-primary animate-pulse">
-            <Activity className="w-3.5 h-3.5" /> {shipments.length} Active
+            <Activity size={12} strokeWidth={1.5} className=".5 .5" /> {shipments.length} Active
           </span>
         </div>
       </div>
@@ -124,7 +124,7 @@ export const LiveFleetMap = () => {
             {/* Label */}
             <div
               className={cn(
-                'absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 rounded-md bg-background/90 text-xs font-medium border border-border shadow-sm whitespace-nowrap transition-all z-20',
+                'absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 rounded-md bg-background/90 text-xs font-medium border border-border shadow-sm whitespace-nowrap transition z-20',
                 'opacity-70 scale-95 group-hover:opacity-100 group-hover:scale-100'
               )}
             >

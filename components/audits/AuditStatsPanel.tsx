@@ -16,7 +16,7 @@ export const AuditStatsPanel: React.FC<AuditStatsPanelProps> = ({ stats }) => {
   const progressPercent = stats.total > 0 ? (stats.scanned / stats.total) * 100 : 0;
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {/* Progress Bar */}
       <div className="h-2 w-full bg-muted/30 overflow-hidden">
         <motion.div
@@ -30,7 +30,7 @@ export const AuditStatsPanel: React.FC<AuditStatsPanelProps> = ({ stats }) => {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4 rounded-md border border-border bg-background flex flex-col items-center justify-center text-center">
-          <Package className="w-6 h-6 text-muted-foreground mb-2" />
+          <Package size={24} strokeWidth={1.5} className="text-muted-foreground mb-2" />
           <div className="text-3xl font-semibold tracking-tight text-foreground">{stats.total}</div>
           <div className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
             Expected
@@ -41,7 +41,7 @@ export const AuditStatsPanel: React.FC<AuditStatsPanelProps> = ({ stats }) => {
           {stats.scanned > 0 && (
             <div className="absolute inset-0 bg-status-success/5 border-b-2 border-status-success pointer-events-none" />
           )}
-          <CheckCircle2 className="w-6 h-6 text-status-success mb-2 relative z-10" />
+          <CheckCircle2 size={24} strokeWidth={1.5} className="text-status-success mb-2 relative z-10" />
           <div className="text-3xl font-semibold tracking-tight text-status-success relative z-10">
             {stats.scanned}
           </div>
@@ -51,7 +51,7 @@ export const AuditStatsPanel: React.FC<AuditStatsPanelProps> = ({ stats }) => {
         </Card>
 
         <Card className="p-4 rounded-md border border-border bg-background flex flex-col items-center justify-center text-center">
-          <Box className="w-6 h-6 text-muted-foreground mb-2 opacity-50" />
+          <Box size={24} strokeWidth={1.5} className="text-muted-foreground mb-2 opacity-50" />
           <div className="text-3xl font-semibold tracking-tight text-foreground">
             {stats.missing}
           </div>

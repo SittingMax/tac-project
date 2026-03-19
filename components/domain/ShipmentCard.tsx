@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Shipment } from '@/types';
-import { StatusBadge } from './StatusBadge';
-import { format } from 'date-fns';
+import { StatusBadge } from '@/components/domain/status-badge';
+import { formatDateShort } from '@/lib/formatters';
 import { Package, Plane, Truck, Ship, Clock, ArrowRight, Weight, ChevronRight } from 'lucide-react';
 
 interface ShipmentCardProps {
@@ -47,12 +47,12 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
       <div
         onClick={onClick}
         className={cn(
-          'flex items-center gap-4 p-4 rounded-md border border-white/5 bg-card/50 hover:bg-card hover:border-primary/30 transition-all cursor-pointer group',
+          'flex items-center gap-4 p-4 rounded-md border border-white/5 bg-card/50 hover:bg-card hover:border-primary/30 transition cursor-pointer group',
           className
         )}
       >
         <div className="p-2 rounded-md bg-primary/10">
-          <Package className="w-4 h-4 text-primary" />
+          <Package size={16} strokeWidth={1.5} className="text-primary" />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -65,11 +65,11 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
 
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <span className="font-medium">{origin.code}</span>
-          <ArrowRight className="w-3 h-3" />
+          <ArrowRight size={12} strokeWidth={1.5} />
           <span className="font-medium">{dest.code}</span>
         </div>
 
-        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+        <ChevronRight size={16} strokeWidth={1.5} className="text-muted-foreground group-hover:text-primary transition-colors" />
       </div>
     );
   }
@@ -78,7 +78,7 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
     <div
       onClick={onClick}
       className={cn(
-        'relative overflow-hidden rounded-md border border-white/10 bg-card/80 backdrop-blur-sm p-4 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 cursor-pointer group',
+        'relative overflow-hidden rounded-md border border-white/10 bg-card/80 backdrop-blur-sm p-4 transition hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 cursor-pointer group',
         className
       )}
     >
@@ -125,7 +125,7 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
 
         <div className="flex-1 flex items-center justify-center gap-2 px-4">
           <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
-          <ModeIcon className="w-4 h-4 text-muted-foreground" />
+          <ModeIcon size={16} strokeWidth={1.5} className="text-muted-foreground" />
           <div className="h-px flex-1 bg-gradient-to-l from-border to-transparent" />
         </div>
 
@@ -138,19 +138,19 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
       {/* Details */}
       <div className="grid grid-cols-3 gap-4 text-sm">
         <div className="flex items-center gap-2">
-          <Package className="w-4 h-4 text-muted-foreground" />
+          <Package size={16} strokeWidth={1.5} className="text-muted-foreground" />
           <span className="text-muted-foreground">
             {shipment.totalPackageCount} {shipment.totalPackageCount === 1 ? 'pkg' : 'pkgs'}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <Weight className="w-4 h-4 text-muted-foreground" />
+          <Weight size={16} strokeWidth={1.5} className="text-muted-foreground" />
           <span className="text-muted-foreground">{shipment.totalWeight.chargeable} kg</span>
         </div>
         <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-muted-foreground" />
+          <Clock size={16} strokeWidth={1.5} className="text-muted-foreground" />
           <span className="text-muted-foreground">
-            {format(new Date(shipment.createdAt), 'dd MMM')}
+            {formatDateShort(shipment.createdAt)}
           </span>
         </div>
       </div>
@@ -160,9 +160,7 @@ export function ShipmentCard({ shipment, onClick, className, compact = false }: 
         <span
           className={cn(
             'text-xs font-bold px-2 py-0.5 rounded-md',
-            shipment.serviceLevel === 'EXPRESS'
-              ? 'badge--in-transit'
-              : 'bg-muted text-muted-foreground'
+            shipment.serviceLevel === 'EXPRESS' ? 'IN_TRANSIT' : 'bg-muted text-muted-foreground'
           )}
         >
           {shipment.serviceLevel}

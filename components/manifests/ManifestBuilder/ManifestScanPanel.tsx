@@ -74,12 +74,12 @@ export function ManifestScanPanel({
   const getResultIcon = (result: ScanResponse | null) => {
     if (!result) return null;
     if (result.success && !result.duplicate) {
-      return <CheckCircle2 className="h-5 w-5 text-status-success" />;
+      return <CheckCircle2 size={20} strokeWidth={1.5} className="text-status-success" />;
     }
     if (result.duplicate) {
-      return <AlertCircle className="h-5 w-5 text-status-warning" />;
+      return <AlertCircle size={20} strokeWidth={1.5} className="text-status-warning" />;
     }
-    return <XCircle className="h-5 w-5 text-status-error" />;
+    return <XCircle size={20} strokeWidth={1.5} className="text-status-error" />;
   };
 
   const getResultColor = (result: ScanResponse | null) => {
@@ -100,7 +100,7 @@ export function ManifestScanPanel({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <Scan className="h-4 w-4" />
+            <Scan size={16} strokeWidth={1.5} />
             Scan CN / Package Barcode
           </CardTitle>
           <Badge variant="secondary" className="text-xs">
@@ -108,7 +108,7 @@ export function ManifestScanPanel({
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col gap-4">
         <Tabs value={scanMode} onValueChange={(value) => setScanMode(value as ManifestScanMode)}>
           <TabsList className="grid grid-cols-3">
             <TabsTrigger value="manual">Manual</TabsTrigger>
@@ -122,14 +122,14 @@ export function ManifestScanPanel({
           </TabsContent>
           <TabsContent value="scanner" className="pt-2">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Keyboard className="h-3.5 w-3.5" />
+              <Keyboard size={12} strokeWidth={1.5} className=".5 .5" />
               USB scanner is active. Keep the input focused.
             </div>
           </TabsContent>
           <TabsContent value="camera" className="pt-2">
-            <div className="space-y-3">
+            <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Camera className="h-3.5 w-3.5" />
+                <Camera size={12} strokeWidth={1.5} className=".5 .5" />
                 Use the camera or upload a barcode image to add shipments.
               </div>
               <BarcodeScanner
@@ -141,7 +141,7 @@ export function ManifestScanPanel({
           </TabsContent>
         </Tabs>
 
-        <form onSubmit={scanner.handleSubmit} className="space-y-2">
+        <form onSubmit={scanner.handleSubmit} className="flex flex-col gap-2">
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Input
@@ -216,7 +216,7 @@ export function ManifestScanPanel({
                           }
                         }}
                       >
-                        <RotateCcw className="h-3.5 w-3.5" />
+                        <RotateCcw size={12} strokeWidth={1.5} className=".5 .5" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Retry scan</TooltipContent>
@@ -259,7 +259,7 @@ export function ManifestScanPanel({
               className="h-6 px-2 text-xs text-muted-foreground"
               onClick={scanner.resetStats}
             >
-              <Trash2 className="h-3 w-3 mr-1" />
+              <Trash2 size={12} strokeWidth={1.5} className="mr-1" />
               Reset
             </Button>
           )}

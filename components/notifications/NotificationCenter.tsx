@@ -230,7 +230,7 @@ export function NotificationCenter({
 
       <PopoverContent align="end" className="w-80 p-0">
         <Card className="border-0 shadow-lg">
-          <CardHeader className="py-3 px-4 flex flex-row items-center justify-between space-y-0">
+          <CardHeader className="py-3 px-4 flex-row items-center justify-between flex flex-col gap-0">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <BellRing className="size-4" />
               Notifications

@@ -90,7 +90,7 @@ export const LabelGenerator: React.FC<LabelGeneratorProps> = ({
       {!hidePrintButton && (
         <div className="label-toolbar print:hidden">
           <Button onClick={handlePrint} size="sm">
-            <Printer className="w-4 h-4 mr-2" /> Print Label
+            <Printer size={16} strokeWidth={1.5} className="mr-2" /> Print Label
           </Button>
         </div>
       )}

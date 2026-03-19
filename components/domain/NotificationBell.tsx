@@ -71,7 +71,7 @@ const NotificationRow: React.FC<NotificationRowProps> = ({
     <button
       onClick={handleClick}
       className={cn(
-        'w-full text-left rounded-md p-4 mb-2 border transition-all hover:bg-accent/50',
+        'w-full text-left rounded-md p-4 mb-2 border transition hover:bg-accent/50',
         notification.is_read ? 'opacity-60 border-transparent' : 'bg-accent/20 border-accent/30'
       )}
     >
@@ -165,12 +165,12 @@ export const NotificationBell: React.FC = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative rounded-md p-2 hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+          className="relative inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground/70 transition-colors hover:text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           aria-label={`Notifications${count > 0 ? ` (${count} unread)` : ''}`}
         >
-          <Bell className="h-5 w-5 text-muted-foreground" />
+          <Bell size={16} strokeWidth={1.5} />
           {count > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 flex items-center justify-center">
               <Badge
                 className={cn('h-5 min-w-[20px] px-1.5 text-xs font-bold', count > 9 && 'px-1')}
               >
@@ -199,7 +199,7 @@ export const NotificationBell: React.FC = () => {
             disabled={count === 0}
             className="h-8 text-xs"
           >
-            <CheckCheck className="w-3.5 h-3.5 mr-1.5" />
+            <CheckCheck size={12} strokeWidth={1.5} className=".5 .5 mr-1.5" />
             Mark all read
           </Button>
         </div>
@@ -223,7 +223,7 @@ export const NotificationBell: React.FC = () => {
                 {unreadNotifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 text-center">
                     <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mb-3">
-                      <Check className="w-6 h-6 text-muted-foreground" />
+                      <Check size={24} strokeWidth={1.5} className="text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">All caught up!</p>
                     <p className="text-xs text-muted-foreground mt-1">No new notifications</p>
@@ -248,7 +248,7 @@ export const NotificationBell: React.FC = () => {
                 {allNotifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 text-center">
                     <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mb-3">
-                      <Bell className="w-6 h-6 text-muted-foreground" />
+                      <Bell size={24} strokeWidth={1.5} className="text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">
                       No notifications yet

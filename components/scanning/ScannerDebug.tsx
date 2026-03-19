@@ -119,7 +119,7 @@ export function ScannerDebug() {
       <CardHeader className="pb-3">
         <CardTitle className="text-sm flex items-center justify-between">
           <span className="flex items-center gap-2">
-            <Search className="w-4 h-4" />
+            <Search size={16} strokeWidth={1.5} />
             Scanner Debug
           </span>
           <button
@@ -131,11 +131,11 @@ export function ScannerDebug() {
           </button>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 text-xs font-mono">
+      <CardContent className="flex flex-col gap-4 text-xs font-mono">
         {/* Keystrokes Display */}
         <div>
           <div className="text-muted-foreground mb-1">Keystrokes:</div>
-          <div className="bg-muted p-2 rounded-md min-h-[2rem] flex flex-wrap gap-1">
+          <div className="bg-muted p-2 rounded-md min-h-[2rem] flex-wrap gap-1">
             {keystrokes.length > 0 ? (
               keystrokes.map((k, i) => (
                 <span
@@ -175,12 +175,12 @@ export function ScannerDebug() {
                 </Badge>
                 {scannerDetected ? (
                   <span className="flex items-center gap-1 text-muted-foreground dark:text-muted-foreground">
-                    <Activity className="w-3 h-3" />
+                    <Activity size={12} strokeWidth={1.5} />
                     Scanner detected
                   </span>
                 ) : (
                   <span className="flex items-center gap-1 text-muted-foreground dark:text-muted-foreground">
-                    <Activity className="w-3 h-3" />
+                    <Activity size={12} strokeWidth={1.5} />
                     Manual input
                   </span>
                 )}
@@ -199,9 +199,9 @@ export function ScannerDebug() {
               <div className="flex items-center justify-between">
                 <span className="truncate flex-1">{lastScan.code}</span>
                 {lastScan.success ? (
-                  <CheckCircle2 className="w-4 h-4 text-muted-foreground dark:text-muted-foreground ml-2 flex-shrink-0" />
+                  <CheckCircle2 size={16} strokeWidth={1.5} className="text-muted-foreground dark:text-muted-foreground ml-2 flex-shrink-0" />
                 ) : (
-                  <XCircle className="w-4 h-4 text-muted-foreground dark:text-muted-foreground ml-2 flex-shrink-0" />
+                  <XCircle size={16} strokeWidth={1.5} className="text-muted-foreground dark:text-muted-foreground ml-2 flex-shrink-0" />
                 )}
               </div>
             ) : (

@@ -1,13 +1,6 @@
-export { KPICard } from './KPICard';
-export { StatusBadge } from './StatusBadge';
-export { TrackingTimeline } from './TrackingTimeline';
-export { ShipmentCard } from './ShipmentCard';
-export { ShippingLabel, PrintableLabel } from './ShippingLabel';
-export { CommandPalette, useCommandPalette } from './CommandPalette';
-
-// New premium domain components
+// StatusBadge — canonical premium version (CVA, all statuses)
 export {
-  StatusBadge as StatusBadgeNew,
+  StatusBadge,
   statusBadgeVariants,
   getStatusBadgeClass,
   getStatusLabel,
@@ -15,6 +8,11 @@ export {
   STATUS_ICONS,
 } from './status-badge';
 export type { StatusBadgeProps } from './status-badge';
+
+export { TrackingTimeline } from './TrackingTimeline';
+export { ShipmentCard } from './ShipmentCard';
+export { ShippingLabel, PrintableLabel } from './ShippingLabel';
+export { CommandPalette, useCommandPalette } from './CommandPalette';
 
 export { ShipmentTimeline } from './shipment-timeline';
 export type { ShipmentTimelineProps, TimelineEvent } from './shipment-timeline';

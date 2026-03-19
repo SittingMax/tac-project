@@ -110,7 +110,7 @@ const KPICard = React.memo(
           onClick={handleClick}
           data-testid={`kpi-card-${label.toLowerCase().replace(/\s+/g, '-')}`}
           className={cn(
-            'relative overflow-hidden h-full flex flex-col justify-between group transition-all duration-300',
+            'relative overflow-hidden h-full flex flex-col justify-between group transition duration-300',
             'border border-border/40 bg-card hover:shadow-md hover:border-primary/40',
             path ? 'cursor-pointer' : ''
           )}
@@ -120,9 +120,9 @@ const KPICard = React.memo(
             <Icon className="w-32 h-32" />
           </div>
 
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 z-10">
+          <CardHeader className="flex-row items-center justify-between flex flex-col gap-0 p-4 pb-2 z-10">
             <CardTitle className="text-xs text-muted-foreground">{label}</CardTitle>
-            <Icon className="h-3.5 w-3.5 text-muted-foreground/30 transition-colors group-hover:text-foreground/50" />
+            <Icon size={12} strokeWidth={1.5} className=".5 .5 text-muted-foreground/30 transition-colors group-hover:text-foreground/50" />
           </CardHeader>
 
           <CardContent className="z-10 p-4 pt-0 pb-6">

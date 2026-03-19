@@ -10,10 +10,8 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
-import { FormSection, FormGrid, FormFooter } from '@/components/ui-core';
+import { FormSection, FormGrid, FormFooter, FieldGroup } from '@/components/ui-core';
 import { Trash2, Plus, Upload, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -156,7 +154,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
         <FormSection
           title="Contact Information"
           description="We will contact you on this number for shipment updates."
@@ -168,17 +166,15 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                 name="whatsappNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      WhatsApp Number <span className="text-destructive">*</span>
-                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                        placeholder="e.g. +91 9876543210"
-                        {...field}
-                      />
+                      <FieldGroup label="WhatsApp Number" required error={form.formState.errors.whatsappNumber?.message}>
+                        <Input
+                          className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                          placeholder="e.g. +91 9876543210"
+                          {...field}
+                        />
+                      </FieldGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -193,17 +189,15 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
               name="consignor.name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Name
-                  </FormLabel>
                   <FormControl>
-                    <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                      placeholder="Consignor Name"
-                      {...field}
-                    />
+                    <FieldGroup label="Name">
+                      <Input
+                        className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                        placeholder="Consignor Name"
+                        {...field}
+                      />
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -212,17 +206,15 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
               name="consignor.phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Phone
-                  </FormLabel>
                   <FormControl>
-                    <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                      placeholder="Consignor Phone"
-                      {...field}
-                    />
+                    <FieldGroup label="Phone">
+                      <Input
+                        className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                        placeholder="Consignor Phone"
+                        {...field}
+                      />
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -232,17 +224,15 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                 name="consignor.address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      Address
-                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                        placeholder="Address Line 1"
-                        {...field}
-                      />
+                      <FieldGroup label="Address">
+                        <Input
+                          className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                          placeholder="Address Line 1"
+                          {...field}
+                        />
+                      </FieldGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -253,16 +243,14 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                 name="consignor.city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      City
-                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                        {...field}
-                      />
+                      <FieldGroup label="City">
+                        <Input
+                          className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                          {...field}
+                        />
+                      </FieldGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -271,16 +259,14 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                 name="consignor.state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      State
-                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                        {...field}
-                      />
+                      <FieldGroup label="State">
+                        <Input
+                          className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                          {...field}
+                        />
+                      </FieldGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -289,16 +275,14 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                 name="consignor.zip"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      Zip
-                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                        {...field}
-                      />
+                      <FieldGroup label="Zip">
+                        <Input
+                          className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                          {...field}
+                        />
+                      </FieldGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -313,17 +297,15 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
               name="consignee.name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Name
-                  </FormLabel>
                   <FormControl>
-                    <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                      placeholder="Consignee Name"
-                      {...field}
-                    />
+                    <FieldGroup label="Name">
+                      <Input
+                        className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                        placeholder="Consignee Name"
+                        {...field}
+                      />
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -332,17 +314,15 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
               name="consignee.phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Phone
-                  </FormLabel>
                   <FormControl>
-                    <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                      placeholder="Consignee Phone"
-                      {...field}
-                    />
+                    <FieldGroup label="Phone">
+                      <Input
+                        className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                        placeholder="Consignee Phone"
+                        {...field}
+                      />
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -352,17 +332,15 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                 name="consignee.address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      Address
-                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                        placeholder="Address Line 1"
-                        {...field}
-                      />
+                      <FieldGroup label="Address">
+                        <Input
+                          className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                          placeholder="Address Line 1"
+                          {...field}
+                        />
+                      </FieldGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -373,16 +351,14 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                 name="consignee.city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      City
-                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                        {...field}
-                      />
+                      <FieldGroup label="City">
+                        <Input
+                          className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                          {...field}
+                        />
+                      </FieldGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -391,16 +367,14 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                 name="consignee.state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      State
-                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                        {...field}
-                      />
+                      <FieldGroup label="State">
+                        <Input
+                          className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                          {...field}
+                        />
+                      </FieldGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -409,16 +383,14 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                 name="consignee.zip"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      Zip
-                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                        {...field}
-                      />
+                      <FieldGroup label="Zip">
+                        <Input
+                          className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                          {...field}
+                        />
+                      </FieldGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -436,114 +408,104 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
               size="sm"
               onClick={() => append({ length: 0, width: 0, height: 0, weight: 0, count: 1 })}
             >
-              <Plus className="w-4 h-4 mr-2" /> Add Item
+              <Plus size={16} strokeWidth={1.5} className="mr-2" /> Add Item
             </Button>
           }
         >
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             {fields.map((field, index) => (
               <div key={field.id} className="grid grid-cols-6 gap-3 items-end">
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1">
                   <FormField
                     control={form.control}
                     name={`volumeMatrix.${index}.length`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-[10px] font-mono text-muted-foreground uppercase">
-                          Len(cm)
-                        </FormLabel>
                         <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            type="number"
-                            {...field}
-                          />
+                          <FieldGroup label="Len(cm)">
+                            <Input
+                              className="h-8 bg-transparent hover:border-ring/50 transition-colors px-2 text-xs"
+                              type="number"
+                              {...field}
+                            />
+                          </FieldGroup>
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1">
                   <FormField
                     control={form.control}
                     name={`volumeMatrix.${index}.width`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-[10px] font-mono text-muted-foreground uppercase">
-                          Wid(cm)
-                        </FormLabel>
                         <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            type="number"
-                            {...field}
-                          />
+                          <FieldGroup label="Wid(cm)">
+                            <Input
+                              className="h-8 bg-transparent hover:border-ring/50 transition-colors px-2 text-xs"
+                              type="number"
+                              {...field}
+                            />
+                          </FieldGroup>
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1">
                   <FormField
                     control={form.control}
                     name={`volumeMatrix.${index}.height`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-[10px] font-mono text-muted-foreground uppercase">
-                          Hgt(cm)
-                        </FormLabel>
                         <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            type="number"
-                            {...field}
-                          />
+                          <FieldGroup label="Hgt(cm)">
+                            <Input
+                              className="h-8 bg-transparent hover:border-ring/50 transition-colors px-2 text-xs"
+                              type="number"
+                              {...field}
+                            />
+                          </FieldGroup>
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1">
                   <FormField
                     control={form.control}
                     name={`volumeMatrix.${index}.weight`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-[10px] font-mono text-muted-foreground uppercase">
-                          Wgt(kg)
-                        </FormLabel>
                         <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            type="number"
-                            {...field}
-                          />
+                          <FieldGroup label="Wgt(kg)">
+                            <Input
+                              className="h-8 bg-transparent hover:border-ring/50 transition-colors px-2 text-xs"
+                              type="number"
+                              {...field}
+                            />
+                          </FieldGroup>
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1">
                   <FormField
                     control={form.control}
                     name={`volumeMatrix.${index}.count`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-[10px] font-mono text-muted-foreground uppercase">
-                          Count
-                        </FormLabel>
                         <FormControl>
-                          <Input
-                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                            type="number"
-                            {...field}
-                          />
+                          <FieldGroup label="Count">
+                            <Input
+                              className="h-8 bg-transparent hover:border-ring/50 transition-colors px-2 text-xs"
+                              type="number"
+                              {...field}
+                            />
+                          </FieldGroup>
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -555,7 +517,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                   onClick={() => remove(index)}
                   disabled={fields.length === 1}
                 >
-                  <Trash2 className="w-4 h-4 text-destructive" />
+                  <Trash2 size={16} strokeWidth={1.5} className="text-destructive" />
                 </Button>
               </div>
             ))}
@@ -578,7 +540,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
                 className="absolute inset-0 opacity-0 cursor-pointer"
                 onChange={handleFileChange}
               />
-              <Upload className="w-8 h-8 text-muted-foreground mb-2" />
+              <Upload size={32} strokeWidth={1.5} className="text-muted-foreground mb-2" />
               <p className="text-sm text-muted-foreground">Click or drag images here to upload</p>
             </div>
 

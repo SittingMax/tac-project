@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import { sanitizeString } from '../../lib/utils/sanitize';
 import { generateLabelPDF } from '@/lib/pdf-generator';
+import { formatDate } from '@/lib/formatters';
 
 interface LabelPreviewDialogProps {
   trigger?: React.ReactNode;
@@ -78,16 +79,8 @@ export const LabelPreviewDialog: React.FC<LabelPreviewDialogProps> = ({
       destSort: 'IMF',
     },
     dates: shipmentData?.dates || {
-      shipDate: new Date().toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }),
-      invoiceDate: new Date().toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }),
+      shipDate: formatDate(new Date(), 'en-GB'),
+      invoiceDate: formatDate(new Date(), 'en-GB'),
     },
     gstNumber: shipmentData?.gstNumber,
   };
@@ -142,7 +135,7 @@ export const LabelPreviewDialog: React.FC<LabelPreviewDialogProps> = ({
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-4">
         {/* Left Side: Customization */}
-        <div className="space-y-6 flex flex-col">
+        <div className="flex flex-col gap-6 flex-col">
           <div className="bg-muted px-4 py-3 border rounded-md">
             <h4 className="font-semibold text-sm mb-1">Label Settings</h4>
             <p className="text-xs text-muted-foreground">
@@ -150,8 +143,8 @@ export const LabelPreviewDialog: React.FC<LabelPreviewDialogProps> = ({
             </p>
           </div>
 
-          <div className="space-y-4 flex-1">
-            <div className="space-y-2">
+          <div className="flex flex-col gap-4 flex-1">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="transport-mode">Transport Mode</Label>
               <Select
                 value={transportMode}
@@ -167,7 +160,7 @@ export const LabelPreviewDialog: React.FC<LabelPreviewDialogProps> = ({
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="service-level">Service Level</Label>
               <Select
                 value={serviceLevel}
@@ -190,7 +183,7 @@ export const LabelPreviewDialog: React.FC<LabelPreviewDialogProps> = ({
         <div className="flex flex-col border rounded-md overflow-hidden bg-background">
           <div className="bg-muted px-4 py-2 border-b flex items-center justify-between">
             <h4 className="font-semibold text-sm flex items-center gap-2">
-              <Eye className="w-4 h-4" /> Live Preview
+              <Eye size={16} strokeWidth={1.5} /> Live Preview
             </h4>
           </div>
           <div className="p-4 bg-muted/10 overflow-y-auto max-h-[calc(80vh-200px)] flex justify-center items-start">
@@ -204,11 +197,11 @@ export const LabelPreviewDialog: React.FC<LabelPreviewDialogProps> = ({
           Cancel
         </Button>
         <Button variant="outline" onClick={handleDownload}>
-          <Download className="w-4 h-4 mr-2" />
+          <Download size={16} strokeWidth={1.5} className="mr-2" />
           Download PDF
         </Button>
         <Button onClick={handlePrint}>
-          <Printer className="w-4 h-4 mr-2" />
+          <Printer size={16} strokeWidth={1.5} className="mr-2" />
           Print Label
         </Button>
       </DialogFooter>

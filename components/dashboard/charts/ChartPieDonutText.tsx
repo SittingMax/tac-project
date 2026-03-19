@@ -146,10 +146,10 @@ export function ChartPieDonutText() {
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 pt-4 border-t border-border">
+      <CardFooter className="flex flex-col gap-2 pt-4 border-t border-border">
         <div className="flex items-center gap-2 text-xs font-medium text-foreground">
           {chartConfig[dominantMode.mode as keyof typeof chartConfig]?.label ?? dominantMode.mode}{' '}
-          dominant <TrendingUp className="h-3 w-3 text-primary" />
+          dominant <TrendingUp size={12} strokeWidth={1.5} className="text-primary" />
         </div>
         <div className="text-xs text-muted-foreground text-center">
           Showing distribution across current shipment records

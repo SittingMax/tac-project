@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { FormProvider as Form } from 'react-hook-form';
 import { toast } from 'sonner';
 import { motion, AnimatePresence, MotionConfig } from '@/lib/motion';
-import useMeasure from 'react-use-measure';
-// removed unused Card imports
 import { Button } from '@/components/ui/button';
 import { Check, ChevronRight, Loader2, Printer } from 'lucide-react';
 
@@ -84,8 +82,6 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
 
   const { data: customers = [] } = useCustomers();
   const [showLabelPreview, setShowLabelPreview] = useState(false);
-  const [measureRef, bounds] = useMeasure();
-
   // Form auto-save (draft)
   useEffect(() => {
     const timer = setInterval(() => {
@@ -347,9 +343,9 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
   return (
     <Form {...form}>
       <MotionConfig transition={{ duration: 0.4, type: 'spring', bounce: 0.2 }}>
-        <div className="flex flex-col h-full w-full min-h-[75vh] bg-background">
+        <div className="flex flex-col h-full w-full min-h-0 bg-background">
           {/* Vanguard Minimalist Progress Header */}
-          <div className="mb-0 px-10 pt-8">
+          <div className="shrink-0 mb-0 px-10 pt-8 bg-background">
             <div className="flex items-end justify-between mb-6">
               <div>
                 <h2 className="text-3xl font-bold tracking-tight text-foreground">
@@ -375,7 +371,7 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
                     <li key={step.title} className="flex items-center shrink-0">
                       <div
                         className={cn(
-                          'flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-300',
+                          'flex items-center gap-2 px-4 py-2 rounded-none transition duration-300',
                           isActive &&
                             'bg-primary/10 text-primary font-semibold shadow-sm ring-1 ring-primary/20',
                           isComplete && 'text-muted-foreground',
@@ -398,32 +394,27 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
           </div>
 
           {/* Step Content Area */}
-          <div className="flex-1 overflow-hidden flex flex-col relative">
-            <motion.div
-              animate={{ height: bounds.height > 0 ? bounds.height : 'auto' }}
-              className="relative overflow-hidden"
-              transition={{ type: 'spring', bounce: 0, duration: 0.5 }}
-            >
-              <div ref={measureRef} className="px-10 py-8">
-                <div className="w-full">
-                  <AnimatePresence mode="popLayout" initial={false} custom={direction}>
-                    <motion.div
-                      key={currentStep}
-                      variants={variants}
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      custom={direction}
-                      className="w-full"
-                    >
-                      {renderStepContent()}
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
+          <div className="flex-1 flex flex-col min-h-0 bg-background/50">
+            <div className="flex-1 overflow-y-auto px-10 py-8">
+              <div className="w-full">
+                <AnimatePresence mode="popLayout" initial={false} custom={direction}>
+                  <motion.div
+                    key={currentStep}
+                    variants={variants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    custom={direction}
+                    className="w-full"
+                  >
+                    {renderStepContent()}
+                  </motion.div>
+                </AnimatePresence>
               </div>
-            </motion.div>
+            </div>
 
-            <div className="flex justify-between border-t border-border/40 bg-muted/10 px-10 py-6 z-10 mt-auto">
+            {/* Sticky Footer */}
+            <div className="shrink-0 flex justify-between border-t border-border/40 bg-muted/30 px-10 py-6 z-10 transition-colors">
               <Button
                 variant="outline"
                 type="button"
@@ -441,7 +432,7 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
                     onClick={() => setShowLabelPreview(true)}
                     disabled={isLoading}
                   >
-                    <Printer className="w-4 h-4 mr-2" />
+                    <Printer size={16} strokeWidth={1.5} className="mr-2" />
                     Preview Label
                   </Button>
                 )}
@@ -452,14 +443,14 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
                   className="min-w-[120px]"
                 >
                   {isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    <Loader2 size={16} strokeWidth={1.5} className="animate-spin mr-2" />
                   ) : currentStep === steps.length - 1 ? (
                     <>
-                      Confirm & Book <Check className="w-4 h-4 ml-2" />
+                      Confirm & Book <Check size={16} strokeWidth={1.5} className="ml-2" />
                     </>
                   ) : (
                     <>
-                      Continue <ChevronRight className="w-4 h-4 ml-2" />
+                      Continue <ChevronRight size={16} strokeWidth={1.5} className="ml-2" />
                     </>
                   )}
                 </Button>

@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { format, startOfDay, subDays } from 'date-fns';
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
+import { formatDateShort, formatDate } from '@/lib/formatters';
 
 import { useShipments } from '@/hooks/useShipments';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -74,7 +75,7 @@ export function ChartBarInteractive() {
     return (
       <Card className="flex flex-col py-0 border border-border bg-card shadow-sm w-full hover:bg-muted/5 transition-colors duration-300">
         <CardHeader className="flex flex-col items-stretch border-b border-border !p-0 sm:flex-row">
-          <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-6 pb-4 sm:!py-6">
+          <div className="flex-1 flex flex-col justify-center gap-1 px-6 pt-6 pb-4 sm:!py-6">
             <CardTitle className="text-xs text-muted-foreground">Booking Intake</CardTitle>
             <div className="text-lg font-semibold text-foreground mt-1">Shipments vs Packages</div>
           </div>
@@ -89,7 +90,7 @@ export function ChartBarInteractive() {
   return (
     <Card className="flex flex-col py-0 border border-border bg-card shadow-sm w-full hover:bg-muted/5 transition-colors duration-300">
       <CardHeader className="flex flex-col items-stretch border-b border-border !p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-6 pb-4 sm:!py-6">
+        <div className="flex-1 flex flex-col justify-center gap-1 px-6 pt-6 pb-4 sm:!py-6">
           <CardTitle className="text-xs text-muted-foreground">Booking Intake</CardTitle>
           <div className="text-lg font-semibold text-foreground mt-1">Shipments vs Packages</div>
         </div>
@@ -100,7 +101,7 @@ export function ChartBarInteractive() {
               <button
                 key={chart}
                 data-active={activeChart === chart}
-                className="data-[active=true]:bg-muted/10 data-[active=true]:text-foreground relative z-30 flex flex-1 flex-col justify-center gap-1 border-t border-border/40 px-6 py-4 text-left even:border-l sm:border-t-0 sm:border-l sm:px-8 sm:py-6 outline-none hover:bg-muted/5 transition-colors"
+                className="data-[active=true]:bg-muted/10 data-[active=true]:text-foreground relative z-30 flex-1 flex flex-col justify-center gap-1 border-t border-border/40 px-6 py-4 text-left even:border-l sm:border-t-0 sm:border-l sm:px-8 sm:py-6 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-muted/5 transition-colors"
                 onClick={() => setActiveChart(chart)}
               >
                 <span className="text-xs text-muted-foreground">{chartConfig[chart].label}</span>
@@ -135,11 +136,7 @@ export function ChartBarInteractive() {
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
-                const date = new Date(value);
-                return date.toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                });
+                return formatDateShort(value);
               }}
             />
             <ChartTooltip
@@ -147,11 +144,7 @@ export function ChartBarInteractive() {
                 <ChartTooltipContent
                   className="w-[150px] shadow-xl"
                   labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    });
+                    return formatDate(value, 'en-US');
                   }}
                 />
               }

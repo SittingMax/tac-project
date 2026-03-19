@@ -201,7 +201,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
           <CardTitle>Hub Shipment Profile</CardTitle>
           <CardDescription>Comparative origin-hub metrics</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-1 items-center justify-center pb-0">
+        <CardContent className="flex-1 items-center justify-center pb-0">
           <p className="text-sm text-muted-foreground py-12">No hub shipment data yet</p>
         </CardContent>
       </Card>
@@ -418,7 +418,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
 
   return (
     <Card className="flex flex-col h-full border border-border/40 bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300">
-      <CardHeader className="flex flex-row items-start justify-between pb-4 border-b border-border/40 space-y-0">
+      <CardHeader className="flex-row items-start justify-between pb-4 border-b border-border/40 flex flex-col gap-0">
         <div>
           <CardTitle className="text-xs text-muted-foreground">Hub Shipment Profile</CardTitle>
           <div className="text-lg font-semibold text-foreground mt-1">
@@ -444,10 +444,10 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
           {renderChart()}
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 pt-4 border-t border-border mt-4">
+      <CardFooter className="flex flex-col gap-2 pt-4 border-t border-border mt-4">
         <div className="flex items-center gap-2 text-xs font-medium text-foreground">
           {hubProfile.primaryHub.label} leading by shipment volume{' '}
-          <TrendingUp className="h-3 w-3 text-primary" />
+          <TrendingUp size={12} strokeWidth={1.5} className="text-primary" />
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           Based on current origin-hub shipment records

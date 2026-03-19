@@ -171,12 +171,8 @@ export function ManifestBuilderWizard({
   // Register as active scan context when modal is open
   React.useEffect(() => {
     if (open) {
-      // eslint-disable-next-line no-console
-      console.debug('[ManifestBuilder] Registering as active scan context');
       setActiveContext('MANIFEST_BUILDER');
     } else {
-      // eslint-disable-next-line no-console
-      console.debug('[ManifestBuilder] Releasing scan context');
       setActiveContext('GLOBAL');
     }
 
@@ -368,7 +364,7 @@ export function ManifestBuilderWizard({
   return (
     <TooltipProvider>
       <Dialog open={open} onOpenChange={handleCancel}>
-        <DialogContent className="w-[100vw] h-[100dvh] md:w-[92vw] md:h-[min(88vh,900px)] md:max-h-[90vh] md:max-w-4xl rounded-none md:rounded-lg flex flex-col gap-0 p-0 overflow-hidden">
+        <DialogContent className="w-[100vw] h-[100dvh] md:w-[92vw] md:h-[min(88vh,900px)] md:max-h-[90vh] md:max-w-6xl xl:max-w-7xl rounded-none md:rounded-lg flex flex-col gap-0 p-0 overflow-hidden">
           {/* Header */}
           <DialogHeader className="px-6 py-4 border-b border-border text-left">
             <DialogTitle className="text-lg">Create Manifest</DialogTitle>
@@ -453,7 +449,7 @@ export function ManifestBuilderWizard({
 
                 {currentStep > 1 && (
                   <Button variant="outline" onClick={handleBack}>
-                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    <ArrowLeft size={16} strokeWidth={1.5} className="mr-2" />
                     Back
                   </Button>
                 )}
@@ -473,13 +469,13 @@ export function ManifestBuilderWizard({
                         >
                           {builder.isCreating ? (
                             <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              <Loader2 size={16} strokeWidth={1.5} className="mr-2 animate-spin" />
                               Creating...
                             </>
                           ) : (
                             <>
                               Next
-                              <ArrowRight className="h-4 w-4 ml-2" />
+                              <ArrowRight size={16} strokeWidth={1.5} className="ml-2" />
                             </>
                           )}
                         </Button>
@@ -502,9 +498,9 @@ export function ManifestBuilderWizard({
                       disabled={isSaving}
                     >
                       {isSaving ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        <Loader2 size={16} strokeWidth={1.5} className="mr-2 animate-spin" />
                       ) : (
-                        <Save className="h-4 w-4 mr-2" />
+                        <Save size={16} strokeWidth={1.5} className="mr-2" />
                       )}
                       Save as Open
                     </Button>
@@ -513,7 +509,7 @@ export function ManifestBuilderWizard({
                       onClick={() => setShowCloseConfirm(true)}
                       disabled={isSaving}
                     >
-                      <Lock className="h-4 w-4 mr-2" />
+                      <Lock size={16} strokeWidth={1.5} className="mr-2" />
                       Close Manifest
                     </Button>
                   </div>

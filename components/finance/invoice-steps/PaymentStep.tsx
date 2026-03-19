@@ -4,8 +4,7 @@ import { InvoiceFormData } from '@/hooks/useMultiStepInvoice';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calculator } from 'lucide-react';
-import { Label } from './shared';
-import { FormSection } from '@/components/ui-core';
+import { FormSection, FieldGroup } from '@/components/ui-core';
 import { formatCurrency } from '@/lib/utils';
 
 interface Props {
@@ -21,32 +20,28 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
   const gstApplicable = watch('gstApplicable');
 
   return (
-    <div className="space-y-8 py-2 max-w-4xl mx-auto">
+    <div className="flex flex-col gap-8 py-2 max-w-4xl mx-auto">
       <FormSection icon={Calculator} title="Freight & Charges">
         <div className="grid grid-cols-2 gap-8 mb-8">
-          <div className="space-y-3">
-            <Label className="text-sm font-semibold tracking-wide">Freight Rate / KG</Label>
+          <FieldGroup label="Freight Rate / KG">
             <div className="relative">
-              <span className="absolute left-4 top-3 text-muted-foreground font-medium">₹</span>
+              <span className="absolute left-4 top-1.5 text-muted-foreground font-medium text-sm">₹</span>
               <Input
                 type="number"
                 {...form.register('ratePerKg', { valueAsNumber: true })}
                 onFocus={(e) => e.target.value === '0' && (e.target.value = '')}
-                className="pl-8 h-11 text-base bg-transparent hover:border-ring/50"
+                className="pl-8 h-8 text-sm bg-transparent hover:border-ring/50"
               />
             </div>
-          </div>
-          <div className="space-y-3">
-            <Label className="text-primary text-sm font-semibold tracking-wide">
-              Base Freight (Auto)
-            </Label>
+          </FieldGroup>
+          <FieldGroup label="Base Freight (Auto)">
             <Input
               type="number"
               {...form.register('baseFreight')}
-              className="h-11 text-base font-bold bg-primary/5 border-primary/20"
+              className="h-8 text-sm font-bold bg-primary/5 border-primary/20"
               readOnly
             />
-          </div>
+          </FieldGroup>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-6 border-t border-border/40">
@@ -58,10 +53,7 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
             'insurance',
             'fuelSurcharge',
           ].map((field) => (
-            <div key={field} className="space-y-2">
-              <Label className="capitalize text-xs font-semibold text-muted-foreground tracking-wide">
-                {field.replace(/([A-Z])/g, ' $1').trim()}
-              </Label>
+            <FieldGroup key={field} label={field.replace(/([A-Z])/g, ' $1').trim()}>
               <Input
                 type="number"
                 {...form.register(
@@ -75,24 +67,24 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
                   { valueAsNumber: true }
                 )}
                 onFocus={(e) => e.target.value === '0' && (e.target.value = '')}
-                className="text-right h-11 bg-transparent hover:border-ring/50"
+                className="text-right h-8 bg-transparent hover:border-ring/50 px-3 text-sm"
               />
-            </div>
+            </FieldGroup>
           ))}
         </div>
 
         <div className="mt-8 pt-6 border-t border-border/40">
-          <div className="flex justify-between items-center">
-            <Label className="text-status-success font-bold text-sm tracking-wide">
+          <div className="flex justify-between items-center bg-status-success/5 p-4 rounded-lg border border-status-success/20">
+            <span className="text-status-success font-bold text-xs uppercase tracking-widest">
               Discount Amount
-            </Label>
+            </span>
             <div className="relative w-48">
-              <span className="absolute left-4 top-3 text-status-success font-semibold">−₹</span>
+              <span className="absolute left-4 top-1.5 text-status-success font-semibold text-sm">−₹</span>
               <Input
                 type="number"
                 {...form.register('discount', { valueAsNumber: true })}
                 onFocus={(e) => e.target.value === '0' && (e.target.value = '')}
-                className="pl-10 h-11 text-right text-base text-status-success font-bold bg-status-success/5 border-status-success/30 rounded-md shadow-sm hover:border-status-success/50"
+                className="pl-10 h-8 text-right text-sm text-status-success font-bold bg-background border-status-success/30 rounded-md shadow-sm hover:border-status-success/50"
               />
             </div>
           </div>
@@ -105,7 +97,7 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10">
-          <div className="space-y-5">
+          <div className="flex flex-col gap-5">
             <div className="flex justify-between items-center py-2 border-b border-border/40">
               <span className="text-sm font-medium text-muted-foreground">Subtotal</span>
               <span className="font-semibold text-lg text-foreground tracking-tight">
@@ -115,7 +107,7 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
 
             <div className="flex justify-between items-center py-2">
               <div className="flex items-center gap-3">
-                <Label className="flex items-center gap-2 cursor-pointer group">
+                <label className="flex items-center gap-2 cursor-pointer group">
                   <Controller
                     control={form.control}
                     name="gstApplicable"
@@ -131,7 +123,7 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
                   <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                     GST Tax
                   </span>
-                </Label>
+                </label>
                 {gstApplicable && (
                   <div className="flex items-center gap-1.5 opacity-90 animate-in fade-in">
                     <Input
@@ -154,13 +146,13 @@ export const PaymentStep = ({ form, subtotal, tax, total, balance }: Props) => {
             <div className="flex justify-between items-center py-3 border-t border-border/40 mt-2">
               <span className="text-sm font-medium text-muted-foreground">Advance Paid</span>
               <div className="relative">
-                <span className="absolute left-3 top-2.5 text-muted-foreground text-sm">₹</span>
+                <span className="absolute left-3 top-1.5 text-muted-foreground text-sm">₹</span>
                 <Input
                   placeholder="0"
                   type="number"
                   {...form.register('advancePaid', { valueAsNumber: true })}
                   onFocus={(e) => e.target.value === '0' && (e.target.value = '')}
-                  className="w-32 text-right pl-8 h-10 text-base font-medium bg-background hover:border-ring/50"
+                  className="w-32 text-right pl-8 h-8 text-sm font-medium bg-background hover:border-ring/50"
                 />
               </div>
             </div>
