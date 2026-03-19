@@ -17,7 +17,7 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
     <CommandPrimitive
       data-slot="command"
       className={cn(
-        'flex size-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground',
+        'flex size-full flex flex-col overflow-hidden rounded-md bg-popover text-popover-foreground',
         className
       )}
       {...props}
@@ -82,7 +82,7 @@ function CommandList({ className, ...props }: React.ComponentProps<typeof Comman
     <CommandPrimitive.List
       data-slot="command-list"
       className={cn(
-        'no-scrollbar max-h-72 scroll-py-0 overflow-x-hidden overflow-y-auto outline-none',
+        'no-scrollbar max-h-72 scroll-py-0 overflow-x-hidden overflow-y-auto focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
         className
       )}
       {...props}

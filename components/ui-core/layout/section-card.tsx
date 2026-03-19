@@ -26,9 +26,14 @@ export function SectionCard({
   const hasHeader = title || description || actions;
 
   return (
-    <Card className={cn('overflow-hidden', className)}>
+    <Card
+      className={cn(
+        'overflow-hidden transition duration-300 hover:shadow-md hover:border-border/80 relative',
+        className
+      )}
+    >
       {hasHeader && (
-        <CardHeader className="flex flex-row items-start lg:items-center justify-between gap-4 space-y-0 pb-4 border-b border-border/40">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-border/40">
           <div className="flex flex-col gap-1.5">
             {title && <CardTitle className="text-base font-semibold">{title}</CardTitle>}
             {description && <CardDescription className="text-sm">{description}</CardDescription>}

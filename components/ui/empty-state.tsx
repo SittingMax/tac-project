@@ -37,19 +37,34 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center p-12 text-center animate-[fadeIn_0.3s_ease-out]',
+        'relative flex flex-col items-center justify-center p-16 text-center animate-[fadeIn_0.3s_ease-out] overflow-hidden rounded-md border border-border/40 bg-card/50',
         className
       )}
     >
-      <div className="w-20 h-20 rounded-none bg-muted/50 flex items-center justify-center mb-6 animate-[scaleIn_0.3s_ease-out]">
-        <Icon className="w-10 h-10 text-muted-foreground" />
+      <div className="absolute inset-0 bg-grain opacity-5 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+
+      <div className="relative z-10 w-20 h-20 rounded-none bg-muted/50 flex items-center justify-center mb-8 border border-border/50 shadow-sm animate-[scaleIn_0.3s_ease-out]">
+        <Icon size={40} strokeWidth={1.5} className="text-muted-foreground/80" />
       </div>
 
-      <h3 className="text-xl font-semibold text-foreground mb-2">{title}</h3>
+      <h3 className="relative z-10 text-2xl font-bold tracking-tight text-foreground mb-3">
+        {title}
+      </h3>
 
-      {description && <p className="text-muted-foreground max-w-md mb-6">{description}</p>}
+      {description && (
+        <p className="relative z-10 text-muted-foreground max-w-md mb-8 text-sm leading-relaxed">
+          {description}
+        </p>
+      )}
 
-      {action && <Button onClick={action.onClick}>{action.label}</Button>}
+      {action && (
+        <div className="relative z-10">
+          <Button onClick={action.onClick} className="rounded-none shadow-sm shadow-primary/20">
+            {action.label}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

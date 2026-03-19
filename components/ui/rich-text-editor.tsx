@@ -102,7 +102,7 @@ const ToolbarButton = memo(
               onClick={onClick}
               disabled={disabled}
               className={cn(
-                'h-8 w-8 p-0 rounded-md transition-all duration-200',
+                'h-8 w-8 p-0 rounded-md transition duration-200',
                 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
                 isActive &&
                   'bg-primary/5 text-primary shadow-[inset_0_-2px_0_0_hsl(var(--primary))]',
@@ -178,7 +178,7 @@ const LinkPopover = memo<{ editor: Editor }>(({ editor }) => {
     >
       <PopoverPrimitive.Trigger asChild>
         <ToolbarButton isActive={editor.isActive('link')} tooltip="Add Link" onClick={() => {}}>
-          <LinkIcon className="h-3.5 w-3.5" />
+          <LinkIcon size={12} strokeWidth={1.5} className=".5 .5" />
         </ToolbarButton>
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
@@ -242,7 +242,7 @@ const ImagePopover = memo<{ editor: Editor }>(({ editor }) => {
     >
       <PopoverPrimitive.Trigger asChild>
         <ToolbarButton tooltip="Add Image">
-          <ImageIcon className="h-3.5 w-3.5" />
+          <ImageIcon size={12} strokeWidth={1.5} className=".5 .5" />
         </ToolbarButton>
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
@@ -290,21 +290,21 @@ const EditorToolbar = memo<EditorToolbarProps>(({ editor, variant }) => {
         isActive={editor.isActive('bold')}
         tooltip="Bold (Ctrl+B)"
       >
-        <Bold className="h-3.5 w-3.5" />
+        <Bold size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleItalic().run()}
         isActive={editor.isActive('italic')}
         tooltip="Italic (Ctrl+I)"
       >
-        <Italic className="h-3.5 w-3.5" />
+        <Italic size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleUnderline().run()}
         isActive={editor.isActive('underline')}
         tooltip="Underline (Ctrl+U)"
       >
-        <UnderlineIcon className="h-3.5 w-3.5" />
+        <UnderlineIcon size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
     </ToolbarGroup>
   );
@@ -316,21 +316,21 @@ const EditorToolbar = memo<EditorToolbarProps>(({ editor, variant }) => {
         isActive={editor.isActive('strike')}
         tooltip="Strikethrough"
       >
-        <Strikethrough className="h-3.5 w-3.5" />
+        <Strikethrough size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleCode().run()}
         isActive={editor.isActive('code')}
         tooltip="Inline Code"
       >
-        <Code className="h-3.5 w-3.5" />
+        <Code size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHighlight().run()}
         isActive={editor.isActive('highlight')}
         tooltip="Highlight"
       >
-        <Highlighter className="h-3.5 w-3.5" />
+        <Highlighter size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
     </ToolbarGroup>
   );
@@ -342,21 +342,21 @@ const EditorToolbar = memo<EditorToolbarProps>(({ editor, variant }) => {
         isActive={editor.isActive('heading', { level: 1 })}
         tooltip="Heading 1"
       >
-        <Heading1 className="h-3.5 w-3.5" />
+        <Heading1 size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         isActive={editor.isActive('heading', { level: 2 })}
         tooltip="Heading 2"
       >
-        <Heading2 className="h-3.5 w-3.5" />
+        <Heading2 size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         isActive={editor.isActive('heading', { level: 3 })}
         tooltip="Heading 3"
       >
-        <Heading3 className="h-3.5 w-3.5" />
+        <Heading3 size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
     </ToolbarGroup>
   );
@@ -368,28 +368,28 @@ const EditorToolbar = memo<EditorToolbarProps>(({ editor, variant }) => {
         isActive={editor.isActive('bulletList')}
         tooltip="Bullet List"
       >
-        <List className="h-3.5 w-3.5" />
+        <List size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         isActive={editor.isActive('orderedList')}
         tooltip="Numbered List"
       >
-        <ListOrdered className="h-3.5 w-3.5" />
+        <ListOrdered size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleTaskList().run()}
         isActive={editor.isActive('taskList')}
         tooltip="Task List"
       >
-        <ListChecks className="h-3.5 w-3.5" />
+        <ListChecks size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         isActive={editor.isActive('blockquote')}
         tooltip="Blockquote"
       >
-        <Quote className="h-3.5 w-3.5" />
+        <Quote size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
     </ToolbarGroup>
   );
@@ -401,28 +401,28 @@ const EditorToolbar = memo<EditorToolbarProps>(({ editor, variant }) => {
         isActive={editor.isActive({ textAlign: 'left' })}
         tooltip="Align Left"
       >
-        <AlignLeft className="h-3.5 w-3.5" />
+        <AlignLeft size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().setTextAlign('center').run()}
         isActive={editor.isActive({ textAlign: 'center' })}
         tooltip="Align Center"
       >
-        <AlignCenter className="h-3.5 w-3.5" />
+        <AlignCenter size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().setTextAlign('right').run()}
         isActive={editor.isActive({ textAlign: 'right' })}
         tooltip="Align Right"
       >
-        <AlignRight className="h-3.5 w-3.5" />
+        <AlignRight size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().setTextAlign('justify').run()}
         isActive={editor.isActive({ textAlign: 'justify' })}
         tooltip="Justify"
       >
-        <AlignJustify className="h-3.5 w-3.5" />
+        <AlignJustify size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
     </ToolbarGroup>
   );
@@ -435,14 +435,14 @@ const EditorToolbar = memo<EditorToolbarProps>(({ editor, variant }) => {
         disabled={!editor.isActive('link')}
         tooltip="Remove Link"
       >
-        <Unlink className="h-3.5 w-3.5" />
+        <Unlink size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ImagePopover editor={editor} />
       <ToolbarButton
         onClick={() => editor.chain().focus().setHorizontalRule().run()}
         tooltip="Horizontal Rule"
       >
-        <Minus className="h-3.5 w-3.5" />
+        <Minus size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
     </ToolbarGroup>
   );
@@ -454,21 +454,21 @@ const EditorToolbar = memo<EditorToolbarProps>(({ editor, variant }) => {
         disabled={!editor.can().undo()}
         tooltip="Undo (Ctrl+Z)"
       >
-        <Undo className="h-3.5 w-3.5" />
+        <Undo size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => editor.chain().focus().redo().run()}
         disabled={!editor.can().redo()}
         tooltip="Redo (Ctrl+Y)"
       >
-        <Redo className="h-3.5 w-3.5" />
+        <Redo size={12} strokeWidth={1.5} className=".5 .5" />
       </ToolbarButton>
     </ToolbarGroup>
   );
 
   if (variant === 'basic') {
     return (
-      <div className="flex flex-wrap items-center gap-2 border-b border-border/40 bg-transparent px-3 py-1.5">
+      <div className="flex-wrap items-center gap-2 border-b border-border/40 bg-transparent px-3 py-1.5">
         {basicTools}
         <ToolbarDivider />
         {historyTools}
@@ -478,7 +478,7 @@ const EditorToolbar = memo<EditorToolbarProps>(({ editor, variant }) => {
 
   if (variant === 'minimal') {
     return (
-      <div className="flex flex-wrap items-center gap-2 border-b border-border/40 bg-transparent px-3 py-1.5">
+      <div className="flex-wrap items-center gap-2 border-b border-border/40 bg-transparent px-3 py-1.5">
         {basicTools}
         <ToolbarDivider />
         {formattingTools}
@@ -491,7 +491,7 @@ const EditorToolbar = memo<EditorToolbarProps>(({ editor, variant }) => {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 border-b border-border/40 bg-transparent px-3 py-1.5">
+    <div className="flex-wrap items-center gap-2 border-b border-border/40 bg-transparent px-3 py-1.5">
       {basicTools}
       <ToolbarDivider />
       {formattingTools}
@@ -520,13 +520,13 @@ const EditorFooter = memo<{ editor: Editor }>(({ editor }) => {
     <div className="flex items-center justify-between border-t border-border/50 bg-muted/10 px-4 py-1.5">
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1.5">
-          <Type className="h-3 w-3 text-muted-foreground/50" />
+          <Type size={12} strokeWidth={1.5} className="text-muted-foreground/50" />
           <span className="text-[10px] font-mono text-muted-foreground/70">
             {words} {words === 1 ? 'word' : 'words'}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <FileText className="h-3 w-3 text-muted-foreground/50" />
+          <FileText size={12} strokeWidth={1.5} className="text-muted-foreground/50" />
           <span className="text-[10px] font-mono text-muted-foreground/70">{characters} chars</span>
         </div>
       </div>
@@ -590,7 +590,7 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
       editorProps: {
         attributes: {
           class: cn(
-            'prose prose-sm dark:prose-invert max-w-none focus:outline-none px-6 py-5',
+            'prose prose-sm dark:prose-invert max-w-none focus:focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring px-6 py-5',
             'prose-headings:font-semibold prose-headings:text-foreground prose-headings:tracking-tight prose-headings:mt-6 prose-headings:mb-3',
             'prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:my-2',
             'prose-a:text-primary prose-a:underline hover:prose-a:text-primary/80 prose-a:underline-offset-2',
@@ -645,7 +645,7 @@ export const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>
     return (
       <div
         className={cn(
-          'rounded-md border border-border bg-background overflow-hidden transition-all duration-300 shadow-sm hover:shadow-md',
+          'rounded-md border border-border bg-background overflow-hidden transition duration-300 shadow-sm hover:shadow-md',
           'focus-within:ring-1 focus-within:ring-primary focus-within:border-primary',
           !editable && 'opacity-70 cursor-not-allowed hover:shadow-sm',
           className

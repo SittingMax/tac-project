@@ -100,14 +100,14 @@ function AiInput({
 
   return (
     <div className="w-full">
-      <div className="relative mx-auto flex w-full flex-col items-start gap-2">
+      <div className="relative mx-auto flex w-full flex flex-col items-start gap-2">
         <div className="relative mx-auto w-full">
           <Textarea
             ref={textareaRef}
             placeholder="Ask me anything..."
             className={cn(
               'bg-muted/50 text-foreground ring-primary/20 placeholder:text-muted-foreground/70 w-full resize-none rounded-md border-none py-4 pr-12 pl-6 leading-[1.2] text-wrap',
-              'focus:ring-primary/30 min-h-[56px] transition-all duration-200 focus:ring-2'
+              'focus:ring-primary/30 min-h-[56px] transition duration-200 focus:ring-2'
             )}
             value={value}
             onKeyDown={onKeyDown}
@@ -119,7 +119,7 @@ function AiInput({
           <button
             onClick={onSubmit}
             className={cn(
-              'bg-primary/10 hover:bg-primary/20 absolute top-1/2 right-3 -translate-y-1/2 rounded-md p-2 transition-all duration-200',
+              'bg-primary/10 hover:bg-primary/20 absolute top-1/2 right-3 -translate-y-1/2 rounded-md p-2 transition duration-200',
               value.trim() ? 'opacity-100' : 'cursor-not-allowed opacity-50'
             )}
             type="button"
@@ -192,9 +192,9 @@ export function TacBot() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-20 delay-1000"></span>
               <Button
                 size="icon"
-                className="relative h-14 w-14 rounded-full shadow-lg hover:shadow-xl hover:shadow-primary/30 bg-background border border-border/50 text-foreground transition-all duration-500 hover:scale-110"
+                className="relative h-14 w-14 rounded-full shadow-lg hover:shadow-xl hover:shadow-primary/30 bg-background border border-border/50 text-foreground transition duration-500 hover:scale-110"
               >
-                <Sparkles className="h-6 w-6 text-primary fill-primary/20" />
+                <Sparkles size={24} strokeWidth={1.5} className="text-primary fill-primary/20" />
               </Button>
             </span>
           </div>
@@ -208,7 +208,7 @@ export function TacBot() {
         <div className="flex items-center justify-between border-b border-border/40 p-4 bg-muted/20">
           <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/20">
-              <Bot className="h-6 w-6 text-primary" />
+              <Bot size={24} strokeWidth={1.5} className="text-primary" />
             </div>
             <div>
               <h2 className="font-semibold text-foreground leading-none">TAC Bot</h2>
@@ -221,7 +221,7 @@ export function TacBot() {
         {/* Messages Area */}
         <div
           ref={scrollRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth bg-gradient-to-b from-background to-muted/10"
+          className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 scroll-smooth bg-gradient-to-b from-background to-muted/10"
         >
           {messages.length > 0 ? (
             messages.map((m) => (
@@ -258,8 +258,8 @@ export function TacBot() {
               </div>
             ))
           ) : (
-            <div className="flex h-full flex-col items-center justify-center text-center opacity-50">
-              <Bot className="h-12 w-12 mb-2 text-primary/40" />
+            <div className="flex h-full flex flex-col items-center justify-center text-center opacity-50">
+              <Bot size={48} strokeWidth={1.5} className="mb-2 text-primary/40" />
               <p className="text-sm">How can I help you today?</p>
             </div>
           )}

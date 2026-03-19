@@ -23,7 +23,7 @@ export function HeroOverlays() {
         className="absolute top-24 left-6 hidden md:flex flex-col gap-1"
       >
         <div className="flex items-center gap-2">
-          <Globe className="w-3 h-3 animate-pulse" />
+          <Globe size={12} strokeWidth={1.5} className="animate-pulse" />
           <span>WGS_SAT_UPLINK_V4.2</span>
         </div>
         <div className="text-muted-foreground">LAT: 26.1445° N | LON: 91.7362° E</div>
@@ -48,13 +48,13 @@ export function HeroOverlays() {
         </Badge>
         <div className="flex items-center gap-4 text-muted-foreground/60">
           <div className="flex items-center gap-1">
-            <Wifi className="w-3 h-3" /> 100%
+            <Wifi size={12} strokeWidth={1.5} /> 100%
           </div>
           <div className="flex items-center gap-1">
-            <Radio className="w-3 h-3" /> 5G_WGS
+            <Radio size={12} strokeWidth={1.5} /> 5G_WGS
           </div>
           <div className="flex items-center gap-1">
-            <Activity className="w-3 h-3" /> LOW_LATENCY
+            <Activity size={12} strokeWidth={1.5} /> LOW_LATENCY
           </div>
         </div>
       </motion.div>

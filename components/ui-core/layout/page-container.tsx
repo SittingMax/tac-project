@@ -28,7 +28,7 @@ export function PageContainer({
   return (
     <div
       className={cn(
-        'mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 space-y-6',
+        'mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 flex flex-col gap-6',
         'animate-in fade-in slide-in-from-bottom-2 duration-500',
         maxWidthMap[maxWidth],
         className

@@ -48,26 +48,29 @@ export function Navbar() {
                     key={link.name}
                     href={link.href}
                     onClick={(e) => handleScroll(e, link.href)}
-                    className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors relative after:absolute after:-bottom-5 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100"
+                    className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors relative after:absolute after:-bottom-5 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100 focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm"
                   >
                     {link.name}
                   </a>
                 ))}
               </div>
               <div className="flex items-center gap-4">
-                <AnimatedThemeToggler className="rounded-md border border-border/50 hover:bg-muted/50 transition-colors" />
+                <AnimatedThemeToggler
+                  className="rounded-md border border-border/50 hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  aria-label="Toggle theme"
+                />
                 <Link
                   to="/login"
-                  className="text-xs font-medium text-foreground hover:text-muted-foreground transition-colors ml-2"
+                  className="text-xs font-medium text-foreground hover:text-muted-foreground transition-colors ml-2 focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm px-2 py-1"
                 >
                   Log in
                 </Link>
                 <Button
                   onClick={() => setBookingDialogOpen(true)}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-6 h-10 font-semibold text-xs shadow-sm ml-2 relative overflow-hidden group border border-primary"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-6 h-10 font-semibold text-xs shadow-sm ml-2 relative overflow-hidden group border border-primary focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <span className="relative z-10">Book Shipment</span>
-                  <div className="absolute inset-0 h-full w-full scale-0 rounded-md transition-all duration-300 ease-out group-hover:scale-100 group-hover:bg-primary-foreground/10"></div>
+                  <div className="absolute inset-0 h-full w-full scale-0 rounded-md transition duration-300 ease-out group-hover:scale-100 group-hover:bg-primary-foreground/10"></div>
                 </Button>
               </div>
             </div>
@@ -79,9 +82,10 @@ export function Navbar() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-md border border-border/50"
+                    className="rounded-md border border-border/50 focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    aria-label="Open menu"
                   >
-                    <Menu className="h-5 w-5" />
+                    <Menu size={20} strokeWidth={1.5} />
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[280px] border-l border-border/50">
@@ -89,7 +93,12 @@ export function Navbar() {
                     <div className="flex items-center justify-between py-4 border-b border-border">
                       <span className="font-semibold text-sm">Menu</span>
                       <SheetClose asChild>
-                        <Button variant="ghost" size="icon" className="rounded-md">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="rounded-md focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          aria-label="Close menu"
+                        >
                           <X className="h-4 w-4" />
                         </Button>
                       </SheetClose>
@@ -100,13 +109,13 @@ export function Navbar() {
                           key={link.name}
                           href={link.href}
                           onClick={(e) => handleScroll(e, link.href)}
-                          className="py-4 border-b border-border/20 text-xs font-medium text-muted-foreground hover:text-foreground hover:pl-2 transition-all"
+                          className="py-4 border-b border-border/20 text-xs font-medium text-muted-foreground hover:text-foreground hover:pl-2 transition focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-sm"
                         >
                           {link.name}
                         </a>
                       ))}
                     </div>
-                    <div className="mt-auto space-y-3 py-4">
+                    <div className="mt-auto flex flex-col gap-3 py-4">
                       <Link to="/login" className="block" onClick={() => setIsOpen(false)}>
                         <Button
                           variant="outline"

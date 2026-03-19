@@ -99,7 +99,7 @@ export const PackageTrackerCard = ({
           onClick={onTrackClick}
           className="bg-muted/50 text-muted-foreground hover:bg-muted flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 text-sm transition-colors"
         >
-          <CheckCircle2 className="h-4 w-4 text-status-success" />
+          <CheckCircle2 size={16} strokeWidth={1.5} className="text-status-success" />
           Show full tracking
         </motion.button>
       </div>
@@ -133,7 +133,7 @@ export const PackageTrackerCard = ({
         </motion.h2>
 
         <div className="mt-6 flex items-end justify-between">
-          <motion.div variants={itemVariants} className="space-y-1">
+          <motion.div variants={itemVariants} className="flex flex-col gap-1">
             <p className="text-muted-foreground text-xs">Package Number:</p>
             <p className="font-mono text-sm font-bold text-primary">{packageNumber}</p>
             <p className="text-muted-foreground text-xs">{date}</p>
@@ -147,7 +147,7 @@ export const PackageTrackerCard = ({
               <ThemeAwareQRCode value={qrCodeValue} size={64} />
             ) : (
               <div className="bg-muted flex h-16 w-16 items-center justify-center">
-                <QrCode className="text-muted-foreground h-8 w-8" />
+                <QrCode size={32} strokeWidth={1.5} className="text-muted-foreground" />
               </div>
             )}
           </motion.div>

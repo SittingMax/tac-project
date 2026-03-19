@@ -41,7 +41,7 @@ export function SystemCapabilities() {
               className="group flex items-center gap-2 px-6 py-4 border border-border bg-card/50 text-foreground text-sm font-semibold rounded-md hover:bg-muted transition-colors whitespace-nowrap shadow-sm"
             >
               <span>Explore Capabilities</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight size={16} strokeWidth={1.5} className="transition-transform group-hover:translate-x-1" />
             </a>
           </div>
         </FadeUp>
@@ -51,7 +51,7 @@ export function SystemCapabilities() {
           {/* Card 1: Live GPS Tracking */}
           <motion.div
             variants={staggerItemVariants}
-            className="group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 md:col-span-1 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-md"
+            className="group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition duration-500 md:col-span-1 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-md"
           >
             {/* Visual */}
             <div className="relative h-48 w-full flex items-center justify-center mb-6 overflow-visible">
@@ -147,7 +147,7 @@ export function SystemCapabilities() {
                 style={{ animation: 'breathe-glow 4s ease-in-out infinite' }}
               >
                 <div className="absolute inset-0 bg-primary/10 rounded-md blur-sm"></div>
-                <Crosshair className="text-foreground relative z-10 w-7 h-7" />
+                <Crosshair size={28} strokeWidth={1.5} className="text-foreground relative z-10" />
               </div>
             </div>
 
@@ -166,7 +166,7 @@ export function SystemCapabilities() {
           {/* Card 2: Smart Routing */}
           <motion.div
             variants={staggerItemVariants}
-            className="md:col-span-2 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-lg"
+            className="md:col-span-2 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-lg"
           >
             <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/20 transition-colors duration-700"></div>
 
@@ -269,7 +269,7 @@ export function SystemCapabilities() {
                   style={{ animation: 'breathe-diamond 4s ease-in-out infinite' }}
                 >
                   <div className="w-12 h-12 border border-primary/50 rounded-md flex items-center justify-center bg-primary/5 relative z-20">
-                    <Map className="text-primary w-6 h-6 z-20" />
+                    <Map size={24} strokeWidth={1.5} className="text-primary z-20" />
                   </div>
                   <div
                     className="absolute inset-0 z-10 opacity-30"
@@ -295,7 +295,7 @@ export function SystemCapabilities() {
           {/* Card 3: Automated Dispatch */}
           <motion.div
             variants={staggerItemVariants}
-            className="md:col-span-2 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-lg"
+            className="md:col-span-2 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-lg"
           >
             <div className="flex w-full h-48 mb-6 relative items-center justify-center">
               <div className="flex items-center gap-4 relative">
@@ -311,7 +311,7 @@ export function SystemCapabilities() {
                     animationDelay: '0s',
                   }}
                 >
-                  <Network className="w-5 h-5" />
+                  <Network size={20} strokeWidth={1.5} />
                 </div>
                 <div
                   className="w-12 h-12 rounded-md border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
@@ -320,7 +320,7 @@ export function SystemCapabilities() {
                     animationDelay: '1s',
                   }}
                 >
-                  <Network className="w-5 h-5" />
+                  <Network size={20} strokeWidth={1.5} />
                 </div>
 
                 <div
@@ -356,7 +356,7 @@ export function SystemCapabilities() {
                     ></path>
                   </svg>
 
-                  <Shield className="w-8 h-8 relative z-10" />
+                  <Shield size={32} strokeWidth={1.5} className="relative z-10" />
 
                   <div className="absolute -bottom-3 bg-background text-foreground border border-border px-2 py-0.5 rounded-md flex items-center gap-1.5 shadow-md">
                     <span className="relative flex h-2 w-2">
@@ -374,7 +374,7 @@ export function SystemCapabilities() {
                     animationDelay: '2s',
                   }}
                 >
-                  <Network className="w-5 h-5" />
+                  <Network size={20} strokeWidth={1.5} />
                 </div>
                 <div
                   className="w-12 h-12 rounded-md border border-border bg-muted/50 flex items-center justify-center text-muted-foreground"
@@ -383,7 +383,7 @@ export function SystemCapabilities() {
                     animationDelay: '3s',
                   }}
                 >
-                  <Network className="w-5 h-5" />
+                  <Network size={20} strokeWidth={1.5} />
                 </div>
               </div>
             </div>
@@ -402,7 +402,7 @@ export function SystemCapabilities() {
           {/* Card 4: Enterprise Scalability */}
           <motion.div
             variants={staggerItemVariants}
-            className="md:col-span-1 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-md"
+            className="md:col-span-1 group flex flex-col overflow-hidden hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition duration-500 bg-card border-border border rounded-md p-8 relative justify-between min-h-[320px] lg:min-h-[400px] shadow-md"
           >
             <div
               className="absolute inset-0 opacity-[0.03] pointer-events-none"

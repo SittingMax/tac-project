@@ -27,21 +27,12 @@ export function FormFooter({
       )}
     >
       {onCancel && (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
           {cancelLabel}
         </Button>
       )}
-      <Button
-        type="submit"
-        disabled={isLoading || disabled}
-        className="min-w-[100px]"
-      >
-        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      <Button type="submit" disabled={isLoading || disabled} className="min-w-[100px]">
+        {isLoading && <Loader2 size={16} strokeWidth={1.5} className="mr-2 animate-spin" />}
         {submitLabel}
       </Button>
     </div>
