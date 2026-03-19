@@ -8,7 +8,15 @@ import { useShipments } from '@/hooks/useShipments';
 import { useBookings } from '@/hooks/useBookings';
 import { useExceptions } from '@/hooks/useExceptions';
 import { formatDistanceToNow } from 'date-fns';
-import { Activity, Box, PackagePlus, AlertTriangle, ChevronRight } from 'lucide-react';
+import {
+  type LucideIcon,
+  Activity,
+  Box,
+  PackagePlus,
+  AlertTriangle,
+  ChevronRight,
+} from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { cn } from '@/lib/utils';
 import { STATUS_COLORS } from '@/lib/design-tokens';
 import { CrudTable } from '@/components/crud/CrudTable';
@@ -23,7 +31,7 @@ interface FeedItem {
   title: string;
   description: string;
   status: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   colorClass: string;
   link: string;
 }
@@ -114,7 +122,11 @@ export const LiveActivityFeed: React.FC = () => {
           const Icon = item.icon;
           return (
             <div className="flex items-center gap-3">
-              <Icon className={cn('w-4 h-4 flex-shrink-0', item.colorClass)} />
+              <AppIcon
+                icon={Icon}
+                size={16}
+                className={cn('w-4 h-4 flex-shrink-0', item.colorClass)}
+              />
               <span className="font-medium text-sm text-foreground whitespace-nowrap">
                 {item.title}
               </span>
@@ -179,7 +191,7 @@ export const LiveActivityFeed: React.FC = () => {
                 navigate(row.original.link);
               }}
             >
-              <ChevronRight className="w-4 h-4" />
+              <AppIcon icon={ChevronRight} size={16} className="w-4 h-4" />
             </Button>
           );
         },
@@ -194,7 +206,7 @@ export const LiveActivityFeed: React.FC = () => {
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-              <Activity className="w-5 h-5 text-primary" />
+              <AppIcon icon={Activity} size={20} className="w-5 h-5 text-primary" />
               Operations Stream
             </h3>
             <span className="flex h-2 w-2 relative ml-1">

@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
 
 import { Badge } from '@/components/ui/badge';
 import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
+import { StatCard, AppIcon } from '@/components/ui-core';
 import { CrudTable } from '@/components/crud/CrudTable';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
@@ -202,7 +202,7 @@ export const Inventory: React.FC = () => {
           const hubName = location ? HUBS[location]?.name || 'Unknown' : 'Unknown';
           return (
             <div className="flex items-center gap-2">
-              <Warehouse size={16} strokeWidth={1.5} className="text-muted-foreground" />
+              <AppIcon icon={Warehouse} size={16} className="text-muted-foreground" />
               {hubName}
             </div>
           );
@@ -253,27 +253,19 @@ export const Inventory: React.FC = () => {
         </ToggleGroup>
       </PageHeader>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="p-4 flex items-center gap-4">
-          <div className="p-3 bg-primary/10 text-primary rounded-lg">
-            <Package size={20} strokeWidth={1.5} />
-          </div>
-          <div>
-            <div className="text-sm font-medium text-muted-foreground mb-0.5">
-              Inventory Backlog
-            </div>
-            <div className="text-2xl font-semibold text-foreground">{stats.total}</div>
-          </div>
-        </Card>
-        <Card className="p-4 flex items-center gap-4">
-          <div className="p-3 bg-status-error/10 text-status-error rounded-lg">
-            <Warehouse size={20} strokeWidth={1.5} />
-          </div>
-          <div>
-            <div className="text-sm font-medium text-destructive mb-0.5">Critical Backlog</div>
-            <div className="text-2xl font-semibold text-destructive">{stats.critical}</div>
-          </div>
-        </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <StatCard
+          title="Inventory Backlog"
+          value={stats.total}
+          icon={Package}
+          iconColor="primary"
+        />
+        <StatCard
+          title="Critical Backlog"
+          value={stats.critical}
+          icon={Warehouse}
+          iconColor="error"
+        />
       </div>
 
       <SectionCard>

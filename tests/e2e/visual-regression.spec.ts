@@ -162,6 +162,61 @@ test.describe('Visual Regression Tests', () => {
     });
   });
 
+  test.describe('Notifications Page', () => {
+    test.skip(!process.env.E2E_TEST_EMAIL, 'Requires auth credentials');
+    test.use({ storageState: authFile });
+
+    test('notifications page matches snapshot', async ({ page }) => {
+      await page.goto('/notifications');
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(1000);
+
+      await expect(page).toHaveScreenshot('notifications-page.png', {
+        fullPage: true,
+        ...screenshotOptions,
+        mask: [page.locator('[data-testid="notification-list"]')],
+      });
+    });
+  });
+
+  test.describe('Search Results Page', () => {
+    test.skip(!process.env.E2E_TEST_EMAIL, 'Requires auth credentials');
+    test.use({ storageState: authFile });
+
+    test('search results page matches snapshot', async ({ page }) => {
+      await page.goto('/search?q=TEST');
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(1000);
+
+      await expect(page).toHaveScreenshot('search-results-page.png', {
+        fullPage: true,
+        ...screenshotOptions,
+        mask: [page.locator('[data-testid="search-results"]')],
+      });
+    });
+  });
+
+  test.describe('Public Tracking Page', () => {
+    // Unauthenticated
+    test.use({ storageState: { cookies: [], origins: [] } });
+
+    test('public tracking page matches snapshot (found)', async ({ page }) => {
+      // Mock tracking API or use a known test AWB if local
+      await page.goto('/track/TAC2026000001');
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(1000);
+
+      await expect(page).toHaveScreenshot('public-tracking-page.png', {
+        fullPage: true,
+        ...screenshotOptions,
+        mask: [
+          page.locator('.tracking-timeline'), // Mask dynamic timeline
+          page.locator('time'),
+        ],
+      });
+    });
+  });
+
   test.describe('Responsive Design', () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 

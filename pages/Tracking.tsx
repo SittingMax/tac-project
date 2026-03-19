@@ -12,6 +12,7 @@ import { useTrackingEvents } from '../hooks/useTrackingEvents';
 import { useRealtimeTracking } from '../hooks/useRealtime';
 import { Shipment, TrackingEvent } from '../types';
 import { HUBS } from '../lib/constants';
+import { PageContainer, PageHeader } from '@/components/ui-core/layout';
 
 const resolveHubCode = (value?: string | null): string => {
   if (!value) return 'UNK';
@@ -94,15 +95,8 @@ export const Tracking: React.FC = () => {
   void isLoading; // Used in UI below
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
-      <div className="flex justify-between items-end pb-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
-            Tracking
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Track shipments in real time</p>
-        </div>
-      </div>
+    <PageContainer>
+      <PageHeader title="Tracking" description="Track shipments in real time" />
 
       {/* Search Area */}
       <Card className="max-w-3xl mx-auto p-8">
@@ -207,6 +201,6 @@ export const Tracking: React.FC = () => {
           </Card>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 };

@@ -62,7 +62,10 @@ export const Analytics: React.FC = () => {
         <PageHeader title="Telemetry" description="Real-time macroscopic telemetry." />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="p-6 bg-card border border-border rounded-lg flex flex-col gap-4">
+            <div
+              key={i}
+              className="p-6 bg-card border border-border rounded-lg flex flex-col gap-4"
+            >
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-10 w-16" />
             </div>
@@ -91,7 +94,11 @@ export const Analytics: React.FC = () => {
         <div className="bg-card border border-border rounded-lg p-4 flex flex-col justify-between group relative overflow-hidden transition hover:bg-muted/5">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-muted-foreground">Total Shipments</span>
-            <Package size={16} strokeWidth={1.5} className="text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
+            <Package
+              size={16}
+              strokeWidth={1.5}
+              className="text-primary opacity-50 group-hover:opacity-100 transition-opacity"
+            />
           </div>
           <div className="text-2xl font-semibold text-foreground">
             {summary.total_shipments.toLocaleString()}
@@ -101,7 +108,11 @@ export const Analytics: React.FC = () => {
         <div className="bg-card border border-border rounded-lg p-4 flex flex-col justify-between group relative overflow-hidden transition hover:bg-muted/5">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-muted-foreground">Delivery Rate</span>
-            <TrendingUp size={16} strokeWidth={1.5} className="text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
+            <TrendingUp
+              size={16}
+              strokeWidth={1.5}
+              className="text-primary opacity-50 group-hover:opacity-100 transition-opacity"
+            />
           </div>
           <div
             className={cn(
@@ -117,7 +128,11 @@ export const Analytics: React.FC = () => {
         <div className="bg-card border border-border rounded-lg p-6 flex flex-col justify-between group relative overflow-hidden transition hover:bg-muted/5">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-muted-foreground">On Track</span>
-            <CheckCircle size={16} strokeWidth={1.5} className="text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
+            <CheckCircle
+              size={16}
+              strokeWidth={1.5}
+              className="text-primary opacity-50 group-hover:opacity-100 transition-opacity"
+            />
           </div>
           <div className="text-2xl font-semibold text-foreground">
             {summary.on_track.toLocaleString()}
@@ -127,7 +142,11 @@ export const Analytics: React.FC = () => {
         <div className="bg-card border border-border rounded-lg p-6 flex flex-col justify-between group relative overflow-hidden transition hover:bg-muted/5">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-destructive">Exceptions</span>
-            <AlertTriangle size={16} strokeWidth={1.5} className="text-destructive opacity-50 group-hover:opacity-100 transition-opacity" />
+            <AlertTriangle
+              size={16}
+              strokeWidth={1.5}
+              className="text-destructive opacity-50 group-hover:opacity-100 transition-opacity"
+            />
           </div>
           <div className="text-2xl font-semibold text-destructive">
             {summary.exceptions.toLocaleString()}

@@ -9,6 +9,7 @@ import { AuditStatsPanel } from '@/components/audits/AuditStatsPanel';
 import { ExpectedShipmentsList } from '@/components/audits/ExpectedShipmentsList';
 import { BarcodeScanner } from '@/components/scanning/BarcodeScanner';
 import { ScanSource } from '@/types';
+import { PageContainer, PageHeader } from '@/components/ui-core/layout';
 import { Camera, Keyboard, ScanLine, X, AlertTriangle, UserCheck } from 'lucide-react';
 import { ScannerDebug } from '@/components/scanning/ScannerDebug';
 
@@ -80,16 +81,9 @@ export const ArrivalAudit: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-24 h-[calc(100vh-140px)] flex-col">
+    <PageContainer>
       {/* Header */}
-      <div className="flex justify-between items-end pb-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
-            Arrival Audit
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Warehouse manifest reconciliation</p>
-        </div>
-      </div>
+      <PageHeader title="Arrival Audit" description="Warehouse manifest reconciliation" />
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0">
         {/* Left Column: Scanner and Input */}
@@ -233,6 +227,6 @@ export const ArrivalAudit: React.FC = () => {
       </div>
 
       <ScannerDebug />
-    </div>
+    </PageContainer>
   );
 };

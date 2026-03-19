@@ -39,6 +39,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  _hasHydrated: boolean;
 
   // Actions
   initialize: () => Promise<() => void>;
@@ -46,6 +47,7 @@ interface AuthState {
   signOut: () => Promise<void>;
   updateProfile: (profile: Partial<StaffUser>) => Promise<void>;
   clearError: () => void;
+  setHasHydrated: (state: boolean) => void;
 }
 
 const AUTH_STORAGE_NAME = 'tac-auth';
@@ -92,6 +94,9 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: true,
       error: null,
+      _hasHydrated: false,
+
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
 
       updateProfile: async (profile) => {
         const currentUser = get().user;
@@ -410,6 +415,9 @@ export const useAuthStore = create<AuthState>()(
     {
       name: AUTH_STORAGE_NAME,
       partialize: getPersistedAuthState,
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

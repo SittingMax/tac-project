@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { TrendingUp } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { PolarGrid, RadialBar, RadialBarChart } from 'recharts';
 
 import { useShipments } from '@/hooks/useShipments';
@@ -114,7 +115,7 @@ export function ChartRadialGrid() {
       <CardFooter className="flex-col gap-2 pt-4 border-t border-border">
         <div className="flex items-center gap-2 text-xs font-medium text-foreground">
           {radialProfile.leadHub?.label ?? 'Origin hub'} leads shipment share{' '}
-          <TrendingUp className="h-3 w-3 text-primary" />
+          <AppIcon icon={TrendingUp} size={16} className="h-3 w-3 text-primary" />
         </div>
         <div className="text-xs text-muted-foreground text-center">
           Showing relative shipment share by origin hub

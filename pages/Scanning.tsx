@@ -238,7 +238,7 @@ export const Scanning: React.FC = () => {
               </span>
             </div>
           </div>
-          <Button size="sm" variant="ghost" onClick={clearManifest} className="p-0" >
+          <Button size="sm" variant="ghost" onClick={clearManifest} className="p-0">
             <X className="w-3.5 h-3.5" />
           </Button>
         </div>
@@ -326,7 +326,11 @@ export const Scanning: React.FC = () => {
                       <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-primary/50" />
                       <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-primary/50" />
                       <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-primary/50" />
-                      <ScanLine size={40} strokeWidth={1.5} className="text-primary/40 absolute inset-0 m-auto animate-pulse" />
+                      <ScanLine
+                        size={40}
+                        strokeWidth={1.5}
+                        className="text-primary/40 absolute inset-0 m-auto animate-pulse"
+                      />
                     </div>
                   </div>
 
@@ -410,7 +414,11 @@ export const Scanning: React.FC = () => {
                     {scannedItems.length === 0 ? (
                       <div className="flex flex-col gap-6 p-6">
                         <div className="py-8 text-center">
-                          <ScanLine size={32} strokeWidth={1.5} className="mx-auto mb-2 text-muted-foreground/30" />
+                          <ScanLine
+                            size={32}
+                            strokeWidth={1.5}
+                            className="mx-auto mb-2 text-muted-foreground/30"
+                          />
                           <p className="text-sm text-muted-foreground">No scans this session</p>
                           <p className="mt-1 text-[10px] text-muted-foreground/60">
                             Point your scanner or type a code above
@@ -467,7 +475,11 @@ export const Scanning: React.FC = () => {
                         >
                           <div className="flex-shrink-0">
                             {item.msg.includes('EXCEPTION') ? (
-                              <AlertTriangle size={16} strokeWidth={1.5} className="text-status-error" />
+                              <AlertTriangle
+                                size={16}
+                                strokeWidth={1.5}
+                                className="text-status-error"
+                              />
                             ) : item.status === 'SUCCESS' ? (
                               <Check size={16} strokeWidth={1.5} className="text-status-success" />
                             ) : (

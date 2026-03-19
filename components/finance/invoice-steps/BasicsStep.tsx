@@ -13,6 +13,7 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Plus, Search, Truck, Plane, Sparkles, Loader2, CalendarIcon } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { TrackingDialog } from '@/components/landing-new/tracking-dialog';
@@ -113,7 +114,7 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
               : 'text-muted-foreground hover:bg-muted/50'
           )}
         >
-          <Plus className="w-3.5 h-3.5 mr-1" /> New Invoice
+          <AppIcon icon={Plus} size={16} className="w-3.5 h-3.5 mr-1" /> New Invoice
         </button>
         <button
           type="button"
@@ -128,7 +129,7 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
               : 'text-muted-foreground hover:bg-muted/50'
           )}
         >
-          <Search className="w-3.5 h-3.5 mr-1" /> Link Shipment
+          <AppIcon icon={Search} size={16} className="w-3.5 h-3.5 mr-1" /> Link Shipment
         </button>
       </div>
 
@@ -146,7 +147,7 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
           <div className="w-px h-6 bg-border mx-2" />
           <TrackingDialog>
             <Button size="sm" variant="outline" className="h-11 gap-2 border-dashed">
-              <Search className="w-4 h-4" /> Check Status
+              <AppIcon icon={Search} size={16} /> Check Status
             </Button>
           </TrackingDialog>
         </div>
@@ -154,147 +155,147 @@ export const BasicsStep = ({ form, mode, setMode, setSelectedShipment }: Props) 
 
       <FormSection title="Basic Details" description="Invoice reference and booking dates.">
         <FormGrid columns={2}>
-        <div className="space-y-2">
-          <Label htmlFor="awb" error={errors.awb?.message}>
-            CN Number
-          </Label>
-          <div className="flex gap-2 items-center">
+          <div className="space-y-2">
+            <Label htmlFor="awb" error={errors.awb?.message}>
+              CN Number
+            </Label>
+            <div className="flex gap-2 items-center">
+              <Input
+                id="awb"
+                {...form.register('awb')}
+                readOnly
+                className="h-11 font-mono bg-muted/40 border-border/60 text-sm"
+                placeholder="Auto-generated on save"
+              />
+              {mode === 'NEW_BOOKING' && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 px-4 shrink-0 shadow-sm"
+                  onClick={handleGenerateAwb}
+                  disabled={isGeneratingAwb || !!watch('awb')}
+                >
+                  {isGeneratingAwb ? (
+                    <AppIcon icon={Loader2} size={16} className="animate-spin" />
+                  ) : (
+                    <AppIcon icon={Sparkles} size={16} className="text-primary" />
+                  )}
+                </Button>
+              )}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="invoiceNumber">Invoice Ref</Label>
             <Input
-              id="awb"
-              {...form.register('awb')}
+              id="invoiceNumber"
+              {...form.register('invoiceNumber')}
               readOnly
               className="h-11 font-mono bg-muted/40 border-border/60 text-sm"
               placeholder="Auto-generated on save"
             />
-            {mode === 'NEW_BOOKING' && (
-              <Button
-                type="button"
-                variant="outline"
-                className="h-11 px-4 shrink-0 shadow-sm"
-                onClick={handleGenerateAwb}
-                disabled={isGeneratingAwb || !!watch('awb')}
-              >
-                {isGeneratingAwb ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Sparkles className="w-4 h-4 text-primary" />
-                )}
-              </Button>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="bookingDate" error={errors.bookingDate?.message}>
+              Booking Date
+            </Label>
+            <Controller
+              control={form.control}
+              name="bookingDate"
+              render={({ field }) => {
+                const dateValue = field.value
+                  ? typeof field.value === 'string'
+                    ? parseISO(field.value)
+                    : field.value
+                  : undefined;
+                return (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id="bookingDate"
+                        variant="outline"
+                        className={cn(
+                          'w-full justify-start text-left font-normal h-11',
+                          !dateValue && 'text-muted-foreground'
+                        )}
+                      >
+                        <AppIcon icon={CalendarIcon} size={16} className="mr-2" />
+                        {dateValue ? format(dateValue, 'PPP') : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={dateValue}
+                        onSelect={(date) => {
+                          if (date) {
+                            field.onChange(date.toISOString().split('T')[0]);
+                          }
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                );
+              }}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="transportMode">Transport Mode</Label>
+            <Controller
+              control={form.control}
+              name="transportMode"
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger id="transportMode" className="h-11 bg-background">
+                    <SelectValue placeholder="Select Mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="TRUCK">
+                      <div className="flex items-center gap-2">
+                        <AppIcon icon={Truck} size={16} className="text-muted-foreground" />
+                        <span>Surface / Truck</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="AIR">
+                      <div className="flex items-center gap-2">
+                        <AppIcon icon={Plane} size={16} className="text-muted-foreground" />
+                        <span>Air Cargo</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="paymentMode" error={errors.paymentMode?.message}>
+              Payment Mode *
+            </Label>
+            <Controller
+              name="paymentMode"
+              control={control}
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <SelectTrigger className="w-full h-11 bg-background hover:border-ring/50">
+                    <SelectValue placeholder="Select Payment Mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAYMENT_MODES.map((pm) => (
+                      <SelectItem key={pm.id} value={pm.id}>
+                        {pm.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.paymentMode && (
+              <p className="text-[0.8rem] font-medium text-destructive">
+                {errors.paymentMode.message}
+              </p>
             )}
           </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="invoiceNumber">Invoice Ref</Label>
-          <Input
-            id="invoiceNumber"
-            {...form.register('invoiceNumber')}
-            readOnly
-            className="h-11 font-mono bg-muted/40 border-border/60 text-sm"
-            placeholder="Auto-generated on save"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="bookingDate" error={errors.bookingDate?.message}>
-            Booking Date
-          </Label>
-          <Controller
-            control={form.control}
-            name="bookingDate"
-            render={({ field }) => {
-              const dateValue = field.value
-                ? typeof field.value === 'string'
-                  ? parseISO(field.value)
-                  : field.value
-                : undefined;
-              return (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="bookingDate"
-                      variant="outline"
-                      className={cn(
-                        'w-full justify-start text-left font-normal h-11',
-                        !dateValue && 'text-muted-foreground'
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateValue ? format(dateValue, 'PPP') : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={dateValue}
-                      onSelect={(date) => {
-                        if (date) {
-                          field.onChange(date.toISOString().split('T')[0]);
-                        }
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              );
-            }}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="transportMode">Transport Mode</Label>
-          <Controller
-            control={form.control}
-            name="transportMode"
-            render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger id="transportMode" className="h-11 bg-background">
-                  <SelectValue placeholder="Select Mode" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="TRUCK">
-                    <div className="flex items-center gap-2">
-                      <Truck className="w-4 h-4 text-muted-foreground" />
-                      <span>Surface / Truck</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="AIR">
-                    <div className="flex items-center gap-2">
-                      <Plane className="w-4 h-4 text-muted-foreground" />
-                      <span>Air Cargo</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="paymentMode" error={errors.paymentMode?.message}>
-            Payment Mode *
-          </Label>
-          <Controller
-            name="paymentMode"
-            control={control}
-            render={({ field }) => (
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger className="w-full h-11 bg-background hover:border-ring/50">
-                  <SelectValue placeholder="Select Payment Mode" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PAYMENT_MODES.map((pm) => (
-                    <SelectItem key={pm.id} value={pm.id}>
-                      {pm.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.paymentMode && (
-            <p className="text-[0.8rem] font-medium text-destructive">
-              {errors.paymentMode.message}
-            </p>
-          )}
-        </div>
-      </FormGrid>
+        </FormGrid>
       </FormSection>
     </div>
   );

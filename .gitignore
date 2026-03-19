@@ -81,3 +81,10 @@ tmp/
 
 *storybook.log
 storybook-static
+
+# Temp debug/lint output files
+build_output.txt
+full_lint_output*.txt
+lint_output.*
+push_error.txt
+tsc-errors*.txt

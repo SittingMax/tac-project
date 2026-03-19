@@ -262,7 +262,15 @@ export function useUpdateShipmentStatus() {
   const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string; silent?: boolean }) => {
+    mutationFn: async ({
+      id,
+      status,
+    }: {
+      id: string;
+      status: string;
+      silent?: boolean;
+      skipInvalidation?: boolean;
+    }) => {
       if (!orgId) {
         throw new Error('No organization context available for shipment status updates.');
       }
@@ -293,8 +301,10 @@ export function useUpdateShipmentStatus() {
       return shipmentData;
     },
     onSuccess: (data: ShipmentWithRelations, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.shipments.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.tracking.byCN(data.cn_number) });
+      if (!variables.skipInvalidation) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.shipments.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.tracking.byCN(data.cn_number) });
+      }
       if (!variables.silent) {
         toast.success(`Status updated to ${data.status}`);
       }

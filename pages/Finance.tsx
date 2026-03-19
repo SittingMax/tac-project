@@ -5,15 +5,8 @@ import { FileText, CreditCard, Plus, Check, Printer, Mail, MessageCircle } from 
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { EmptyInvoices } from '@/components/ui/empty-state';
-import { PageHeader, PageContainer, SectionCard } from '@/components/ui-core/layout';
+import { PageHeader, PageContainer, SectionCard, SizedDialog, AppIcon } from '@/components/ui-core';
 
 // CRUD Components
 import { CrudTable } from '@/components/crud/CrudTable';
@@ -199,7 +192,7 @@ export const Finance: React.FC = () => {
         description="Manage invoices, billing records, and shipment documents"
       >
         <Button onClick={() => setIsCreateOpen(true)}>
-          <Plus size={16} strokeWidth={1.5} className="mr-2" />
+          <AppIcon icon={Plus} size={16} className="mr-2" />
           New Invoice
         </Button>
       </PageHeader>
@@ -211,7 +204,7 @@ export const Finance: React.FC = () => {
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Invoices
             </CardTitle>
-            <FileText size={16} strokeWidth={1.5} className="text-primary opacity-50" />
+            <AppIcon icon={FileText} size={16} className="text-primary opacity-50" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">{invoicesData.length}</div>
@@ -223,7 +216,7 @@ export const Finance: React.FC = () => {
             <CardTitle className="text-sm font-medium text-status-success">
               Revenue (Paid)
             </CardTitle>
-            <CreditCard size={16} strokeWidth={1.5} className="text-status-success opacity-50" />
+            <AppIcon icon={CreditCard} size={16} className="text-status-success opacity-50" />
           </CardHeader>
           <CardContent>
             <div
@@ -238,7 +231,7 @@ export const Finance: React.FC = () => {
         <Card>
           <CardHeader className="flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium text-status-warning">Pending</CardTitle>
-            <FileText size={16} strokeWidth={1.5} className="text-status-warning opacity-50" />
+            <AppIcon icon={FileText} size={16} className="text-status-warning opacity-50" />
           </CardHeader>
           <CardContent>
             <div
@@ -253,7 +246,7 @@ export const Finance: React.FC = () => {
         <Card>
           <CardHeader className="flex-row items-center justify-between flex flex-col gap-0 pb-2">
             <CardTitle className="text-sm font-medium text-destructive">Overdue</CardTitle>
-            <FileText size={16} strokeWidth={1.5} className="text-destructive opacity-50" />
+            <AppIcon icon={FileText} size={16} className="text-destructive opacity-50" />
           </CardHeader>
           <CardContent>
             <div
@@ -280,89 +273,80 @@ export const Finance: React.FC = () => {
       </SectionCard>
 
       {/* Create Invoice Modal */}
-      <Dialog open={isCreateOpen} onOpenChange={handleCreateModalChange}>
-        <DialogContent className="sm:max-w-5xl w-[95vw] h-[90dvh] flex flex-col overflow-hidden p-0 gap-0 shadow-2xl">
-          <DialogHeader className="shrink-0 p-6 border-b border-border/40">
-            <DialogTitle className="text-xl font-semibold tracking-tight">
-              {editingInvoice
-                ? `Edit Invoice ${editingInvoice.invoice_no}`
-                : 'Generate New Invoice'}
-            </DialogTitle>
-            <DialogDescription>Fill in the details to create a new invoice.</DialogDescription>
-          </DialogHeader>
-          <div className="flex-1 min-h-0 flex-col">
-            <CreateInvoiceForm
-              onSuccess={onInvoiceCreated}
-              onCancel={() => handleCreateModalChange(false)}
-              initialData={editingInvoice || undefined}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+      <SizedDialog
+        open={isCreateOpen}
+        onOpenChange={handleCreateModalChange}
+        size="5xl"
+        title={
+          editingInvoice ? `Edit Invoice ${editingInvoice.invoice_no}` : 'Generate New Invoice'
+        }
+        description="Fill in the details to create a new invoice."
+      >
+        <CreateInvoiceForm
+          onSuccess={onInvoiceCreated}
+          onCancel={() => handleCreateModalChange(false)}
+          initialData={editingInvoice || undefined}
+        />
+      </SizedDialog>
 
       {/* Success Modal */}
-      <Dialog
+      <SizedDialog
         open={!!successData}
         onOpenChange={(open) => {
           if (!open) setSuccessData(null);
         }}
+        size="sm"
+        title="Documents Created Successfully"
       >
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Documents Created Successfully</DialogTitle>
-          </DialogHeader>
-          {successData && (
-            <div className="text-center flex flex-col gap-6">
-              <div className="size-16 bg-status-success/10 rounded-xl flex items-center justify-center mx-auto">
-                <Check size={32} strokeWidth={1.5} className="text-status-success" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Documents Ready</h3>
-                <p className="text-muted-foreground text-sm">
-                  Invoice {successData.invoice.invoiceNumber} and shipment document{' '}
-                  {successData.invoice.awb} are available for download.
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Button size="lg" onClick={(e) => handleDownloadInvoice(successData.invoice, e)}>
-                  <FileText size={16} strokeWidth={1.5} className="mr-2" /> Download Invoice
+        {successData && (
+          <div className="text-center flex flex-col gap-6">
+            <div className="size-16 bg-status-success/10 rounded-xl flex items-center justify-center mx-auto">
+              <AppIcon icon={Check} size={32} className="text-status-success" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-foreground mb-2">Documents Ready</h3>
+              <p className="text-muted-foreground text-sm">
+                Invoice {successData.invoice.invoiceNumber} and shipment document{' '}
+                {successData.invoice.awb} are available for download.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Button size="lg" onClick={(e) => handleDownloadInvoice(successData.invoice, e)}>
+                <AppIcon icon={FileText} size={16} className="mr-2" /> Download Invoice
+              </Button>
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={(e) => handleDownloadLabel(successData.invoice, e)}
+              >
+                <AppIcon icon={Printer} size={16} className="mr-2" /> Print Label
+              </Button>
+            </div>
+            <div className="border-t border-border pt-4">
+              <p className="text-xs text-muted-foreground mb-3 font-medium">Share with Customer</p>
+              <div className="flex justify-center gap-4">
+                <Button
+                  variant="ghost"
+                  className="text-status-success border border-status-success/30 hover:bg-status-success/10"
+                  onClick={() => handleShareWhatsapp(successData.invoice)}
+                >
+                  <AppIcon icon={MessageCircle} size={16} className="mr-2" /> WhatsApp
                 </Button>
                 <Button
-                  size="lg"
-                  variant="secondary"
-                  onClick={(e) => handleDownloadLabel(successData.invoice, e)}
+                  variant="ghost"
+                  className="text-status-info border border-status-info/30 hover:bg-status-info/10"
+                  onClick={() => handleShareEmail(successData.invoice)}
                 >
-                  <Printer size={16} strokeWidth={1.5} className="mr-2" /> Print Label
+                  <AppIcon icon={Mail} size={16} className="mr-2" /> Email
                 </Button>
               </div>
-              <div className="border-t border-border pt-4">
-                <p className="text-xs text-muted-foreground mb-3 font-medium">
-                  Share with Customer
-                </p>
-                <div className="flex justify-center gap-4">
-                  <Button
-                    variant="ghost"
-                    className="text-status-success border border-status-success/30 hover:bg-status-success/10"
-                    onClick={() => handleShareWhatsapp(successData.invoice)}
-                  >
-                    <MessageCircle size={16} strokeWidth={1.5} className="mr-2" /> WhatsApp
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="text-status-info border border-status-info/30 hover:bg-status-info/10"
-                    onClick={() => handleShareEmail(successData.invoice)}
-                  >
-                    <Mail size={16} strokeWidth={1.5} className="mr-2" /> Email
-                  </Button>
-                </div>
-              </div>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
+          </div>
+        )}
+      </SizedDialog>
 
       {/* Invoice Detail View Modal */}
-      <Dialog
+      <SizedDialog
         open={!!viewInvoice}
         onOpenChange={(open) => {
           if (!open) {
@@ -370,27 +354,24 @@ export const Finance: React.FC = () => {
             setViewShipment(undefined);
           }
         }}
+        size="lg"
+        title="Invoice Details"
       >
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Invoice Details</DialogTitle>
-          </DialogHeader>
-          {viewInvoice && (
-            <InvoiceDetails
-              invoice={viewInvoice}
-              shipment={viewShipment}
-              onClose={() => {
-                setViewInvoice(null);
-                setViewShipment(undefined);
-              }}
-              onDownloadInvoice={handleDownloadInvoice}
-              onDownloadLabel={handleDownloadLabel}
-              onMarkPaid={(id) => handleStatusUpdate(id, 'PAID')}
-              onCancel={(id) => handleStatusUpdate(id, 'CANCELLED')}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+        {viewInvoice && (
+          <InvoiceDetails
+            invoice={viewInvoice}
+            shipment={viewShipment}
+            onClose={() => {
+              setViewInvoice(null);
+              setViewShipment(undefined);
+            }}
+            onDownloadInvoice={handleDownloadInvoice}
+            onDownloadLabel={handleDownloadLabel}
+            onMarkPaid={(id) => handleStatusUpdate(id, 'PAID')}
+            onCancel={(id) => handleStatusUpdate(id, 'CANCELLED')}
+          />
+        )}
+      </SizedDialog>
 
       {/* Delete Confirmation Dialog */}
       <CrudDeleteDialog

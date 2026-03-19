@@ -37,6 +37,7 @@ import {
 import { ChartSkeleton } from '../../ui/skeleton';
 import { useShipments } from '../../../hooks/useShipments';
 import { TrendingUp } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 
 type ChartType = 'radar' | 'area' | 'bar' | 'line' | 'pie' | 'radial';
@@ -447,7 +448,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
       <CardFooter className="flex-col gap-2 pt-4 border-t border-border mt-4">
         <div className="flex items-center gap-2 text-xs font-medium text-foreground">
           {hubProfile.primaryHub.label} leading by shipment volume{' '}
-          <TrendingUp className="h-3 w-3 text-primary" />
+          <AppIcon icon={TrendingUp} size={16} className="h-3 w-3 text-primary" />
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           Based on current origin-hub shipment records

@@ -15,13 +15,19 @@ import {
 import { useAuthStore } from '@/store/authStore';
 import { hasRoleAccess } from '@/lib/access-control';
 
-// Tab Content
-import { GeneralTab } from '@/components/settings/tabs/GeneralTab';
-import { OperationsTab } from '@/components/settings/tabs/OperationsTab';
-import { BillingTab } from '@/components/settings/tabs/BillingTab';
-import { SecurityTab } from '@/components/settings/tabs/SecurityTab';
-import { UsersTab } from '@/components/settings/tabs/UsersTab';
-import { AuditTab } from '@/components/settings/tabs/AuditTab';
+// Placeholder Tab Components for unimplemented branches
+const PlaceholderTab = ({ name }: { name: string }) => (
+  <div className="p-8 text-center text-muted-foreground bg-muted/20 rounded-lg border border-dashed mt-4">
+    <p>{name} settings are currently under development.</p>
+  </div>
+);
+
+const GeneralTab = () => <PlaceholderTab name="General" />;
+const OperationsTab = () => <PlaceholderTab name="Operations" />;
+const BillingTab = () => <PlaceholderTab name="Billing" />;
+const SecurityTab = () => <PlaceholderTab name="Security" />;
+const UsersTab = () => <PlaceholderTab name="Users" />;
+const AuditTab = () => <PlaceholderTab name="Audit Logs" />;
 
 type TabId = 'general' | 'operations' | 'billing' | 'security' | 'users' | 'audit';
 

@@ -5,13 +5,7 @@ import { ArrowLeft, ArrowRight, Save, Lock, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useScanContext } from '@/context/ScanContext';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Stepper, SizedDialog } from '@/components/ui-core';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   AlertDialog,
@@ -26,7 +20,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useManifestBuilder } from '@/hooks/useManifestBuilder';
 import { useStaff } from '@/hooks/useStaff';
-import { WizardStepper } from './WizardStepper';
 import { StepManifestSetup, type ManifestSettingsValues } from './steps/StepManifestSetup';
 import { StepAddShipments } from './steps/StepAddShipments';
 import { StepReviewFinalize } from './steps/StepReviewFinalize';
@@ -367,162 +360,155 @@ export function ManifestBuilderWizard({
 
   return (
     <TooltipProvider>
-      <Dialog open={open} onOpenChange={handleCancel}>
-        <DialogContent className="w-[100vw] h-[100dvh] md:w-[92vw] md:h-[min(88vh,900px)] md:max-h-[90vh] md:max-w-4xl rounded-none md:rounded-lg flex flex-col gap-0 p-0 overflow-hidden">
-          {/* Header */}
-          <DialogHeader className="px-6 py-4 border-b border-border text-left">
-            <DialogTitle className="text-lg">Create Manifest</DialogTitle>
-            <DialogDescription className="text-sm">
-              Create a new dispatch manifest for cargo shipments
-            </DialogDescription>
-          </DialogHeader>
-
-          {/* Stepper */}
-          <div className="px-6 py-4 border-b border-border bg-secondary/20">
-            <WizardStepper steps={WIZARD_STEPS} currentStep={currentStep} />
+      <SizedDialog
+        open={open}
+        onOpenChange={handleCancel}
+        size="5xl"
+        title="Create Manifest"
+        description="Create a new dispatch manifest for cargo shipments"
+        headerSlot={
+          <div className="px-6 py-4 border-b border-border bg-secondary/20 shrink-0">
+            <Stepper
+              steps={WIZARD_STEPS}
+              currentStep={currentStep}
+              className="pb-0 mb-0 border-b-0"
+            />
           </div>
+        }
+        footer={
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={handleCancel}>
+                Cancel
+              </Button>
 
-          {/* Content - Use CSS visibility instead of conditional rendering to prevent portal destruction */}
-          <div className="flex-1 min-h-0 overflow-y-auto bg-background/50">
-            <div className="p-4 sm:p-4 md:p-6 lg:p-8">
-              {/* Step 1: Manifest Setup - Always mounted, hidden via CSS */}
-              <div
-                className={currentStep === 1 ? 'block' : 'hidden'}
-                aria-hidden={currentStep !== 1}
-                inert={currentStep !== 1 ? true : undefined}
-              >
-                <StepManifestSetup
-                  hubs={hubs}
-                  data={setupData}
-                  onDataChange={setSetupData}
-                  isValid={isStep1Valid}
-                  onValidationChange={setIsStep1Valid}
-                />
-              </div>
-
-              {/* Step 2: Add Shipments - Mounted when manifest exists, hidden via CSS */}
-              <div
-                className={currentStep === 2 ? 'block' : 'hidden'}
-                aria-hidden={currentStep !== 2}
-                inert={currentStep !== 2 ? true : undefined}
-              >
-                {builder.manifest && (
-                  <StepAddShipments
-                    manifestId={builder.manifest.id}
-                    staffId={currentStaff?.id}
-                    rules={{
-                      onlyReady: setupData.onlyReady,
-                      matchDestination: setupData.matchDestination,
-                      excludeCod: setupData.excludeCod,
-                    }}
-                    items={builder.items}
-                    fromHub={hubs.find((h) => h.id === setupData.fromHubId) ?? null}
-                    toHub={hubs.find((h) => h.id === setupData.toHubId) ?? null}
-                    isLoading={builder.isLoading}
-                    isEditable={builder.isEditable}
-                    onItemsChanged={builder.refetch}
-                    onRemove={(shipmentId) => builder.removeShipment(shipmentId, currentStaff?.id)}
-                    onViewShipment={(shipmentId) => navigate(`/shipments/${shipmentId}`)}
-                  />
-                )}
-              </div>
-
-              {/* Step 3: Review & Finalize - Always mounted, hidden via CSS */}
-              <div
-                className={currentStep === 3 ? 'block' : 'hidden'}
-                aria-hidden={currentStep !== 3}
-                inert={currentStep !== 3 ? true : undefined}
-              >
-                <StepReviewFinalize
-                  setupData={setupData}
-                  shipments={builder.items.map((i) => i.shipment)}
-                  hubs={hubs}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="border-t border-border bg-background">
-            <div className="flex items-center justify-between px-6 py-4">
-              <div className="flex items-center gap-2">
-                {/* Cancel Button */}
-                <Button variant="ghost" onClick={handleCancel}>
-                  Cancel
+              {currentStep > 1 && (
+                <Button variant="outline" onClick={handleBack}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
                 </Button>
+              )}
 
-                {currentStep > 1 && (
-                  <Button variant="outline" onClick={handleBack}>
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back
+              {currentStep < 3 ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span tabIndex={0}>
+                      <Button
+                        onClick={handleNext}
+                        disabled={
+                          (currentStep === 1 && (!isStep1Valid || builder.isCreating)) ||
+                          (currentStep === 2 && builder.items.length === 0)
+                        }
+                      >
+                        {builder.isCreating ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Creating...
+                          </>
+                        ) : (
+                          <>
+                            Next
+                            <ArrowRight className="h-4 w-4 ml-2" />
+                          </>
+                        )}
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {currentStep === 1 && !isStep1Valid && (
+                      <p>Please fill all required fields correctly</p>
+                    )}
+                    {currentStep === 2 && builder.items.length === 0 && (
+                      <p>Add at least one shipment to proceed</p>
+                    )}
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    onClick={() => handleCloseManifest('OPEN')}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-2" />
+                    )}
+                    Save as Open
                   </Button>
-                )}
-
-                {currentStep < 3 ? (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span tabIndex={0}>
-                        {' '}
-                        {/* Span needed for disabled button tooltip */}
-                        <Button
-                          onClick={handleNext}
-                          disabled={
-                            (currentStep === 1 && (!isStep1Valid || builder.isCreating)) ||
-                            (currentStep === 2 && builder.items.length === 0)
-                          }
-                        >
-                          {builder.isCreating ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Creating...
-                            </>
-                          ) : (
-                            <>
-                              Next
-                              <ArrowRight className="h-4 w-4 ml-2" />
-                            </>
-                          )}
-                        </Button>
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {currentStep === 1 && !isStep1Valid && (
-                        <p>Please fill all required fields correctly</p>
-                      )}
-                      {currentStep === 2 && builder.items.length === 0 && (
-                        <p>Add at least one shipment to proceed</p>
-                      )}
-                    </TooltipContent>
-                  </Tooltip>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="secondary"
-                      onClick={() => handleCloseManifest('OPEN')}
-                      disabled={isSaving}
-                    >
-                      {isSaving ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <Save className="h-4 w-4 mr-2" />
-                      )}
-                      Save as Open
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => setShowCloseConfirm(true)}
-                      disabled={isSaving}
-                    >
-                      <Lock className="h-4 w-4 mr-2" />
-                      Close Manifest
-                    </Button>
-                  </div>
-                )}
-              </div>
+                  <Button
+                    variant="destructive"
+                    onClick={() => setShowCloseConfirm(true)}
+                    disabled={isSaving}
+                  >
+                    <Lock className="h-4 w-4 mr-2" />
+                    Close Manifest
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        }
+      >
+        {/* Content - Use CSS visibility instead of conditional rendering to prevent portal destruction */}
+        <div className="px-2">
+          {/* Step 1: Manifest Setup - Always mounted, hidden via CSS */}
+          <div
+            className={currentStep === 1 ? 'block' : 'hidden'}
+            aria-hidden={currentStep !== 1}
+            inert={currentStep !== 1 ? true : undefined}
+          >
+            <StepManifestSetup
+              hubs={hubs}
+              data={setupData}
+              onDataChange={setSetupData}
+              isValid={isStep1Valid}
+              onValidationChange={setIsStep1Valid}
+            />
+          </div>
+
+          {/* Step 2: Add Shipments - Mounted when manifest exists, hidden via CSS */}
+          <div
+            className={currentStep === 2 ? 'block' : 'hidden'}
+            aria-hidden={currentStep !== 2}
+            inert={currentStep !== 2 ? true : undefined}
+          >
+            {builder.manifest && (
+              <StepAddShipments
+                manifestId={builder.manifest.id}
+                staffId={currentStaff?.id}
+                rules={{
+                  onlyReady: setupData.onlyReady,
+                  matchDestination: setupData.matchDestination,
+                  excludeCod: setupData.excludeCod,
+                }}
+                items={builder.items}
+                fromHub={hubs.find((h) => h.id === setupData.fromHubId) ?? null}
+                toHub={hubs.find((h) => h.id === setupData.toHubId) ?? null}
+                isLoading={builder.isLoading}
+                isEditable={builder.isEditable}
+                onItemsChanged={builder.refetch}
+                onRemove={(shipmentId) => builder.removeShipment(shipmentId, currentStaff?.id)}
+                onViewShipment={(shipmentId) => navigate(`/shipments/${shipmentId}`)}
+              />
+            )}
+          </div>
+
+          {/* Step 3: Review & Finalize - Always mounted, hidden via CSS */}
+          <div
+            className={currentStep === 3 ? 'block' : 'hidden'}
+            aria-hidden={currentStep !== 3}
+            inert={currentStep !== 3 ? true : undefined}
+          >
+            <StepReviewFinalize
+              setupData={setupData}
+              shipments={builder.items.map((i) => i.shipment)}
+              hubs={hubs}
+            />
+          </div>
+        </div>
+      </SizedDialog>
 
       {/* Close Confirmation Dialog - Only mount when needed to prevent portal race conditions */}
       {showCloseConfirm && (

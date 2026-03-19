@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import { FormSection, FormGrid, FormFooter } from '@/components/ui-core';
+import { FormSection, FormGrid, FormFooter, FieldGroup, AppIcon } from '@/components/ui-core';
 import { useCustomers } from '@/hooks/useCustomers';
 import { useCreateShipment } from '@/hooks/useShipments';
 import { HUBS, SHIPMENT_MODES, SERVICE_LEVELS } from '@/lib/constants';
@@ -249,8 +249,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               )}
             />
 
-            {/* Customer in full width row */}
-            <div className="md:col-span-2">
+            <FieldGroup className="md:col-span-2">
               <FormField
                 control={form.control}
                 name="customerId"
@@ -283,7 +282,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                   <span className="text-muted-foreground text-xs">{selectedCustomer.phone}</span>
                 </div>
               )}
-            </div>
+            </FieldGroup>
 
             <FormField
               control={form.control}
@@ -309,9 +308,9 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                             className="hidden"
                           />
                           {mode.id === 'AIR' ? (
-                            <Plane className="w-4 h-4 mr-2" />
+                            <AppIcon icon={Plane} size={16} className="mr-2" />
                           ) : (
-                            <Truck className="w-4 h-4 mr-2" />
+                            <AppIcon icon={Truck} size={16} className="mr-2" />
                           )}
                           {mode.label}
                         </label>
@@ -346,9 +345,9 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                             className="hidden"
                           />
                           {level.id === 'EXPRESS' ? (
-                            <Zap className="w-4 h-4 mr-2" />
+                            <AppIcon icon={Zap} size={16} className="mr-2" />
                           ) : (
-                            <Clock className="w-4 h-4 mr-2" />
+                            <AppIcon icon={Clock} size={16} className="mr-2" />
                           )}
                           {level.label.split(' ')[0]}
                         </label>
@@ -400,7 +399,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                 </FormItem>
               )}
             />
-            <div className="md:col-span-2">
+            <FieldGroup className="md:col-span-2">
               <FormField
                 control={form.control}
                 name="consigneeAddress"
@@ -419,7 +418,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                   </FormItem>
                 )}
               />
-            </div>
+            </FieldGroup>
             <FormField
               control={form.control}
               name="consigneeCity"
@@ -456,7 +455,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                 </FormItem>
               )}
             />
-            <div className="md:col-span-2">
+            <FieldGroup className="md:col-span-2">
               <FormField
                 control={form.control}
                 name="consigneeZip"
@@ -475,7 +474,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                   </FormItem>
                 )}
               />
-            </div>
+            </FieldGroup>
           </FormGrid>
         </FormSection>
 
@@ -522,7 +521,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                 </FormItem>
               )}
             />
-            <div className="md:col-span-2">
+            <FieldGroup className="md:col-span-2">
               <FormLabel className="text-xs font-mono text-muted-foreground uppercase mb-2 block">
                 Package Dimensions (L × W × H in cm)
               </FormLabel>
@@ -585,7 +584,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                   )}
                 />
               </div>
-            </div>
+            </FieldGroup>
           </FormGrid>
         </FormSection>
 

@@ -235,9 +235,7 @@ export function Messages() {
       accessorKey: 'created_at',
       header: 'Date',
       cell: ({ row }) => (
-        <span className="whitespace-nowrap">
-          {formatDateTime(row.original.created_at)}
-        </span>
+        <span className="whitespace-nowrap">{formatDateTime(row.original.created_at)}</span>
       ),
     },
     {
@@ -386,9 +384,7 @@ export function Messages() {
         onOpenChange={(open) => !open && setSelectedMessage(null)}
         title="Message Details"
         description={
-          selectedMessage
-            ? `Received on ${formatDateTime(selectedMessage.created_at)}`
-            : ''
+          selectedMessage ? `Received on ${formatDateTime(selectedMessage.created_at)}` : ''
         }
         size="xl"
       >

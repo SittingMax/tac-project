@@ -23,6 +23,7 @@ import {
   UserCircle,
   Receipt,
 } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 
 interface ShipmentRecord {
   cn_number: string;
@@ -180,7 +181,7 @@ export function PublicTracking() {
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-status-info to-status-success flex items-center justify-center">
-              <Package size={24} strokeWidth={1.5} className="text-foreground" />
+              <AppIcon icon={Package} size={24} className="text-foreground" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">TAC Cargo</h1>
@@ -199,19 +200,19 @@ export function PublicTracking() {
               value="track"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              <Search size={16} strokeWidth={1.5} className="mr-2" /> Track
+              <AppIcon icon={Search} size={16} className="mr-2" /> Track
             </TabsTrigger>
             <TabsTrigger
               value="book"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              <Package size={16} strokeWidth={1.5} className="mr-2" /> Book
+              <AppIcon icon={Package} size={16} className="mr-2" /> Book
             </TabsTrigger>
             <TabsTrigger
               value="account"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              <UserCircle size={16} strokeWidth={1.5} className="mr-2" /> Account
+              <AppIcon icon={UserCircle} size={16} className="mr-2" /> Account
             </TabsTrigger>
           </TabsList>
 
@@ -223,7 +224,11 @@ export function PublicTracking() {
             <Card className="p-6 bg-card/50 border-border">
               <form onSubmit={handleSearch} className="flex gap-4">
                 <div className="flex-1 relative">
-                  <Search size={20} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <AppIcon
+                    icon={Search}
+                    size={20}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  />
                   <Input
                     value={searchAwb}
                     onChange={(e) => setSearchAwb(e.target.value)}
@@ -248,7 +253,11 @@ export function PublicTracking() {
             {/* Error State */}
             {error && (
               <Card className="p-8 text-center bg-card/50 border-border">
-                <Package size={48} strokeWidth={1.5} className="text-destructive mx-auto mb-4" />
+                <AppIcon
+                  icon={Package}
+                  size={32}
+                  className="text-destructive mx-auto w-12 h-12 mb-4"
+                />
                 <h3 className="text-lg font-semibold text-foreground mb-2">Shipment Not Found</h3>
                 <p className="text-muted-foreground">
                   We couldn't find a shipment with AWB:{' '}
@@ -263,7 +272,11 @@ export function PublicTracking() {
             {/* No AWB State */}
             {!awb && !isLoading && (
               <Card className="p-8 text-center bg-card/50 border-border">
-                <Search size={48} strokeWidth={1.5} className="text-muted-foreground mx-auto mb-4" />
+                <AppIcon
+                  icon={Search}
+                  size={32}
+                  className="text-muted-foreground mx-auto w-12 h-12 mb-4"
+                />
                 <h3 className="text-lg font-semibold text-foreground mb-2">Track Your Shipment</h3>
                 <p className="text-muted-foreground">
                   Enter your CN Number above to track your shipment in real-time.
@@ -291,7 +304,7 @@ export function PublicTracking() {
                   {/* Route */}
                   <div className="flex items-center gap-4 p-4 rounded-md bg-muted/50 mb-6">
                     <div className="text-center">
-                      <MapPin size={24} strokeWidth={1.5} className="text-status-info mx-auto mb-1" />
+                      <AppIcon icon={MapPin} size={24} className="text-status-info mx-auto mb-1" />
                       <p className="text-lg font-bold text-foreground">
                         {resolveHubCode(data.shipment.origin_hub, data.shipment.origin_hub_id)}
                       </p>
@@ -300,15 +313,19 @@ export function PublicTracking() {
                     <div className="flex-1 flex items-center justify-center">
                       <div className="h-0.5 flex-1 bg-border" />
                       {data.shipment.service_level === 'EXPRESS' ? (
-                        <Plane size={24} strokeWidth={1.5} className="text-status-info mx-2" />
+                        <AppIcon icon={Plane} size={24} className="text-status-info mx-2" />
                       ) : (
-                        <Truck size={24} strokeWidth={1.5} className="text-status-info mx-2" />
+                        <AppIcon icon={Truck} size={24} className="text-status-info mx-2" />
                       )}
-                      <ArrowRight size={16} strokeWidth={1.5} className="text-muted-foreground" />
+                      <AppIcon icon={ArrowRight} size={16} className="text-muted-foreground" />
                       <div className="h-0.5 flex-1 bg-border" />
                     </div>
                     <div className="text-center">
-                      <MapPin size={24} strokeWidth={1.5} className="text-status-success mx-auto mb-1" />
+                      <AppIcon
+                        icon={MapPin}
+                        size={24}
+                        className="text-status-success mx-auto mb-1"
+                      />
                       <p className="text-lg font-bold text-foreground">
                         {resolveHubCode(
                           data.shipment.destination_hub,
@@ -339,9 +356,9 @@ export function PublicTracking() {
                         {String(data.shipment.mode || '')
                           .toUpperCase()
                           .includes('AIR') ? (
-                          <Plane size={16} strokeWidth={1.5} />
+                          <AppIcon icon={Plane} size={16} />
                         ) : (
-                          <Truck size={16} strokeWidth={1.5} />
+                          <AppIcon icon={Truck} size={16} />
                         )}
                         {data.shipment.mode}
                       </p>
@@ -358,7 +375,7 @@ export function PublicTracking() {
                 {/* Tracking Timeline */}
                 <Card className="p-6 bg-card/80 border-border">
                   <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                    <Clock size={20} strokeWidth={1.5} className="text-status-info" />
+                    <AppIcon icon={Clock} size={20} className="text-status-info" />
                     Tracking History
                   </h3>
 
@@ -385,7 +402,7 @@ export function PublicTracking() {
                     contact our support team with your CN Number.
                   </p>
                   <div className="flex items-center gap-2 text-status-info">
-                    <Package size={16} strokeWidth={1.5} />
+                    <AppIcon icon={Package} size={16} />
                     <span className="font-mono">{data.shipment.cn_number}</span>
                   </div>
                 </Card>
@@ -406,7 +423,7 @@ export function PublicTracking() {
           >
             <Card className="p-12 text-center bg-card/50 border-border">
               <div className="w-16 h-16 rounded-xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
-                <Receipt size={32} strokeWidth={1.5} className="text-primary" />
+                <AppIcon icon={Receipt} size={32} className="text-primary w-12 h-12" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-4">Portal Access & Support</h3>
               <p className="text-muted-foreground mb-8 max-w-md mx-auto">

@@ -8,6 +8,8 @@
     "audit:types": "node scripts/type-coverage-report.mjs",
     "guard:no-mock-data": "node scripts/no-mock-data-guard.mjs",
     "guard:page-shell": "node scripts/page-shell-guard.mjs",
+    "guard:design-system": "node scripts/guard-design-system.mjs",
+    "guard:icons": "node scripts/guard-icons.mjs",
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",

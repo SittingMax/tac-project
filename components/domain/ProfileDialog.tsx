@@ -143,7 +143,9 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
                     disabled={isUploading}
                   />
                   {isUploading && (
-                    <span className="text-xs text-muted-foreground animate-pulse">Uploading...</span>
+                    <span className="text-xs text-muted-foreground animate-pulse">
+                      Uploading...
+                    </span>
                   )}
                 </div>
                 <p className="text-[10px] text-muted-foreground">

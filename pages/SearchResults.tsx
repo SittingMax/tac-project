@@ -5,6 +5,7 @@ import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/lay
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, ArrowRight, FileText, Truck, Box } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -34,7 +35,7 @@ export const SearchResults: React.FC = () => {
         <SectionCard>
           <div className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
             <div className="mb-4 rounded-lg bg-muted/50 p-4">
-              <Box size={32} strokeWidth={1.5} className="opacity-50" />
+              <AppIcon icon={Box} size={32} className="opacity-50" />
             </div>
             <p className="text-lg font-medium">Start typing to search</p>
             <p className="text-sm">Search by CN, Name, Phone, Invoice No, etc.</p>
@@ -54,7 +55,7 @@ export const SearchResults: React.FC = () => {
       {isLoading ? (
         <SectionCard>
           <div className="flex h-64 items-center justify-center">
-            <Loader2 size={32} strokeWidth={1.5} className="animate-spin text-primary" />
+            <AppIcon icon={Loader2} size={32} className="animate-spin text-primary" />
           </div>
         </SectionCard>
       ) : error ? (
@@ -67,7 +68,7 @@ export const SearchResults: React.FC = () => {
         <SectionCard>
           <div className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
             <div className="mb-4 rounded-lg bg-muted/50 p-4">
-              <Box size={32} strokeWidth={1.5} className="opacity-50" />
+              <AppIcon icon={Box} size={32} className="opacity-50" />
             </div>
             <p className="text-lg font-medium">No results found</p>
             <p className="text-sm">Try using different keywords or verify the spelling.</p>
@@ -98,7 +99,7 @@ export const SearchResults: React.FC = () => {
                             </Badge>
                           </div>
                         </div>
-                        <ArrowRight size={20} strokeWidth={1.5} className="text-muted-foreground" />
+                        <AppIcon icon={ArrowRight} size={20} className="text-muted-foreground" />
                       </div>
                     )}
 
@@ -111,7 +112,7 @@ export const SearchResults: React.FC = () => {
                             {result.metadata.code}
                           </div>
                         </div>
-                        <ArrowRight size={20} strokeWidth={1.5} className="text-muted-foreground" />
+                        <AppIcon icon={ArrowRight} size={20} className="text-muted-foreground" />
                       </div>
                     )}
 
@@ -119,7 +120,7 @@ export const SearchResults: React.FC = () => {
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2 font-medium text-foreground">
-                            <FileText size={16} strokeWidth={1.5} className="text-muted-foreground" />
+                            <AppIcon icon={FileText} size={16} className="text-muted-foreground" />
                             {result.title}
                           </div>
                           <div className="text-sm text-muted-foreground">{result.subtitle}</div>
@@ -137,7 +138,7 @@ export const SearchResults: React.FC = () => {
                             </Badge>
                           </div>
                         </div>
-                        <ArrowRight size={20} strokeWidth={1.5} className="text-muted-foreground" />
+                        <AppIcon icon={ArrowRight} size={20} className="text-muted-foreground" />
                       </div>
                     )}
 
@@ -145,7 +146,7 @@ export const SearchResults: React.FC = () => {
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-2 font-medium text-foreground">
-                            <Truck size={16} strokeWidth={1.5} className="text-muted-foreground" />
+                            <AppIcon icon={Truck} size={16} className="text-muted-foreground" />
                             {result.title}
                           </div>
                           <div className="text-sm text-muted-foreground">{result.subtitle}</div>
@@ -158,7 +159,7 @@ export const SearchResults: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                        <ArrowRight size={20} strokeWidth={1.5} className="text-muted-foreground" />
+                        <AppIcon icon={ArrowRight} size={20} className="text-muted-foreground" />
                       </div>
                     )}
 
@@ -168,7 +169,7 @@ export const SearchResults: React.FC = () => {
                           <div className="font-medium text-foreground">{result.title}</div>
                           <div className="text-sm text-muted-foreground">{result.subtitle}</div>
                         </div>
-                        <ArrowRight size={20} strokeWidth={1.5} className="text-muted-foreground" />
+                        <AppIcon icon={ArrowRight} size={20} className="text-muted-foreground" />
                       </div>
                     )}
                   </CardContent>

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, type LucideIcon } from 'lucide-react';
+import { AppIcon } from '../utils/app-icon';
 
 interface StatCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title: React.ReactNode;
@@ -54,8 +55,12 @@ export function StatCard({
                   trendColorMap[trend.direction]
                 )}
               >
-                {trend.direction === 'up' && <TrendingUp className="mr-0.5 size-3" />}
-                {trend.direction === 'down' && <TrendingDown className="mr-0.5 size-3" />}
+                {trend.direction === 'up' && (
+                  <AppIcon icon={TrendingUp} size={16} className="mr-0.5" />
+                )}
+                {trend.direction === 'down' && (
+                  <AppIcon icon={TrendingDown} size={16} className="mr-0.5" />
+                )}
                 {trend.value}
                 {trend.label && (
                   <span className="ml-1 text-muted-foreground font-normal">{trend.label}</span>
@@ -72,7 +77,7 @@ export function StatCard({
               iconColorMap[iconColor]
             )}
           >
-            <Icon className="size-5" />
+            <AppIcon icon={Icon} size={20} />
           </div>
         )}
       </div>

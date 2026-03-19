@@ -8,6 +8,7 @@ import useMeasure from 'react-use-measure';
 // removed unused Card imports
 import { Button } from '@/components/ui/button';
 import { Check, ChevronRight, Loader2, Printer } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 
 import {
   useCreateInvoice,
@@ -441,7 +442,7 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
                     onClick={() => setShowLabelPreview(true)}
                     disabled={isLoading}
                   >
-                    <Printer className="w-4 h-4 mr-2" />
+                    <AppIcon icon={Printer} size={16} className="mr-2" />
                     Preview Label
                   </Button>
                 )}
@@ -452,14 +453,14 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
                   className="min-w-[120px]"
                 >
                   {isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    <AppIcon icon={Loader2} size={16} className="animate-spin mr-2" />
                   ) : currentStep === steps.length - 1 ? (
                     <>
-                      Confirm & Book <Check className="w-4 h-4 ml-2" />
+                      Confirm & Book <AppIcon icon={Check} size={16} className="ml-2" />
                     </>
                   ) : (
                     <>
-                      Continue <ChevronRight className="w-4 h-4 ml-2" />
+                      Continue <AppIcon icon={ChevronRight} size={16} className="ml-2" />
                     </>
                   )}
                 </Button>

@@ -19,6 +19,7 @@ import {
 import { useFindShipmentByCN } from '@/hooks/useShipments';
 import { useRealtimeExceptions } from '@/hooks/useRealtime';
 import { AlertCircle, CheckCircle, Plus, ShieldAlert, Clock } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { ColumnDef } from '@tanstack/react-table';
 import { StatusBadge } from '@/components/domain/status-badge';
 import { StatCard } from '@/components/ui-core';
@@ -161,7 +162,7 @@ export const Exceptions: React.FC = () => {
           if (ex.status === 'OPEN') {
             return (
               <Button variant="outline" size="sm" onClick={() => setSelectedException(ex)}>
-                <CheckCircle className="size-4" data-icon="inline-start" /> Resolve
+                <AppIcon icon={CheckCircle} size={16} data-icon="inline-start" /> Resolve
               </Button>
             );
           }
@@ -223,7 +224,7 @@ export const Exceptions: React.FC = () => {
     <PageContainer>
       <PageHeader title="Exceptions" description="Track and resolve shipment anomalies">
         <Button variant="destructive" onClick={() => setIsRaiseModalOpen(true)}>
-          <Plus data-icon="inline-start" /> Raise Exception
+          <AppIcon icon={Plus} size={16} data-icon="inline-start" /> Raise Exception
         </Button>
       </PageHeader>
 
@@ -305,47 +306,47 @@ export const Exceptions: React.FC = () => {
               />
             </FieldGroup>
             <div className="grid grid-cols-2 gap-6">
-                <FieldGroup label="Type">
-                  <Controller
-                    control={controlRaise}
-                    name="type"
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors">
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="DAMAGE">Damage</SelectItem>
-                          <SelectItem value="SHORTAGE">Shortage</SelectItem>
-                          <SelectItem value="MISROUTE">Misroute</SelectItem>
-                          <SelectItem value="DELAY">Delay</SelectItem>
-                          <SelectItem value="CUSTOMER_REFUSAL">Customer Refusal</SelectItem>
-                          <SelectItem value="ADDRESS_ISSUE">Address Issue</SelectItem>
-                          <SelectItem value="OTHER">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </FieldGroup>
-                <FieldGroup label="Severity">
-                  <Controller
-                    control={controlRaise}
-                    name="severity"
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors">
-                          <SelectValue placeholder="Select severity" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="LOW">Low</SelectItem>
-                          <SelectItem value="MEDIUM">Medium</SelectItem>
-                          <SelectItem value="HIGH">High</SelectItem>
-                          <SelectItem value="CRITICAL">Critical</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </FieldGroup>
+              <FieldGroup label="Type">
+                <Controller
+                  control={controlRaise}
+                  name="type"
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="DAMAGE">Damage</SelectItem>
+                        <SelectItem value="SHORTAGE">Shortage</SelectItem>
+                        <SelectItem value="MISROUTE">Misroute</SelectItem>
+                        <SelectItem value="DELAY">Delay</SelectItem>
+                        <SelectItem value="CUSTOMER_REFUSAL">Customer Refusal</SelectItem>
+                        <SelectItem value="ADDRESS_ISSUE">Address Issue</SelectItem>
+                        <SelectItem value="OTHER">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </FieldGroup>
+              <FieldGroup label="Severity">
+                <Controller
+                  control={controlRaise}
+                  name="severity"
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="h-8 px-3 text-sm bg-transparent hover:border-ring/50 transition-colors">
+                        <SelectValue placeholder="Select severity" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="LOW">Low</SelectItem>
+                        <SelectItem value="MEDIUM">Medium</SelectItem>
+                        <SelectItem value="HIGH">High</SelectItem>
+                        <SelectItem value="CRITICAL">Critical</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </FieldGroup>
             </div>
             <FieldGroup label="Description" htmlFor="raise-description">
               <Textarea
@@ -385,7 +386,8 @@ export const Exceptions: React.FC = () => {
           >
             <div className="bg-muted/30 p-5 rounded-lg border border-border/50">
               <div className="font-semibold text-foreground text-sm flex items-center gap-2">
-                <ShieldAlert className="size-4 text-primary" /> Exception: {selectedException?.type}
+                <AppIcon icon={ShieldAlert} size={16} className="text-primary" /> Exception:{' '}
+                {selectedException?.type}
               </div>
               <div className="text-muted-foreground mt-2 text-sm leading-relaxed">
                 {selectedException?.description}

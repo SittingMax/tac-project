@@ -19,6 +19,7 @@ import { useAuthStore } from '@/store/authStore';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageContainer, PageHeader } from '@/components/ui-core/layout';
+import { AppIcon } from '@/components/ui-core';
 
 // Dynamically import heavy charting components
 const RealtimeCorridorActivity = lazy(() =>
@@ -160,9 +161,7 @@ export const Dashboard: React.FC = () => {
                   : ' Viewing operations overview.'}
               </span>
             }
-            badge={
-              <Activity size={16} strokeWidth={1.5} className="animate-pulse text-emerald-400" />
-            }
+            badge={<AppIcon icon={Activity} size={16} className="animate-pulse text-emerald-400" />}
             className="mb-0"
           >
             <DateRangeSelector />
@@ -172,7 +171,7 @@ export const Dashboard: React.FC = () => {
               onClick={refreshData}
               className="h-10 bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-sm transition shadow-sm"
             >
-              <RefreshCw size={16} strokeWidth={1.5} className="sm:mr-2" />
+              <AppIcon icon={RefreshCw} size={16} className="sm:mr-2" />
               <span className="hidden sm:inline">Refresh</span>
             </Button>
             {canExportDashboardReport && (
@@ -248,7 +247,10 @@ export const Dashboard: React.FC = () => {
             className="p-0 flex flex-col items-stretch h-full bg-muted/10 border-l border-border/40"
           >
             <div className="flex-1 flex flex-col p-4 w-full h-full min-h-[600px] overflow-auto custom-scrollbar">
-              <Tabs defaultValue="status" className="flex-1 flex flex-col h-full flex flex-col gap-4">
+              <Tabs
+                defaultValue="status"
+                className="flex-1 flex flex-col h-full flex flex-col gap-4"
+              >
                 <div className="flex items-center justify-between">
                   <TabsList className="grid w-full grid-cols-3 bg-muted/50 border border-border/50">
                     <TabsTrigger value="status" className="text-xs">

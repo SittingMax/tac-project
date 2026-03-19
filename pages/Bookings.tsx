@@ -33,9 +33,7 @@ export const Bookings: React.FC = () => {
       accessorKey: 'created_at',
       header: 'Created',
       cell: ({ row }) => (
-        <span className="text-sm">
-          {formatDateTime(row.getValue('created_at'))}
-        </span>
+        <span className="text-sm">{formatDateTime(row.getValue('created_at'))}</span>
       ),
     },
     {

@@ -8,7 +8,7 @@ import type { Table as TanStackTable } from '@tanstack/react-table';
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { PageHeader, PageContainer, SectionCard } from '@/components/ui-core/layout';
+import { PageHeader, PageContainer, SectionCard, SizedDialog } from '@/components/ui-core';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +40,8 @@ import {
 import { getShipmentsColumns } from '@/components/shipments/shipments.columns';
 import { useAuthStore } from '@/store/authStore';
 import { useDebounce } from '@/lib/hooks/useDebounce';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/queryKeys';
 
 // Types
 import { adaptToShipment } from '@/lib/utils/shipment-adapter';
@@ -51,6 +53,7 @@ const formatStatusLabel = (status: ShipmentStatusType) => status.replaceAll('_',
 export const Shipments: React.FC = () => {
   const { user } = useAuthStore();
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const queryClient = useQueryClient();
 
   // Search state
   // Search state synced with URL
@@ -125,6 +128,7 @@ export const Shipments: React.FC = () => {
           id: row.original.id,
           status,
           silent: true,
+          skipInvalidation: true,
         })
       )
     );
@@ -136,6 +140,7 @@ export const Shipments: React.FC = () => {
       toast.success(
         `${successCount} shipment${successCount === 1 ? '' : 's'} updated to ${formatStatusLabel(status)}`
       );
+      queryClient.invalidateQueries({ queryKey: queryKeys.shipments.all });
     }
 
     if (failureCount > 0) {
@@ -283,23 +288,17 @@ export const Shipments: React.FC = () => {
       </SectionCard>
 
       {/* Create Wizard Modal */}
-      <Dialog
+      <SizedDialog
         open={isCreateModalOpen}
         onOpenChange={handleCreateModalChange}
-        data-testid="create-shipment-modal"
+        size="5xl"
+        title="Create New Shipment"
       >
-        <DialogContent className="sm:max-w-5xl w-[95vw] overflow-y-auto max-h-[90vh] p-0 gap-0 rounded-xl overflow-x-hidden shadow-2xl">
-          <DialogHeader className="p-8 pb-0">
-            <DialogTitle className="text-2xl font-semibold tracking-tight">
-              Create New Shipment
-            </DialogTitle>
-          </DialogHeader>
-          <CreateShipmentForm
-            onSuccess={() => setIsCreateModalOpen(false)}
-            onCancel={() => setIsCreateModalOpen(false)}
-          />
-        </DialogContent>
-      </Dialog>
+        <CreateShipmentForm
+          onSuccess={() => setIsCreateModalOpen(false)}
+          onCancel={() => setIsCreateModalOpen(false)}
+        />
+      </SizedDialog>
 
       {/* Details Modal */}
       <Dialog
