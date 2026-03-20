@@ -17,7 +17,7 @@ test.describe('Enterprise Stress Tests', () => {
       page,
     }) => {
       await page.goto('/scanning');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Find scan input
       const scanInput = page.getByPlaceholder(/awb|scan|barcode/i).first();
@@ -65,7 +65,7 @@ test.describe('Enterprise Stress Tests', () => {
 
     test('should maintain UI responsiveness during rapid scanning', async ({ page }) => {
       await page.goto('/scanning');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       const startTime = Date.now();
 
@@ -101,7 +101,7 @@ test.describe('Enterprise Stress Tests', () => {
       });
 
       await page.goto('/finance');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Verify finance page loads
       await expect(page.locator('body')).toContainText(/(Finance|Invoice|Dashboard)/i, {
@@ -121,7 +121,7 @@ test.describe('Enterprise Stress Tests', () => {
 
     test('should display invoice list with correct columns', async ({ page }) => {
       await page.goto('/finance');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Should have invoice-related content visible
       await expect(page.locator('body')).toContainText(/(Finance|Invoice|Create)/i, {
@@ -131,7 +131,7 @@ test.describe('Enterprise Stress Tests', () => {
 
     test('should handle invoice creation form validation', async ({ page }) => {
       await page.goto('/finance');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Look for create invoice button
       const createButton = page
@@ -165,7 +165,7 @@ test.describe('Enterprise Stress Tests', () => {
   test.describe('Manifest Workflow Tests', () => {
     test('should load manifests page', async ({ page }) => {
       await page.goto('/manifests');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       await expect(page.locator('body')).toContainText(/(Manifest|Dashboard|TAC)/i, {
         timeout: 15000,
@@ -174,7 +174,7 @@ test.describe('Enterprise Stress Tests', () => {
 
     test('should enforce manifest status workflow order', async ({ page }) => {
       await page.goto('/manifests');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Verify status filter or manifest list is available
       const statusFilter = page.getByRole('combobox');
@@ -192,7 +192,7 @@ test.describe('Enterprise Stress Tests', () => {
   test.describe('Shipment Status Transition Tests', () => {
     test('should load shipments page', async ({ page }) => {
       await page.goto('/shipments');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       await expect(page.locator('body')).toContainText(/(Shipment|AWB|Dashboard)/i, {
         timeout: 15000,
@@ -201,7 +201,7 @@ test.describe('Enterprise Stress Tests', () => {
 
     test('should display shipment status correctly', async ({ page }) => {
       await page.goto('/shipments');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Page should be functional with or without data
       await expect(page.locator('body')).toBeVisible();
@@ -211,7 +211,7 @@ test.describe('Enterprise Stress Tests', () => {
   test.describe('Exception Handling Tests', () => {
     test('should load exceptions page', async ({ page }) => {
       await page.goto('/exceptions');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       await expect(page.locator('body')).toContainText(/(Exception|Issue|Dashboard)/i, {
         timeout: 15000,
@@ -220,7 +220,7 @@ test.describe('Enterprise Stress Tests', () => {
 
     test('should display exception severity levels', async ({ page }) => {
       await page.goto('/exceptions');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Look for severity filters or indicators
       const severityFilter = page.getByRole('combobox');
@@ -240,7 +240,7 @@ test.describe('Enterprise Stress Tests', () => {
       context,
     }) => {
       await page.goto('/dashboard');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Simulate offline mode
       await context.setOffline(true);
@@ -253,7 +253,7 @@ test.describe('Enterprise Stress Tests', () => {
       // Go back online
       await context.setOffline(false);
       await page.goto('/shipments');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Page should recover
       await expect(page.locator('body')).toContainText(/(Shipment|Dashboard|TAC)/i, {
@@ -263,7 +263,7 @@ test.describe('Enterprise Stress Tests', () => {
 
     test('should display user-friendly error messages', async ({ page }) => {
       await page.goto('/#/dashboard');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Verify no raw Supabase errors are displayed
       const rawErrors = page.locator('text=/PGRST|PostgrestError|supabase.*error/i');
@@ -284,8 +284,8 @@ test.describe('Enterprise Stress Tests', () => {
       await page1.goto('/dashboard');
       await page2.goto('/dashboard');
 
-      await page1.waitForLoadState('networkidle');
-      await page2.waitForLoadState('networkidle');
+      await page1.waitForLoadState('load');
+      await page2.waitForLoadState('load');
 
       // Both should work independently (increased timeout for Firefox)
       await expect(page1.locator('body')).toContainText(/(Dashboard|TAC)/i, { timeout: 15000 });
@@ -295,8 +295,8 @@ test.describe('Enterprise Stress Tests', () => {
       await page1.goto('/shipments');
       await page2.goto('/manifests');
 
-      await page1.waitForLoadState('networkidle');
-      await page2.waitForLoadState('networkidle');
+      await page1.waitForLoadState('load');
+      await page2.waitForLoadState('load');
 
       // Both should function correctly
       await expect(page1.locator('body')).toBeVisible();
@@ -315,7 +315,7 @@ test.describe('Performance Tests', () => {
     const startTime = Date.now();
 
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     const loadTime = Date.now() - startTime;
 
@@ -337,7 +337,7 @@ test.describe('Performance Tests', () => {
 
     // Page should still be responsive after rapid navigation
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await expect(page.locator('body')).toContainText(/(Dashboard|TAC)/i, { timeout: 15000 });
   });

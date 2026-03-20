@@ -29,6 +29,7 @@ export const invoiceSchema = z.object({
   // Consignor
   consignorName: z.string().min(2, 'Name Required'),
   consignorPhone: z.string().min(10, 'Phone Required'),
+  consignorContact: z.string().optional(),
   consignorAddress: z.string().min(5, 'Address Required'),
   consignorCity: z.string().min(2, 'City Required'),
   consignorState: z.string().min(2, 'State Required'),
@@ -38,6 +39,7 @@ export const invoiceSchema = z.object({
   // Consignee
   consigneeName: z.string().min(2, 'Name Required'),
   consigneePhone: z.string().min(10, 'Phone Required'),
+  consigneeContact: z.string().optional(),
   consigneeAddress: z.string().min(5, 'Address Required'),
   consigneeCity: z.string().min(2, 'City Required'),
   consigneeState: z.string().min(2, 'State Required'),

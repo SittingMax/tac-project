@@ -5,13 +5,15 @@ import { ArrowLeft, ArrowRight, Save, Lock, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useScanContext } from '@/context/ScanContext';
 
+import { Stepper } from '@/components/ui-core';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   AlertDialog,
@@ -26,7 +28,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useManifestBuilder } from '@/hooks/useManifestBuilder';
 import { useStaff } from '@/hooks/useStaff';
-import { WizardStepper } from './WizardStepper';
 import { StepManifestSetup, type ManifestSettingsValues } from './steps/StepManifestSetup';
 import { StepAddShipments } from './steps/StepAddShipments';
 import { StepReviewFinalize } from './steps/StepReviewFinalize';
@@ -367,86 +368,84 @@ export function ManifestBuilderWizard({
 
   return (
     <TooltipProvider>
-      <Dialog open={open} onOpenChange={handleCancel}>
-        <DialogContent className="w-[100vw] h-[100dvh] md:w-[min(1200px,92vw)] md:h-[min(88vh,900px)] md:max-h-[90vh] lg:w-[min(1320px,88vw)] rounded-none md:rounded-lg flex flex-col gap-0 p-0 max-w-none overflow-hidden">
-          {/* Header */}
-          <DialogHeader className="px-6 py-4 border-b border-border text-left">
-            <DialogTitle className="text-lg">Create Manifest</DialogTitle>
-            <DialogDescription className="text-sm">
-              Create a new dispatch manifest for cargo shipments
-            </DialogDescription>
-          </DialogHeader>
-
-          {/* Stepper */}
-          <div className="px-6 py-4 border-b border-border bg-secondary/20">
-            <WizardStepper steps={WIZARD_STEPS} currentStep={currentStep} />
+      <Sheet open={open} onOpenChange={handleCancel}>
+        <SheetContent side="right" className="w-full sm:max-w-4xl p-0 flex flex-col h-full bg-background border-l border-border/40 shadow-2xl">
+          
+          <SheetHeader className="px-6 pt-6 pb-4 border-b border-border/40">
+            <SheetTitle className="text-xl font-semibold tracking-tight">Create Manifest</SheetTitle>
+            <SheetDescription>Create a new dispatch manifest for cargo shipments</SheetDescription>
+          </SheetHeader>
+          
+          <div className="px-6 py-4 border-b border-border/40 bg-muted/5 shrink-0">
+            <Stepper
+              steps={WIZARD_STEPS}
+              currentStep={currentStep}
+              className="pb-0 mb-0 border-b-0"
+            />
           </div>
 
-          {/* Content - Use CSS visibility instead of conditional rendering to prevent portal destruction */}
-          <div className="flex-1 min-h-0 overflow-y-auto bg-background/50">
-            <div className="p-4 sm:p-4 md:p-6 lg:p-8">
-              {/* Step 1: Manifest Setup - Always mounted, hidden via CSS */}
-              <div
-                className={currentStep === 1 ? 'block' : 'hidden'}
-                aria-hidden={currentStep !== 1}
-                inert={currentStep !== 1 ? true : undefined}
-              >
-                <StepManifestSetup
-                  hubs={hubs}
-                  data={setupData}
-                  onDataChange={setSetupData}
-                  isValid={isStep1Valid}
-                  onValidationChange={setIsStep1Valid}
-                />
-              </div>
-
-              {/* Step 2: Add Shipments - Mounted when manifest exists, hidden via CSS */}
-              <div
-                className={currentStep === 2 ? 'block' : 'hidden'}
-                aria-hidden={currentStep !== 2}
-                inert={currentStep !== 2 ? true : undefined}
-              >
-                {builder.manifest && (
-                  <StepAddShipments
-                    manifestId={builder.manifest.id}
-                    staffId={currentStaff?.id}
-                    rules={{
-                      onlyReady: setupData.onlyReady,
-                      matchDestination: setupData.matchDestination,
-                      excludeCod: setupData.excludeCod,
-                    }}
-                    items={builder.items}
-                    fromHub={hubs.find((h) => h.id === setupData.fromHubId) ?? null}
-                    toHub={hubs.find((h) => h.id === setupData.toHubId) ?? null}
-                    isLoading={builder.isLoading}
-                    isEditable={builder.isEditable}
-                    onItemsChanged={builder.refetch}
-                    onRemove={(shipmentId) => builder.removeShipment(shipmentId, currentStaff?.id)}
-                    onViewShipment={(shipmentId) => navigate(`/shipments/${shipmentId}`)}
-                  />
-                )}
-              </div>
-
-              {/* Step 3: Review & Finalize - Always mounted, hidden via CSS */}
-              <div
-                className={currentStep === 3 ? 'block' : 'hidden'}
-                aria-hidden={currentStep !== 3}
-                inert={currentStep !== 3 ? true : undefined}
-              >
-                <StepReviewFinalize
-                  setupData={setupData}
-                  shipments={builder.items.map((i) => i.shipment)}
-                  hubs={hubs}
-                />
-              </div>
-            </div>
+          <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
+        {/* Content - Use CSS visibility instead of conditional rendering to prevent portal destruction */}
+        <div className="px-2">
+          {/* Step 1: Manifest Setup - Always mounted, hidden via CSS */}
+          <div
+            className={currentStep === 1 ? 'block' : 'hidden'}
+            aria-hidden={currentStep !== 1}
+            inert={currentStep !== 1 ? true : undefined}
+          >
+            <StepManifestSetup
+              hubs={hubs}
+              data={setupData}
+              onDataChange={setSetupData}
+              isValid={isStep1Valid}
+              onValidationChange={setIsStep1Valid}
+            />
           </div>
 
-          {/* Footer */}
-          <div className="border-t border-border bg-background">
-            <div className="flex items-center justify-between px-6 py-4">
+          {/* Step 2: Add Shipments - Mounted when manifest exists, hidden via CSS */}
+          <div
+            className={currentStep === 2 ? 'block' : 'hidden'}
+            aria-hidden={currentStep !== 2}
+            inert={currentStep !== 2 ? true : undefined}
+          >
+            {builder.manifest && (
+              <StepAddShipments
+                manifestId={builder.manifest.id}
+                staffId={currentStaff?.id}
+                rules={{
+                  onlyReady: setupData.onlyReady,
+                  matchDestination: setupData.matchDestination,
+                  excludeCod: setupData.excludeCod,
+                }}
+                items={builder.items}
+                fromHub={hubs.find((h) => h.id === setupData.fromHubId) ?? null}
+                toHub={hubs.find((h) => h.id === setupData.toHubId) ?? null}
+                isLoading={builder.isLoading}
+                isEditable={builder.isEditable}
+                onItemsChanged={builder.refetch}
+                onRemove={(shipmentId) => builder.removeShipment(shipmentId, currentStaff?.id)}
+                onViewShipment={(shipmentId) => navigate(`/shipments/${shipmentId}`)}
+              />
+            )}
+          </div>
+
+          {/* Step 3: Review & Finalize - Always mounted, hidden via CSS */}
+          <div
+            className={currentStep === 3 ? 'block' : 'hidden'}
+            aria-hidden={currentStep !== 3}
+            inert={currentStep !== 3 ? true : undefined}
+          >
+            <StepReviewFinalize
+              setupData={setupData}
+              shipments={builder.items.map((i) => i.shipment)}
+              hubs={hubs}
+            />
+          </div>
+        </div>
+          </div>
+          <SheetFooter className="px-6 py-4 border-t border-border/40 bg-card mt-auto shrink-0 sm:justify-between w-full">
+            <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
-                {/* Cancel Button */}
                 <Button variant="ghost" onClick={handleCancel}>
                   Cancel
                 </Button>
@@ -462,8 +461,6 @@ export function ManifestBuilderWizard({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <span tabIndex={0}>
-                        {' '}
-                        {/* Span needed for disabled button tooltip */}
                         <Button
                           onClick={handleNext}
                           disabled={
@@ -520,9 +517,9 @@ export function ManifestBuilderWizard({
                 )}
               </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       {/* Close Confirmation Dialog - Only mount when needed to prevent portal race conditions */}
       {showCloseConfirm && (

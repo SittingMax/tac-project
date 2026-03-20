@@ -1,6 +1,5 @@
 import HeroFinal from '@/components/landing-new/hero-final';
 import { SystemCapabilities } from '@/components/landing-new/system-capabilities';
-import { GlobalFleet } from '@/components/landing-new/global-fleet';
 import { ContactSection } from '@/components/landing-new/contact-section';
 import { TrackingSection } from '@/components/landing-new/tracking-section';
 import { Footer } from '@/components/landing-new/footer';
@@ -16,7 +15,6 @@ export function Landing() {
         <HeroFinal />
         <TrackingSection />
         <SystemCapabilities />
-        <GlobalFleet />
         <StatsCTA />
         <ContactSection />
       </main>

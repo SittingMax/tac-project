@@ -1,24 +1,53 @@
 import { test, expect } from '@playwright/test';
 
+type LongTaskEntry = {
+  duration: number;
+  name: string;
+} & Record<string, unknown>;
+
+const asLongTaskEntry = (entry: unknown): LongTaskEntry | null => {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+    return null;
+  }
+
+  const record = entry as Record<string, unknown>;
+  if (typeof record.name !== 'string' || typeof record.duration !== 'number') {
+    return null;
+  }
+
+  return {
+    ...record,
+    name: record.name,
+    duration: record.duration,
+  };
+};
+
 test.describe('Legal Pages Performance', () => {
   test('Terms of Service should load and not hang', async ({ page }) => {
     // Monitor for long tasks (tasks > 50ms)
-    const longTasks: any[] = [];
-    await page.exposeFunction('reportLongTask', (entry: any) => {
-      console.log('Long Task Detected:', entry.name, entry.duration, 'ms');
-      longTasks.push(entry);
+    const longTasks: LongTaskEntry[] = [];
+    await page.exposeFunction('reportLongTask', (entry: unknown) => {
+      const longTask = asLongTaskEntry(entry);
+      if (!longTask) {
+        return;
+      }
+
+      console.log('Long Task Detected:', longTask.name, longTask.duration, 'ms');
+      longTasks.push(longTask);
     });
 
     await page.addInitScript(() => {
+      const reportLongTask = (window as Window & { reportLongTask?: (entry: unknown) => void })
+        .reportLongTask;
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          (window as any).reportLongTask(entry.toJSON());
+          reportLongTask?.(entry.toJSON());
         }
       });
       observer.observe({ entryTypes: ['longtask'] });
     });
 
-    await page.goto('http://localhost:5173/terms');
+    await page.goto('/terms');
 
     // Wait for the main heading
     await expect(page.locator('h1', { hasText: 'Terms and Conditions' })).toBeVisible({
@@ -43,7 +72,7 @@ test.describe('Legal Pages Performance', () => {
   });
 
   test('Privacy Policy should load and not hang', async ({ page }) => {
-    await page.goto('http://localhost:5173/privacy');
+    await page.goto('/privacy');
     await expect(page.locator('h1', { hasText: 'Privacy Policy' })).toBeVisible({ timeout: 10000 });
   });
 });

@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Moon, Sun, Monitor } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Moon, Sun, Monitor, User as UserIcon } from 'lucide-react';
+import { FormSection, FormGrid } from '@/components/ui-core';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
@@ -115,49 +117,55 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Full Name
-              </label>
-              <Input
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Avatar Image
-              </label>
-              <div className="flex items-center gap-4">
+          <FormSection icon={UserIcon} title="Personal Information">
+            <FormGrid columns={1} className="gap-y-6">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Full Name
+                </Label>
                 <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="cursor-pointer"
-                  disabled={isUploading}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Enter your full name"
                 />
-                {isUploading && (
-                  <span className="text-xs text-muted-foreground animate-pulse">Uploading...</span>
-                )}
               </div>
-              <p className="text-[10px] text-muted-foreground">
-                Upload a PNG, JPG or GIF image (max 2MB)
-              </p>
-            </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none opacity-50">Email</label>
-              <Input value={user.email} disabled className="bg-muted opacity-50" />
-            </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Avatar Image
+                </Label>
+                <div className="flex items-center gap-4">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="cursor-pointer"
+                    disabled={isUploading}
+                  />
+                  {isUploading && (
+                    <span className="text-xs text-muted-foreground animate-pulse">
+                      Uploading...
+                    </span>
+                  )}
+                </div>
+                <p className="text-[10px] text-muted-foreground">
+                  Upload a PNG, JPG or GIF image (max 2MB)
+                </p>
+              </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none opacity-50">Role</label>
-              <Input value={user.role} disabled className="bg-muted opacity-50" />
-            </div>
-          </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium leading-none opacity-50">Email</Label>
+                  <Input value={user.email} disabled className="bg-muted opacity-50" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium leading-none opacity-50">Role</Label>
+                  <Input value={user.role} disabled className="bg-muted opacity-50" />
+                </div>
+              </div>
+            </FormGrid>
+          </FormSection>
 
           <div className="flex justify-end pt-4">
             <Button onClick={handleSaveProfile} disabled={isLoading}>

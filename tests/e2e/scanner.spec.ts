@@ -9,7 +9,7 @@ test.describe('Scanner Workflow', () => {
 
   test('should process manual scan input and render scan log entry', async ({ page }) => {
     await page.goto('/scanning');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     const code = `TAC${Date.now().toString().slice(-8)}`;
     const scanInput = page.getByTestId('scan-input');
@@ -23,7 +23,7 @@ test.describe('Scanner Workflow', () => {
 
   test('should clear manual scan input after submit', async ({ page }) => {
     await page.goto('/scanning');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     const scanInput = page.getByTestId('scan-input');
     await expect(scanInput).toBeVisible();
@@ -35,7 +35,7 @@ test.describe('Scanner Workflow', () => {
 
   test('should support Enter key submission from scan input', async ({ page }) => {
     await page.goto('/scanning');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     const code = `TAC${(Date.now() + 1).toString().slice(-8)}`;
     const scanInput = page.getByTestId('scan-input');

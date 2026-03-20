@@ -109,9 +109,9 @@ export function StepAddShipments({
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-5 h-[calc(100vh-250px)] min-h-[500px]">
+      <div className="grid gap-6 lg:grid-cols-12 h-[calc(100vh-250px)] min-h-[500px]">
         {/* Left Panel: Scan Controls */}
-        <div className="lg:col-span-2 space-y-4 flex flex-col h-full overflow-hidden">
+        <div className="lg:col-span-5 space-y-4 flex flex-col h-full overflow-hidden">
           <Card className="border-border bg-card/50 shrink-0">
             <CardHeader className="pb-4">
               <CardTitle className="text-base flex items-center gap-2">
@@ -126,10 +126,19 @@ export function StepAddShipments({
                 onValueChange={(value) => setScanMode(value as ManifestScanMode)}
                 className="w-full"
               >
-                <TabsList className="w-full grid grid-cols-3">
-                  <TabsTrigger value="manual">Manual</TabsTrigger>
-                  <TabsTrigger value="scanner">USB Scanner</TabsTrigger>
-                  <TabsTrigger value="camera">Camera</TabsTrigger>
+                <TabsList className="w-full flex">
+                  <TabsTrigger value="manual" className="flex-1 flex gap-2">
+                    <Keyboard className="h-3.5 w-3.5" />
+                    <span>Type</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="scanner" className="flex-1 flex gap-2">
+                    <Scan className="h-3.5 w-3.5" />
+                    <span>Scan</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="camera" className="flex-1 flex gap-2">
+                    <Camera className="h-3.5 w-3.5" />
+                    <span>Lens</span>
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="manual" className="mt-4 space-y-4">
@@ -300,7 +309,7 @@ export function StepAddShipments({
         </div>
 
         {/* Right Panel: Shipments List */}
-        <div className="lg:col-span-3 h-full overflow-hidden flex flex-col">
+        <div className="lg:col-span-7 h-full overflow-hidden flex flex-col">
           <Card className="border-border bg-card/50 h-full flex flex-col">
             <CardHeader className="pb-4 shrink-0">
               <div className="flex items-center justify-between">

@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAnomalyDetector, ShipmentAnomaly } from '@/hooks/useAnomalyDetector';
 import { BrainCircuit, AlertTriangle, AlertCircle, TrendingUp, Info } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,7 +18,7 @@ export const AnomalyDetectorWidget: React.FC = () => {
       <Card className="h-full border-border bg-card shadow-sm col-span-1 lg:col-span-2">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <BrainCircuit className="w-5 h-5 text-primary animate-pulse" />
+            <AppIcon icon={BrainCircuit} size={20} className="w-5 h-5 text-primary animate-pulse" />
             <Skeleton className="w-48 h-6" />
           </div>
           <Skeleton className="w-64 h-4 mt-2" />
@@ -51,13 +52,13 @@ export const AnomalyDetectorWidget: React.FC = () => {
   const getTypeIcon = (type: ShipmentAnomaly['type']) => {
     switch (type) {
       case 'ROUTE_MISMATCH':
-        return <AlertTriangle className="w-4 h-4" />;
+        return <AppIcon icon={AlertTriangle} size={16} className="w-4 h-4" />;
       case 'STALLED':
-        return <AlertCircle className="w-4 h-4" />;
+        return <AppIcon icon={AlertCircle} size={16} className="w-4 h-4" />;
       case 'DELAY':
-        return <TrendingUp className="w-4 h-4" />;
+        return <AppIcon icon={TrendingUp} size={16} className="w-4 h-4" />;
       default:
-        return <Info className="w-4 h-4" />;
+        return <AppIcon icon={Info} size={16} className="w-4 h-4" />;
     }
   };
 
@@ -67,7 +68,7 @@ export const AnomalyDetectorWidget: React.FC = () => {
       <CardHeader className="relative z-10 pb-4 flex flex-row items-start justify-between">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <BrainCircuit className="w-5 h-5 text-primary" />
+            <AppIcon icon={BrainCircuit} size={20} className="w-5 h-5 text-primary" />
             <CardTitle className="text-xl">Shipment Alert Monitor</CardTitle>
           </div>
           <CardDescription>
@@ -95,7 +96,7 @@ export const AnomalyDetectorWidget: React.FC = () => {
         {error ? (
           <div className="flex flex-col items-center justify-center p-8 text-center h-48">
             <div className="w-12 h-12 rounded-lg bg-destructive/10 flex items-center justify-center mb-4">
-              <AlertTriangle className="w-6 h-6 text-destructive" />
+              <AppIcon icon={AlertTriangle} size={24} className="w-6 h-6 text-destructive" />
             </div>
             <p className="text-sm font-medium text-foreground">Alert Check Failed</p>
             <p className="text-xs text-muted-foreground mt-1 max-w-[250px] mb-4">
@@ -108,7 +109,7 @@ export const AnomalyDetectorWidget: React.FC = () => {
         ) : anomalies.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center h-48">
             <div className="w-12 h-12 rounded-lg bg-status-success/20 flex items-center justify-center mb-4">
-              <BrainCircuit className="w-6 h-6 text-status-success" />
+              <AppIcon icon={BrainCircuit} size={24} className="w-6 h-6 text-status-success" />
             </div>
             <p className="text-sm font-medium text-foreground">All Clear</p>
             <p className="text-xs text-muted-foreground mt-1 max-w-[250px]">

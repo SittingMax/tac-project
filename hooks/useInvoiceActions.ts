@@ -10,6 +10,58 @@ import { logger } from '@/lib/logger';
 import { HubLocation, Invoice, Shipment, ShipmentMode, ServiceLevel, PaymentMode } from '@/types';
 import { LabelData } from '@/components/domain/LabelGenerator';
 
+type ShipmentLookupRow = {
+  id: string;
+  cn_number?: string | null;
+  awb?: string | null;
+  customer_id?: string | null;
+  customer?: { name?: string | null; email?: string | null } | null;
+  origin_hub_id?: string | null;
+  destination_hub_id?: string | null;
+  origin_hub?: { code?: string | null } | null;
+  destination_hub?: { code?: string | null } | null;
+  total_weight?: number | null;
+  mode?: string | null;
+  service_level?: string | null;
+  total_packages?: number | null;
+  status?: Shipment['status'] | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  consignor_name?: string | null;
+  consignor_phone?: string | null;
+  consignor_address?: unknown;
+  consignee_name?: string | null;
+  consignee_phone?: string | null;
+  consignee_address?: unknown;
+  payment_mode?: string | null;
+  contents?: string | null;
+};
+
+type PartyNameLike = { name?: string | null } | null | undefined;
+type PartyDetails = {
+  name?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+};
+type InvoiceRowLike = {
+  id: string;
+  invoice_no: string;
+  customer_id: string;
+  shipment_id?: string | null;
+  status: Invoice['status'];
+  created_at: string;
+  due_date?: string | null;
+  customer?: { name?: string | null } | null;
+  shipment?: { cn_number?: string | null } | null;
+  line_items?: unknown;
+  tax_amount?: number | null;
+  subtotal?: number | null;
+  discount?: number | null;
+  total?: number | null;
+};
+
 export function useInvoiceActions() {
   const [labelDownloading, setLabelDownloading] = useState(false);
   const [labelPreviewOpen, setLabelPreviewOpen] = useState(false);
@@ -17,7 +69,7 @@ export function useInvoiceActions() {
     undefined
   );
 
-  const getShipment = async (awb: string) => {
+  const getShipment = async (awb: string): Promise<ShipmentLookupRow | null> => {
     const { data, error } = await supabase
       .from('shipments')
       .select(
@@ -30,14 +82,59 @@ export function useInvoiceActions() {
       console.warn('Shipment fetch error:', error);
       return null;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return data as any;
+    return data as ShipmentLookupRow | null;
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const formatAddress = (address: any) => {
+  const asRecord = (value: unknown): Record<string, unknown> | null => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return null;
+    }
+
+    return value as Record<string, unknown>;
+  };
+
+  const getString = (value: unknown) => (typeof value === 'string' ? value : undefined);
+
+  const getNumber = (value: unknown) => {
+    if (typeof value === 'number') {
+      return value;
+    }
+
+    if (typeof value === 'string' && value.trim() !== '') {
+      const parsed = Number(value);
+      return Number.isNaN(parsed) ? undefined : parsed;
+    }
+
+    return undefined;
+  };
+
+  const getPartyDetails = (value: unknown): PartyDetails => {
+    const record = asRecord(value);
+    return {
+      name: getString(record?.name),
+      phone: getString(record?.phone),
+      address: getString(record?.address),
+      city: getString(record?.city),
+      state: getString(record?.state),
+    };
+  };
+
+  const getInvoiceSupplementalData = (inv: Invoice) => {
+    const invoiceRecord = asRecord(inv) ?? {};
+    const lineItems =
+      asRecord(invoiceRecord.line_items) ?? asRecord(invoiceRecord.financials) ?? {};
+
+    return {
+      lineItems,
+      consignor: getPartyDetails(lineItems.consignor ?? invoiceRecord.consignor),
+      consignee: getPartyDetails(lineItems.consignee ?? invoiceRecord.consignee),
+    };
+  };
+
+  const formatAddress = (address: unknown) => {
     if (!address) return '';
     if (typeof address === 'string') return address;
+    if (typeof address !== 'object' || Array.isArray(address)) return '';
     const { line1, line2, city, state, zip } = address as Record<string, string | undefined>;
     return [line1, line2, city, state, zip].filter(Boolean).join(', ');
   };
@@ -48,8 +145,11 @@ export function useInvoiceActions() {
     return safeDate.toISOString().slice(0, 10).replace(/-/g, '');
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const buildInvoiceFilename = (inv: Invoice, consignor: any, consignee: any) => {
+  const buildInvoiceFilename = (
+    inv: Invoice,
+    consignor?: PartyNameLike,
+    consignee?: PartyNameLike
+  ) => {
     const rawName = sanitizeString(
       inv.customerName || consignee?.name || consignor?.name || 'Customer'
     );
@@ -61,8 +161,10 @@ export function useInvoiceActions() {
     return `INVOICE-${safeName || 'customer'}-${dateTag}.pdf`;
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const resolveHubLocation = (row: any, type: 'origin' | 'destination'): HubLocation => {
+  const resolveHubLocation = (
+    row: ShipmentLookupRow,
+    type: 'origin' | 'destination'
+  ): HubLocation => {
     const hubId = type === 'origin' ? row.origin_hub_id : row.destination_hub_id;
     const hubCode = type === 'origin' ? row.origin_hub?.code : row.destination_hub?.code;
     const byUuid = Object.values(HUBS).find((hub) => hub.uuid === hubId)?.id;
@@ -84,16 +186,15 @@ export function useInvoiceActions() {
     return 'STANDARD';
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapShipmentForLabel = (row: any): Shipment => {
+  const mapShipmentForLabel = (row: ShipmentLookupRow): Shipment => {
     const originHub = resolveHubLocation(row, 'origin');
     const destinationHub = resolveHubLocation(row, 'destination');
     const weight = Number(row.total_weight ?? 0);
 
     return {
       id: row.id,
-      awb: row.cn_number || row.awb,
-      customerId: row.customer_id,
+      awb: row.cn_number || row.awb || '',
+      customerId: row.customer_id || '',
       customerName: row.customer?.name || row.consignee_name || 'Unknown',
       originHub,
       destinationHub,
@@ -122,12 +223,7 @@ export function useInvoiceActions() {
 
   const buildShipmentFromInvoice = (inv: Invoice): Shipment => {
     logger.debug('[Label]', 'Building shipment from invoice', { id: inv.id, awb: inv.awb });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const lineItems = (inv as any).line_items || (inv as any).financials || {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const consignor = lineItems.consignor || (inv as any).consignor || {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const consignee = lineItems.consignee || (inv as any).consignee || {};
+    const { lineItems, consignor, consignee } = getInvoiceSupplementalData(inv);
 
     return {
       id: inv.id,
@@ -168,8 +264,8 @@ export function useInvoiceActions() {
     try {
       toast.info('Generating invoice PDF...');
       const shipmentRow = inv.awb ? await getShipment(inv.awb) : null;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const lineItems = (inv as any).line_items || (inv as any).financials || {};
+      const { consignor: fallbackConsignor, consignee: fallbackConsignee } =
+        getInvoiceSupplementalData(inv);
 
       const consignor = shipmentRow
         ? {
@@ -177,16 +273,14 @@ export function useInvoiceActions() {
             phone: shipmentRow.consignor_phone,
             address: formatAddress(shipmentRow.consignor_address),
           }
-        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          lineItems.consignor || (inv as any).consignor || {};
+        : fallbackConsignor;
       const consignee = shipmentRow
         ? {
             name: shipmentRow.consignee_name,
             phone: shipmentRow.consignee_phone,
             address: formatAddress(shipmentRow.consignee_address),
           }
-        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          lineItems.consignee || (inv as any).consignee || {};
+        : fallbackConsignee;
 
       const fullInvoice = { ...inv, consignor, consignee };
       const url = await generateEnterpriseInvoice(fullInvoice as Invoice);
@@ -230,17 +324,9 @@ export function useInvoiceActions() {
 
   const handleShareWhatsapp = async (inv: Invoice) => {
     const shipment = inv.awb ? await getShipment(inv.awb) : null;
-    const invData = inv as unknown as {
-      consignee?: { phone?: string };
-      line_items?: { consignee?: { phone?: string } };
-    };
-    const shipData = shipment as unknown as { consignee_phone?: string };
+    const { consignee } = getInvoiceSupplementalData(inv);
 
-    const phone =
-      invData.consignee?.phone ||
-      invData.line_items?.consignee?.phone ||
-      shipData?.consignee_phone ||
-      '';
+    const phone = consignee.phone || shipment?.consignee_phone || '';
     if (!phone) {
       toast.error('No customer phone number found for this invoice.');
       return;
@@ -257,8 +343,7 @@ Thank you for choosing TAC Cargo.`;
 
   const handleShareEmail = async (inv: Invoice) => {
     const shipment = inv.awb ? await getShipment(inv.awb) : null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const email = (shipment as any)?.customer?.email || '';
+    const email = shipment?.customer?.email || '';
     if (!email) {
       toast.error('No customer email found for this invoice.');
       return;
@@ -272,11 +357,16 @@ Thank you for choosing TAC Cargo.`;
   };
 
   // Helper to build Invoice object from DB row
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const buildInvoiceFromRow = (row: any): Invoice => {
-    const lineItems = row.line_items || {};
-    const awb = row.shipment?.cn_number || lineItems.awb || '';
-    const tax = lineItems.tax ?? { cgst: 0, sgst: 0, igst: 0, total: row.tax_amount ?? 0 };
+  const buildInvoiceFromRow = (row: InvoiceRowLike): Invoice => {
+    const lineItems = asRecord(row.line_items) ?? {};
+    const awb = row.shipment?.cn_number || getString(lineItems.awb) || '';
+    const taxRecord = asRecord(lineItems.tax);
+    const tax = {
+      cgst: getNumber(taxRecord?.cgst) ?? 0,
+      sgst: getNumber(taxRecord?.sgst) ?? 0,
+      igst: getNumber(taxRecord?.igst) ?? 0,
+      total: getNumber(taxRecord?.total) ?? row.tax_amount ?? 0,
+    };
 
     return {
       id: row.id,
@@ -288,21 +378,21 @@ Thank you for choosing TAC Cargo.`;
       status: row.status,
       createdAt: row.created_at,
       dueDate: row.due_date || '',
-      paymentMode: lineItems.paymentMode || 'PAID',
+      paymentMode: (getString(lineItems.paymentMode) as PaymentMode | undefined) || 'PAID',
       financials: {
-        ratePerKg: lineItems.ratePerKg ?? 0,
-        baseFreight: lineItems.baseFreight ?? row.subtotal ?? 0,
-        docketCharge: lineItems.docketCharge ?? 0,
-        pickupCharge: lineItems.pickupCharge ?? 0,
-        packingCharge: lineItems.packingCharge ?? 0,
-        fuelSurcharge: lineItems.fuelSurcharge ?? 0,
-        handlingFee: lineItems.handlingFee ?? 0,
-        insurance: lineItems.insurance ?? 0,
+        ratePerKg: getNumber(lineItems.ratePerKg) ?? 0,
+        baseFreight: getNumber(lineItems.baseFreight) ?? row.subtotal ?? 0,
+        docketCharge: getNumber(lineItems.docketCharge) ?? 0,
+        pickupCharge: getNumber(lineItems.pickupCharge) ?? 0,
+        packingCharge: getNumber(lineItems.packingCharge) ?? 0,
+        fuelSurcharge: getNumber(lineItems.fuelSurcharge) ?? 0,
+        handlingFee: getNumber(lineItems.handlingFee) ?? 0,
+        insurance: getNumber(lineItems.insurance) ?? 0,
         tax,
-        discount: lineItems.discount ?? row.discount ?? 0,
+        discount: getNumber(lineItems.discount) ?? row.discount ?? 0,
         totalAmount: row.total ?? 0,
-        advancePaid: lineItems.advancePaid ?? 0,
-        balance: lineItems.balance ?? row.total ?? 0,
+        advancePaid: getNumber(lineItems.advancePaid) ?? 0,
+        balance: getNumber(lineItems.balance) ?? row.total ?? 0,
       },
       ...(Object.keys(lineItems).length > 0 ? { line_items: lineItems } : {}),
     } as Invoice;

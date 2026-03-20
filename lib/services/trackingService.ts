@@ -2,8 +2,6 @@
  * Tracking Service
  * Handles tracking events and shipment status updates
  */
-/* eslint-disable @typescript-eslint/no-explicit-any -- Supabase client requires any for complex operations */
-
 import { supabase } from '@/lib/supabase';
 import { mapSupabaseError } from '@/lib/errors';
 import { orgService } from './orgService';
@@ -60,13 +58,14 @@ export const trackingService = {
 
   async create(event: Omit<TrackingEventInsert, 'org_id'>): Promise<TrackingEvent> {
     const orgId = orgService.getCurrentOrgId();
+    const payload: TrackingEventInsert = {
+      ...event,
+      org_id: orgId,
+    };
 
     const { data, error } = await supabase
       .from('tracking_events')
-      .insert({
-        ...event,
-        org_id: orgId,
-      } as any)
+      .insert(payload)
       .select()
       .single();
 
@@ -80,7 +79,7 @@ export const trackingService = {
     eventCode: string,
     hubId: string,
     staffId: string,
-    meta?: Record<string, any>
+    meta?: TrackingEventInsert['meta']
   ): Promise<TrackingEvent> {
     return this.create({
       shipment_id: shipmentId,

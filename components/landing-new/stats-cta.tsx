@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Package, Clock, ShieldCheck } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { motion } from '@/lib/motion';
 import { HUBS, SHIPMENT_MODES, SERVICE_LEVELS } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,6 @@ import { TextReveal } from '@/components/motion/TextReveal';
 import { FadeUp } from '@/components/motion/FadeUp';
 import { StaggerChildren } from '@/components/motion/StaggerChildren';
 import { CountUp } from '@/components/motion/CountUp';
-import { LottieSlot } from './lottie-slot';
 
 export function StatsCTA() {
   return (
@@ -63,33 +62,14 @@ export function StatsCTA() {
               hidden: { opacity: 0, y: 30 },
               visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
             }}
-            whileHover={{ y: -5, transition: { duration: 0.3 } }}
-            className="group relative bg-card/40 backdrop-blur-md border border-border/50 rounded-md p-10 text-center hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 overflow-hidden"
+            className="group relative flex flex-col items-center p-6 text-center"
           >
-            <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
-
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative z-10">
-              <div className="w-16 h-16 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-8 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-sm relative overflow-hidden">
-                <LottieSlot
-                  src="/lottie/rising-bar-chart .json"
-                  className="w-12 h-12 relative z-10"
-                  fallbackIcon={<Package className="w-8 h-8 relative z-10" />}
-                />
-                <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/50 transition-colors z-0"></div>
-              </div>
-              <div className="text-5xl lg:text-6xl font-extrabold text-foreground mb-3 tracking-tighter font-mono tabular-nums">
-                <CountUp to={Object.keys(HUBS).length} duration={2.5} />
-              </div>
-              <p className="text-muted-foreground font-semibold text-sm uppercase tracking-widest group-hover:text-foreground transition-colors [text-wrap:balance]">
-                Operational Hubs
-              </p>
+            <div className="text-7xl lg:text-8xl font-black text-foreground mb-4 tracking-tighter font-sans">
+              <CountUp to={Object.keys(HUBS).length} duration={2.5} />
             </div>
-            {/* Corner Accent Label */}
-            <div className="absolute top-4 right-4 font-mono text-[10px] text-muted-foreground/50 tracking-widest font-bold">
-              OBJ_01
-            </div>
+            <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-muted-foreground [text-wrap:balance]">
+              Operational Hubs
+            </p>
           </motion.div>
 
           {/* Stat 2 */}
@@ -98,28 +78,14 @@ export function StatsCTA() {
               hidden: { opacity: 0, y: 30 },
               visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
             }}
-            whileHover={{ y: -5, transition: { duration: 0.3 } }}
-            className="group relative bg-card/40 backdrop-blur-md border border-border/50 rounded-md p-10 text-center hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 overflow-hidden"
+            className="group relative flex flex-col items-center p-6 text-center"
           >
-            <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
-
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative z-10">
-              <div className="w-16 h-16 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-8 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-sm relative overflow-hidden">
-                <ShieldCheck className="w-8 h-8 relative z-10" />
-                <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/50 transition-colors z-0"></div>
-              </div>
-              <div className="text-5xl lg:text-6xl font-extrabold text-foreground mb-3 tracking-tighter font-mono tabular-nums">
-                <CountUp to={SHIPMENT_MODES.length} duration={2.5} />
-              </div>
-              <p className="text-muted-foreground font-semibold text-sm uppercase tracking-widest group-hover:text-foreground transition-colors [text-wrap:balance]">
-                Freight Modes Supported
-              </p>
+            <div className="text-7xl lg:text-8xl font-black text-foreground mb-4 tracking-tighter font-sans">
+              <CountUp to={SHIPMENT_MODES.length} duration={2.5} />
             </div>
-            <div className="absolute top-4 right-4 font-mono text-[10px] text-muted-foreground/50 tracking-widest font-bold">
-              OBJ_02
-            </div>
+            <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-muted-foreground [text-wrap:balance]">
+              Freight Modes Supported
+            </p>
           </motion.div>
 
           {/* Stat 3 */}
@@ -128,28 +94,14 @@ export function StatsCTA() {
               hidden: { opacity: 0, y: 30 },
               visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
             }}
-            whileHover={{ y: -5, transition: { duration: 0.3 } }}
-            className="group relative bg-card/40 backdrop-blur-md border border-border/50 rounded-md p-10 text-center hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 overflow-hidden"
+            className="group relative flex flex-col items-center p-6 text-center"
           >
-            <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
-
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative z-10">
-              <div className="w-16 h-16 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-8 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-sm relative overflow-hidden">
-                <Clock className="w-8 h-8 relative z-10" />
-                <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/50 transition-colors z-0"></div>
-              </div>
-              <div className="text-5xl lg:text-6xl font-extrabold text-foreground mb-3 tracking-tighter font-mono tabular-nums">
-                <CountUp to={SERVICE_LEVELS.length} duration={2.5} />
-              </div>
-              <p className="text-muted-foreground font-semibold text-sm uppercase tracking-widest group-hover:text-foreground transition-colors [text-wrap:balance]">
-                Service Levels Offered
-              </p>
+            <div className="text-7xl lg:text-8xl font-black text-foreground mb-4 tracking-tighter font-sans">
+              <CountUp to={SERVICE_LEVELS.length} duration={2.5} />
             </div>
-            <div className="absolute top-4 right-4 font-mono text-[10px] text-muted-foreground/50 tracking-widest font-bold">
-              OBJ_03
-            </div>
+            <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-muted-foreground [text-wrap:balance]">
+              Service Levels Offered
+            </p>
           </motion.div>
         </StaggerChildren>
       </div>

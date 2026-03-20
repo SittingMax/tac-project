@@ -2,13 +2,13 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { startOfDay } from 'date-fns';
 import { useSearchParams } from 'react-router-dom';
 import { Download, Plus, ChevronDown, CheckCircle } from 'lucide-react';
-import { RowSelectionState } from '@tanstack/react-table';
 import { toast } from 'sonner';
+import type { Table as TanStackTable } from '@tanstack/react-table';
 
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageHeader, PageContainer, SectionCard, SizedDialog } from '@/components/ui-core';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,12 +21,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-// CRUD Components
 import { CrudTable } from '@/components/crud/CrudTable';
 import { CrudDeleteDialog } from '@/components/crud/CrudDeleteDialog';
 import { EmptyState } from '@/components/states/EmptyState';
 import { ErrorState } from '@/components/states/ErrorState';
-import { TableSkeleton } from '@/components/states/TableSkeleton';
 
 // Domain Components
 import { CreateShipmentForm } from '@/components/shipments/CreateShipmentForm';
@@ -42,16 +40,20 @@ import {
 import { getShipmentsColumns } from '@/components/shipments/shipments.columns';
 import { useAuthStore } from '@/store/authStore';
 import { useDebounce } from '@/lib/hooks/useDebounce';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/queryKeys';
 
 // Types
 import { adaptToShipment } from '@/lib/utils/shipment-adapter';
 import { VALID_STATUS_TRANSITIONS, type ShipmentStatusType } from '@/lib/schemas/shipment.schema';
+import { formatDate } from '@/lib/formatters';
 
 const formatStatusLabel = (status: ShipmentStatusType) => status.replaceAll('_', ' ');
 
 export const Shipments: React.FC = () => {
   const { user } = useAuthStore();
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const queryClient = useQueryClient();
 
   // Search state
   // Search state synced with URL
@@ -112,24 +114,6 @@ export const Shipments: React.FC = () => {
   const [rowToDelete, setRowToDelete] = useState<ShipmentWithRelations | null>(null);
   const [isBulkUpdating, setIsBulkUpdating] = useState(false);
 
-  // Bulk selection state
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-
-  const getCommonNextStatuses = (selectedRows: Array<{ original: ShipmentWithRelations }>) => {
-    const sharedStatuses = selectedRows.reduce<ShipmentStatusType[] | null>((accumulator, row) => {
-      const currentStatus = row.original.status as ShipmentStatusType;
-      const allowedStatuses = VALID_STATUS_TRANSITIONS[currentStatus] ?? [];
-
-      if (accumulator === null) {
-        return [...allowedStatuses];
-      }
-
-      return accumulator.filter((status) => allowedStatuses.includes(status));
-    }, null);
-
-    return sharedStatuses ?? [];
-  };
-
   const handleBulkStatusUpdate = async (
     status: ShipmentStatusType,
     selectedRows: Array<{ original: ShipmentWithRelations }>
@@ -144,6 +128,7 @@ export const Shipments: React.FC = () => {
           id: row.original.id,
           status,
           silent: true,
+          skipInvalidation: true,
         })
       )
     );
@@ -155,6 +140,7 @@ export const Shipments: React.FC = () => {
       toast.success(
         `${successCount} shipment${successCount === 1 ? '' : 's'} updated to ${formatStatusLabel(status)}`
       );
+      queryClient.invalidateQueries({ queryKey: queryKeys.shipments.all });
     }
 
     if (failureCount > 0) {
@@ -169,7 +155,6 @@ export const Shipments: React.FC = () => {
       );
     }
 
-    setRowSelection({});
     setIsBulkUpdating(false);
   };
 
@@ -222,142 +207,98 @@ export const Shipments: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+    <PageContainer>
       <PageHeader title="Shipments" description="Manage and track all consignment notes" />
 
-      {/* Table with CRUD */}
-      <CrudTable
-        columns={columns}
-        data={shipments ?? []}
-        searchKey="cn_number" // Keep for prop requirement, but onSearch overrides behavior
-        searchPlaceholder="Search by CN, Invoice, Name, Phone..."
-        onSearch={setSearchTerm} // Pass handleSearch
-        searchValue={searchTerm} // Sync input value
-        isLoading={isLoading}
-        loadingState={<TableSkeleton />}
-        emptyState={({ isFiltered }) =>
-          error ? (
-            <ErrorState
-              title="Unable to load shipments"
-              description="The system could not retrieve shipment data. Please retry."
-              onRetry={() => refetch()}
+      <SectionCard>
+        {/* Table with CRUD */}
+        <CrudTable
+          columns={columns}
+          data={shipments ?? []}
+          isLoading={isLoading}
+          searchKey="shipments"
+          searchPlaceholder="Search by CN, Invoice, Name, Phone..."
+          searchValue={searchTerm}
+          onSearch={setSearchTerm}
+          enableRowSelection
+          bulkActions={(table) => (
+            <ShipmentBulkActions
+              table={table}
+              isBulkUpdating={isBulkUpdating}
+              handleBulkStatusUpdate={handleBulkStatusUpdate}
             />
-          ) : (
-            <EmptyState
-              title="No shipments found"
-              description={
-                isFiltered || debouncedSearch
-                  ? 'No shipments match the selected filters.'
-                  : 'Shipments will appear here once created or imported.'
-              }
-              actionLabel={isFiltered || debouncedSearch ? undefined : 'Create shipment'}
-              onAction={
-                isFiltered || debouncedSearch ? undefined : () => setIsCreateModalOpen(true)
-              }
-            />
-          )
-        }
-        enableRowSelection={true}
-        rowSelection={rowSelection}
-        onRowSelectionChange={setRowSelection}
-        bulkActions={(table) => {
-          const selectedRows = table.getSelectedRowModel().rows;
-          const commonNextStatuses = getCommonNextStatuses(selectedRows);
-
-          if (selectedRows.length === 0) return null;
-          return (
-            <div className="flex items-center gap-2 mr-4 border-r border-border pr-4">
-              <span className="text-sm text-primary font-medium">
-                {selectedRows.length} selected
-              </span>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="secondary" size="sm" className="h-8" disabled={isBulkUpdating}>
-                    Bulk Actions <ChevronDown className="w-4 h-4 ml-2" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>Shipment Actions</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {commonNextStatuses.length > 0 ? (
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger disabled={isBulkUpdating}>
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        Update Status
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent>
-                        {commonNextStatuses.map((status) => (
-                          <DropdownMenuItem
-                            key={status}
-                            onClick={() => void handleBulkStatusUpdate(status, selectedRows)}
-                            disabled={isBulkUpdating}
-                          >
-                            {formatStatusLabel(status)}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuSubContent>
-                    </DropdownMenuSub>
-                  ) : (
-                    <DropdownMenuItem disabled>No shared status transition</DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          );
-        }}
-        toolbar={
-          <div className="flex gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => {
-                if (shipments) {
-                  import('@/lib/export').then(({ exportToCSV }) => {
-                    // Flatten data for export
-                    const dataToExport = shipments.map((s) => ({
-                      awb: s.cn_number,
-                      Customer: s.customer?.name,
-                      Origin: s.origin_hub?.code || s.origin_hub_id,
-                      Destination: s.destination_hub?.code || s.destination_hub_id,
-                      Status: s.status,
-                      Mode: s.mode,
-                      Packages: s.package_count,
-                      Weight: s.total_weight,
-                      Created: new Date(s.created_at).toLocaleDateString(),
-                    }));
-                    exportToCSV(
-                      dataToExport,
-                      `shipments-${new Date().toISOString().split('T')[0]}`
-                    );
-                  });
+          )}
+          toolbar={
+            <>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (shipments) {
+                    import('@/lib/export').then(({ exportToCSV }) => {
+                      const dataToExport = shipments.map((s) => ({
+                        awb: s.cn_number,
+                        Customer: s.customer?.name,
+                        Origin: s.origin_hub?.code || s.origin_hub_id,
+                        Destination: s.destination_hub?.code || s.destination_hub_id,
+                        Status: s.status,
+                        Mode: s.mode,
+                        Packages: s.package_count,
+                        Weight: s.total_weight,
+                        Created: formatDate(s.created_at),
+                      }));
+                      exportToCSV(
+                        dataToExport,
+                        `shipments-${new Date().toISOString().split('T')[0]}`
+                      );
+                    });
+                  }
+                }}
+                disabled={!shipments || shipments.length === 0}
+              >
+                <Download size={16} strokeWidth={1.5} className="mr-2" /> Export
+              </Button>
+              <Button onClick={() => setIsCreateModalOpen(true)} data-testid="new-shipment-button">
+                <Plus size={16} strokeWidth={1.5} className="mr-2" /> New Shipment
+              </Button>
+            </>
+          }
+          emptyState={
+            error ? (
+              <ErrorState
+                title="Unable to load shipments"
+                description="The system could not retrieve shipment data. Please retry."
+                onRetry={() => refetch()}
+              />
+            ) : (
+              <EmptyState
+                title="No shipments found"
+                description={
+                  searchTerm || debouncedSearch
+                    ? 'No shipments match the selected filters.'
+                    : 'Shipments will appear here once created or imported.'
                 }
-              }}
-              disabled={!shipments || shipments.length === 0}
-            >
-              <Download className="w-4 h-4 mr-2" /> Export
-            </Button>
-            <Button onClick={() => setIsCreateModalOpen(true)} data-testid="new-shipment-button">
-              <Plus className="w-4 h-4 mr-2" /> New Shipment
-            </Button>
-          </div>
-        }
-      />
+                actionLabel={searchTerm || debouncedSearch ? undefined : 'Create shipment'}
+                onAction={
+                  searchTerm || debouncedSearch ? undefined : () => setIsCreateModalOpen(true)
+                }
+              />
+            )
+          }
+        />
+      </SectionCard>
 
       {/* Create Wizard Modal */}
-      <Dialog
+      <SizedDialog
         open={isCreateModalOpen}
         onOpenChange={handleCreateModalChange}
-        data-testid="create-shipment-modal"
+        size="5xl"
+        title="Create New Shipment"
       >
-        <DialogContent className="sm:max-w-[800px] w-[95vw]">
-          <DialogHeader>
-            <DialogTitle>Create New Shipment</DialogTitle>
-          </DialogHeader>
-          <CreateShipmentForm
-            onSuccess={() => setIsCreateModalOpen(false)}
-            onCancel={() => setIsCreateModalOpen(false)}
-          />
-        </DialogContent>
-      </Dialog>
+        <CreateShipmentForm
+          onSuccess={() => setIsCreateModalOpen(false)}
+          onCancel={() => setIsCreateModalOpen(false)}
+        />
+      </SizedDialog>
 
       {/* Details Modal */}
       <Dialog
@@ -392,6 +333,82 @@ export const Shipments: React.FC = () => {
         onConfirm={handleDelete}
         confirmLabel={isSuperAdmin ? 'Delete Permanently' : 'Archive'}
       />
-    </div>
+    </PageContainer>
   );
 };
+
+const getCommonNextStatuses = (selectedRows: Array<{ original: ShipmentWithRelations }>) => {
+  const sharedStatuses = selectedRows.reduce<ShipmentStatusType[] | null>((accumulator, row) => {
+    const currentStatus = row.original.status as ShipmentStatusType;
+    const allowedStatuses = VALID_STATUS_TRANSITIONS[currentStatus] ?? [];
+
+    if (accumulator === null) {
+      return [...allowedStatuses];
+    }
+
+    return accumulator.filter((status) => allowedStatuses.includes(status));
+  }, null);
+
+  return sharedStatuses ?? [];
+};
+
+function ShipmentBulkActions({
+  table,
+  isBulkUpdating,
+  handleBulkStatusUpdate,
+}: {
+  table: TanStackTable<ShipmentWithRelations>;
+  isBulkUpdating: boolean;
+  handleBulkStatusUpdate: (
+    status: ShipmentStatusType,
+    selectedRows: Array<{ original: ShipmentWithRelations }>
+  ) => void;
+}) {
+  const selectedRows = table.getSelectedRowModel().rows as unknown as Array<{
+    original: ShipmentWithRelations;
+  }>;
+
+  if (selectedRows.length === 0) return null;
+  const commonNextStatuses = getCommonNextStatuses(selectedRows);
+
+  return (
+    <div className="flex items-center gap-2 mr-4 border-r border-border pr-4">
+      <span className="text-sm text-primary font-medium">{selectedRows.length} selected</span>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="secondary" size="sm" className="h-8" disabled={isBulkUpdating}>
+            Bulk Actions <ChevronDown size={16} strokeWidth={1.5} className="ml-2" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuLabel>Shipment Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {commonNextStatuses.length > 0 ? (
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger disabled={isBulkUpdating}>
+                <CheckCircle size={16} strokeWidth={1.5} className="mr-2" />
+                Update Status
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                {commonNextStatuses.map((status) => (
+                  <DropdownMenuItem
+                    key={status}
+                    onClick={() => {
+                      void handleBulkStatusUpdate(status, selectedRows);
+                      table.setRowSelection({});
+                    }}
+                    disabled={isBulkUpdating}
+                  >
+                    {formatStatusLabel(status)}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          ) : (
+            <DropdownMenuItem disabled>No shared status transition</DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}

@@ -1,32 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
-import type { Json } from '../lib/database.types';
-import { useAuthStore } from '../store/authStore';
-import { logger } from '../lib/logger';
+import type { Json } from '@/lib/database.types';
+import { logger } from '@/lib/logger';
+import { queryKeys } from '@/lib/queryKeys';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/authStore';
 
 // Direct supabase usage - types handled via database.types.ts
-
-/**
- * Query key factory for shipments.
- * Provides consistent, type-safe query keys for caching.
- */
-export const shipmentKeys = {
-  all: ['shipments'] as const,
-  lists: () => [...shipmentKeys.all, 'list'] as const,
-  list: (filters?: {
-    limit?: number;
-    status?: string;
-    orgId?: string;
-    search?: string;
-    deliveredSince?: string;
-    page?: number;
-    pageSize?: number;
-  }) => [...shipmentKeys.lists(), filters] as const,
-  details: () => [...shipmentKeys.all, 'detail'] as const,
-  detail: (id: string) => [...shipmentKeys.details(), id] as const,
-  byCN: (awb: string) => [...shipmentKeys.all, 'CN Number', awb] as const,
-};
 
 export interface ShipmentWithRelations {
   id: string;
@@ -74,7 +54,7 @@ export function useShipments(options?: {
   const offset = (page - 1) * pageSize;
 
   return useQuery({
-    queryKey: shipmentKeys.list({ ...options, orgId, page, pageSize }),
+    queryKey: queryKeys.shipments.list({ ...options, orgId, page, pageSize }),
     queryFn: async () => {
       let query;
 
@@ -146,7 +126,7 @@ export function useShipments(options?: {
 export function useShipmentByAWB(awb: string | null) {
   const orgId = useAuthStore((s) => s.user?.orgId);
   return useQuery({
-    queryKey: ['shipment', 'CN Number', awb, orgId],
+    queryKey: [...queryKeys.shipments.byCN(awb ?? ''), orgId] as const,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('shipments')
@@ -171,7 +151,7 @@ export function useShipmentByAWB(awb: string | null) {
 
 export function useShipmentById(id: string | undefined) {
   return useQuery({
-    queryKey: shipmentKeys.detail(id!),
+    queryKey: queryKeys.shipments.detail(id!),
     queryFn: async () => {
       const { data, error } = await supabase
         .from('shipments')
@@ -217,17 +197,10 @@ export function useCreateShipment() {
 
   return useMutation({
     mutationFn: async (shipment: CreateShipmentInput) => {
-      // eslint-disable-next-line no-console
-      console.debug('Starting createShipment mutation...', shipment);
       const orgId = staffUser?.orgId;
       if (!orgId) {
         throw new Error('No organization context available for shipment creation.');
       }
-      // eslint-disable-next-line no-console
-      console.debug('Using auth store orgId:', orgId);
-
-      // eslint-disable-next-line no-console
-      console.debug('Calling generate_cn_number RPC...');
       const { data: awbResult, error: awbError } = await supabase.rpc('generate_cn_number', {
         p_org_id: orgId,
       });
@@ -236,8 +209,6 @@ export function useCreateShipment() {
         logger.error('useShipments', 'AWB Generation Error', { error: awbError });
         throw awbError;
       }
-      // eslint-disable-next-line no-console
-      console.debug('AWB Result:', awbResult);
 
       if (typeof awbResult !== 'string' || !awbResult) {
         throw new Error('AWB service unavailable');
@@ -245,9 +216,8 @@ export function useCreateShipment() {
 
       const insertPayload = {
         ...shipment,
-        // Ensure customer_id is a string (checked below)
-        customer_id: shipment.customer_id as string,
-        org_id: orgId as string,
+        customer_id: shipment.customer_id,
+        org_id: orgId,
         cn_number: awbResult,
         status: 'CREATED' as const,
       };
@@ -255,9 +225,6 @@ export function useCreateShipment() {
       if (!insertPayload.customer_id) {
         throw new Error('Customer is required to create a shipment. Please select a customer.');
       }
-
-      // eslint-disable-next-line no-console
-      console.debug('Inserting shipment payload:', insertPayload);
 
       const { data, error } = await supabase
         .from('shipments')
@@ -269,12 +236,10 @@ export function useCreateShipment() {
         logger.error('useShipments', 'Shipment Insert Error', { error });
         throw error;
       }
-      // eslint-disable-next-line no-console
-      console.debug('Shipment created successfully:', data);
       return data as unknown as ShipmentWithRelations;
     },
     onSuccess: (data: ShipmentWithRelations) => {
-      queryClient.invalidateQueries({ queryKey: ['shipments'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.shipments.all });
       toast.success(`Shipment ${data.cn_number} created successfully`);
     },
     onError: (error: Error) => {
@@ -297,7 +262,15 @@ export function useUpdateShipmentStatus() {
   const orgId = useAuthStore((s) => s.user?.orgId);
 
   return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string; silent?: boolean }) => {
+    mutationFn: async ({
+      id,
+      status,
+    }: {
+      id: string;
+      status: string;
+      silent?: boolean;
+      skipInvalidation?: boolean;
+    }) => {
       if (!orgId) {
         throw new Error('No organization context available for shipment status updates.');
       }
@@ -328,8 +301,10 @@ export function useUpdateShipmentStatus() {
       return shipmentData;
     },
     onSuccess: (data: ShipmentWithRelations, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['shipments'] });
-      queryClient.invalidateQueries({ queryKey: ['tracking-events', data.cn_number] });
+      if (!variables.skipInvalidation) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.shipments.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.tracking.byCN(data.cn_number) });
+      }
       if (!variables.silent) {
         toast.success(`Status updated to ${data.status}`);
       }
@@ -366,7 +341,7 @@ export function useDeleteShipment() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: shipmentKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.shipments.lists() });
       toast.success('Shipment deleted successfully');
     },
     onError: (error: Error) => {
@@ -425,7 +400,7 @@ export function useHardDeleteShipment() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: shipmentKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.shipments.lists() });
       toast.success('Shipment permanently deleted');
     },
     onError: (error: Error) => {

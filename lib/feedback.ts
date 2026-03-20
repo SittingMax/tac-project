@@ -6,13 +6,22 @@
 // Audio context for generating tones
 let audioContext: AudioContext | null = null;
 
-const getAudioContext = (): AudioContext => {
+type AudioContextWindow = Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext };
+
+const getAudioContext = (): AudioContext | null => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const AudioContextConstructor =
+    window.AudioContext || (window as AudioContextWindow).webkitAudioContext;
+
+  if (!AudioContextConstructor) {
+    return null;
+  }
+
   if (!audioContext) {
-    audioContext = new (
-      window.AudioContext ||
-      (window as Window & typeof globalThis & { webkitAudioContext: typeof AudioContext })
-        .webkitAudioContext
-    )();
+    audioContext = new AudioContextConstructor();
   }
   return audioContext;
 };
@@ -23,6 +32,9 @@ const getAudioContext = (): AudioContext => {
 const playTone = (frequency: number, duration: number, type: OscillatorType = 'sine') => {
   try {
     const ctx = getAudioContext();
+    if (!ctx) {
+      return;
+    }
     const oscillator = ctx.createOscillator();
     const gainNode = ctx.createGain();
 
@@ -48,7 +60,7 @@ const playTone = (frequency: number, duration: number, type: OscillatorType = 's
  */
 const triggerHaptic = (pattern: number | number[]) => {
   try {
-    if ('vibrate' in navigator) {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate(pattern);
     }
   } catch (error) {

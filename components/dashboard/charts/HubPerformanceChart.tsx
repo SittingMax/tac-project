@@ -37,6 +37,7 @@ import {
 import { ChartSkeleton } from '../../ui/skeleton';
 import { useShipments } from '../../../hooks/useShipments';
 import { TrendingUp } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 
 type ChartType = 'radar' | 'area' | 'bar' | 'line' | 'pie' | 'radial';
@@ -417,8 +418,8 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
   };
 
   return (
-    <Card className="flex flex-col h-full border border-border/40 bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300">
-      <CardHeader className="flex flex-row items-start justify-between pb-4 border-b border-border/40 space-y-0">
+    <Card className="flex flex-col h-full border border-border/50 bg-background shadow-none hover:bg-muted/5 transition-colors duration-300">
+      <CardHeader className="flex flex-row items-start justify-between pb-4 border-b border-border/50 space-y-0">
         <div>
           <CardTitle className="text-xs text-muted-foreground">Hub Shipment Profile</CardTitle>
           <div className="text-lg font-semibold text-foreground mt-1">
@@ -426,7 +427,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
           </div>
         </div>
         <Select value={chartType} onValueChange={(v) => setChartType(v as ChartType)}>
-          <SelectTrigger className="w-[110px] h-8 text-xs border-border bg-transparent shadow-none">
+          <SelectTrigger className="w-[110px] h-8 text-xs border-border/50 bg-transparent shadow-none">
             <SelectValue placeholder="Chart Type" />
           </SelectTrigger>
           <SelectContent>
@@ -447,7 +448,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
       <CardFooter className="flex-col gap-2 pt-4 border-t border-border mt-4">
         <div className="flex items-center gap-2 text-xs font-medium text-foreground">
           {hubProfile.primaryHub.label} leading by shipment volume{' '}
-          <TrendingUp className="h-3 w-3 text-primary" />
+          <AppIcon icon={TrendingUp} size={16} className="h-3 w-3 text-primary" />
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           Based on current origin-hub shipment records

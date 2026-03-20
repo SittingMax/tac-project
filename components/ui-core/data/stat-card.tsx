@@ -1,15 +1,14 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowUp01Icon, ArrowDown01Icon } from '@hugeicons/core-free-icons';
+import { TrendingUp, TrendingDown, type LucideIcon } from 'lucide-react';
+import { AppIcon } from '../utils/app-icon';
 
 interface StatCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title: React.ReactNode;
   value: React.ReactNode;
   subtitle?: React.ReactNode;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  icon?: any;
+  icon?: LucideIcon;
   iconColor?: 'primary' | 'success' | 'warning' | 'error' | 'muted';
   trend?: {
     value: number | string;
@@ -36,7 +35,7 @@ export function StatCard({
   title,
   value,
   subtitle,
-  icon,
+  icon: Icon,
   iconColor = 'primary',
   trend,
   className,
@@ -57,10 +56,10 @@ export function StatCard({
                 )}
               >
                 {trend.direction === 'up' && (
-                  <HugeiconsIcon icon={ArrowUp01Icon} className="mr-0.5 size-3" />
+                  <AppIcon icon={TrendingUp} size={16} className="mr-0.5" />
                 )}
                 {trend.direction === 'down' && (
-                  <HugeiconsIcon icon={ArrowDown01Icon} className="mr-0.5 size-3" />
+                  <AppIcon icon={TrendingDown} size={16} className="mr-0.5" />
                 )}
                 {trend.value}
                 {trend.label && (
@@ -71,14 +70,14 @@ export function StatCard({
           </div>
           {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
         </div>
-        {icon && (
+        {Icon && (
           <div
             className={cn(
               'flex size-10 shrink-0 items-center justify-center rounded-lg',
               iconColorMap[iconColor]
             )}
           >
-            <HugeiconsIcon icon={icon} className="size-5" />
+            <AppIcon icon={Icon} size={20} />
           </div>
         )}
       </div>

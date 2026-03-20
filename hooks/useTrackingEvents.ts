@@ -24,6 +24,11 @@ export interface TrackingEvent {
   notes?: string | null;
 }
 
+type TrackingEventViewRow = TrackingEvent & {
+  hub_code?: string | null;
+  hub_name?: string | null;
+};
+
 export function useTrackingEvents(awbNumber: string | null) {
   const queryClient = useQueryClient();
 
@@ -40,11 +45,10 @@ export function useTrackingEvents(awbNumber: string | null) {
       if (error) throw error;
 
       // Map view result to TrackingEvent shape if needed (view flattens hub details)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return data.map((event: any) => ({
+      return (data as TrackingEventViewRow[]).map((event) => ({
         ...event,
-        hub: event.hub_code ? { code: event.hub_code, name: event.hub_name } : undefined,
-      })) as TrackingEvent[];
+        hub: event.hub_code ? { code: event.hub_code, name: event.hub_name ?? '' } : undefined,
+      }));
     },
     enabled: !!awbNumber,
   });

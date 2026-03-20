@@ -8,17 +8,17 @@ import {
   ArrowLeft,
   Eye,
   EyeOff,
-  Mail,
-  Lock,
   Shield,
   LogIn,
-  Wifi,
   Loader2,
   AlertCircle,
   Check,
 } from 'lucide-react';
 import { TacLogo } from '@/components/shared/tac-logo';
 import { AnimatedThemeToggler } from '../../components/ui/animated-theme-toggler';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { getDefaultRouteForRole } from '@/lib/access-control';
 import { gsap } from '@/lib/gsap';
 
@@ -207,39 +207,14 @@ export const Login: React.FC = () => {
 
       <main className="relative flex min-h-screen items-center justify-center p-4 sm:p-6">
         {/* Card */}
-        <div ref={cardRef} className="relative z-10 w-full max-w-3xl opacity-0">
-          <div className="group relative overflow-hidden rounded-lg border border-black/10 dark:border-white/10 bg-white/70 dark:bg-white/10 backdrop-blur-lg shadow-2xl shadow-black/10 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/10 transition-all duration-300 hover:border-black/15 dark:hover:border-white/20 hover:ring-black/10 dark:hover:ring-white/20">
+        <div ref={cardRef} className="relative z-10 w-full max-w-md mx-auto opacity-0">
+          <div className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/40 dark:bg-black/40 backdrop-blur-2xl shadow-2xl ring-1 ring-black/5 dark:ring-white/10">
             {/* Top hairline */}
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/20 to-transparent" />
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
 
-            {/* Split: Image + Form */}
-            <div className="relative flex flex-col sm:flex-row">
-              {/* Image (Left) */}
-              <div
-                ref={imageRef}
-                className="relative w-full sm:w-1/2 h-40 sm:h-auto sm:min-h-[320px] overflow-hidden opacity-0"
-              >
-                <img
-                  src="/tac-hero-bg.jpeg"
-                  alt="TAC logistics"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[8s] ease-out group-hover:scale-[1.03]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-black/60 via-black/30 to-transparent" />
-
-                {/* Overlay badge */}
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-md border border-white/10 bg-black/30 px-4 py-2 backdrop-blur-md">
-                  <div className="flex items-center gap-2 text-xs text-white/80">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/30 text-primary">
-                      <Wifi className="h-3 w-3" />
-                    </div>
-                    <span className="text-xs font-medium tracking-tight">System Online</span>
-                  </div>
-                  <span className="text-[11px] text-white/60">TAC v4.1</span>
-                </div>
-              </div>
-
-              {/* Form (Right) */}
-              <div className="p-4 sm:p-8 w-full sm:w-1/2">
+            {/* Unified Centered Form */}
+            <div className="relative flex flex-col">
+              <div className="p-8 sm:p-10 w-full">
                 <div ref={formItemsRef}>
                   {/* Logo */}
                   <div className="mb-6 flex items-center justify-between">
@@ -279,25 +254,20 @@ export const Login: React.FC = () => {
                   <form onSubmit={handleLogin} className="space-y-4">
                     {/* Email Field - Enhanced */}
                     <div className="space-y-2">
-                      <label
+                      <Label
                         htmlFor="login-email"
-                        className="block text-xs font-semibold text-foreground"
+                        className="block text-sm font-medium text-foreground"
                       >
                         Email address
-                      </label>
+                      </Label>
                       <div
-                        className={`group/input relative flex items-center rounded-md border bg-background px-4 h-12 transition-all duration-200 ${
+                        className={`group/input relative flex items-center rounded-lg border-0 bg-muted/30 px-4 h-12 transition-all duration-200 ${
                           focusedField === 'email'
-                            ? 'border-primary ring-2 ring-primary/10'
-                            : 'border-border hover:border-border/80'
-                        } ${error ? 'border-destructive/50 ring-1 ring-destructive/20' : ''}`}
+                            ? 'ring-1 ring-primary/50 bg-muted/50'
+                            : ''
+                        } ${error ? 'ring-1 ring-destructive/50 bg-destructive/10' : ''}`}
                       >
-                        <Mail
-                          className={`mr-3 h-5 w-5 shrink-0 transition-colors ${
-                            focusedField === 'email' ? 'text-primary' : 'text-muted-foreground'
-                          }`}
-                        />
-                        <input
+                        <Input
                           id="login-email"
                           type="email"
                           inputMode="email"
@@ -310,21 +280,21 @@ export const Login: React.FC = () => {
                           disabled={isLoading}
                           data-testid="login-email-input"
                           aria-describedby={error ? 'login-error-message' : undefined}
-                          className="w-full bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none disabled:opacity-50"
+                          className="w-full border-0 bg-transparent px-0 text-sm font-medium text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-50 shadow-none"
                         />
-                        {email && <Check className="ml-2 h-4 w-4 text-status-success shrink-0" />}
+                        {email && <Check className="ml-2 h-4 w-4 text-primary shrink-0 transition-opacity opacity-70" />}
                       </div>
                     </div>
 
                     {/* Password Field - Enhanced */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <label
+                        <Label
                           htmlFor="login-password"
-                          className="block text-xs font-semibold text-foreground"
+                          className="block text-sm font-medium text-foreground"
                         >
                           Password
-                        </label>
+                        </Label>
                         <a
                           href="mailto:support@tac-cargo.com?subject=Password%20Reset%20Request"
                           className="text-xs text-primary hover:text-primary/80 hover:underline transition-colors"
@@ -333,18 +303,13 @@ export const Login: React.FC = () => {
                         </a>
                       </div>
                       <div
-                        className={`group/input relative flex items-center rounded-md border bg-background px-4 h-12 transition-all duration-200 ${
+                        className={`group/input relative flex items-center rounded-lg border-0 bg-muted/30 px-4 h-12 transition-all duration-200 ${
                           focusedField === 'password'
-                            ? 'border-primary ring-2 ring-primary/10'
-                            : 'border-border hover:border-border/80'
-                        } ${error ? 'border-destructive/50 ring-1 ring-destructive/20' : ''}`}
+                            ? 'ring-1 ring-primary/50 bg-muted/50'
+                            : ''
+                        } ${error ? 'ring-1 ring-destructive/50 bg-destructive/10' : ''}`}
                       >
-                        <Lock
-                          className={`mr-3 h-5 w-5 shrink-0 transition-colors ${
-                            focusedField === 'password' ? 'text-primary' : 'text-muted-foreground'
-                          }`}
-                        />
-                        <input
+                        <Input
                           id="login-password"
                           type={showPassword ? 'text' : 'password'}
                           autoComplete="current-password"
@@ -356,19 +321,19 @@ export const Login: React.FC = () => {
                           disabled={isLoading}
                           data-testid="login-password-input"
                           aria-describedby={error ? 'login-error-message' : undefined}
-                          className="w-full bg-transparent text-sm font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none disabled:opacity-50"
+                          className="w-full border-0 bg-transparent px-0 text-sm font-medium text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-50 shadow-none"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="ml-2 grid h-8 w-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                          className="ml-2 grid h-8 w-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors focus-visible:ring-1 focus-visible:ring-primary/50 outline-none"
                           aria-label={showPassword ? 'Hide password' : 'Show password'}
                           title={showPassword ? 'Hide password' : 'Show password'}
                         >
                           {showPassword ? (
-                            <EyeOff className="h-4 w-4" />
+                            <EyeOff className="h-4 w-4 opacity-70" />
                           ) : (
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-4 w-4 opacity-70" />
                           )}
                         </button>
                       </div>
@@ -377,7 +342,7 @@ export const Login: React.FC = () => {
                     {/* Remember Me & Submit */}
                     <div className="space-y-4">
                       {/* Remember Me Checkbox */}
-                      <label className="flex items-center gap-2 cursor-pointer group">
+                      <Label className="flex items-center gap-2 cursor-pointer group">
                         <div className="relative">
                           <input
                             type="checkbox"
@@ -395,30 +360,27 @@ export const Login: React.FC = () => {
                         <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
                           Remember email for 30 days
                         </span>
-                      </label>
+                      </Label>
 
                       {/* Submit Button - Enhanced */}
-                      <button
+                      <Button
                         type="submit"
                         disabled={isLoading}
                         data-testid="login-submit-button"
-                        className="group/btn relative w-full inline-flex items-center justify-center rounded-md bg-primary h-12 px-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 outline-none transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 overflow-hidden"
+                        className="w-full h-12 text-sm font-semibold shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
                       >
-                        <div className="absolute inset-0 h-full w-full scale-0 rounded-md transition-all duration-300 ease-out group-hover/btn:scale-100 group-hover/btn:bg-primary-foreground/10"></div>
-                        <span className="relative z-10 flex items-center">
-                          {isLoading ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Authenticating...
-                            </>
-                          ) : (
-                            <>
-                              <LogIn className="mr-2 h-4 w-4" />
-                              Sign in to Dashboard
-                            </>
-                          )}
-                        </span>
-                      </button>
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Authenticating...
+                          </>
+                        ) : (
+                          <>
+                            <LogIn className="mr-2 h-4 w-4" />
+                            Sign in to Dashboard
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </form>
                 </div>

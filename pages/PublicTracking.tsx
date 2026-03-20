@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import type { Database } from '@/lib/database.types';
 import { HUBS } from '@/lib/constants';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,7 @@ import {
   UserCircle,
   Receipt,
 } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 
 interface ShipmentRecord {
   cn_number: string;
@@ -49,6 +51,54 @@ interface TrackingData {
   events: TrackingEventRecord[];
 }
 
+type PublicHubRecord = {
+  code: string | null;
+  name: string | null;
+};
+
+type PublicHubRelation = PublicHubRecord[] | PublicHubRecord | null;
+
+type PublicShipmentViewRow = Database['public']['Views']['public_shipment_tracking']['Row'] & {
+  origin_hub?: PublicHubRelation;
+  destination_hub?: PublicHubRelation;
+};
+
+type PublicTrackingEventViewRow = Database['public']['Views']['public_tracking_events']['Row'] & {
+  hub?: PublicHubRelation;
+};
+
+const mapPublicHub = (hub?: PublicHubRelation): { code: string; name: string } | null => {
+  const normalizedHub = Array.isArray(hub) ? hub[0] : hub;
+  if (!normalizedHub?.code) {
+    return null;
+  }
+
+  return {
+    code: normalizedHub.code,
+    name: normalizedHub.name ?? normalizedHub.code,
+  };
+};
+
+const mapShipmentRecord = (shipment: PublicShipmentViewRow): ShipmentRecord => ({
+  cn_number: shipment.cn_number ?? '',
+  status: shipment.status ?? 'CREATED',
+  service_level: shipment.service_level ?? 'STANDARD',
+  mode: shipment.mode ?? undefined,
+  origin_hub_id: shipment.origin_hub_id,
+  destination_hub_id: shipment.destination_hub_id,
+  package_count: shipment.package_count ?? 0,
+  total_weight: shipment.total_weight ?? 0,
+  origin_hub: mapPublicHub(shipment.origin_hub),
+  destination_hub: mapPublicHub(shipment.destination_hub),
+});
+
+const mapTrackingEventRecord = (event: PublicTrackingEventViewRow): TrackingEventRecord => ({
+  id: event.id ?? '',
+  event_code: event.event_code ?? '',
+  event_time: event.event_time,
+  hub: mapPublicHub(event.hub),
+});
+
 const resolveHubCode = (hub?: { code: string; name: string } | null, hubId?: string | null) => {
   if (hub?.code) {
     return hub.code;
@@ -75,9 +125,8 @@ export function PublicTracking() {
       if (!awb) return null;
 
       // Fetch shipment via secure public view (excludes PII)
-      const { data: shipment, error: shipmentError } = await (supabase
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .from('public_shipment_tracking' as any)
+      const shipmentQuery = supabase
+        .from('public_shipment_tracking')
         .select(
           `
           *,
@@ -86,16 +135,17 @@ export function PublicTracking() {
         `
         )
         .eq('cn_number', awb)
-        .limit(1)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .maybeSingle() as any);
+        .limit(1);
+      const { data: shipmentData, error: shipmentError } = await shipmentQuery.maybeSingle();
 
       if (shipmentError) throw shipmentError;
+      if (!shipmentData) return null;
+
+      const shipment = shipmentData as PublicShipmentViewRow;
 
       // Fetch tracking events via secure public view (excludes actor_staff_id, notes, meta)
-      const { data: events, error: eventsError } = await (supabase
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .from('public_tracking_events' as any)
+      const eventsQuery = supabase
+        .from('public_tracking_events')
         .select(
           `
           *,
@@ -103,14 +153,15 @@ export function PublicTracking() {
         `
         )
         .eq('cn_number', awb)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .order('event_time', { ascending: false }) as any);
+        .order('event_time', { ascending: false });
+      const { data: eventsData, error: eventsError } = await eventsQuery;
 
       if (eventsError) throw eventsError;
+      const events = (eventsData ?? []) as PublicTrackingEventViewRow[];
 
       return {
-        shipment: shipment as unknown as ShipmentRecord,
-        events: (events || []) as unknown as TrackingEventRecord[],
+        shipment: mapShipmentRecord(shipment),
+        events: events.map(mapTrackingEventRecord),
       };
     },
     enabled: !!awb,
@@ -130,7 +181,7 @@ export function PublicTracking() {
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-status-info to-status-success flex items-center justify-center">
-              <Package className="w-6 h-6 text-foreground" />
+              <AppIcon icon={Package} size={24} className="text-foreground" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">TAC Cargo</h1>
@@ -149,31 +200,35 @@ export function PublicTracking() {
               value="track"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              <Search className="w-4 h-4 mr-2" /> Track
+              <AppIcon icon={Search} size={16} className="mr-2" /> Track
             </TabsTrigger>
             <TabsTrigger
               value="book"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              <Package className="w-4 h-4 mr-2" /> Book
+              <AppIcon icon={Package} size={16} className="mr-2" /> Book
             </TabsTrigger>
             <TabsTrigger
               value="account"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              <UserCircle className="w-4 h-4 mr-2" /> Account
+              <AppIcon icon={UserCircle} size={16} className="mr-2" /> Account
             </TabsTrigger>
           </TabsList>
 
           <TabsContent
             value="track"
-            className="mt-0 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+            className="mt-0 flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
           >
             {/* Search Form */}
             <Card className="p-6 bg-card/50 border-border">
               <form onSubmit={handleSearch} className="flex gap-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <AppIcon
+                    icon={Search}
+                    size={20}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  />
                   <Input
                     value={searchAwb}
                     onChange={(e) => setSearchAwb(e.target.value)}
@@ -198,7 +253,11 @@ export function PublicTracking() {
             {/* Error State */}
             {error && (
               <Card className="p-8 text-center bg-card/50 border-border">
-                <Package className="w-12 h-12 text-destructive mx-auto mb-4" />
+                <AppIcon
+                  icon={Package}
+                  size={32}
+                  className="text-destructive mx-auto w-12 h-12 mb-4"
+                />
                 <h3 className="text-lg font-semibold text-foreground mb-2">Shipment Not Found</h3>
                 <p className="text-muted-foreground">
                   We couldn't find a shipment with AWB:{' '}
@@ -213,7 +272,11 @@ export function PublicTracking() {
             {/* No AWB State */}
             {!awb && !isLoading && (
               <Card className="p-8 text-center bg-card/50 border-border">
-                <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <AppIcon
+                  icon={Search}
+                  size={32}
+                  className="text-muted-foreground mx-auto w-12 h-12 mb-4"
+                />
                 <h3 className="text-lg font-semibold text-foreground mb-2">Track Your Shipment</h3>
                 <p className="text-muted-foreground">
                   Enter your CN Number above to track your shipment in real-time.
@@ -223,7 +286,7 @@ export function PublicTracking() {
 
             {/* Tracking Results */}
             {data?.shipment && (
-              <div className="space-y-6">
+              <div className="flex flex-col gap-6">
                 {/* Shipment Overview */}
                 <Card className="p-6 bg-card/80 border-border">
                   <div className="flex items-start justify-between mb-6">
@@ -241,7 +304,7 @@ export function PublicTracking() {
                   {/* Route */}
                   <div className="flex items-center gap-4 p-4 rounded-md bg-muted/50 mb-6">
                     <div className="text-center">
-                      <MapPin className="w-6 h-6 text-status-info mx-auto mb-1" />
+                      <AppIcon icon={MapPin} size={24} className="text-status-info mx-auto mb-1" />
                       <p className="text-lg font-bold text-foreground">
                         {resolveHubCode(data.shipment.origin_hub, data.shipment.origin_hub_id)}
                       </p>
@@ -250,15 +313,19 @@ export function PublicTracking() {
                     <div className="flex-1 flex items-center justify-center">
                       <div className="h-0.5 flex-1 bg-border" />
                       {data.shipment.service_level === 'EXPRESS' ? (
-                        <Plane className="w-6 h-6 text-status-info mx-2" />
+                        <AppIcon icon={Plane} size={24} className="text-status-info mx-2" />
                       ) : (
-                        <Truck className="w-6 h-6 text-status-info mx-2" />
+                        <AppIcon icon={Truck} size={24} className="text-status-info mx-2" />
                       )}
-                      <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                      <AppIcon icon={ArrowRight} size={16} className="text-muted-foreground" />
                       <div className="h-0.5 flex-1 bg-border" />
                     </div>
                     <div className="text-center">
-                      <MapPin className="w-6 h-6 text-status-success mx-auto mb-1" />
+                      <AppIcon
+                        icon={MapPin}
+                        size={24}
+                        className="text-status-success mx-auto mb-1"
+                      />
                       <p className="text-lg font-bold text-foreground">
                         {resolveHubCode(
                           data.shipment.destination_hub,
@@ -289,9 +356,9 @@ export function PublicTracking() {
                         {String(data.shipment.mode || '')
                           .toUpperCase()
                           .includes('AIR') ? (
-                          <Plane className="w-4 h-4" />
+                          <AppIcon icon={Plane} size={16} />
                         ) : (
-                          <Truck className="w-4 h-4" />
+                          <AppIcon icon={Truck} size={16} />
                         )}
                         {data.shipment.mode}
                       </p>
@@ -308,7 +375,7 @@ export function PublicTracking() {
                 {/* Tracking Timeline */}
                 <Card className="p-6 bg-card/80 border-border">
                   <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-status-info" />
+                    <AppIcon icon={Clock} size={20} className="text-status-info" />
                     Tracking History
                   </h3>
 
@@ -335,7 +402,7 @@ export function PublicTracking() {
                     contact our support team with your CN Number.
                   </p>
                   <div className="flex items-center gap-2 text-status-info">
-                    <Package className="w-4 h-4" />
+                    <AppIcon icon={Package} size={16} />
                     <span className="font-mono">{data.shipment.cn_number}</span>
                   </div>
                 </Card>
@@ -356,14 +423,14 @@ export function PublicTracking() {
           >
             <Card className="p-12 text-center bg-card/50 border-border">
               <div className="w-16 h-16 rounded-xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
-                <Receipt className="w-8 h-8 text-primary" />
+                <AppIcon icon={Receipt} size={32} className="text-primary w-12 h-12" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-4">Portal Access & Support</h3>
               <p className="text-muted-foreground mb-8 max-w-md mx-auto">
                 Dashboard sign-in is available for TAC operations staff. For invoice history,
                 statements, or account assistance, contact our team and share your CN Number.
               </p>
-              <div className="max-w-xs mx-auto space-y-3">
+              <div className="max-w-xs mx-auto flex flex-col gap-3">
                 <Button className="w-full" onClick={() => navigate('/login')}>
                   Sign In to Dashboard
                 </Button>

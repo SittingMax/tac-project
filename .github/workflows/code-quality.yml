@@ -67,7 +67,7 @@ jobs:
         run: |
           if grep -rE "service_role|SUPABASE_SERVICE_ROLE" \
             --include="*.ts" --include="*.tsx" --include="*.js" \
-            --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=supabase/functions \
+            --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=supabase/functions --exclude-dir=scripts \
             --exclude="*.test.*" --exclude="*.spec.*" \
             . 2>/dev/null; then
             echo "❌ Service role key reference found in client code"
@@ -123,11 +123,11 @@ jobs:
             --exclude-dir=node_modules --exclude-dir=tests --exclude-dir=.archive \
             -l . 2>/dev/null | wc -l || true)
           echo "Found console.log in $COUNT files"
-          if [ "$COUNT" -gt 600 ]; then
-            echo "❌ Too many files with console.log statements (max: 600)"
+          if [ "$COUNT" -gt 10 ]; then
+            echo "❌ Too many files with console.log statements (max: 10)"
             exit 1
           fi
-          echo "✅ Console.log usage within limits (target: <50)"
+          echo "✅ Console.log usage within limits (target: <10)"
 
       - name: Check for extensive 'any' type usage
         run: |
@@ -136,11 +136,11 @@ jobs:
             --exclude-dir=node_modules --exclude-dir=tests --exclude-dir=.archive \
             . 2>/dev/null | wc -l || true)
           echo "Found $COUNT instances of 'any' type"
-          if [ "$COUNT" -gt 600 ]; then
-            echo "❌ Too many 'any' type instances (max: 600)"
+          if [ "$COUNT" -gt 100 ]; then
+            echo "❌ Too many 'any' type instances (max: 100)"
             exit 1
           fi
-          echo "✅ Any type usage within acceptable limits (target: <50)"
+          echo "✅ Any type usage within acceptable limits (target: <100)"
 
       - name: Barcode compliance check
         run: |

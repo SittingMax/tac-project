@@ -79,8 +79,7 @@ const ArrivalAudit = lazy(() =>
 
 export interface AppRoute {
   path: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  element: React.LazyExoticComponent<React.ComponentType<any>>;
+  element: React.LazyExoticComponent<React.ComponentType<Record<string, never>>>;
   protected?: boolean;
   layout?: boolean;
   allowedRoles?: UserRole[];

@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { format } from 'date-fns';
+import { formatDateTime } from '@/lib/formatters';
 import { useSearchParams } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CrudTable } from '@/components/crud/CrudTable';
 import type { ColumnDef } from '@tanstack/react-table';
+import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
+import { StatCard } from '@/components/ui-core';
+import { SizedDialog } from '@/components/ui-core/dialog/sized-dialog';
 import {
   Loader2,
   Mail,
@@ -19,14 +22,6 @@ import {
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import { useAuthStore } from '@/store/authStore';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
 
 interface Message {
   id: string;
@@ -76,8 +71,7 @@ export function Messages() {
       toast.error('Failed to fetch messages');
       logger.error('Messages', 'Error', { error });
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setMessages((data as any) || []);
+      setMessages(Array.isArray(data) ? (data as Message[]) : []);
     }
     setLoading(false);
   }, [statusFilter, user]);
@@ -216,11 +210,23 @@ export function Messages() {
     toast.success('Marked as replied');
   };
 
+  const unreadCount = messages.filter((message) => message.status === 'unread').length;
+  const repliedCount = messages.filter((message) => message.replied).length;
+  const archivedCount = messages.filter((message) => message.archived).length;
+
   if (loading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <PageContainer>
+        <PageHeader
+          title="Messages"
+          description="Captured contact submissions for your organization"
+        />
+        <SectionCard>
+          <div className="flex h-[40vh] items-center justify-center">
+            <Loader2 size={32} strokeWidth={1.5} className="animate-spin text-primary" />
+          </div>
+        </SectionCard>
+      </PageContainer>
     );
   }
 
@@ -229,9 +235,7 @@ export function Messages() {
       accessorKey: 'created_at',
       header: 'Date',
       cell: ({ row }) => (
-        <span className="whitespace-nowrap">
-          {format(new Date(row.original.created_at), 'MMM d, yyyy HH:mm')}
-        </span>
+        <span className="whitespace-nowrap">{formatDateTime(row.original.created_at)}</span>
       ),
     },
     {
@@ -248,7 +252,7 @@ export function Messages() {
           <>
             {msg.phone && (
               <div className="flex items-center gap-1 text-sm">
-                <MessageCircle className="h-3 w-3 text-status-success" />
+                <MessageCircle size={12} strokeWidth={1.5} className="text-status-success" />
                 {msg.phone}
               </div>
             )}
@@ -291,7 +295,7 @@ export function Messages() {
       cell: ({ row }) => {
         const msg = row.original;
         return (
-          <div className="text-right space-x-2" onClick={(e) => e.stopPropagation()}>
+          <div className="text-right flex gap-2 items-center" onClick={(e) => e.stopPropagation()}>
             <Button
               variant="outline"
               size="sm"
@@ -301,7 +305,7 @@ export function Messages() {
                 openMessage(msg);
               }}
             >
-              <Eye className="h-4 w-4" />
+              <Eye size={16} strokeWidth={1.5} />
               View
             </Button>
             <Button
@@ -312,11 +316,12 @@ export function Messages() {
                 updateStatus(msg.id, msg.status === 'unread' ? 'read' : 'unread');
               }}
               title={msg.status === 'unread' ? 'Mark as Read' : 'Mark as Unread'}
+              aria-label={msg.status === 'unread' ? 'Mark as Read' : 'Mark as Unread'}
             >
               {msg.status === 'unread' ? (
-                <Mail className="h-4 w-4" />
+                <Mail size={16} strokeWidth={1.5} />
               ) : (
-                <CheckCircle className="h-4 w-4" />
+                <CheckCircle size={16} strokeWidth={1.5} />
               )}
             </Button>
             <Button
@@ -327,8 +332,9 @@ export function Messages() {
                 toggleArchive(msg.id, msg.archived);
               }}
               title={msg.archived ? 'Unarchive' : 'Archive'}
+              aria-label={msg.archived ? 'Unarchive message' : 'Archive message'}
             >
-              <Archive className="h-4 w-4" />
+              <Archive size={16} strokeWidth={1.5} />
             </Button>
             <Button
               variant="ghost"
@@ -339,8 +345,9 @@ export function Messages() {
                 deleteMessage(msg.id);
               }}
               title="Delete"
+              aria-label="Delete message"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 size={16} strokeWidth={1.5} />
             </Button>
           </div>
         );
@@ -349,127 +356,128 @@ export function Messages() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
-          Messages
-        </h1>
-        <Button onClick={fetchMessages} variant="outline" size="sm">
+    <PageContainer>
+      <PageHeader title="Messages" description="Captured contact submissions for your organization">
+        <Button
+          onClick={() => {
+            void fetchMessages();
+          }}
+          variant="outline"
+          size="sm"
+        >
           Refresh
         </Button>
+      </PageHeader>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <StatCard title="Unread" value={unreadCount} icon={Mail} />
+        <StatCard title="Replied" value={repliedCount} icon={CheckCircle} iconColor="success" />
+        <StatCard title="Archived" value={archivedCount} icon={Archive} iconColor="muted" />
       </div>
 
-      <div className="rounded-xl border border-border/40 overflow-hidden bg-card text-foreground shadow-xs">
-        <div className="p-6 pb-4 border-b border-border/40">
-          <h2 className="text-xl font-semibold tracking-tight">Inbox</h2>
-        </div>
-        <div className="border border-border/40 bg-card rounded-b-xl overflow-hidden shadow-xs border-x-0 border-b-0">
-          <CrudTable columns={columns} data={messages} pageSize={10} onRowClick={openMessage} />
-        </div>
-      </div>
+      <SectionCard title="Inbox" description="Review, open, and action incoming contact messages">
+        <CrudTable columns={columns} data={messages} pageSize={10} onRowClick={openMessage} />
+      </SectionCard>
 
-      <Dialog open={!!selectedMessage} onOpenChange={(open) => !open && setSelectedMessage(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Message Details</DialogTitle>
-            <DialogDescription>
-              Received on {selectedMessage && format(new Date(selectedMessage.created_at), 'PPP p')}
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedMessage && (
-            <div className="space-y-6 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <h4 className="text-sm font-medium text-muted-foreground">From</h4>
-                  <p className="text-base font-medium">{selectedMessage.name}</p>
-                  {selectedMessage.phone && (
-                    <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MessageCircle className="h-4 w-4 text-status-success" />
-                      {selectedMessage.phone}
-                    </p>
-                  )}
-                  {selectedMessage.email && (
-                    <p className="text-sm text-muted-foreground">{selectedMessage.email}</p>
-                  )}
-                </div>
-                <div className="space-y-1 text-right">
-                  <h4 className="text-sm font-medium text-muted-foreground">Status</h4>
-                  <div className="flex justify-end gap-2">
-                    <Badge variant={selectedMessage.status === 'unread' ? 'default' : 'secondary'}>
-                      {selectedMessage.status}
-                    </Badge>
-                    {selectedMessage.replied && (
-                      <Badge
-                        variant="outline"
-                        className="bg-status-success/10 text-status-success border-status-success/30"
-                      >
-                        Replied
-                      </Badge>
-                    )}
-                    {selectedMessage.archived && <Badge variant="outline">Archived</Badge>}
-                  </div>
-                </div>
+      <SizedDialog
+        open={!!selectedMessage}
+        onOpenChange={(open) => !open && setSelectedMessage(null)}
+        title="Message Details"
+        description={
+          selectedMessage ? `Received on ${formatDateTime(selectedMessage.created_at)}` : ''
+        }
+        size="xl"
+      >
+        {selectedMessage && (
+          <div className="flex flex-col gap-6 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1">
+                <h4 className="text-sm font-medium text-muted-foreground">From</h4>
+                <p className="text-base font-medium">{selectedMessage.name}</p>
+                {selectedMessage.phone && (
+                  <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <MessageCircle size={16} strokeWidth={1.5} className="text-status-success" />
+                    {selectedMessage.phone}
+                  </p>
+                )}
+                {selectedMessage.email && (
+                  <p className="text-sm text-muted-foreground">{selectedMessage.email}</p>
+                )}
               </div>
-
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-muted-foreground">Message</h4>
-                <div className="p-4 bg-muted/30 rounded-md border border-border text-sm leading-relaxed whitespace-pre-wrap">
-                  {selectedMessage.message}
-                </div>
-              </div>
-
-              {/* Reply Action */}
-              <div className="pt-4 border-t">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  {selectedMessage.phone ? (
-                    <Button
-                      className="w-full sm:w-auto bg-status-success hover:bg-status-success/80 text-primary-foreground"
-                      onClick={handleWhatsAppClick}
+              <div className="flex flex-col gap-1 text-right">
+                <h4 className="text-sm font-medium text-muted-foreground">Status</h4>
+                <div className="flex justify-end gap-2">
+                  <Badge variant={selectedMessage.status === 'unread' ? 'default' : 'secondary'}>
+                    {selectedMessage.status}
+                  </Badge>
+                  {selectedMessage.replied && (
+                    <Badge
+                      variant="outline"
+                      className="bg-status-success/10 text-status-success border-status-success/30"
                     >
-                      <MessageCircle className="mr-2 h-4 w-4" />
-                      Open WhatsApp
-                      <ExternalLink className="ml-2 h-3 w-3 opacity-70" />
-                    </Button>
-                  ) : (
-                    <div className="p-4 bg-status-warning/10 text-status-warning rounded-md text-sm border border-status-warning/30">
-                      This contact does not have a WhatsApp number associated with it.
-                    </div>
+                      Replied
+                    </Badge>
                   )}
-                  {!selectedMessage.replied && (
-                    <Button variant="outline" onClick={() => void markSelectedMessageAsReplied()}>
-                      Mark as Replied
-                    </Button>
-                  )}
+                  {selectedMessage.archived && <Badge variant="outline">Archived</Badge>}
                 </div>
               </div>
             </div>
-          )}
 
-          <DialogFooter className="gap-2 sm:gap-0 mt-2">
-            {selectedMessage && (
-              <>
-                <div className="flex mr-auto gap-2">
+            <div className="flex flex-col gap-2">
+              <h4 className="text-sm font-medium text-muted-foreground">Message</h4>
+              <div className="p-4 bg-muted/30 rounded-md border border-border text-sm leading-relaxed whitespace-pre-wrap">
+                {selectedMessage.message}
+              </div>
+            </div>
+
+            {/* Reply Action */}
+            <div className="pt-4 border-t">
+              <div className="flex flex-col sm:flex-row gap-2">
+                {selectedMessage.phone ? (
                   <Button
-                    variant="outline"
-                    onClick={() => toggleArchive(selectedMessage.id, selectedMessage.archived)}
+                    className="w-full sm:w-auto bg-status-success hover:bg-status-success/80 text-primary-foreground"
+                    onClick={handleWhatsAppClick}
                   >
-                    {selectedMessage.archived ? 'Unarchive' : 'Archive'}
+                    <MessageCircle size={16} strokeWidth={1.5} className="mr-2" />
+                    Open WhatsApp
+                    <ExternalLink size={12} strokeWidth={1.5} className="ml-2 opacity-70" />
                   </Button>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="destructive" onClick={() => deleteMessage(selectedMessage.id)}>
-                    Delete
+                ) : (
+                  <div className="p-4 bg-status-warning/10 text-status-warning rounded-md text-sm border border-status-warning/30">
+                    This contact does not have a WhatsApp number associated with it.
+                  </div>
+                )}
+                {!selectedMessage.replied && (
+                  <Button variant="outline" onClick={() => void markSelectedMessageAsReplied()}>
+                    Mark as Replied
                   </Button>
-                  <Button variant="secondary" onClick={() => setSelectedMessage(null)}>
-                    Close
-                  </Button>
-                </div>
-              </>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {selectedMessage && (
+          <div className="mt-2 flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => toggleArchive(selectedMessage.id, selectedMessage.archived)}
+              >
+                {selectedMessage.archived ? 'Unarchive' : 'Archive'}
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="destructive" onClick={() => deleteMessage(selectedMessage.id)}>
+                Delete
+              </Button>
+              <Button variant="secondary" onClick={() => setSelectedMessage(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        )}
+      </SizedDialog>
+    </PageContainer>
   );
 }

@@ -16,10 +16,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { PageHeader } from '@/components/ui/page-header';
+import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/layout';
 import { useAuthStore } from '@/store/authStore';
 import { supabase } from '@/lib/supabase';
 import { queryClient } from '@/lib/query-client';
+import { FormSection, FormGrid, FormFooter } from '@/components/ui-core';
 
 // CRUD Components
 import { CrudTable } from '@/components/crud/CrudTable';
@@ -162,7 +163,7 @@ export const Management: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+    <PageContainer>
       <PageHeader title="Staff & Hubs" description="Manage access control and personnel">
         {isSuperAdmin && (
           <Button onClick={() => setCreateUserOpen(true)} variant="destructive">
@@ -171,92 +172,103 @@ export const Management: React.FC = () => {
         )}
       </PageHeader>
 
-      <CrudTable
-        columns={columns}
-        data={staff}
-        searchKey="full_name"
-        searchPlaceholder="Search staff..."
-        isLoading={isLoading}
-        emptyMessage="No staff members found."
-      />
+      <SectionCard>
+        <CrudTable
+          columns={columns}
+          data={staff}
+          isLoading={isLoading}
+          searchKey="staff"
+          searchPlaceholder="Search staff..."
+          emptyMessage="No staff members found."
+          density="compact"
+          className="[&_tr]:border-border/40"
+        />
+      </SectionCard>
 
       {/* Super Admin Create User Modal */}
       <Dialog open={createUserOpen} onOpenChange={setCreateUserOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Super Admin: Create User</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleCreateUser} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="create-email">Email</Label>
-              <Input
-                id="create-email"
-                type="email"
-                required
-                value={createUserForm.email}
-                onChange={(e) => setCreateUserForm((prev) => ({ ...prev, email: e.target.value }))}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="create-password">Password</Label>
-              <Input
-                id="create-password"
-                type="password"
-                required
-                value={createUserForm.password}
-                onChange={(e) =>
-                  setCreateUserForm((prev) => ({ ...prev, password: e.target.value }))
-                }
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="create-fullname">Full Name</Label>
-              <Input
-                id="create-fullname"
-                required
-                value={createUserForm.fullName}
-                onChange={(e) =>
-                  setCreateUserForm((prev) => ({ ...prev, fullName: e.target.value }))
-                }
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="create-role">Role</Label>
-                <Select
-                  value={createUserForm.role}
-                  onValueChange={(val) => setCreateUserForm((prev) => ({ ...prev, role: val }))}
-                >
-                  <SelectTrigger id="create-role">
-                    <SelectValue placeholder="Select Role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ADMIN">Admin</SelectItem>
-                    <SelectItem value="MANAGER">Manager</SelectItem>
-                    <SelectItem value="OPS_STAFF">Operations Staff</SelectItem>
-                    <SelectItem value="WAREHOUSE_STAFF">Warehouse Staff</SelectItem>
-                    <SelectItem value="FINANCE_STAFF">Finance Staff</SelectItem>
-                    <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="create-hub">Hub Code (Optional)</Label>
-                <Input
-                  id="create-hub"
-                  placeholder="e.g. IMF, DEL"
-                  value={createUserForm.hubCode}
-                  onChange={(e) =>
-                    setCreateUserForm((prev) => ({ ...prev, hubCode: e.target.value }))
-                  }
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" onClick={() => setCreateUserOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">Create User</Button>
+          <form onSubmit={handleCreateUser} className="flex flex-col gap-6">
+            <FormSection title="User Details">
+              <FormGrid columns={1}>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="create-email">Email</Label>
+                  <Input
+                    id="create-email"
+                    type="email"
+                    required
+                    value={createUserForm.email}
+                    onChange={(e) =>
+                      setCreateUserForm((prev) => ({ ...prev, email: e.target.value }))
+                    }
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="create-password">Password</Label>
+                  <Input
+                    id="create-password"
+                    type="password"
+                    required
+                    value={createUserForm.password}
+                    onChange={(e) =>
+                      setCreateUserForm((prev) => ({ ...prev, password: e.target.value }))
+                    }
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="create-fullname">Full Name</Label>
+                  <Input
+                    id="create-fullname"
+                    required
+                    value={createUserForm.fullName}
+                    onChange={(e) =>
+                      setCreateUserForm((prev) => ({ ...prev, fullName: e.target.value }))
+                    }
+                  />
+                </div>
+              </FormGrid>
+            </FormSection>
+
+            <FormSection title="Access Control">
+              <FormGrid columns={2}>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="create-role">Role</Label>
+                  <Select
+                    value={createUserForm.role}
+                    onValueChange={(val) => setCreateUserForm((prev) => ({ ...prev, role: val }))}
+                  >
+                    <SelectTrigger id="create-role">
+                      <SelectValue placeholder="Select Role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ADMIN">Admin</SelectItem>
+                      <SelectItem value="MANAGER">Manager</SelectItem>
+                      <SelectItem value="OPS_STAFF">Operations Staff</SelectItem>
+                      <SelectItem value="WAREHOUSE_STAFF">Warehouse Staff</SelectItem>
+                      <SelectItem value="FINANCE_STAFF">Finance Staff</SelectItem>
+                      <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="create-hub">Hub Code (Optional)</Label>
+                  <Input
+                    id="create-hub"
+                    placeholder="e.g. IMF, DEL"
+                    value={createUserForm.hubCode}
+                    onChange={(e) =>
+                      setCreateUserForm((prev) => ({ ...prev, hubCode: e.target.value }))
+                    }
+                  />
+                </div>
+              </FormGrid>
+            </FormSection>
+
+            <div className="mt-2">
+              <FormFooter onCancel={() => setCreateUserOpen(false)} submitLabel="Create User" />
             </div>
           </form>
         </DialogContent>
@@ -275,93 +287,99 @@ export const Management: React.FC = () => {
         submitLabel="Save Changes"
       >
         {(form) => (
-          <div className="flex flex-col gap-4">
-            <FormField
-              control={form.control}
-              name="full_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Alice Johnson" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email Address</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="e.g. alice@taccargo.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+          <div className="flex flex-col gap-6">
+            <FormSection title="Personal Information">
+              <FormGrid columns={1}>
+                <FormField
+                  control={form.control}
+                  name="full_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
+                        <Input placeholder="e.g. Alice Johnson" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="OPS_STAFF">Operations Staff</SelectItem>
-                        <SelectItem value="WAREHOUSE_STAFF">Warehouse Staff</SelectItem>
-                        <SelectItem value="FINANCE_STAFF">Finance Staff</SelectItem>
-                        <SelectItem value="SUPPORT">Support</SelectItem>
-                        <SelectItem value="MANAGER">Manager</SelectItem>
-                        <SelectItem value="ADMIN">Administrator</SelectItem>
-                        <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
-                        <SelectItem value="OPS">Operations (Legacy)</SelectItem>
-                        <SelectItem value="WAREHOUSE_IMPHAL">Warehouse (Imphal)</SelectItem>
-                        <SelectItem value="WAREHOUSE_DELHI">Warehouse (Delhi)</SelectItem>
-                        <SelectItem value="INVOICE">Finance (Legacy)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="hub_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assigned Hub</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Global / HQ" />
-                        </SelectTrigger>
+                        <Input type="email" placeholder="e.g. alice@taccargo.com" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value={GLOBAL_HUB_VALUE}>Global / HQ</SelectItem>
-                        {Object.values(HUBS).map((h) => (
-                          <SelectItem key={h.id} value={h.id}>
-                            {h.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </FormGrid>
+            </FormSection>
+
+            <FormSection title="Role & Access">
+              <FormGrid columns={2}>
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Role</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="OPS_STAFF">Operations Staff</SelectItem>
+                          <SelectItem value="WAREHOUSE_STAFF">Warehouse Staff</SelectItem>
+                          <SelectItem value="FINANCE_STAFF">Finance Staff</SelectItem>
+                          <SelectItem value="SUPPORT">Support</SelectItem>
+                          <SelectItem value="MANAGER">Manager</SelectItem>
+                          <SelectItem value="ADMIN">Administrator</SelectItem>
+                          <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                          <SelectItem value="OPS">Operations (Legacy)</SelectItem>
+                          <SelectItem value="WAREHOUSE_IMPHAL">Warehouse (Imphal)</SelectItem>
+                          <SelectItem value="WAREHOUSE_DELHI">Warehouse (Delhi)</SelectItem>
+                          <SelectItem value="INVOICE">Finance (Legacy)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="hub_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Assigned Hub</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Global / HQ" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value={GLOBAL_HUB_VALUE}>Global / HQ</SelectItem>
+                          {Object.values(HUBS).map((h) => (
+                            <SelectItem key={h.id} value={h.id}>
+                              {h.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </FormGrid>
+            </FormSection>
           </div>
         )}
       </CrudUpsertDialog>
@@ -375,6 +393,6 @@ export const Management: React.FC = () => {
         onConfirm={handleDelete}
         confirmLabel="Remove"
       />
-    </div>
+    </PageContainer>
   );
 };

@@ -1,18 +1,19 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { HugeiconsIcon } from '@hugeicons/react';
+import type { LucideIcon } from 'lucide-react';
 
 interface FormSectionProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   title: React.ReactNode;
   description?: React.ReactNode;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  icon?: any;
+  icon?: LucideIcon;
+  action?: React.ReactNode;
 }
 
 export function FormSection({
   title,
   description,
-  icon,
+  icon: Icon,
+  action,
   className,
   children,
   ...props
@@ -22,11 +23,11 @@ export function FormSection({
       className={cn('rounded-xl border border-border bg-card shadow-xs overflow-hidden', className)}
       {...props}
     >
-      <div className="border-b border-border bg-muted/30 px-6 py-4">
+      <div className="border-b border-border bg-muted/30 px-6 py-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          {icon && (
+          {Icon && (
             <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-background text-primary shadow-xs">
-              <HugeiconsIcon icon={icon} className="size-4" />
+              <Icon className="size-4" />
             </div>
           )}
           <div className="space-y-0.5">
@@ -34,6 +35,7 @@ export function FormSection({
             {description && <p className="text-xs text-muted-foreground">{description}</p>}
           </div>
         </div>
+        {action && <div>{action}</div>}
       </div>
       <div className="p-6">{children}</div>
     </section>

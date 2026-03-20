@@ -17,6 +17,7 @@ import {
   Settings as SettingsIcon,
   LucideIcon,
 } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { Card, CardContent } from '@/components/ui/card';
 import { hasRoleAccess } from '@/lib/access-control';
 import { cn } from '@/lib/utils';
@@ -176,7 +177,7 @@ export const DomainOverview: React.FC = () => {
                     >
                       <CardContent className="p-4 flex items-center gap-3">
                         <div className="p-2 rounded-sm bg-primary/10 text-primary">
-                          <Icon className="w-4 h-4" />
+                          <AppIcon icon={Icon} size={16} className="w-4 h-4" />
                         </div>
                         <div className="flex flex-col">
                           <span className="text-sm font-semibold text-foreground">

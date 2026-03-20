@@ -1,21 +1,23 @@
 import React, { useState, useMemo, useRef } from 'react';
 import Fuse from 'fuse.js';
 import { Customer as CustomerDB } from '@/hooks/useCustomers';
-import { ChevronDown, Plane, Truck, Search } from 'lucide-react';
+import { ChevronDown, Plane, Truck, Search, LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Label as ShadcnLabel } from '@/components/ui/label';
+import { AppIcon } from '@/components/ui-core';
 
 export const SectionHeader: React.FC<{
-  icon: React.ElementType;
+  icon: LucideIcon;
   title: string;
   action?: React.ReactNode;
 }> = ({ icon: Icon, title, action }) => (
   <div className="flex items-center justify-between pb-2 mb-4 border-b border-border/40">
     <div className="flex items-center gap-2.5">
       <div className="p-1.5 rounded-md bg-primary/10 text-primary border border-primary/20">
-        <Icon className="w-4 h-4" />
+        <AppIcon icon={Icon} size={16} />
       </div>
       <span className="text-sm font-bold tracking-wide text-foreground uppercase">{title}</span>
     </div>
@@ -30,10 +32,10 @@ export const Label: React.FC<{
   className?: string;
 }> = ({ children, required, error, className }) => (
   <div className={`flex justify-between items-end mb-2 ${className}`}>
-    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+    <ShadcnLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
       {children}
       {required && <span className="text-destructive text-xs leading-none">*</span>}
-    </label>
+    </ShadcnLabel>
     {error && <span className="text-xs text-destructive font-medium">{error}</span>}
   </div>
 );
@@ -98,7 +100,7 @@ export const CustomerSearch: React.FC<{
           >
             {displayLabel || placeholder}
           </span>
-          <ChevronDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
+          <AppIcon icon={ChevronDown} size={16} className="ml-1 w-3 h-3 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -107,7 +109,7 @@ export const CustomerSearch: React.FC<{
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <div className="flex items-center border-b border-border px-2">
-          <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+          <AppIcon icon={Search} size={16} className="mr-2 shrink-0 text-muted-foreground" />
           <Input
             ref={inputRef}
             placeholder="Type to filter..."
@@ -144,9 +146,9 @@ export const CustomerSearch: React.FC<{
                       {c.preferences.preferredTransportMode && (
                         <span className="text-[8px] px-1 py-0.5 rounded-sm bg-muted text-muted-foreground flex items-center gap-1">
                           {c.preferences.preferredTransportMode === 'AIR' ? (
-                            <Plane className="w-2.5 h-2.5" />
+                            <AppIcon icon={Plane} size={16} className="w-2.5 h-2.5" />
                           ) : (
-                            <Truck className="w-2.5 h-2.5" />
+                            <AppIcon icon={Truck} size={16} className="w-2.5 h-2.5" />
                           )}
                           {c.preferences.preferredTransportMode}
                         </span>

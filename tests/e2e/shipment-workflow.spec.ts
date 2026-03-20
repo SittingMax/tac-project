@@ -15,7 +15,7 @@ test.describe('Shipment Workflow', () => {
   test('should create a new shipment', async ({ page }) => {
     // Navigate to shipments page directly
     await page.goto('/shipments');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Verify we're on the shipments page
     await expect(page.getByRole('heading', { name: 'Shipments', exact: true })).toBeVisible({
@@ -26,7 +26,7 @@ test.describe('Shipment Workflow', () => {
   test('should search and view shipment details', async ({ page }) => {
     // Navigate to shipments page
     await page.goto('/shipments');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Wait for the page to load
     await expect(page.getByRole('heading', { name: 'Shipments', exact: true })).toBeVisible({
@@ -47,7 +47,7 @@ test.describe('Shipment Workflow', () => {
   test('should track shipment status', async ({ page }) => {
     // Navigate to tracking page
     await page.goto('/tracking');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Verify tracking page loaded
     await expect(page.locator('h1, h2').filter({ hasText: /track/i })).toBeVisible({
@@ -61,7 +61,7 @@ test.describe('Public Tracking', () => {
     // Navigate directly to public tracking
     // Navigate directly to public tracking
     await page.goto('/track');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Default tab might be "book", so explicitly click "Track"
     const trackTab = page.getByRole('tab', { name: /track/i });

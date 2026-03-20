@@ -10,6 +10,7 @@ import type { Database } from '@/lib/database.types';
 
 type AuditLog = Database['public']['Tables']['audit_logs']['Row'];
 type AuditLogInsert = Database['public']['Tables']['audit_logs']['Insert'];
+type AuditPayload = AuditLogInsert['before'];
 
 export interface AuditLogWithRelations extends AuditLog {
   actor?: {
@@ -96,10 +97,8 @@ export const auditService = {
     entityType: string,
     entityId: string,
     staffId?: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic audit data
-    before?: any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic audit data
-    after?: any
+    before?: AuditPayload,
+    after?: AuditPayload
   ): Promise<AuditLog> {
     return this.create({
       action,
@@ -116,8 +115,7 @@ export const auditService = {
     entityType: string,
     entityId: string,
     staffId: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic entity data
-    data: any
+    data: AuditPayload
   ): Promise<AuditLog> {
     return this.logAction('CREATE', entityType, entityId, staffId, null, data);
   },
@@ -126,10 +124,8 @@ export const auditService = {
     entityType: string,
     entityId: string,
     staffId: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic entity data
-    before: any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic entity data
-    after: any
+    before: AuditPayload,
+    after: AuditPayload
   ): Promise<AuditLog> {
     return this.logAction('UPDATE', entityType, entityId, staffId, before, after);
   },
@@ -138,8 +134,7 @@ export const auditService = {
     entityType: string,
     entityId: string,
     staffId: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic entity data
-    data: any
+    data: AuditPayload
   ): Promise<AuditLog> {
     return this.logAction('DELETE', entityType, entityId, staffId, data, null);
   },

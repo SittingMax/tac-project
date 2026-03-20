@@ -5,9 +5,15 @@ import { bookingSchema, type BookingFormData } from '@/lib/schemas/booking.schem
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { FormSection, FormGrid, FormFooter } from '@/components/ui-core';
 import { Trash2, Plus, Upload, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -27,13 +33,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { user } = useAuthStore();
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm<BookingFormData>({
+  const form = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
       volumeMatrix: [{ length: 0, width: 0, height: 0, weight: 0, count: 1 }],
@@ -50,7 +50,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
   });
 
   const { fields, append, remove } = useFieldArray({
-    control,
+    control: form.control,
     name: 'volumeMatrix',
   });
 
@@ -143,7 +143,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
         // Don't block the success flow if this fails
       }
 
-      reset();
+      form.reset();
       setSelectedFiles([]);
       onSuccess?.();
     } catch (error) {
@@ -155,180 +155,420 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base text-primary">Contact Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-1">
-            <Label>
-              WhatsApp Number <span className="text-destructive">*</span>
-            </Label>
-            <Input {...register('whatsappNumber')} placeholder="e.g. +91 9876543210" />
-            {errors.whatsappNumber && (
-              <p className="text-xs text-destructive">{errors.whatsappNumber.message}</p>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormSection
+          title="Contact Information"
+          description="We will contact you on this number for shipment updates."
+        >
+          <FormGrid columns={1}>
+            <div className="max-w-md">
+              <FormField
+                control={form.control}
+                name="whatsappNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      WhatsApp Number <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        placeholder="e.g. +91 9876543210"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </FormGrid>
+        </FormSection>
+
+        <FormSection title="Consignor Details">
+          <FormGrid columns={2}>
+            <FormField
+              control={form.control}
+              name="consignor.name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Name
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      placeholder="Consignor Name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="consignor.phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Phone
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      placeholder="Consignor Phone"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="md:col-span-2">
+              <FormField
+                control={form.control}
+                name="consignor.address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Address
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        placeholder="Address Line 1"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="consignor.city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      City
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="consignor.state"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      State
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="consignor.zip"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Zip
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </FormGrid>
+        </FormSection>
+
+        <FormSection title="Consignee Details">
+          <FormGrid columns={2}>
+            <FormField
+              control={form.control}
+              name="consignee.name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Name
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      placeholder="Consignee Name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="consignee.phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                    Phone
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                      placeholder="Consignee Phone"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="md:col-span-2">
+              <FormField
+                control={form.control}
+                name="consignee.address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Address
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        placeholder="Address Line 1"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="consignee.city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      City
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="consignee.state"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      State
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="consignee.zip"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
+                      Zip
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </FormGrid>
+        </FormSection>
+
+        {/* Volume Matrix */}
+        <FormSection
+          title="Volume Matrix"
+          action={
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => append({ length: 0, width: 0, height: 0, weight: 0, count: 1 })}
+            >
+              <Plus className="w-4 h-4 mr-2" /> Add Item
+            </Button>
+          }
+        >
+          <div className="space-y-4">
+            {fields.map((field, index) => (
+              <div key={field.id} className="grid grid-cols-6 gap-3 items-end">
+                <div className="space-y-1">
+                  <FormField
+                    control={form.control}
+                    name={`volumeMatrix.${index}.length`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[10px] font-mono text-muted-foreground uppercase">
+                          Len(cm)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                            type="number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <FormField
+                    control={form.control}
+                    name={`volumeMatrix.${index}.width`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[10px] font-mono text-muted-foreground uppercase">
+                          Wid(cm)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                            type="number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <FormField
+                    control={form.control}
+                    name={`volumeMatrix.${index}.height`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[10px] font-mono text-muted-foreground uppercase">
+                          Hgt(cm)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                            type="number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <FormField
+                    control={form.control}
+                    name={`volumeMatrix.${index}.weight`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[10px] font-mono text-muted-foreground uppercase">
+                          Wgt(kg)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                            type="number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <FormField
+                    control={form.control}
+                    name={`volumeMatrix.${index}.count`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[10px] font-mono text-muted-foreground uppercase">
+                          Count
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            className="h-11 bg-transparent hover:border-ring/50 transition-colors"
+                            type="number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => remove(index)}
+                  disabled={fields.length === 1}
+                >
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
+            ))}
+            {form.formState.errors.volumeMatrix && (
+              <p className="text-xs text-destructive">
+                {form.formState.errors.volumeMatrix.message}
+              </p>
             )}
-            <p className="text-xs text-muted-foreground">
-              We will contact you on this number for shipment updates.
-            </p>
           </div>
-        </CardContent>
-      </Card>
+        </FormSection>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Consignor Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Consignor</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="space-y-1">
-              <Label>Name</Label>
-              <Input {...register('consignor.name')} placeholder="Consignor Name" />
-              {errors.consignor?.name && (
-                <p className="text-xs text-destructive">{errors.consignor.name.message}</p>
-              )}
-            </div>
-            <div className="space-y-1">
-              <Label>Phone</Label>
-              <Input {...register('consignor.phone')} placeholder="Consignor Phone" />
-              {errors.consignor?.phone && (
-                <p className="text-xs text-destructive">{errors.consignor.phone.message}</p>
-              )}
-            </div>
-            <div className="space-y-1">
-              <Label>Address</Label>
-              <Input {...register('consignor.address')} placeholder="Address Line 1" />
-              {errors.consignor?.address && (
-                <p className="text-xs text-destructive">{errors.consignor.address.message}</p>
-              )}
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1">
-                <Label>City</Label>
-                <Input {...register('consignor.city')} />
-              </div>
-              <div className="space-y-1">
-                <Label>State</Label>
-                <Input {...register('consignor.state')} />
-              </div>
-              <div className="space-y-1">
-                <Label>ZIP</Label>
-                <Input {...register('consignor.zip')} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Consignee Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Consignee</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="space-y-1">
-              <Label>Name</Label>
-              <Input {...register('consignee.name')} placeholder="Consignee Name" />
-              {errors.consignee?.name && (
-                <p className="text-xs text-destructive">{errors.consignee.name.message}</p>
-              )}
-            </div>
-            <div className="space-y-1">
-              <Label>Phone</Label>
-              <Input {...register('consignee.phone')} placeholder="Consignee Phone" />
-              {errors.consignee?.phone && (
-                <p className="text-xs text-destructive">{errors.consignee.phone.message}</p>
-              )}
-            </div>
-            <div className="space-y-1">
-              <Label>Address</Label>
-              <Input {...register('consignee.address')} placeholder="Address Line 1" />
-              {errors.consignee?.address && (
-                <p className="text-xs text-destructive">{errors.consignee.address.message}</p>
-              )}
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1">
-                <Label>City</Label>
-                <Input {...register('consignee.city')} />
-              </div>
-              <div className="space-y-1">
-                <Label>State</Label>
-                <Input {...register('consignee.state')} />
-              </div>
-              <div className="space-y-1">
-                <Label>ZIP</Label>
-                <Input {...register('consignee.zip')} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Separator />
-
-      {/* Volume Matrix */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">Volume Matrix</CardTitle>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => append({ length: 0, width: 0, height: 0, weight: 0, count: 1 })}
-          >
-            <Plus className="w-4 h-4 mr-2" /> Add Item
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {fields.map((field, index) => (
-            <div key={field.id} className="grid grid-cols-6 gap-3 items-end">
-              <div className="space-y-1">
-                <Label className="text-xs">Len (cm)</Label>
-                <Input type="number" {...register(`volumeMatrix.${index}.length`)} />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Wid (cm)</Label>
-                <Input type="number" {...register(`volumeMatrix.${index}.width`)} />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Hgt (cm)</Label>
-                <Input type="number" {...register(`volumeMatrix.${index}.height`)} />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Wgt (kg)</Label>
-                <Input type="number" {...register(`volumeMatrix.${index}.weight`)} />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Count</Label>
-                <Input type="number" {...register(`volumeMatrix.${index}.count`)} />
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => remove(index)}
-                disabled={fields.length === 1}
-              >
-                <Trash2 className="w-4 h-4 text-destructive" />
-              </Button>
-            </div>
-          ))}
-          {errors.volumeMatrix && (
-            <p className="text-xs text-destructive">{errors.volumeMatrix.message}</p>
-          )}
-        </CardContent>
-      </Card>
-
-      <Separator />
-
-      {/* Image Upload */}
-      <Card className={isMobile ? 'mb-6' : ''}>
-        <CardHeader>
-          <CardTitle className="text-base">Images</CardTitle>
-        </CardHeader>
-        <CardContent>
+        {/* Image Upload */}
+        <FormSection title="Images" className={isMobile ? 'mb-6' : ''}>
           <div className="flex flex-col gap-4">
             <div className="border-2 border-dashed border-input rounded-md p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-accent/50 transition-colors relative">
               <input
@@ -370,23 +610,16 @@ export const BookingForm: React.FC<BookingFormProps> = ({ onSuccess, onCancel, i
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </FormSection>
 
-      <div
-        className={
-          isMobile
-            ? 'sticky bottom-0 -mx-4 -mb-4 mt-6 p-4 bg-background border-t border-border flex justify-end gap-3 z-10'
-            : 'flex justify-end gap-3 pt-4'
-        }
-      >
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting || uploading}>
-          {isSubmitting || uploading ? 'Submitting...' : 'Book Shipment'}
-        </Button>
-      </div>
-    </form>
+        <div className={isMobile ? 'sticky bottom-0 -mx-4 -mb-4 mt-6 p-4 bg-background z-10' : ''}>
+          <FormFooter
+            onCancel={onCancel}
+            submitLabel="Book Shipment"
+            isLoading={form.formState.isSubmitting || uploading}
+          />
+        </div>
+      </form>
+    </Form>
   );
 };

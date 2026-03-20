@@ -141,7 +141,7 @@ export function parseScanInput(input: string): ScanResult {
     };
   }
 
-  if (/^(MNF|WEE-MNF)-\d{4}-\d{6}$/i.test(trimmed)) {
+  if (/^(MNF|TAC-MNF)-\d{4}-\d{6}$/i.test(trimmed)) {
     return {
       type: 'manifest',
       manifestNo: trimmed.toUpperCase(),

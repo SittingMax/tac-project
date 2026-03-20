@@ -144,18 +144,18 @@ export const EASING = {
 // ============================================
 // STATUS COLORS (Semantic)
 // ============================================
-export const STATUS_COLORS: Partial<Record<ShipmentStatus, string>> = {
-  CREATED: 'badge--created',
-  PICKUP_SCHEDULED: 'badge--created',
-  PICKED_UP: 'badge--manifested',
-  RECEIVED_AT_ORIGIN: 'badge--manifested',
-  IN_TRANSIT: 'badge--in-transit',
-  RECEIVED_AT_DEST: 'badge--arrived',
-  OUT_FOR_DELIVERY: 'badge--in-transit',
-  DELIVERED: 'badge--delivered',
-  CANCELLED: 'badge--cancelled',
-  RTO: 'badge--returned',
-  EXCEPTION: 'badge--exception',
+export const STATUS_COLORS: Partial<Record<ShipmentStatus, ShipmentStatus>> = {
+  CREATED: 'CREATED',
+  PICKUP_SCHEDULED: 'PICKUP_SCHEDULED',
+  PICKED_UP: 'PICKED_UP',
+  RECEIVED_AT_ORIGIN: 'RECEIVED_AT_ORIGIN',
+  IN_TRANSIT: 'IN_TRANSIT',
+  RECEIVED_AT_DEST: 'RECEIVED_AT_DEST',
+  OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED',
+  RTO: 'RTO',
+  EXCEPTION: 'EXCEPTION',
 };
 
 // ============================================

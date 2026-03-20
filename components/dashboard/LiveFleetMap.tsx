@@ -1,6 +1,7 @@
 import { Card } from '../ui/card';
 import { motion } from 'framer-motion';
 import { Map, Plane, Truck, Activity } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { useShipments } from '@/hooks/useShipments';
 import { cn } from '@/lib/utils';
 
@@ -33,20 +34,20 @@ export const LiveFleetMap = () => {
       <div className="p-6 pb-2 relative z-10 flex justify-between items-center">
         <div>
           <h3 className="text-lg font-bold flex items-center gap-2">
-            <Map className="w-5 h-5 text-primary" />
+            <AppIcon icon={Map} size={20} className="w-5 h-5 text-primary" />
             Live Fleet Map
           </h3>
           <p className="text-sm text-muted-foreground">Real-time corridor activity</p>
         </div>
         <div className="flex items-center gap-4 text-xs font-medium">
           <span className="flex items-center gap-1.5 opacity-80">
-            <Plane className="w-3.5 h-3.5 text-chart-2" /> Air Routes
+            <AppIcon icon={Plane} size={16} className="w-3.5 h-3.5 text-chart-2" /> Air Routes
           </span>
           <span className="flex items-center gap-1.5 opacity-80">
-            <Truck className="w-3.5 h-3.5 text-primary" /> Ground Routes
+            <AppIcon icon={Truck} size={16} className="w-3.5 h-3.5 text-primary" /> Ground Routes
           </span>
           <span className="flex items-center gap-1.5 text-primary animate-pulse">
-            <Activity className="w-3.5 h-3.5" /> {shipments.length} Active
+            <AppIcon icon={Activity} size={16} className="w-3.5 h-3.5" /> {shipments.length} Active
           </span>
         </div>
       </div>

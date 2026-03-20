@@ -15,7 +15,7 @@ test.describe('Manifest Workflow', () => {
   test('should create a new manifest', async ({ page }) => {
     // Navigate to manifests page directly
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await page.waitForTimeout(1000); // Allow page to fully render
 
     // Verify page loaded (check for any content indicating we're authenticated)
@@ -26,7 +26,7 @@ test.describe('Manifest Workflow', () => {
 
   test('should view manifest details', async ({ page }) => {
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Verify manifests page loaded
     await expect(page.locator('h1, h2').filter({ hasText: /manifest/i })).toBeVisible({
@@ -59,7 +59,7 @@ test.describe('Scanning Workflow', () => {
 
   test('should switch scan modes', async ({ page }) => {
     await page.goto('/scanning');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Verify scanning page loaded
     await expect(page.locator('h1, h2').filter({ hasText: /scan/i })).toBeVisible({
@@ -69,7 +69,7 @@ test.describe('Scanning Workflow', () => {
 
   test('should handle manual AWB entry', async ({ page }) => {
     await page.goto('/scanning');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Verify scanning page loaded
     await expect(page.locator('h1, h2').filter({ hasText: /scan/i })).toBeVisible({

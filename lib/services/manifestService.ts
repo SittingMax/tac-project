@@ -18,6 +18,7 @@ import { ScanSource } from '@/types';
 
 type Manifest = Database['public']['Tables']['manifests']['Row'];
 type ManifestInsert = Database['public']['Tables']['manifests']['Insert'];
+type ManifestUpdate = Database['public']['Tables']['manifests']['Update'];
 type ManifestItem = Database['public']['Tables']['manifest_items']['Row'];
 
 export type ManifestStatus =
@@ -69,8 +70,23 @@ export interface ManifestItemWithShipment extends ManifestItem {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic Supabase join result
-export function mapManifestItemWithShipment(item: any): ManifestItemWithShipment {
+type ShipmentDestinationJoin = Database['public']['Tables']['shipments']['Row'] & {
+  destination_hub?: { code?: string | null; name?: string | null } | null;
+};
+
+const asRecord = (value: unknown): Record<string, unknown> | null => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+
+  return value as Record<string, unknown>;
+};
+
+const getString = (value: unknown) => (typeof value === 'string' ? value : undefined);
+
+export function mapManifestItemWithShipment(
+  item: ManifestItemWithShipment
+): ManifestItemWithShipment {
   return {
     ...item,
     shipment: item.shipment
@@ -84,7 +100,7 @@ export function mapManifestItemWithShipment(item: any): ManifestItemWithShipment
           consignor_phone: item.shipment.consignor_phone,
           package_count: item.shipment.package_count,
           total_weight: item.shipment.total_weight,
-          consignee_city: item.shipment.consignee_address?.city,
+          consignee_city: getString(asRecord(item.shipment.consignee_address)?.city),
         }
       : undefined,
   };
@@ -684,10 +700,11 @@ export const manifestService = {
 
       // Validate destination
       if (validateDestination && shipment.destination_hub_id !== manifest.to_hub_id) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Optional nested hub code access
-        const shipDestCode = (shipment as any).destination_hub?.code || 'UNKNOWN';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Optional nested hub code access
-        const manDestCode = (manifest as any).to_hub?.code || 'UNKNOWN';
+        const shipmentRecord = asRecord(shipment as ShipmentDestinationJoin);
+        const manifestRecord = asRecord(manifest);
+        const shipDestCode =
+          getString(asRecord(shipmentRecord?.destination_hub)?.code) || 'UNKNOWN';
+        const manDestCode = getString(asRecord(manifestRecord?.to_hub)?.code) || 'UNKNOWN';
         return {
           success: false,
           error: 'DESTINATION_MISMATCH',
@@ -931,8 +948,7 @@ export const manifestService = {
     }
 
     // Build update payload
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic update payload
-    const updatePayload: Record<string, any> = {
+    const updatePayload: ManifestUpdate = {
       status: newStatus,
       updated_at: new Date().toISOString(),
     };
@@ -1006,8 +1022,7 @@ export const manifestService = {
     if (error) throw mapSupabaseError(error);
 
     // Map to expected format with receiver/Consignor Names
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic Supabase join result
-    return ((data ?? []) as any[]).map(mapManifestItemWithShipment);
+    return ((data ?? []) as ManifestItemWithShipment[]).map(mapManifestItemWithShipment);
   },
 
   /**

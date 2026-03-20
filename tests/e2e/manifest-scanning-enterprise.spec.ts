@@ -75,7 +75,7 @@ test.describe('Enterprise Manifest Scanning', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to manifests page
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await waitForManifestsReady(page);
   });
 
@@ -204,7 +204,7 @@ test.describe('Manifest Status Workflow', () => {
   test('should display manifest status badge', async ({ page }) => {
     // Ensure we have at least one manifest by creating one
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await waitForManifestsReady(page);
 
     // Check if we need to create one
@@ -240,7 +240,7 @@ test.describe('Manifest Status Workflow', () => {
     }
 
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await waitForManifestsReady(page);
 
     // Look for status badges (UI shows lowercase)
@@ -262,7 +262,7 @@ test.describe('Manifest Status Workflow', () => {
 
   test('should open manifest wizard for open manifests', async ({ page }) => {
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await waitForManifestsReady(page);
 
     // Click on an OPEN or BUILDING manifest - use first matching cell (UI shows lowercase)

@@ -52,12 +52,12 @@ export function getStaffColumns(params: StaffColumnsParams): ColumnDef<Staff>[] 
       accessorKey: 'full_name',
       header: 'Staff Member',
       cell: ({ row }) => (
-        <div className="flex items-center gap-4">
-          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center border border-white/10">
-            <UserIcon className="w-4 h-4 text-muted-foreground" />
+        <div className="flex items-center gap-4 group cursor-default">
+          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center border border-white/10 group-hover:bg-primary/10 transition-colors">
+            <UserIcon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
           <div>
-            <div className="font-medium text-foreground">{row.original.full_name}</div>
+            <div className="font-medium text-foreground group-hover:text-primary transition-colors">{row.original.full_name}</div>
             <div className="text-xs text-muted-foreground">{row.original.email}</div>
           </div>
         </div>

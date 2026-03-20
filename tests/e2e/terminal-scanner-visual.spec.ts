@@ -6,12 +6,11 @@ import { test, expect } from '@playwright/test';
  */
 test.describe('Terminal Scanner UI Redesign', () => {
   test('visual verification of redesigned scanner page', async ({ page }) => {
-    const BASE = 'http://localhost:5173';
     const email = process.env.E2E_TEST_EMAIL;
     const password = process.env.E2E_TEST_PASSWORD;
 
     // ── STEP 1: LOGIN ──────────────────────────
-    await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.waitForTimeout(2000);
 
     if (email && password) {
@@ -48,7 +47,7 @@ test.describe('Terminal Scanner UI Redesign', () => {
     }
 
     // ── STEP 2: NAVIGATE TO SCANNING ───────────
-    await page.goto(`${BASE}/scanning`, { waitUntil: 'networkidle', timeout: 15000 });
+    await page.goto('/scanning', { waitUntil: 'load', timeout: 15000 });
     await page.waitForTimeout(3000);
 
     // Screenshot: initial state

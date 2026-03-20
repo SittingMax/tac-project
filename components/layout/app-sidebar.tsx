@@ -152,7 +152,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props} className="border-r-0 shadow-sm z-50">
-      <SidebarHeader className="border-b border-sidebar-border/50 px-4 py-3 h-16 flex items-center justify-center bg-sidebar/50">
+      <SidebarHeader className="border-b border-sidebar-border/30 px-4 py-3 h-16 flex items-center justify-center bg-transparent">
         <TacLogo
           size="sm"
           showSubtitle={!isCollapsed}
@@ -203,10 +203,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     tooltip={item.label}
                                     isActive={isActive}
                                     className={cn(
-                                      'h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0',
+                                      'h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0 mx-2 rounded-md',
                                       isActive
-                                        ? 'bg-primary/10 text-primary border-l-2 border-primary rounded-none rounded-r-md font-semibold'
-                                        : 'hover:bg-accent/50 hover:text-accent-foreground text-muted-foreground border-l-2 border-transparent'
+                                        ? 'bg-accent/50 text-foreground font-semibold shadow-sm'
+                                        : 'hover:bg-accent/30 hover:text-foreground text-muted-foreground'
                                     )}
                                   >
                                     {item.icon && (
@@ -226,10 +226,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                             asChild
                                             isActive={isSubActive}
                                             className={cn(
-                                              'h-8 text-xs font-medium transition-all group-data-[collapsible=icon]:hidden',
+                                              'h-8 text-xs font-medium transition-all group-data-[collapsible=icon]:hidden rounded-md px-2 mx-2',
                                               isSubActive
-                                                ? 'text-primary font-bold'
-                                                : 'text-muted-foreground hover:text-foreground'
+                                                ? 'bg-accent/40 text-foreground font-semibold'
+                                                : 'text-muted-foreground hover:text-foreground hover:bg-accent/20'
                                             )}
                                           >
                                             <Link to={subItem.url}>
@@ -254,10 +254,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               isActive={isActive}
                               tooltip={item.label}
                               className={cn(
-                                'h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0',
+                                'h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0 mx-2 rounded-md',
                                 isActive
-                                  ? 'bg-primary/10 text-primary border-l-2 border-primary rounded-none rounded-r-md font-semibold'
-                                  : 'hover:bg-accent/50 hover:text-accent-foreground text-muted-foreground border-l-2 border-transparent'
+                                  ? 'bg-accent/50 text-foreground font-semibold shadow-sm'
+                                  : 'hover:bg-accent/30 hover:text-foreground text-muted-foreground'
                               )}
                             >
                               <Link to={item.url}>

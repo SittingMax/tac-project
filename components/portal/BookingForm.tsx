@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Package, Send, Plus, MapPin, User, Phone } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 import { bookingSchema } from '@/lib/schemas/booking.schema';
 import { bookingService } from '@/lib/services/bookingService';
 
@@ -120,7 +121,7 @@ export const BookingForm: React.FC = () => {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Full Name *</label>
+            <Label className="text-sm font-medium text-foreground">Full Name *</Label>
             <Input
               required
               value={sender.name}
@@ -129,7 +130,7 @@ export const BookingForm: React.FC = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Phone Number *</label>
+            <Label className="text-sm font-medium text-foreground">Phone Number *</Label>
             <Input
               required
               value={sender.phone}
@@ -138,7 +139,7 @@ export const BookingForm: React.FC = () => {
             />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-medium text-foreground">Pickup Address *</label>
+            <Label className="text-sm font-medium text-foreground">Pickup Address *</Label>
             <Input
               required
               value={sender.address}
@@ -147,7 +148,7 @@ export const BookingForm: React.FC = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Pickup City *</label>
+            <Label className="text-sm font-medium text-foreground">Pickup City *</Label>
             <Input
               required
               value={sender.city}
@@ -156,7 +157,7 @@ export const BookingForm: React.FC = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Pickup State *</label>
+            <Label className="text-sm font-medium text-foreground">Pickup State *</Label>
             <Input
               required
               value={sender.state}
@@ -165,9 +166,9 @@ export const BookingForm: React.FC = () => {
             />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-medium text-foreground">
+            <Label className="text-sm font-medium text-foreground">
               Pickup ZIP / Postal Code *
-            </label>
+            </Label>
             <Input
               required
               value={sender.zip}
@@ -185,7 +186,7 @@ export const BookingForm: React.FC = () => {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Full Name *</label>
+            <Label className="text-sm font-medium text-foreground">Full Name *</Label>
             <Input
               required
               value={receiver.name}
@@ -194,7 +195,7 @@ export const BookingForm: React.FC = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Phone Number *</label>
+            <Label className="text-sm font-medium text-foreground">Phone Number *</Label>
             <Input
               required
               value={receiver.phone}
@@ -203,7 +204,7 @@ export const BookingForm: React.FC = () => {
             />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-medium text-foreground">Delivery Address *</label>
+            <Label className="text-sm font-medium text-foreground">Delivery Address *</Label>
             <Input
               required
               value={receiver.address}
@@ -212,7 +213,7 @@ export const BookingForm: React.FC = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Delivery City *</label>
+            <Label className="text-sm font-medium text-foreground">Delivery City *</Label>
             <Input
               required
               value={receiver.city}
@@ -221,7 +222,7 @@ export const BookingForm: React.FC = () => {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Delivery State *</label>
+            <Label className="text-sm font-medium text-foreground">Delivery State *</Label>
             <Input
               required
               value={receiver.state}
@@ -230,9 +231,9 @@ export const BookingForm: React.FC = () => {
             />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-medium text-foreground">
+            <Label className="text-sm font-medium text-foreground">
               Delivery ZIP / Postal Code *
-            </label>
+            </Label>
             <Input
               required
               value={receiver.zip}
@@ -258,7 +259,7 @@ export const BookingForm: React.FC = () => {
           {packages.map((pkg, idx) => (
             <div key={idx} className="grid grid-cols-5 gap-3 p-4 bg-muted/30 rounded-md">
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Qty</label>
+                <Label className="text-xs text-muted-foreground">Qty</Label>
                 <Input
                   type="number"
                   min="1"
@@ -267,7 +268,7 @@ export const BookingForm: React.FC = () => {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">L (cm)</label>
+                <Label className="text-xs text-muted-foreground">L (cm)</Label>
                 <Input
                   type="number"
                   min="1"
@@ -276,7 +277,7 @@ export const BookingForm: React.FC = () => {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">W (cm)</label>
+                <Label className="text-xs text-muted-foreground">W (cm)</Label>
                 <Input
                   type="number"
                   min="1"
@@ -285,7 +286,7 @@ export const BookingForm: React.FC = () => {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">H (cm)</label>
+                <Label className="text-xs text-muted-foreground">H (cm)</Label>
                 <Input
                   type="number"
                   min="1"
@@ -294,7 +295,7 @@ export const BookingForm: React.FC = () => {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Wt (kg)</label>
+                <Label className="text-xs text-muted-foreground">Wt (kg)</Label>
                 <Input
                   type="number"
                   min="0.1"
@@ -314,9 +315,9 @@ export const BookingForm: React.FC = () => {
           <Phone className="w-5 h-5 text-status-success" /> Updates & Confirmation
         </h3>
         <div className="space-y-2 max-w-md">
-          <label className="text-sm font-medium text-foreground">
+          <Label className="text-sm font-medium text-foreground">
             WhatsApp Number for Updates *
-          </label>
+          </Label>
           <Input
             required
             value={whatsapp}

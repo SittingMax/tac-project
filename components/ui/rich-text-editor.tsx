@@ -55,6 +55,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
+import { Label } from '@/components/ui/label';
 
 export interface RichTextEditorRef {
   getHTML: () => string;
@@ -187,9 +188,9 @@ const LinkPopover = memo<{ editor: Editor }>(({ editor }) => {
           sideOffset={8}
           className="z-50 w-72 rounded-md bg-popover border border-border/60 shadow-xl p-4 animate-in fade-in-0 zoom-in-95"
         >
-          <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1.5 block">
+          <Label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1.5 block">
             URL
-          </label>
+          </Label>
           <div className="flex gap-2">
             <Input
               ref={inputRef}
@@ -251,9 +252,9 @@ const ImagePopover = memo<{ editor: Editor }>(({ editor }) => {
           sideOffset={8}
           className="z-50 w-72 rounded-md bg-popover border border-border/60 shadow-xl p-4 animate-in fade-in-0 zoom-in-95"
         >
-          <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1.5 block">
+          <Label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1.5 block">
             Image URL
-          </label>
+          </Label>
           <div className="flex gap-2">
             <Input
               ref={inputRef}

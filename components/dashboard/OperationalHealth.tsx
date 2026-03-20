@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 import { Card } from '../ui/card';
 import { useDashboardKPIs } from '@/hooks/useDashboardKPIs';
 import { motion } from 'framer-motion';
-import { ShieldCheck, Activity, AlertCircle, Zap } from 'lucide-react';
+import { ShieldCheck, Activity, AlertCircle, Zap, LucideIcon } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { cn } from '@/lib/utils';
 import { Progress } from '../ui/progress';
 
@@ -85,7 +86,7 @@ export const OperationalHealth = () => {
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-12 translate-x-12 pointer-events-none" />
 
       <div className="flex items-center gap-2 mb-6">
-        <Activity className="w-5 h-5 text-primary" />
+        <AppIcon icon={Activity} size={20} className="w-5 h-5 text-primary" />
         <h3 className="text-lg font-bold text-foreground">Operational Health</h3>
       </div>
 
@@ -147,9 +148,15 @@ export const OperationalHealth = () => {
             'border-current/20'
           )}
         >
-          {healthData.status === 'healthy' && <ShieldCheck className="w-4 h-4" />}
-          {healthData.status === 'warning' && <AlertCircle className="w-4 h-4" />}
-          {healthData.status === 'critical' && <AlertCircle className="w-4 h-4" />}
+          {healthData.status === 'healthy' && (
+            <AppIcon icon={ShieldCheck} size={16} className="w-4 h-4" />
+          )}
+          {healthData.status === 'warning' && (
+            <AppIcon icon={AlertCircle} size={16} className="w-4 h-4" />
+          )}
+          {healthData.status === 'critical' && (
+            <AppIcon icon={AlertCircle} size={16} className="w-4 h-4" />
+          )}
           SLA {healthData.status.charAt(0).toUpperCase() + healthData.status.slice(1)}
         </div>
       </div>
@@ -164,7 +171,11 @@ export const OperationalHealth = () => {
           >
             <div className="flex justify-between items-center text-sm">
               <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
-                <metric.icon className="w-4 h-4 opacity-70" />
+                <AppIcon
+                  icon={metric.icon as LucideIcon}
+                  size={16}
+                  className="w-4 h-4 opacity-70"
+                />
                 <span>{metric.label}</span>
               </div>
               <span className="font-semibold font-mono">{metric.displayValue}</span>

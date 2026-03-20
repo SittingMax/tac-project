@@ -26,6 +26,10 @@ export interface AuditItem extends Omit<ManifestItemWithRelations, 'shipment'> {
   shipment: NonNullable<ManifestItemWithRelations['shipment']>;
 }
 
+type AuditItemRow = Omit<ManifestItemWithRelations, 'shipment'> & {
+  shipment: ManifestItemWithRelations['shipment'] & { status: string };
+};
+
 export function useArrivalAudit() {
   const queryClient = useQueryClient();
   const [activeManifestId, setActiveManifestId] = useState<string | null>(null);
@@ -87,16 +91,15 @@ export function useArrivalAudit() {
       if (error) throw error;
 
       // Map to AuditItem with status based on shipment status
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (data || []).map((item: any) => ({
+      return ((data || []) as AuditItemRow[]).map((item) => ({
         ...item,
         status:
           item.shipment.status === 'RECEIVED_AT_DEST'
-            ? 'SCANNED'
+            ? ('SCANNED' as const)
             : item.shipment.status === 'EXCEPTION'
-              ? 'EXCEPTION'
-              : 'PENDING',
-      })) as AuditItem[];
+              ? ('EXCEPTION' as const)
+              : ('PENDING' as const),
+      }));
     },
     enabled: !!activeManifestId,
   });

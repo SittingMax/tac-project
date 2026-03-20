@@ -1,7 +1,7 @@
 import React from 'react';
 import { useManifests } from '../../hooks/useManifests';
 import { Button } from '../ui/button';
-import { Card } from '../ui/card';
+import { PageHeader } from '@/components/ui-core/layout';
 import { CrudTable } from '@/components/crud/CrudTable';
 import type { ColumnDef } from '@tanstack/react-table';
 import { FileText, Plane, Truck, ArrowRight, Loader } from 'lucide-react';
@@ -105,23 +105,15 @@ export const ManifestList: React.FC = () => {
   if (error) return <div className="text-destructive">Error loading manifests</div>;
 
   return (
-    <Card className="p-6 bg-white dark:bg-card border border-border">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Linehaul Manifests
-          </h2>
-          <p className="text-xs text-muted-foreground">Manage hub-to-hub transport</p>
-        </div>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-24">
+      <PageHeader title="Linehaul Manifests" description="Manage hub-to-hub transport">
         <Button onClick={() => navigate('/manifests/create')}>
           <FileText className="w-4 h-4 mr-2" />
           Create Manifest
         </Button>
-      </div>
+      </PageHeader>
 
-      <div className="border border-border/40 bg-card rounded-xl overflow-hidden shadow-xs">
-        <CrudTable columns={columns} data={manifests || []} pageSize={10} />
-      </div>
-    </Card>
+      <CrudTable columns={columns} data={manifests || []} pageSize={10} />
+    </div>
   );
 };

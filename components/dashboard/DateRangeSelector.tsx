@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
@@ -35,7 +36,7 @@ export const DateRangeSelector = () => {
             currentRange !== 'all' && 'border-solid text-foreground'
           )}
         >
-          <Calendar className="w-4 h-4" />
+          <AppIcon icon={Calendar} size={16} className="w-4 h-4" />
           <span>{activeLabel}</span>
         </Button>
       </PopoverTrigger>

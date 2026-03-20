@@ -13,13 +13,13 @@ test.describe('Scanning Idempotency', () => {
   test('should handle duplicate AWB scans gracefully', async ({ page }) => {
     // Navigate to scanning page
     await page.goto('/scanning');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await expect(page.locator('body')).toContainText(/(Scanning|Dashboard|TAC)/i, {
       timeout: 15000,
     });
 
     // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Verify scanning mode selector is visible
     const modeSelector = page.getByRole('combobox').first();
@@ -66,7 +66,7 @@ test.describe('Scanning Idempotency', () => {
       }
     });
 
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Verify main scanning UI elements
     await expect(page.locator('body')).toContainText(/(Scanning|Dashboard|TAC)/i, {
@@ -84,7 +84,7 @@ test.describe('Scanning Idempotency', () => {
 
   test('should switch between scan modes', async ({ page }) => {
     await page.goto('/scanning');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Find mode selector
     const modeSelector = page.getByRole('combobox').first();

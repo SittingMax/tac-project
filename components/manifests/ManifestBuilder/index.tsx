@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { StatusBadge } from '@/components/domain/status-badge';
 import {
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { AppIcon } from '@/components/ui-core';
 import {
   Package,
   Truck,
@@ -362,7 +364,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
           <CardHeader className="py-4">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg flex items-center gap-2">
-                <Package className="size-5" />
+                <AppIcon icon={Package} size={20} />
                 Available Shipments
                 {availableShipments && (
                   <Badge variant="secondary" className="ml-2">
@@ -395,7 +397,11 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
             <ScrollArea className="h-[400px]">
               {isLoading ? (
                 <div className="flex items-center justify-center h-full">
-                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                  <AppIcon
+                    icon={Loader2}
+                    size={24}
+                    className="animate-spin text-muted-foreground"
+                  />
                 </div>
               ) : filteredShipments && filteredShipments.length > 0 ? (
                 <div className="space-y-2">
@@ -413,7 +419,11 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                         draggedItem === shipment.id && 'opacity-50'
                       )}
                     >
-                      <GripVertical className="size-4 text-muted-foreground shrink-0" />
+                      <AppIcon
+                        icon={GripVertical}
+                        size={16}
+                        className="text-muted-foreground shrink-0"
+                      />
                       <input
                         type="checkbox"
                         checked={selectedShipments.has(shipment.id)}
@@ -427,15 +437,15 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                         </div>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                           <span className="flex items-center gap-1">
-                            <Weight className="size-3" />
+                            <AppIcon icon={Weight} size={16} />
                             {shipment.total_weight}kg
                           </span>
                           <span className="flex items-center gap-1">
-                            <Hash className="size-3" />
+                            <AppIcon icon={Hash} size={16} />
                             {shipment.package_count} pkgs
                           </span>
                           <span className="flex items-center gap-1">
-                            <MapPin className="size-3" />
+                            <AppIcon icon={MapPin} size={16} />
                             {shipment.destination_hub?.code || 'N/A'}
                           </span>
                         </div>
@@ -445,7 +455,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center py-8">
-                  <Package className="size-12 text-muted-foreground/50 mb-3" />
+                  <AppIcon icon={Package} size={32} className="text-muted-foreground/50 mb-3" />
                   <p className="text-muted-foreground">No shipments available</p>
                   <p className="text-sm text-muted-foreground/70">
                     All shipments have been assigned to manifests
@@ -464,9 +474,9 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
           <CardHeader className="py-4">
             <CardTitle className="text-lg flex items-center gap-2">
               {transportType === 'AIR' ? (
-                <Plane className="size-5" />
+                <AppIcon icon={Plane} size={20} />
               ) : (
-                <Truck className="size-5" />
+                <AppIcon icon={Truck} size={20} />
               )}
               {manifest ? `Manifest ${manifest.manifest_no}` : 'New Manifest'}
             </CardTitle>
@@ -480,7 +490,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                     <p className="text-lg font-bold">{manifest.from_hub?.code}</p>
                     <p className="text-xs text-muted-foreground">Origin</p>
                   </div>
-                  <ArrowRight className="size-5 text-muted-foreground" />
+                  <AppIcon icon={ArrowRight} size={20} className="text-muted-foreground" />
                   <div className="text-center">
                     <p className="text-lg font-bold">{manifest.to_hub?.code}</p>
                     <p className="text-xs text-muted-foreground">Destination</p>
@@ -519,12 +529,12 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                       disabled={closeMutation.isPending}
                       className="w-full"
                     >
-                      <CheckCircle2 className="size-4 mr-2" />
+                      <AppIcon icon={CheckCircle2} size={16} className="mr-2" />
                       Close Manifest
                     </Button>
                   )}
                   <Button variant="outline" className="w-full">
-                    <Printer className="size-4 mr-2" />
+                    <AppIcon icon={Printer} size={16} className="mr-2" />
                     Print Manifest
                   </Button>
                 </div>
@@ -533,7 +543,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
               <>
                 {/* Transport Type */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Transport Type</label>
+                  <Label className="text-sm font-medium">Transport Type</Label>
                   <Select
                     value={transportType}
                     onValueChange={(v) => setTransportType(v as 'SURFACE' | 'AIR')}
@@ -550,7 +560,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
 
                 {/* Destination Hub */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Destination Hub</label>
+                  <Label className="text-sm font-medium">Destination Hub</Label>
                   <Select value={destinationHubId} onValueChange={setDestinationHubId}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select destination..." />
@@ -571,7 +581,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                 {transportType === 'SURFACE' && (
                   <>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Vehicle Number</label>
+                      <Label className="text-sm font-medium">Vehicle Number</Label>
                       <Input
                         value={vehicleNumber}
                         onChange={(e) => setVehicleNumber(e.target.value)}
@@ -580,7 +590,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Driver Name</label>
+                        <Label className="text-sm font-medium">Driver Name</Label>
                         <Input
                           value={driverName}
                           onChange={(e) => setDriverName(e.target.value)}
@@ -588,7 +598,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Driver Phone</label>
+                        <Label className="text-sm font-medium">Driver Phone</Label>
                         <Input
                           value={driverPhone}
                           onChange={(e) => setDriverPhone(e.target.value)}
@@ -603,7 +613,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                 {transportType === 'AIR' && (
                   <>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Flight Number</label>
+                      <Label className="text-sm font-medium">Flight Number</Label>
                       <Input
                         value={flightNumber}
                         onChange={(e) => setFlightNumber(e.target.value)}
@@ -611,7 +621,7 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Flight Date</label>
+                      <Label className="text-sm font-medium">Flight Date</Label>
                       <Input
                         type="date"
                         value={flightDate}
@@ -647,9 +657,9 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                   className="w-full"
                 >
                   {createMutation.isPending ? (
-                    <Loader2 className="size-4 mr-2 animate-spin" />
+                    <AppIcon icon={Loader2} size={16} className="mr-2 animate-spin" />
                   ) : (
-                    <Plus className="size-4 mr-2" />
+                    <AppIcon icon={Plus} size={16} className="mr-2" />
                   )}
                   Create Manifest ({selectedShipments.size} shipments)
                 </Button>
@@ -681,14 +691,14 @@ export function ManifestBuilder({ manifestId, hubId, className }: ManifestBuilde
                       onDragEnd={handleDragEnd}
                       className="flex items-center gap-2 p-2 rounded-md bg-muted/30 text-sm"
                     >
-                      <GripVertical className="size-3 text-muted-foreground" />
+                      <AppIcon icon={GripVertical} size={16} className="text-muted-foreground" />
                       <span className="font-mono flex-1">{shipment.cn_number}</span>
                       <Button
                         variant="ghost"
                         size="icon-xs"
                         onClick={() => removeShipmentMutation.mutate(shipment.id)}
                       >
-                        <X className="size-3" />
+                        <AppIcon icon={X} size={16} className="w-3 h-3" />
                       </Button>
                     </div>
                   ))}

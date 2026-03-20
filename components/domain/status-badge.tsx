@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { ShipmentStatus, ManifestStatus, InvoiceStatus } from '@/types';
 
 // Extended status type for all domain entities
-type StatusVariant = ShipmentStatus | ManifestStatus | InvoiceStatus | 'NEUTRAL';
+type StatusVariant = ShipmentStatus | ManifestStatus | InvoiceStatus | 'NEUTRAL' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | 'IN_PROGRESS' | 'RESOLVED';
 
 const statusBadgeVariants = cva(
   'inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider transition-all duration-200',
@@ -38,6 +38,14 @@ const statusBadgeVariants = cva(
         DEPARTED: 'badge--in-transit',
         ARRIVED: 'badge--arrived',
         // RECONCILED: 'badge--delivered',
+
+        // Exception Status & Severities
+        IN_PROGRESS: 'badge--in-transit',
+        RESOLVED: 'badge--delivered',
+        LOW: 'badge--neutral',
+        MEDIUM: 'badge--in-transit',
+        HIGH: 'badge--warning',
+        CRITICAL: 'badge--exception',
 
         // Invoice Statuses
         ISSUED: 'badge--manifested',
@@ -89,6 +97,14 @@ const STATUS_LABELS: Record<StatusVariant, string> = {
   ARRIVED: 'Arrived',
   // RECONCILED: 'Reconciled',
 
+  // Exceptions
+  IN_PROGRESS: 'In Progress',
+  RESOLVED: 'Resolved',
+  LOW: 'Low',
+  MEDIUM: 'Medium',
+  HIGH: 'High',
+  CRITICAL: 'Critical',
+
   // Invoice
   ISSUED: 'Issued',
   PAID: 'Paid',
@@ -118,6 +134,13 @@ const STATUS_ICONS: Record<StatusVariant, string> = {
   DEPARTED: 'Plane',
   ARRIVED: 'PlaneLanding',
   // RECONCILED: 'CheckSquare',
+
+  IN_PROGRESS: 'Activity',
+  RESOLVED: 'CheckCircle',
+  LOW: 'ArrowDown',
+  MEDIUM: 'ArrowRight',
+  HIGH: 'ArrowUp',
+  CRITICAL: 'AlertOctagon',
   ISSUED: 'FileText',
   PAID: 'CreditCard',
   OVERDUE: 'Clock',

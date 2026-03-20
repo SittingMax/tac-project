@@ -93,8 +93,8 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
   };
 
   return (
-    <Card className="flex flex-col h-full border border-border/40 bg-card shadow-sm py-0 p-0">
-      <CardHeader className="flex flex-col items-stretch space-y-0 border-b border-border/40 p-0! sm:flex-row">
+    <Card className="flex flex-col h-full border border-border/50 bg-background shadow-none py-0 p-0">
+      <CardHeader className="flex flex-col items-stretch space-y-0 border-b border-border/50 p-0! sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:py-6">
           <CardTitle className="flex justify-between items-center text-xs text-muted-foreground">
             <span>Invoice Totals</span>

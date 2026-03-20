@@ -5,9 +5,10 @@ import { FormProvider as Form } from 'react-hook-form';
 import { toast } from 'sonner';
 import { motion, AnimatePresence, MotionConfig } from '@/lib/motion';
 import useMeasure from 'react-use-measure';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+// removed unused Card imports
 import { Button } from '@/components/ui/button';
 import { Check, ChevronRight, Loader2, Printer } from 'lucide-react';
+import { AppIcon } from '@/components/ui-core';
 
 import {
   useCreateInvoice,
@@ -124,14 +125,7 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
           return;
         }
 
-        if (originHubId === destHubId) {
-          toast.error(
-            'Consignor and consignee cannot resolve to the same hub for auto-created shipments. Choose different supported hub cities or link an existing shipment.'
-          );
-          setDirection(-1);
-          setCurrentStep(1);
-          return;
-        }
+
 
         const newShipment = await createShipmentMutation.mutateAsync({
           customer_id: data.customerId,
@@ -347,12 +341,12 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
   return (
     <Form {...form}>
       <MotionConfig transition={{ duration: 0.4, type: 'spring', bounce: 0.2 }}>
-        <div className="flex flex-col h-full max-w-4xl mx-auto w-full min-h-[70vh]">
+        <div className="flex flex-col h-full w-full min-h-[75vh] bg-background">
           {/* Vanguard Minimalist Progress Header */}
-          <div className="mb-8">
+          <div className="mb-0 px-10 pt-8">
             <div className="flex items-end justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold tracking-tight text-foreground">
+                <h2 className="text-3xl font-bold tracking-tight text-foreground">
                   {steps[currentStep].title}
                 </h2>
                 <p className="text-muted-foreground text-sm mt-1">
@@ -364,8 +358,8 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
               </div>
             </div>
 
-            <nav aria-label="Progress" className="w-full pb-4 border-b border-border/40">
-              <ol className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <nav aria-label="Progress" className="w-full pb-6 border-b border-border/40">
+              <ol className="flex items-center gap-2 overflow-x-auto no-scrollbar">
                 {steps.map((step, index) => {
                   const isActive = index === currentStep;
                   const isComplete = index < currentStep;
@@ -375,10 +369,11 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
                     <li key={step.title} className="flex items-center shrink-0">
                       <div
                         className={cn(
-                          'flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-300',
-                          isActive && 'bg-primary/10 text-primary font-semibold',
+                          'flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-300',
+                          isActive &&
+                            'bg-primary/10 text-primary font-semibold shadow-sm ring-1 ring-primary/20',
                           isComplete && 'text-muted-foreground',
-                          isUpcoming && 'text-muted-foreground/40 opacity-70'
+                          isUpcoming && 'text-muted-foreground/40'
                         )}
                       >
                         <span className="font-mono text-[10px] tracking-widest uppercase">
@@ -396,15 +391,15 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
             </nav>
           </div>
 
-          {/* Step Content Card */}
-          <Card className="flex-1 overflow-hidden flex flex-col border-border/60 shadow-lg">
+          {/* Step Content Area */}
+          <div className="flex-1 overflow-hidden flex flex-col relative">
             <motion.div
               animate={{ height: bounds.height > 0 ? bounds.height : 'auto' }}
               className="relative overflow-hidden"
               transition={{ type: 'spring', bounce: 0, duration: 0.5 }}
             >
-              <div ref={measureRef}>
-                <CardContent className="p-8">
+              <div ref={measureRef} className="px-10 py-8">
+                <div className="w-full">
                   <AnimatePresence mode="popLayout" initial={false} custom={direction}>
                     <motion.div
                       key={currentStep}
@@ -418,11 +413,11 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
                       {renderStepContent()}
                     </motion.div>
                   </AnimatePresence>
-                </CardContent>
+                </div>
               </div>
             </motion.div>
 
-            <CardFooter className="flex justify-between border-t bg-muted/20 p-6 z-10 mt-auto">
+            <div className="flex justify-between border-t border-border/40 bg-muted/10 px-10 py-6 z-10 mt-auto">
               <Button
                 variant="outline"
                 type="button"
@@ -440,7 +435,7 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
                     onClick={() => setShowLabelPreview(true)}
                     disabled={isLoading}
                   >
-                    <Printer className="w-4 h-4 mr-2" />
+                    <AppIcon icon={Printer} size={16} className="mr-2" />
                     Preview Label
                   </Button>
                 )}
@@ -451,20 +446,20 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
                   className="min-w-[120px]"
                 >
                   {isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    <AppIcon icon={Loader2} size={16} className="animate-spin mr-2" />
                   ) : currentStep === steps.length - 1 ? (
                     <>
-                      Confirm & Book <Check className="w-4 h-4 ml-2" />
+                      Confirm & Book <AppIcon icon={Check} size={16} className="ml-2" />
                     </>
                   ) : (
                     <>
-                      Continue <ChevronRight className="w-4 h-4 ml-2" />
+                      Continue <AppIcon icon={ChevronRight} size={16} className="ml-2" />
                     </>
                   )}
                 </Button>
               </div>
-            </CardFooter>
-          </Card>
+            </div>
+          </div>
         </div>
       </MotionConfig>
 

@@ -675,9 +675,10 @@ The CSS token system is well-designed. Enforcement rules:
 ### Phase 6: Final polish + verification — ~1 hour
 1. Full `npm run typecheck`
 2. Full `npm run lint`
-3. Full `npm run build` (production build)
-4. Visual review of all pages
-5. Remove deprecated old `PageHeader` (or mark as legacy)
+3. Run `npm run guard:page-shell`
+4. Full `npm run build` (production build)
+5. Visual review of all pages
+6. Remove deprecated old `PageHeader` (or mark as legacy)
 
 ---
 
@@ -706,7 +707,7 @@ After completion, every authenticated page must:
 7. ✅ Use `<FormSection>` + `<FormGrid>` for multi-field forms
 8. ✅ Have consistent spacing (space-y-6 between sections, gap-4 in grids)
 9. ✅ Have soft border-radius (not sharp 0px corners)
-10. ✅ Pass typecheck, lint, and build
+10. ✅ Pass typecheck, lint, page-shell guard, and build
 
 ---
 

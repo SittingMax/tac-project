@@ -9,7 +9,6 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import { FadeUp } from '@/components/motion/FadeUp';
-import { LottieSlot } from './lottie-slot';
 
 export function ContactSection() {
   const [name, setName] = useState('');
@@ -68,25 +67,19 @@ export function ContactSection() {
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[150px] rounded-full pointer-events-none" />
 
       <div className="max-w-4xl mx-auto px-6 relative z-10">
-        <FadeUp className="text-center mb-16">
-          <div className="flex justify-center mb-6">
-            <LottieSlot
-              src="/lottie/envelope.json"
-              className="w-24 h-24 opacity-80"
-              fallbackIcon={<Send className="h-10 w-10 text-primary opacity-50" />}
-            />
-          </div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-card border border-border text-xs font-semibold text-primary mb-6 shadow-sm">
+        <FadeUp className="text-center mb-16 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border/40 bg-card/40 backdrop-blur-md text-[10px] font-semibold text-foreground uppercase tracking-widest mb-6 shadow-sm">
+            <span className="flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
             Get in Touch
           </div>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6 tracking-tight [text-wrap:balance]">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-foreground mb-6 tracking-tight">
             Ready to{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/50 italic pr-2">
               Elevate
             </span>{' '}
             your Logistics?
           </h2>
-          <p className="text-lg text-muted-foreground font-mono text-sm leading-relaxed [text-wrap:balance]">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Share your shipment requirements here and the request will be routed into our contact
             inbox for follow-up by the operations team.
           </p>
@@ -133,24 +126,6 @@ export function ContactSection() {
               </ul>
             </div>
 
-            <div className="p-6 rounded-md bg-primary/5 border-l-2 border-primary relative mt-8">
-              <div className="absolute -top-4 right-4 text-primary/10 text-5xl font-serif leading-none italic select-none">
-                "
-              </div>
-              <p className="text-sm italic text-muted-foreground mb-5 relative z-10 leading-relaxed [text-wrap:balance]">
-                "Your message is stored directly in the team inbox from this form, so complete route
-                and cargo details will help speed up the follow-up."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-md bg-primary border border-primary/50 flex items-center justify-center text-[10px] font-bold text-primary-foreground shadow-sm shadow-primary/30">
-                  IN
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-foreground">Inbox Workflow</p>
-                  <p className="text-[10px] text-muted-foreground">Contact Requests</p>
-                </div>
-              </div>
-            </div>
           </FadeUp>
 
           {/* Contact Form */}
@@ -169,7 +144,7 @@ export function ContactSection() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="John Doe"
                   required
-                  className="h-12 rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 text-sm placeholder:text-muted-foreground/50 transition-all hover:bg-background"
+                  className="h-12 rounded-lg border-0 bg-muted/30 text-foreground shadow-none focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:bg-muted/50 text-sm placeholder:text-muted-foreground/40 transition-colors"
                 />
               </div>
               <div>
@@ -186,7 +161,7 @@ export function ContactSection() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="john@company.com"
                   required
-                  className="h-12 rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 text-sm placeholder:text-muted-foreground/50 transition-all hover:bg-background"
+                  className="h-12 rounded-lg border-0 bg-muted/30 text-foreground shadow-none focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:bg-muted/50 text-sm placeholder:text-muted-foreground/40 transition-colors"
                 />
               </div>
               <div>
@@ -203,7 +178,7 @@ export function ContactSection() {
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+91 98765 43210"
                   required
-                  className="h-12 rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 text-sm placeholder:text-muted-foreground/50 transition-all hover:bg-background"
+                  className="h-12 rounded-lg border-0 bg-muted/30 text-foreground shadow-none focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:bg-muted/50 text-sm placeholder:text-muted-foreground/40 transition-colors"
                 />
               </div>
               <div>
@@ -219,7 +194,7 @@ export function ContactSection() {
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Tell us about your logistics needs..."
                   required
-                  className="w-full min-h-[140px] rounded-md border border-input bg-background/50 text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary/50 resize-y p-4 text-sm placeholder:text-muted-foreground/50 transition-all hover:bg-background"
+                  className="w-full min-h-[140px] rounded-lg border-0 bg-muted/30 text-foreground shadow-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:bg-muted/50 resize-y p-4 text-sm placeholder:text-muted-foreground/40 transition-colors"
                 />
               </div>
 

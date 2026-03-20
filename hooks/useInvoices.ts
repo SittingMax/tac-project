@@ -243,8 +243,7 @@ export function useUpdateInvoice() {
       }
       const { id, ...updates } = invoice;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const updatePayload: any = {
+      const updatePayload: Database['public']['Tables']['invoices']['Update'] = {
         updated_at: new Date().toISOString(),
         ...updates,
       };

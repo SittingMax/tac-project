@@ -6,6 +6,7 @@
 
 import { toast } from 'sonner';
 import { logger } from './logger';
+import type { Database } from './database.types';
 
 // Types
 export interface OfflineScan {
@@ -30,6 +31,12 @@ export interface SyncStatus {
   lastSync?: string;
   isOnline: boolean;
 }
+
+type TrackingEventInsert = Database['public']['Tables']['tracking_events']['Insert'];
+type ShipmentSyncLookupRow = Pick<
+  Database['public']['Tables']['shipments']['Row'],
+  'id' | 'org_id'
+>;
 
 // IndexedDB configuration
 const DB_NAME = 'tac-offline-scans';
@@ -241,17 +248,37 @@ async function syncScanToServer(scan: OfflineScan): Promise<boolean> {
   try {
     // Dynamic import to avoid circular dependency
     const { supabase } = await import('./supabase');
+    const { data: shipment, error: shipmentError } = await supabase
+      .from('shipments')
+      .select('id, org_id')
+      .eq('cn_number', scan.cn_number)
+      .is('deleted_at', null)
+      .limit(1)
+      .maybeSingle();
 
-    // Create tracking event
-    const { error } = await supabase.from('tracking_events').insert({
+    if (shipmentError) {
+      throw shipmentError;
+    }
+
+    const shipmentLookup = shipment as ShipmentSyncLookupRow | null;
+    if (!shipmentLookup) {
+      throw new Error(`Shipment not found for offline scan ${scan.cn_number}`);
+    }
+
+    const payload: TrackingEventInsert = {
+      shipment_id: shipmentLookup.id,
+      org_id: shipmentLookup.org_id,
       cn_number: scan.cn_number,
       event_code: scan.event_code,
       event_time: scan.scan_time,
       hub_id: scan.hub_id,
       source: 'OFFLINE_SCAN',
       location: scan.hub_code,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic tracking event data
-    } as any);
+      notes: scan.notes ?? null,
+    };
+
+    // Create tracking event
+    const { error } = await supabase.from('tracking_events').insert(payload);
 
     if (error) {
       throw error;

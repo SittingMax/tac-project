@@ -8,6 +8,7 @@ import { Customer } from '@/hooks/useCustomers';
 import { IdBadge } from '@/components/ui-core/data/id-badge';
 
 export interface CustomersColumnsParams {
+  onView: (row: Customer) => void;
   onEdit: (row: Customer) => void;
   onDelete: (row: Customer) => void;
 }
@@ -22,8 +23,14 @@ export function getCustomersColumns(params: CustomersColumnsParams): ColumnDef<C
       accessorKey: 'name',
       header: 'Customer',
       cell: ({ row }) => (
-        <div className="flex items-center gap-4">
-          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center text-primary">
+        <div 
+          className="flex items-center gap-4 cursor-pointer group"
+          onClick={(e) => {
+            e.stopPropagation();
+            params.onView(row.original);
+          }}
+        >
+          <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors">
             {row.original.type === 'BUSINESS' ? (
               <Building className="w-4 h-4" />
             ) : (
@@ -31,7 +38,7 @@ export function getCustomersColumns(params: CustomersColumnsParams): ColumnDef<C
             )}
           </div>
           <div>
-            <div className="font-medium text-foreground">{row.original.name}</div>
+            <div className="font-medium text-foreground group-hover:text-primary transition-colors">{row.original.name}</div>
             <IdBadge
               entity="customer"
               idValue={row.original.id}

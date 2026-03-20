@@ -61,6 +61,7 @@ export function getInvoicesColumns(
       header: 'Invoice',
       cell: ({ row }) => (
         <div
+          className="cursor-pointer group"
           onClick={(e) => {
             e.stopPropagation();
             params.onView(row.original);
@@ -70,10 +71,27 @@ export function getInvoicesColumns(
             entity="invoice"
             idValue={row.original.id}
             cnNumber={row.original.invoice_no}
-            className="cursor-pointer"
+            className="group-hover:text-primary transition-colors"
           />
         </div>
       ),
+    },
+    {
+      accessorKey: 'details',
+      header: 'Details',
+      cell: ({ row }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const items: any[] = Array.isArray(row.original.line_items) ? row.original.line_items : [];
+        const mainDesc = items.length > 0 ? items[0].description || items[0].name : 'Standard Freight';
+        return (
+          <div className="flex flex-col">
+            <span className="font-medium text-foreground text-sm truncate max-w-[180px]" title={mainDesc}>{mainDesc || 'Services rendered'}</span>
+            <span className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">
+              {items.length > 1 ? `+${items.length - 1} MORE ITEM${items.length > 2 ? 'S' : ''}` : '1 ITEM'}
+            </span>
+          </div>
+        );
+      }
     },
     {
       accessorKey: 'CN Number',
@@ -105,12 +123,12 @@ export function getInvoicesColumns(
       cell: ({ row }) => {
         const statusColor = AMOUNT_STATUS_COLORS[row.original.status] || 'text-foreground';
         return (
-          <div className="text-right">
-            <div className={`font-bold text-lg ${statusColor}`}>
+          <div className="text-right flex flex-col items-end">
+            <div className={`font-mono font-bold text-sm ${statusColor}`}>
               ₹{row.original.total?.toLocaleString('en-IN') ?? '0'}
             </div>
-            <div className="text-xs text-muted-foreground">
-              Tax: ₹{(row.original.tax_amount ?? 0).toLocaleString('en-IN')}
+            <div className="text-[10px] text-muted-foreground font-mono">
+              TAX: ₹{(row.original.tax_amount ?? 0).toLocaleString('en-IN')}
             </div>
           </div>
         );
@@ -119,13 +137,15 @@ export function getInvoicesColumns(
     {
       accessorKey: 'due_date',
       header: 'Due Date',
-      cell: ({ row }) => (
-        <span className="font-mono text-sm text-muted-foreground">
-          {row.original.due_date
-            ? new Date(row.original.due_date).toLocaleDateString('en-IN')
-            : '—'}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const isOverdue = row.original.status === 'OVERDUE';
+        const dateText = row.original.due_date ? new Date(row.original.due_date).toLocaleDateString('en-IN') : '—';
+        return (
+          <span className={`font-mono text-xs ${isOverdue ? 'text-destructive font-bold bg-destructive/10 px-1.5 py-0.5 rounded' : 'text-muted-foreground'}`}>
+            {dateText}
+          </span>
+        );
+      },
     },
     {
       accessorKey: 'status',
