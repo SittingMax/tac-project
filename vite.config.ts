@@ -11,7 +11,7 @@ export default defineConfig(() => {
     appType: 'spa' as const,
     server: {
       port: devPort,
-      strictPort: false, // Don't fail if port is taken
+      strictPort: false,
       host: '0.0.0.0',
       allowedHosts: ['localhost', '127.0.0.1', '.ngrok-free.app', '.ngrok.io', '.loca.lt'],
     },
@@ -55,40 +55,53 @@ export default defineConfig(() => {
       },
     },
     build: {
-      // Target modern browsers for smaller output
       target: 'es2022',
-      // CSS code splitting for better caching
       cssCodeSplit: true,
       // Hidden source maps for Sentry error tracking (not served to clients)
       sourcemap: 'hidden' as const,
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (id.includes('node_modules')) {
-              if (id.includes('@sentry')) return 'vendor-sentry';
-              if (id.includes('@tiptap') || id.includes('prosemirror')) return 'vendor-editor';
-              if (id.includes('jspdf') || id.includes('pdf-lib') || id.includes('html2canvas'))
-                return 'vendor-pdf';
-              if (
-                id.includes('@zxing') ||
-                id.includes('jsbarcode') ||
-                id.includes('bwip-js') ||
-                id.includes('qrcode')
-              )
-                return 'vendor-scanner';
-              if (id.includes('gsap')) return 'vendor-gsap';
-              if (id.includes('recharts') || id.includes('d3-')) return 'vendor-charts';
-              if (id.includes('@supabase')) return 'vendor-supabase';
-              if (id.includes('@radix-ui')) return 'vendor-radix';
-              if (id.includes('lucide-react')) return 'vendor-icons';
-              if (id.includes('@tanstack') || id.includes('zustand') || id.includes('zod'))
-                return 'vendor-data';
-              if (id.includes('react') && !id.includes('@')) return 'vendor-react';
-              if (id.includes('motion') || id.includes('framer-motion')) return 'vendor-motion';
-              if (id.includes('date-fns') || id.includes('fuse.js') || id.includes('sonner'))
-                return 'vendor-utils';
-              return 'vendor-core'; // catch-all for other deps
-            }
+            if (!id.includes('node_modules')) return;
+
+            // --- Heavy, self-contained bundles first ---
+            if (id.includes('@sentry')) return 'vendor-sentry';
+            if (id.includes('@tiptap') || id.includes('prosemirror')) return 'vendor-editor';
+            if (id.includes('jspdf') || id.includes('pdf-lib') || id.includes('html2canvas'))
+              return 'vendor-pdf';
+            if (
+              id.includes('@zxing') ||
+              id.includes('jsbarcode') ||
+              id.includes('bwip-js') ||
+              id.includes('qrcode')
+            )
+              return 'vendor-scanner';
+            if (id.includes('recharts') || id.includes('d3-')) return 'vendor-charts';
+            if (id.includes('@supabase')) return 'vendor-supabase';
+            if (id.includes('lucide-react')) return 'vendor-icons';
+            if (id.includes('gsap')) return 'vendor-gsap';
+            if (id.includes('motion') || id.includes('framer-motion')) return 'vendor-motion';
+
+            // --- CRITICAL: React + Radix UI MUST share one chunk ---
+            // Splitting them causes Radix to resolve React.forwardRef/createElement
+            // before the React chunk has finished executing, producing:
+            //   "Cannot read properties of undefined (reading 'forwardRef')"
+            if (id.includes('react') || id.includes('@radix-ui') || id.includes('radix-ui'))
+              return 'vendor-react';
+
+            // --- Data / state / validation ---
+            if (
+              id.includes('@tanstack') ||
+              id.includes('zustand') ||
+              id.includes('zod') ||
+              id.includes('date-fns') ||
+              id.includes('fuse.js') ||
+              id.includes('sonner')
+            )
+              return 'vendor-data';
+
+            // --- Everything else ---
+            return 'vendor-core';
           },
         },
       },
