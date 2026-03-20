@@ -82,7 +82,7 @@ test.describe('Barcode Scanning – Dashboard Invoice Preview', () => {
 
   test('scan shipment barcode → invoice preview dialog appears', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await simulateScan(page, 'TAC20260001');
 
@@ -95,7 +95,7 @@ test.describe('Barcode Scanning – Dashboard Invoice Preview', () => {
 
   test('dialog shows invoice amount, customer, and AWB', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await simulateScan(page, 'TAC20260001');
 
@@ -111,7 +111,7 @@ test.describe('Barcode Scanning – Dashboard Invoice Preview', () => {
 
   test('"View Full Details" navigates to /finance?awb=...', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await simulateScan(page, 'TAC20260001');
 
@@ -125,7 +125,7 @@ test.describe('Barcode Scanning – Dashboard Invoice Preview', () => {
 
   test('"Dismiss" closes dialog, stays on dashboard', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await simulateScan(page, 'TAC20260001');
 
@@ -140,7 +140,7 @@ test.describe('Barcode Scanning – Dashboard Invoice Preview', () => {
 
   test('"Copy" button is clickable', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await simulateScan(page, 'TAC20260001');
 
@@ -161,7 +161,7 @@ test.describe('Barcode Scanning – Error Handling', () => {
 
   test('non-existent AWB shows error in dialog', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await simulateScan(page, 'TAC00000000');
 
@@ -174,7 +174,7 @@ test.describe('Barcode Scanning – Error Handling', () => {
 
   test('unknown barcode format shows scanned value', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await simulateScan(page, 'UNKNOWN12345');
 
@@ -194,7 +194,7 @@ test.describe('Barcode Scanning – Manifest Preview', () => {
 
   test('MAN barcode shows manifest preview dialog', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await simulateScan(page, 'MAN20260001');
 
@@ -213,7 +213,7 @@ test.describe('Barcode Scanning – Context Awareness', () => {
 
   test('/scanning page handles scans locally (no invoice preview dialog)', async ({ page }) => {
     await page.goto('/scanning');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     await simulateScan(page, 'TAC20260001');
 
@@ -231,7 +231,7 @@ test.describe('Barcode Scanning – Performance', () => {
 
   test('handles 3 consecutive scan-dismiss cycles', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     for (let i = 0; i < 3; i++) {
       await simulateScan(page, 'TAC20260001');
@@ -252,7 +252,7 @@ test.describe('Barcode Scanning – Performance', () => {
 
   test('slow manual typing does NOT trigger scanner dialog', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Dispatch keystrokes at 200ms intervals (human speed, above 150ms threshold)
     await page.evaluate(() => {

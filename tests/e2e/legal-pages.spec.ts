@@ -47,7 +47,7 @@ test.describe('Legal Pages Performance', () => {
       observer.observe({ entryTypes: ['longtask'] });
     });
 
-    await page.goto('http://localhost:5173/terms');
+    await page.goto('/terms');
 
     // Wait for the main heading
     await expect(page.locator('h1', { hasText: 'Terms and Conditions' })).toBeVisible({
@@ -72,7 +72,7 @@ test.describe('Legal Pages Performance', () => {
   });
 
   test('Privacy Policy should load and not hang', async ({ page }) => {
-    await page.goto('http://localhost:5173/privacy');
+    await page.goto('/privacy');
     await expect(page.locator('h1', { hasText: 'Privacy Policy' })).toBeVisible({ timeout: 10000 });
   });
 });

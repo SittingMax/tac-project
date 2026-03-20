@@ -18,13 +18,13 @@ test.describe('Scanner Stress Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the dashboard (requires auth — uses stored session)
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
   });
 
   test('rapid scan — 50 consecutive keyboard scans without duplicate dialogs', async ({ page }) => {
     // Navigate to a scan-capable page (e.g., manifests or shipments)
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     let dialogCount = 0;
     page.on('dialog', async (dialog) => {
@@ -65,7 +65,7 @@ test.describe('Scanner Stress Tests', () => {
 
     for (const path of pages) {
       await page.goto(path);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
     }
 
     // Count active keydown listeners on document
@@ -84,7 +84,7 @@ test.describe('Scanner Stress Tests', () => {
   test('large table with 100+ barcodes renders without crash', async ({ page }) => {
     // Navigate to shipments page which can have many rows
     await page.goto('/shipments');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Wait for table to render
     const table = page.locator('table').first();
@@ -111,7 +111,7 @@ test.describe('Scanner Stress Tests', () => {
   test('manifest builder + scan does not cause context collision', async ({ page }) => {
     // Open manifest builder
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Click "Create Manifest" or equivalent button
     const createBtn = page.locator('button', { hasText: /create|new/i }).first();

@@ -20,23 +20,23 @@ test.describe('Production Readiness - Domain Enforcement', () => {
   test('should not display IXA hub code anywhere in UI', async ({ page }) => {
     // Check Dashboard
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await expect(page.locator('body')).not.toContainText('IXA');
 
     // Check Manifests
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await expect(page.locator('body')).not.toContainText('IXA');
 
     // Check Shipments
     await page.goto('/shipments');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await expect(page.locator('body')).not.toContainText('IXA');
   });
 
   test('should show Imphal Hub with IMF code in manifest creation', async ({ page }) => {
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Click create manifest to see hub dropdowns
     const createBtn = page.getByRole('button', { name: /create manifest/i }).first();
@@ -62,7 +62,7 @@ test.describe('Production Readiness', () => {
 
   test('should not show hardcoded mock data on dashboard', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     const bodyText = (await page.locator('body').textContent()) || '';
 
@@ -78,7 +78,7 @@ test.describe('Production Readiness', () => {
   test('should show empty state when no data exists', async ({ page }) => {
     // This test assumes a clean database or filtered view with no data
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await page.waitForTimeout(1000);
 
     // Check for various valid dashboard states
@@ -109,7 +109,7 @@ test.describe('Production Readiness - Empty States', () => {
 
   test('should render empty state correctly for charts with no data', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Wait for initial render
     await page.waitForTimeout(1000);
@@ -153,7 +153,7 @@ test.describe('Production Readiness - Critical User Flows', () => {
     // Smoke test: verify invoice creation UI is accessible
     // Full E2E flow requires manual QA (see PRODUCTION_READINESS_CHECKLIST.md)
     await page.goto('/finance');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Verify invoice creation button exists
     const createInvoiceBtn = page.getByRole('button', { name: /create|new.*invoice/i }).first();
@@ -163,7 +163,7 @@ test.describe('Production Readiness - Critical User Flows', () => {
   test('Shipment page should not show label generation error', async ({ page }) => {
     // Verify the forbidden error message is not displayed
     await page.goto('/shipments');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Should not show error: "No shipment data found. Please generate label from Invoices dashboard."
     const forbiddenError = page.getByText(/no shipment data found.*generate label from invoices/i);
@@ -187,7 +187,7 @@ test.describe('Production Readiness - Critical User Flows', () => {
     });
 
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Try to open create manifest
     const createBtn = page.getByRole('button', { name: /create manifest/i }).first();
@@ -204,7 +204,7 @@ test.describe('Production Readiness - Critical User Flows', () => {
 
   test('Hub dropdown should show IMF correctly', async ({ page }) => {
     await page.goto('/manifests');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     const createBtn = page.getByRole('button', { name: /create manifest/i }).first();
     await expect(createBtn).toBeVisible({ timeout: 5000 });
@@ -241,7 +241,7 @@ test.describe('Production Readiness - No Console Errors', () => {
     });
 
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await page.waitForTimeout(2000);
 
     // Filter out acceptable errors (network errors, etc.)

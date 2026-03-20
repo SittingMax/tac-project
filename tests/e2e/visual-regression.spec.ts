@@ -28,7 +28,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('login page matches snapshot', async ({ page }) => {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Wait for animations to complete
       await page.waitForTimeout(500);
@@ -46,7 +46,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('login error state matches snapshot', async ({ page }) => {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Use generic selectors that work with current login form
       const emailInput = page.locator('input[type="email"]').first();
@@ -75,7 +75,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('dashboard page matches snapshot', async ({ page }) => {
       await page.goto('/dashboard');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       // Wait for KPI data to load
       await page.waitForSelector('[data-testid="kpi-grid"]', { timeout: 15000 });
@@ -93,7 +93,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('dashboard header matches snapshot', async ({ page }) => {
       await page.goto('/dashboard');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       const header = page.locator('[data-testid="dashboard-page"] h1').first();
       await expect(header).toBeVisible();
@@ -105,7 +105,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('quick actions matches snapshot', async ({ page }) => {
       await page.goto('/dashboard');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
 
       const quickActions = page.locator('[data-testid="quick-actions"]');
       await expect(quickActions).toBeVisible();
@@ -122,7 +122,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('manifests page matches snapshot', async ({ page }) => {
       await page.goto('/manifests');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
       await page.waitForTimeout(1000);
       await expect(
         page
@@ -148,7 +148,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('shipments page matches snapshot', async ({ page }) => {
       await page.goto('/shipments');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
       await page.waitForTimeout(1000);
 
       await expect(page).toHaveScreenshot('shipments-page.png', {
@@ -168,7 +168,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('notifications page matches snapshot', async ({ page }) => {
       await page.goto('/notifications');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
       await page.waitForTimeout(1000);
 
       await expect(page).toHaveScreenshot('notifications-page.png', {
@@ -185,7 +185,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('search results page matches snapshot', async ({ page }) => {
       await page.goto('/search?q=TEST');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
       await page.waitForTimeout(1000);
 
       await expect(page).toHaveScreenshot('search-results-page.png', {
@@ -203,7 +203,7 @@ test.describe('Visual Regression Tests', () => {
     test('public tracking page matches snapshot (found)', async ({ page }) => {
       // Mock tracking API or use a known test AWB if local
       await page.goto('/track/TAC2026000001');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
       await page.waitForTimeout(1000);
 
       await expect(page).toHaveScreenshot('public-tracking-page.png', {
@@ -223,7 +223,7 @@ test.describe('Visual Regression Tests', () => {
     test('login page mobile view', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 });
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
       await page.waitForTimeout(500);
 
       await expect(page).toHaveScreenshot('login-mobile.png', {
@@ -235,7 +235,7 @@ test.describe('Visual Regression Tests', () => {
     test('login page tablet view', async ({ page }) => {
       await page.setViewportSize({ width: 768, height: 1024 });
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
       await page.waitForTimeout(500);
 
       await expect(page).toHaveScreenshot('login-tablet.png', {
@@ -251,7 +251,7 @@ test.describe('Visual Regression Tests', () => {
     test('login page dark mode', async ({ page }) => {
       await page.emulateMedia({ colorScheme: 'dark' });
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
       await page.waitForTimeout(500);
 
       await expect(page).toHaveScreenshot('login-dark-mode.png', {

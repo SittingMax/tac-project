@@ -9,7 +9,7 @@ test.describe('Dashboard Auth Redirect Guard', () => {
 
   test('should navigate via quick action without redirecting to login', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     const scanPackageButton = page.getByTestId('quick-action-scan-package');
     await expect(scanPackageButton).toBeVisible();

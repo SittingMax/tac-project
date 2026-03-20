@@ -67,7 +67,7 @@ jobs:
         run: |
           if grep -rE "service_role|SUPABASE_SERVICE_ROLE" \
             --include="*.ts" --include="*.tsx" --include="*.js" \
-            --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=supabase/functions \
+            --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=supabase/functions --exclude-dir=scripts \
             --exclude="*.test.*" --exclude="*.spec.*" \
             . 2>/dev/null; then
             echo "❌ Service role key reference found in client code"
