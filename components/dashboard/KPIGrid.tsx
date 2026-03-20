@@ -112,14 +112,11 @@ const KPICard = React.memo(
           data-testid={`kpi-card-${label.toLowerCase().replace(/\s+/g, '-')}`}
           className={cn(
             'relative overflow-hidden h-full flex flex-col justify-between group transition-all duration-300',
-            'border border-border/40 bg-card hover:shadow-md hover:border-primary/40',
+            'border border-border/50 bg-background shadow-xs hover:border-border hover:shadow-sm',
             path ? 'cursor-pointer' : ''
           )}
         >
-          {/* Background Icon */}
-          <div className="absolute -top-4 -right-4 p-4 opacity-[0.02] group-hover:opacity-[0.06] transition-opacity pointer-events-none transform group-hover:scale-110 duration-500 z-0">
-            <AppIcon icon={Icon} size={32} className="w-32 h-32" />
-          </div>
+          {/* Background Icon Removed for Calm Design */}
 
           <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2 z-10">
             <CardTitle className="text-xs text-muted-foreground">{label}</CardTitle>

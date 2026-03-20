@@ -145,7 +145,7 @@ export const Inventory: React.FC = () => {
       case '12-24h':
         return 'text-status-warning';
       case '24h+':
-        return 'text-status-error font-bold';
+        return 'text-destructive font-bold bg-destructive/10 px-2 py-0.5 rounded';
       default:
         return 'text-muted-foreground';
     }
@@ -187,12 +187,16 @@ export const Inventory: React.FC = () => {
       {
         accessorKey: 'package_count',
         header: 'Packages',
-        cell: ({ row }) => <span className="font-mono">{row.original.package_count}</span>,
+        cell: ({ row }) => (
+          <span className="font-mono text-xs font-medium text-foreground">{row.original.package_count}</span>
+        ),
       },
       {
         id: 'weight',
         header: 'Weight',
-        cell: ({ row }) => <span className="font-mono">{row.original.total_weight} kg</span>,
+        cell: ({ row }) => (
+          <span className="font-mono text-xs text-muted-foreground">{row.original.total_weight} <span className="text-[10px] uppercase">kg</span></span>
+        ),
       },
       {
         id: 'location',
@@ -201,9 +205,9 @@ export const Inventory: React.FC = () => {
           const location = getInventoryLocation(row.original);
           const hubName = location ? HUBS[location]?.name || 'Unknown' : 'Unknown';
           return (
-            <div className="flex items-center gap-2">
-              <AppIcon icon={Warehouse} size={16} className="text-muted-foreground" />
-              {hubName}
+            <div className="flex items-center gap-1.5 text-sm">
+              <AppIcon icon={Warehouse} size={16} className="text-muted-foreground/70" />
+              <span className="font-medium text-foreground">{hubName}</span>
             </div>
           );
         },
@@ -220,7 +224,7 @@ export const Inventory: React.FC = () => {
         header: 'Age',
         cell: ({ row }) => {
           const bucket = getAgingBucket(row.original.created_at);
-          return <span className={`font-mono font-bold ${bucketColor(bucket)}`}>{bucket}</span>;
+          return <span className={`font-mono text-xs ${bucketColor(bucket)}`}>{bucket}</span>;
         },
       },
     ],
@@ -282,6 +286,7 @@ export const Inventory: React.FC = () => {
           }}
           pageSize={Math.max(shipments.length, 1)}
           emptyMessage="No items found."
+          density="compact"
         />
 
         <div className="pt-2 border-t mt-2">

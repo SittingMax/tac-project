@@ -55,6 +55,8 @@ export interface CrudTableProps<TData> {
   emptyState?:
     | React.ReactNode
     | ((ctx: { isFiltered: boolean; filter: string }) => React.ReactNode);
+  /** Table density styling */
+  density?: 'default' | 'compact';
   /** Toolbar content (e.g., filters, create button) */
   toolbar?: React.ReactNode;
   /** Optional callback for server-side search */
@@ -102,6 +104,7 @@ export function CrudTable<TData>({
   onRowSelectionChange,
   bulkActions,
   onRowClick,
+  density = 'default',
 }: CrudTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -250,7 +253,10 @@ export function CrudTable<TData>({
                       {headerGroup.headers.map((header) => (
                         <TableHead
                           key={header.id}
-                          className="relative group transition-colors"
+                          className={cn(
+                            'relative group transition-colors',
+                            density === 'compact' && 'h-8 px-3 text-xs'
+                          )}
                           style={{ width: header.getSize() }}
                         >
                           {header.isPlaceholder ? null : (
@@ -291,12 +297,15 @@ export function CrudTable<TData>({
                         key={row.id}
                         onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                         className={cn(
-                          'transition-colors hover:bg-muted/5',
+                          'transition-colors hover:bg-muted/30',
                           onRowClick ? 'cursor-pointer' : ''
                         )}
                       >
                         {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
+                          <TableCell 
+                            key={cell.id}
+                            className={cn(density === 'compact' && 'py-1.5 px-3 text-xs')}
+                          >
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </TableCell>
                         ))}

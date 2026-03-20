@@ -18,7 +18,7 @@ import {
 } from '@/hooks/useExceptions';
 import { useFindShipmentByCN } from '@/hooks/useShipments';
 import { useRealtimeExceptions } from '@/hooks/useRealtime';
-import { AlertCircle, CheckCircle, Plus, ShieldAlert, Clock } from 'lucide-react';
+import { AlertCircle, CheckCircle, Plus, ShieldAlert, Clock, X } from 'lucide-react';
 import { AppIcon } from '@/components/ui-core';
 import { ColumnDef } from '@tanstack/react-table';
 import { StatusBadge } from '@/components/domain/status-badge';
@@ -34,6 +34,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { formatDateTime } from '@/lib/formatters';
+import { cn } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
 
 const raiseSchema = z.object({
   awb: z.string().min(1, 'CN Required'),
@@ -161,8 +163,8 @@ export const Exceptions: React.FC = () => {
           const ex = row.original;
           if (ex.status === 'OPEN') {
             return (
-              <Button variant="outline" size="sm" onClick={() => setSelectedException(ex)}>
-                <AppIcon icon={CheckCircle} size={16} data-icon="inline-start" /> Resolve
+              <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedException(ex); }}>
+                View
               </Button>
             );
           }
@@ -239,56 +241,143 @@ export const Exceptions: React.FC = () => {
         <StatCard title="Total Exceptions" value={exceptions.length} icon={Clock} />
       </div>
 
-      <SectionCard>
-        <CrudTable
-          columns={columns}
-          data={exceptions}
-          isLoading={isLoading}
-          searchKey="exceptions"
-          searchPlaceholder="Search by CN..."
-          toolbar={
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <Select
-                value={statusFilter}
-                onValueChange={(value) => updateFilterParam('status', value)}
-              >
-                <SelectTrigger className="w-full sm:w-[160px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUS_FILTER_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={severityFilter}
-                onValueChange={(value) => updateFilterParam('severity', value)}
-              >
-                <SelectTrigger className="w-full sm:w-[170px]">
-                  <SelectValue placeholder="Severity" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SEVERITY_FILTER_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {(statusFilter !== 'ALL' || severityFilter !== 'ALL') && (
-                <Button variant="outline" onClick={clearFilters}>
-                  Clear Filters
+      <div className="flex flex-col xl:flex-row gap-6 items-start w-full">
+        <div className={cn("flex-1 w-full transition-all duration-300", selectedException ? "xl:max-w-[calc(100%-424px)]" : "")}>
+          <SectionCard>
+            <CrudTable
+              columns={columns}
+              data={exceptions}
+              isLoading={isLoading}
+              searchKey="exceptions"
+              searchPlaceholder="Search by CN..."
+              toolbar={
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <Select
+                    value={statusFilter}
+                    onValueChange={(value) => updateFilterParam('status', value)}
+                  >
+                    <SelectTrigger className="w-full sm:w-[160px]">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATUS_FILTER_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={severityFilter}
+                    onValueChange={(value) => updateFilterParam('severity', value)}
+                  >
+                    <SelectTrigger className="w-full sm:w-[170px]">
+                      <SelectValue placeholder="Severity" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SEVERITY_FILTER_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {(statusFilter !== 'ALL' || severityFilter !== 'ALL') && (
+                    <Button variant="outline" onClick={clearFilters}>
+                      Clear Filters
+                    </Button>
+                  )}
+                </div>
+              }
+              emptyState={<EmptyExceptions />}
+              emptyMessage="No exceptions found."
+              onRowClick={setSelectedException}
+              density="compact"
+            />
+          </SectionCard>
+        </div>
+
+        {selectedException && (
+          <div className="w-full xl:w-[400px] flex-shrink-0 animate-in slide-in-from-right-8 duration-300 sticky top-6">
+            <Card className="flex flex-col h-full min-h-[500px] border-border/50 shadow-md relative overflow-hidden bg-card">
+              <div className="p-4 border-b border-border/50 bg-muted/10 flex items-center justify-between shrink-0">
+                <h3 className="font-semibold text-base tracking-tight flex items-center gap-2">
+                  <AppIcon icon={AlertCircle} className="text-primary" size={16} /> 
+                  Exception Details
+                </h3>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50" onClick={() => setSelectedException(null)}>
+                  <X className="h-4 w-4" />
                 </Button>
-              )}
-            </div>
-          }
-          emptyState={<EmptyExceptions />}
-          emptyMessage="No exceptions found."
-        />
-      </SectionCard>
+              </div>
+              
+              <div className="p-5 flex flex-col gap-6 overflow-y-auto custom-scrollbar flex-1">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <IdBadge entity="exception" idValue={selectedException.id} className="text-xs" />
+                    <StatusBadge status={selectedException.status} />
+                    <StatusBadge status={selectedException.severity} />
+                  </div>
+                  
+                  {selectedException.shipment && (
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Shipment CN</span>
+                      <span className="font-mono text-base font-bold text-foreground">
+                        {selectedException.shipment.cn_number}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="bg-muted/20 p-4 rounded-xl border border-border/40 flex flex-col gap-3">
+                    <div>
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Type</span>
+                      <span className="text-sm font-medium">{selectedException.type}</span>
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Description</span>
+                      <span className="text-sm text-foreground/90 leading-relaxed">{selectedException.description}</span>
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Reported At</span>
+                      <span className="text-sm text-muted-foreground">{formatDateTime(selectedException.created_at)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-border/40 mt-auto">
+                  {selectedException.status === 'OPEN' ? (
+                    <form onSubmit={handleSubmitResolve(onResolveSubmit)} className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-2">
+                        <label htmlFor="resolve-note" className="text-sm font-medium text-foreground">
+                          Resolution Note
+                        </label>
+                        <Textarea
+                          id="resolve-note"
+                          {...registerResolve('note')}
+                          placeholder="Explain how this exception was resolved..."
+                          rows={4}
+                          className="resize-none text-sm bg-background border-border/50 focus-visible:ring-1 focus-visible:ring-primary/30"
+                        />
+                      </div>
+                      <Button type="submit" disabled={resolveMutation.isPending} className="w-full font-medium">
+                        {resolveMutation.isPending ? 'Resolving Case...' : 'Resolve Exception'}
+                      </Button>
+                    </form>
+                  ) : (
+                    <div className="bg-success/5 border border-success/20 px-4 py-4 rounded-xl text-sm flex flex-col gap-2">
+                      <div className="font-semibold text-success flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4" /> Exception Resolved
+                      </div>
+                      <div className="text-foreground/80 leading-relaxed">
+                        {selectedException.resolution || 'Resolved without specific notes.'}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+      </div>
 
       {/* Raise Modal */}
       <Dialog open={isRaiseModalOpen} onOpenChange={setIsRaiseModalOpen}>
@@ -369,49 +458,7 @@ export const Exceptions: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Resolve Modal */}
-      <Dialog
-        open={!!selectedException}
-        onOpenChange={(open) => {
-          if (!open) setSelectedException(null);
-        }}
-      >
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl">Resolve Exception</DialogTitle>
-          </DialogHeader>
-          <form
-            onSubmit={handleSubmitResolve(onResolveSubmit)}
-            className="flex flex-col gap-6 py-4"
-          >
-            <div className="bg-muted/30 p-5 rounded-lg border border-border/50">
-              <div className="font-semibold text-foreground text-sm flex items-center gap-2">
-                <AppIcon icon={ShieldAlert} size={16} className="text-primary" /> Exception:{' '}
-                {selectedException?.type}
-              </div>
-              <div className="text-muted-foreground mt-2 text-sm leading-relaxed">
-                {selectedException?.description}
-              </div>
-            </div>
-            <FieldGroup label="Resolution Note" htmlFor="resolve-note">
-              <Textarea
-                id="resolve-note"
-                {...registerResolve('note')}
-                placeholder="How was this resolved?"
-                rows={4}
-                className="min-h-[100px] bg-transparent hover:border-ring/50 transition-colors resize-y text-sm"
-              />
-            </FieldGroup>
-            <Button
-              type="submit"
-              className="w-full h-8 text-xs font-bold mt-2"
-              disabled={resolveMutation.isPending}
-            >
-              {resolveMutation.isPending ? 'Resolving...' : 'Confirm Resolution'}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+
     </PageContainer>
   );
 };

@@ -5,7 +5,15 @@ import { ArrowLeft, ArrowRight, Save, Lock, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useScanContext } from '@/context/ScanContext';
 
-import { Stepper, SizedDialog } from '@/components/ui-core';
+import { Stepper } from '@/components/ui-core';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   AlertDialog,
@@ -360,97 +368,23 @@ export function ManifestBuilderWizard({
 
   return (
     <TooltipProvider>
-      <SizedDialog
-        open={open}
-        onOpenChange={handleCancel}
-        size="5xl"
-        title="Create Manifest"
-        description="Create a new dispatch manifest for cargo shipments"
-        headerSlot={
-          <div className="px-6 py-4 border-b border-border bg-secondary/20 shrink-0">
+      <Sheet open={open} onOpenChange={handleCancel}>
+        <SheetContent side="right" className="w-full sm:max-w-4xl p-0 flex flex-col h-full bg-background border-l border-border/40 shadow-2xl">
+          
+          <SheetHeader className="px-6 pt-6 pb-4 border-b border-border/40">
+            <SheetTitle className="text-xl font-semibold tracking-tight">Create Manifest</SheetTitle>
+            <SheetDescription>Create a new dispatch manifest for cargo shipments</SheetDescription>
+          </SheetHeader>
+          
+          <div className="px-6 py-4 border-b border-border/40 bg-muted/5 shrink-0">
             <Stepper
               steps={WIZARD_STEPS}
               currentStep={currentStep}
               className="pb-0 mb-0 border-b-0"
             />
           </div>
-        }
-        footer={
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={handleCancel}>
-                Cancel
-              </Button>
 
-              {currentStep > 1 && (
-                <Button variant="outline" onClick={handleBack}>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
-                </Button>
-              )}
-
-              {currentStep < 3 ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span tabIndex={0}>
-                      <Button
-                        onClick={handleNext}
-                        disabled={
-                          (currentStep === 1 && (!isStep1Valid || builder.isCreating)) ||
-                          (currentStep === 2 && builder.items.length === 0)
-                        }
-                      >
-                        {builder.isCreating ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Creating...
-                          </>
-                        ) : (
-                          <>
-                            Next
-                            <ArrowRight className="h-4 w-4 ml-2" />
-                          </>
-                        )}
-                      </Button>
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {currentStep === 1 && !isStep1Valid && (
-                      <p>Please fill all required fields correctly</p>
-                    )}
-                    {currentStep === 2 && builder.items.length === 0 && (
-                      <p>Add at least one shipment to proceed</p>
-                    )}
-                  </TooltipContent>
-                </Tooltip>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="secondary"
-                    onClick={() => handleCloseManifest('OPEN')}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <Save className="h-4 w-4 mr-2" />
-                    )}
-                    Save as Open
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => setShowCloseConfirm(true)}
-                    disabled={isSaving}
-                  >
-                    <Lock className="h-4 w-4 mr-2" />
-                    Close Manifest
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        }
-      >
+          <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
         {/* Content - Use CSS visibility instead of conditional rendering to prevent portal destruction */}
         <div className="px-2">
           {/* Step 1: Manifest Setup - Always mounted, hidden via CSS */}
@@ -508,7 +442,84 @@ export function ManifestBuilderWizard({
             />
           </div>
         </div>
-      </SizedDialog>
+          </div>
+          <SheetFooter className="px-6 py-4 border-t border-border/40 bg-card mt-auto shrink-0 sm:justify-between w-full">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" onClick={handleCancel}>
+                  Cancel
+                </Button>
+
+                {currentStep > 1 && (
+                  <Button variant="outline" onClick={handleBack}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back
+                  </Button>
+                )}
+
+                {currentStep < 3 ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span tabIndex={0}>
+                        <Button
+                          onClick={handleNext}
+                          disabled={
+                            (currentStep === 1 && (!isStep1Valid || builder.isCreating)) ||
+                            (currentStep === 2 && builder.items.length === 0)
+                          }
+                        >
+                          {builder.isCreating ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Creating...
+                            </>
+                          ) : (
+                            <>
+                              Next
+                              <ArrowRight className="h-4 w-4 ml-2" />
+                            </>
+                          )}
+                        </Button>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {currentStep === 1 && !isStep1Valid && (
+                        <p>Please fill all required fields correctly</p>
+                      )}
+                      {currentStep === 2 && builder.items.length === 0 && (
+                        <p>Add at least one shipment to proceed</p>
+                      )}
+                    </TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="secondary"
+                      onClick={() => handleCloseManifest('OPEN')}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Save className="h-4 w-4 mr-2" />
+                      )}
+                      Save as Open
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowCloseConfirm(true)}
+                      disabled={isSaving}
+                    >
+                      <Lock className="h-4 w-4 mr-2" />
+                      Close Manifest
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       {/* Close Confirmation Dialog - Only mount when needed to prevent portal race conditions */}
       {showCloseConfirm && (

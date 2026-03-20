@@ -257,32 +257,40 @@ export default function ShiftReport() {
               </CardContent>
             </Card>
 
-            {/* Recent Activity — uses ScrollArea instead of overflow-y-auto */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Latest operations during shift</CardDescription>
+            {/* Recent Activity — immutable ledgers */}
+            <Card className="lg:col-span-2 border-border/60 shadow-sm">
+              <CardHeader className="py-4 border-b border-border/50 bg-muted/10">
+                <CardTitle className="text-sm font-semibold uppercase tracking-widest flex items-center gap-2">
+                  <Clock className="size-4" /> Operations Ledger
+                </CardTitle>
+                <CardDescription className="text-xs">Immutable chronological log of shift events</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[300px]">
-                  <div className="flex flex-col gap-3 pr-3">
-                    {report.recentActivity.map((activity, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm">
-                        <span className="text-muted-foreground whitespace-nowrap">
-                          {formatDateTime(activity.time)}
-                        </span>
-                        <div className="flex-1">
-                          <p>{activity.description}</p>
-                          {activity.actor && (
-                            <p className="text-xs text-muted-foreground">by {activity.actor}</p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                    {report.recentActivity.length === 0 && (
-                      <EmptyState icon={Clock} title="No recent activity" className="p-4 py-8" />
-                    )}
-                  </div>
+              <CardContent className="p-0">
+                <ScrollArea className="h-[400px]">
+                  <table className="w-full text-sm">
+                    <tbody className="divide-y divide-border/40">
+                      {report.recentActivity.map((activity, i) => (
+                        <tr key={i} className="hover:bg-muted/20 transition-colors group">
+                          <td className="py-2.5 px-4 whitespace-nowrap text-xs font-mono text-muted-foreground w-40 align-top group-hover:text-foreground transition-colors">
+                            {formatDateTime(activity.time)}
+                          </td>
+                          <td className="py-2.5 px-4 align-top text-xs leading-relaxed">
+                            <span className="font-medium text-foreground">{activity.description}</span>
+                          </td>
+                          <td className="py-2.5 px-4 text-[10px] font-mono tracking-widest text-muted-foreground align-top text-right whitespace-nowrap">
+                            {activity.actor ? `OP:${activity.actor.replace(/\s+/g, '').substring(0,8).toUpperCase()}` : 'SYSTEM'}
+                          </td>
+                        </tr>
+                      ))}
+                      {report.recentActivity.length === 0 && (
+                        <tr>
+                          <td colSpan={3} className="py-8">
+                            <EmptyState icon={Clock} title="No log entries" className="p-4" />
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </ScrollArea>
               </CardContent>
             </Card>

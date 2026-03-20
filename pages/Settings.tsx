@@ -14,6 +14,11 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { hasRoleAccess } from '@/lib/access-control';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 // Placeholder Tab Components for unimplemented branches
 const PlaceholderTab = ({ name }: { name: string }) => (
@@ -22,7 +27,53 @@ const PlaceholderTab = ({ name }: { name: string }) => (
   </div>
 );
 
-const GeneralTab = () => <PlaceholderTab name="General" />;
+const GeneralTab = () => (
+  <div className="flex flex-col gap-6 p-1">
+    <div className="grid gap-5">
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="org-name">Organization Name</Label>
+        <Input id="org-name" defaultValue="TAC Cargo Enterprise" />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="support-email">Support Email</Label>
+        <Input id="support-email" defaultValue="support@tac-cargo.com" />
+      </div>
+    </div>
+    
+    <Accordion type="single" collapsible className="w-full">
+      <AccordionItem value="advanced" className="border-border/40">
+        <AccordionTrigger className="text-sm font-semibold">Advanced Settings</AccordionTrigger>
+        <AccordionContent>
+          <div className="grid gap-6 pt-4 pb-2 px-1">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Developer Mode</Label>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Enable experimental features and REST logs.</p>
+              </div>
+              <Switch />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Legacy Endpoint Support</Label>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Allow connections from deprecated v1 APIs.</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="webhook-url">Webhook Root URL</Label>
+              <Input id="webhook-url" placeholder="https://" defaultValue="https://api.tac-cargo.com/hooks/v2" />
+            </div>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+
+    <div className="flex justify-start pt-4 border-t border-border/30 mt-2">
+      <Button>Save Settings</Button>
+    </div>
+  </div>
+);
+
 const OperationsTab = () => <PlaceholderTab name="Operations" />;
 const BillingTab = () => <PlaceholderTab name="Billing" />;
 const SecurityTab = () => <PlaceholderTab name="Security" />;

@@ -1,8 +1,9 @@
 import React, { lazy, Suspense } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Activity, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { KPIGrid } from '@/components/dashboard/KPIGrid';
 import { QuickActions } from '@/components/dashboard/QuickActions';
+import { NextBestAction } from '@/components/dashboard/NextBestAction';
 import { LiveActivityFeed } from '@/components/dashboard/LiveActivityFeed';
 import { OperationalHealth } from '@/components/dashboard/OperationalHealth';
 import { DateRangeSelector } from '@/components/dashboard/DateRangeSelector';
@@ -18,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PageContainer, PageHeader } from '@/components/ui-core/layout';
+import { PageContainer } from '@/components/ui-core/layout';
 import { AppIcon } from '@/components/ui-core';
 
 // Dynamically import heavy charting components
@@ -137,70 +138,73 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const userGreetingName = user?.fullName?.split(' ')[0] || 'Team';
-
   return (
     <PageContainer
       data-testid="dashboard-page"
       className="flex flex-col gap-6 animate-in fade-in duration-300"
     >
-      {/* Vibrant SaaS Welcome Hero */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6 md:p-8 text-primary-foreground shadow-lg border border-primary/20">
-        <div className="relative z-10">
-          <PageHeader
-            title={
-              <span className="text-3xl font-bold tracking-tight text-primary-foreground md:text-4xl">
-                Good morning, {userGreetingName}
-              </span>
-            }
-            description={
-              <span className="max-w-2xl text-primary-foreground/80 md:text-lg font-medium">
-                Real-time logistics telemetry and operations health.
-                {hasRoleAccess(user?.role, ['ADMIN', 'SUPER_ADMIN'])
-                  ? ' You have full administrative access.'
-                  : ' Viewing operations overview.'}
-              </span>
-            }
-            badge={<AppIcon icon={Activity} size={16} className="animate-pulse text-emerald-400" />}
-            className="mb-0"
-          >
-            <DateRangeSelector />
-            <Button
-              data-testid="dashboard-refresh-button"
-              variant="outline"
-              onClick={refreshData}
-              className="h-10 bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-sm transition shadow-sm"
-            >
-              <AppIcon icon={RefreshCw} size={16} className="sm:mr-2" />
-              <span className="hidden sm:inline">Refresh</span>
-            </Button>
-            {canExportDashboardReport && (
+      {/* Top Split: North Star / Operations (Left) vs Next Best Action (Right) for F-Pattern */}
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] 2xl:grid-cols-[1fr_380px] gap-6">
+        
+        {/* Left Column: Data & Operations */}
+        <div className="flex flex-col gap-6">
+          {/* Header (Replaces Vibrant Hero for Calm Design) */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-border/50">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">Overview</h1>
+              <p className="text-muted-foreground text-sm mt-1 flex items-center gap-2">
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success"></span>
+                </span>
+                Real-time enterprise logistics telemetry
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <DateRangeSelector />
               <Button
-                data-testid="dashboard-download-button"
-                className="h-10 bg-white text-primary hover:bg-white/90 shadow-sm transition font-semibold"
-                onClick={handleDownloadReport}
+                data-testid="dashboard-refresh-button"
+                variant="outline"
+                size="sm"
+                onClick={refreshData}
+                className="h-9 shadow-none border-border/50 bg-background text-foreground"
               >
-                <span className="hidden sm:inline">Export Report</span>
-                <span className="sm:hidden">Export</span>
+                <AppIcon icon={RefreshCw} size={16} className="sm:mr-2 text-muted-foreground" />
+                <span className="hidden sm:inline">Sync</span>
               </Button>
-            )}
-          </PageHeader>
+              {canExportDashboardReport && (
+                <Button
+                  data-testid="dashboard-download-button"
+                  size="sm"
+                  className="h-9 font-semibold"
+                  onClick={handleDownloadReport}
+                >
+                  <span className="hidden sm:inline">Export Report</span>
+                  <span className="sm:hidden">Export</span>
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Primary Metrics Layer */}
+          <ErrorBoundary fallback={<InlineError message="Failed to load KPI data" />}>
+            <KPIGrid />
+          </ErrorBoundary>
+
+          <div className="mt-2">
+            <ErrorBoundary fallback={<InlineError message="Failed to load quick actions" />}>
+              <QuickActions />
+            </ErrorBoundary>
+          </div>
         </div>
 
-        {/* Abstract blur background effect */}
-        <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-white/20 blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-12 -left-12 h-40 w-40 rounded-full bg-black/10 blur-2xl pointer-events-none"></div>
-      </div>
-
-      {/* Primary Metrics Layer */}
-      <ErrorBoundary fallback={<InlineError message="Failed to load KPI data" />}>
-        <KPIGrid />
-      </ErrorBoundary>
-
-      <div className="mt-2">
-        <ErrorBoundary fallback={<InlineError message="Failed to load quick actions" />}>
-          <QuickActions />
-        </ErrorBoundary>
+        {/* Right Column: Next Best Action / Alerts Widget */}
+        <div className="flex flex-col xl:pt-16">
+          {/* pt-16 pushes it down to align with the bottom of the header assuming header is ~64px tall */}
+          <ErrorBoundary fallback={<InlineError message="Failed to load action stream" />}>
+            <NextBestAction />
+          </ErrorBoundary>
+        </div>
       </div>
 
       {/* Telemetry Charts Tier */}

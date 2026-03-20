@@ -125,14 +125,7 @@ export default function MultiStepCreateInvoice({ onSuccess, onCancel, initialDat
           return;
         }
 
-        if (originHubId === destHubId) {
-          toast.error(
-            'Consignor and consignee cannot resolve to the same hub for auto-created shipments. Choose different supported hub cities or link an existing shipment.'
-          );
-          setDirection(-1);
-          setCurrentStep(1);
-          return;
-        }
+
 
         const newShipment = await createShipmentMutation.mutateAsync({
           customer_id: data.customerId,

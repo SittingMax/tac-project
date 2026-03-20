@@ -2,37 +2,25 @@ import { useMemo } from 'react';
 import {
   AreaChart,
   Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  BarChart,
-  Bar,
   ResponsiveContainer,
-  Tooltip,
 } from 'recharts';
 import { useAnalyticsSummary } from '../hooks/useAnalytics';
 import { Package, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
 import { PageContainer, PageHeader } from '@/components/ui-core/layout';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { AnomalyDetectorWidget } from '@/components/dashboard/AnomalyDetectorWidget';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 export const Analytics: React.FC = () => {
   const { data: summary, isLoading, isError } = useAnalyticsSummary();
-
-  const tooltipStyle = {
-    backgroundColor: 'var(--background)',
-    borderColor: 'var(--border)',
-    color: 'var(--foreground)',
-    borderRadius: '8px',
-    boxShadow: '4px 4px 0px 0px rgba(0,0,0,0.1)',
-    fontFamily: 'Inter, sans-serif',
-    fontWeight: 500,
-    textTransform: 'uppercase' as const,
-    fontSize: '11px',
-    padding: '12px',
-    border: '1px solid var(--border)',
-  };
 
   const deliveryRate = useMemo(() => {
     if (!summary) return '0.0';
@@ -55,6 +43,43 @@ export const Analytics: React.FC = () => {
       },
     ];
   }, [summary]);
+
+  const totalEfficiency = useMemo(() => {
+    return efficiencyData.reduce((acc, curr) => acc + curr.value, 0);
+  }, [efficiencyData]);
+
+  const flowData = useMemo(() => {
+    if (!summary || !summary.monthly_data?.length) return [];
+    
+    const data = summary.monthly_data;
+    const thisMonth = data[data.length - 1];
+    const lastMonth = data[data.length - 2] || { inbound: 0, outbound: 0 };
+    
+    const inboundVariance = lastMonth.inbound ? ((thisMonth.inbound - lastMonth.inbound) / lastMonth.inbound) * 100 : 0;
+    const outboundVariance = lastMonth.outbound ? ((thisMonth.outbound - lastMonth.outbound) / lastMonth.outbound) * 100 : 0;
+    
+    return [
+      {
+        id: 'inbound',
+        name: 'Inbound Volume',
+        lastMonth: lastMonth.inbound,
+        thisMonth: thisMonth.inbound,
+        variance: inboundVariance,
+        history: data.map(d => ({ value: d.inbound })),
+        color: 'var(--border)'
+      },
+      {
+        id: 'outbound',
+        name: 'Gross Outbound',
+        lastMonth: lastMonth.outbound,
+        thisMonth: thisMonth.outbound,
+        variance: outboundVariance,
+        history: data.map(d => ({ value: d.outbound })),
+        color: 'var(--primary)'
+      }
+    ];
+  }, [summary]);
+
 
   if (isLoading) {
     return (
@@ -156,130 +181,100 @@ export const Analytics: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Trajectory */}
-        <div className="flex flex-col gap-4">
-          <div className="flex items-end justify-between border-b border-border pb-4">
+        <div className="flex flex-col gap-4 bg-card border border-border rounded-lg p-5">
+          <div className="flex items-end justify-between border-b border-border/40 pb-3 mb-2">
             <div>
-              <h3 className="text-xs text-muted-foreground">Shipment Volume</h3>
-              <p className="text-lg font-semibold text-foreground mt-1">6-Month Overview</p>
+              <p className="text-lg font-semibold text-foreground tracking-tight">Shipment Volume Flow</p>
+              <h3 className="text-xs text-muted-foreground mt-0.5">30-day rolling variance</h3>
             </div>
           </div>
 
-          <div className="h-[350px] w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={summary.monthly_data}
-                margin={{ left: -20, right: 0, top: 0, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="colorOutboundGarde" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.2} />
-                    <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorInboundGarde" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--border)" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="var(--border)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  vertical={false}
-                  strokeDasharray="2 2"
-                  stroke="var(--border)"
-                  opacity={0.4}
-                />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={16}
-                  tick={{ fill: 'var(--muted-foreground)', fontSize: 10, fontFamily: 'monospace' }}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fill: 'var(--muted-foreground)', fontSize: 10, fontFamily: 'monospace' }}
-                />
-                <Tooltip
-                  contentStyle={tooltipStyle}
-                  cursor={{ stroke: 'var(--primary)', strokeWidth: 1, strokeDasharray: '4 4' }}
-                />
-
-                <Area
-                  dataKey="inbound"
-                  name="Inbound"
-                  type="step"
-                  fill="url(#colorInboundGarde)"
-                  stroke="var(--muted-foreground)"
-                  strokeWidth={1}
-                />
-                <Area
-                  dataKey="outbound"
-                  name="Gross Vol."
-                  type="step"
-                  fill="url(#colorOutboundGarde)"
-                  stroke="var(--primary)"
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b-border/40 hover:bg-transparent">
+                <TableHead className="text-xs h-8 pl-0">Flow Metric</TableHead>
+                <TableHead className="text-xs h-8 text-right">Prior</TableHead>
+                <TableHead className="text-xs h-8 text-right">Current</TableHead>
+                <TableHead className="text-xs h-8 text-right">Variance</TableHead>
+                <TableHead className="text-xs h-8 text-right pr-0 w-24">Trend (6M)</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {flowData.map((row) => (
+                <TableRow key={row.id} className="border-b-border/40 hover:bg-muted/5">
+                  <TableCell className="font-medium text-xs pl-0 py-3">{row.name}</TableCell>
+                  <TableCell className="text-right text-xs text-muted-foreground py-3">{row.lastMonth.toLocaleString()}</TableCell>
+                  <TableCell className="text-right text-xs py-3">{row.thisMonth.toLocaleString()}</TableCell>
+                  <TableCell className={cn("text-right text-xs font-medium py-3", row.variance > 0 ? "text-status-success" : row.variance < 0 ? "text-destructive" : "text-muted-foreground")}>
+                    {row.variance > 0 ? '+' : ''}{row.variance.toFixed(1)}%
+                  </TableCell>
+                  <TableCell className="text-right pr-0 py-3">
+                    <div className="h-6 w-16 ml-auto">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={row.history} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id={`gradient-${row.id}`} x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor={row.color} stopOpacity={0.3} />
+                              <stop offset="100%" stopColor={row.color} stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <Area 
+                            type="monotone" 
+                            dataKey="value" 
+                            stroke={row.color} 
+                            strokeWidth={1.5} 
+                            fill={`url(#gradient-${row.id})`}
+                            isAnimationActive={false}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
 
         {/* State Distribution */}
-        <div className="flex flex-col gap-4">
-          <div className="flex items-end justify-between border-b border-border pb-4">
+        <div className="flex flex-col gap-4 bg-card border border-border rounded-lg p-5">
+          <div className="flex items-end justify-between border-b border-border/40 pb-3 mb-2">
             <div>
-              <h3 className="text-xs text-muted-foreground">Status Distribution</h3>
-              <p className="text-lg font-semibold text-foreground mt-1">Current Breakdown</p>
+              <p className="text-lg font-semibold text-foreground tracking-tight">Status Distribution</p>
+              <h3 className="text-xs text-muted-foreground mt-0.5">Current operational state breakdown</h3>
             </div>
           </div>
 
-          <div className="h-[350px] w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={efficiencyData}
-                layout="vertical"
-                margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
-              >
-                <CartesianGrid
-                  horizontal={true}
-                  vertical={false}
-                  strokeDasharray="2 2"
-                  stroke="var(--border)"
-                  opacity={0.4}
-                />
-                <XAxis
-                  type="number"
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fill: 'var(--muted-foreground)', fontSize: 10, fontFamily: 'monospace' }}
-                />
-                <YAxis
-                  dataKey="name"
-                  type="category"
-                  tickLine={false}
-                  axisLine={false}
-                  width={100}
-                  tick={{
-                    fill: 'var(--foreground)',
-                    fontSize: 11,
-                    fontFamily: 'Inter',
-                    fontWeight: 600,
-                  }}
-                />
-                <Tooltip
-                  contentStyle={tooltipStyle}
-                  cursor={{ fill: 'var(--muted)', opacity: 0.1 }}
-                />
-                <Bar
-                  dataKey="value"
-                  name="Units"
-                  fill="var(--primary)"
-                  radius={[0, 4, 4, 0]}
-                  barSize={24}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b-border/40 hover:bg-transparent">
+                <TableHead className="text-xs h-8 pl-0">Status</TableHead>
+                <TableHead className="text-xs h-8 text-right">Units</TableHead>
+                <TableHead className="text-xs h-8 text-right">Share</TableHead>
+                <TableHead className="text-xs h-8 text-right pr-0 w-32">Distribution</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {efficiencyData.map((row) => {
+                const percentage = totalEfficiency > 0 ? ((row.value / totalEfficiency) * 100) : 0;
+                return (
+                  <TableRow key={row.key} className="border-b-border/40 hover:bg-muted/5">
+                    <TableCell className="font-medium text-xs pl-0 py-3">{row.name}</TableCell>
+                    <TableCell className="text-right text-xs py-3">{row.value.toLocaleString()}</TableCell>
+                    <TableCell className="text-right text-xs text-muted-foreground py-3">{percentage.toFixed(1)}%</TableCell>
+                    <TableCell className="text-right pr-0 py-3">
+                      <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden ml-auto">
+                        <div 
+                          className="h-full rounded-full" 
+                          style={{ width: `${percentage}%`, backgroundColor: row.color }}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </div>
       </div>
 

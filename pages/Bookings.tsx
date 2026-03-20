@@ -106,6 +106,7 @@ export const Bookings: React.FC = () => {
           searchPlaceholder="Filter by status..."
           isLoading={isLoading}
           emptyMessage="No bookings loaded yet."
+          density="compact"
         />
       </SectionCard>
     </PageContainer>

@@ -20,6 +20,7 @@ import { PageContainer, PageHeader, SectionCard } from '@/components/ui-core/lay
 import { CrudTable } from '@/components/crud/CrudTable';
 import { CrudUpsertDialog } from '@/components/crud/CrudUpsertDialog';
 import { CrudDeleteDialog } from '@/components/crud/CrudDeleteDialog';
+import { CustomerProfileBento } from '@/components/customers/CustomerProfileBento';
 
 // Hooks & Data
 import {
@@ -97,6 +98,9 @@ export const Customers: React.FC = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<Customer | null>(null);
 
+  const [viewOpen, setViewOpen] = useState(false);
+  const [rowToView, setRowToView] = useState<Customer | null>(null);
+
   const openCreate = () => {
     setMode('create');
     setActiveRow(null);
@@ -106,6 +110,10 @@ export const Customers: React.FC = () => {
   const columns = useMemo(
     () =>
       getCustomersColumns({
+        onView: (row) => {
+          setRowToView(row);
+          setViewOpen(true);
+        },
         onEdit: (row) => {
           setMode('edit');
           setActiveRow(row);
@@ -441,6 +449,12 @@ export const Customers: React.FC = () => {
         title="Delete customer?"
         description={`This will remove "${rowToDelete?.name ?? ''}" from your customer directory. This action cannot be undone.`}
         onConfirm={handleDelete}
+      />
+
+      <CustomerProfileBento
+        open={viewOpen}
+        onOpenChange={setViewOpen}
+        customer={rowToView}
       />
     </PageContainer>
   );

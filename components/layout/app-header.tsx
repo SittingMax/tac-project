@@ -50,7 +50,7 @@ export const Header: React.FC = () => {
   const paths = location.pathname.split('/').filter(Boolean);
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between gap-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-background/95 backdrop-blur-md px-6 z-40 sticky top-0 supports-backdrop-blur:bg-background/60">
+    <header className="flex h-16 shrink-0 items-center justify-between gap-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-background/40 backdrop-blur-xl border-b border-border/30 px-6 z-40 sticky top-0">
       <div className="flex items-center gap-4">
         <SidebarTrigger className="-ml-2 hover:bg-accent hover:text-accent-foreground transition-colors" />
 
@@ -91,13 +91,13 @@ export const Header: React.FC = () => {
       <div className="flex flex-1 items-center justify-end gap-3 md:gap-5">
         <button
           onClick={() => setCommandOpen(true)}
-          className="group hidden lg:flex h-9 w-full max-w-[280px] items-center gap-2 rounded-full border border-border/50 bg-muted/40 px-4 text-sm text-muted-foreground transition-all hover:bg-accent/80 hover:text-accent-foreground hover:border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+          className="group hidden lg:flex h-9 w-full max-w-[280px] items-center gap-2 rounded-full bg-muted/20 px-4 text-sm text-muted-foreground transition-all hover:bg-muted/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
         >
-          <Search className="h-4 w-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+          <Search className="h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
           <span className="flex-1 text-left text-[13px] font-medium tracking-wide">
             Search everywhere...
           </span>
-          <Kbd className="bg-background/80">
+          <Kbd className="bg-background/40 border-none shadow-none text-muted-foreground">
             <Command className="h-2.5 w-2.5 mr-0.5" /> K
           </Kbd>
         </button>

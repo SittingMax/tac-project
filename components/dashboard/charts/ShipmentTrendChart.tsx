@@ -81,7 +81,7 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
   if (isLoading) return <ChartSkeleton />;
 
   return (
-    <Card className="pt-0 h-full flex flex-col border-border bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300">
+    <Card className="pt-0 h-full flex flex-col border border-border/50 bg-background shadow-none hover:bg-muted/5 transition-colors duration-300">
       <CardHeader className="flex items-start gap-4 space-y-0 pb-4 sm:flex-row sm:items-center">
         <div className="grid flex-1 gap-1">
           <CardTitle className="text-xs text-muted-foreground">Shipment Volume Trend</CardTitle>

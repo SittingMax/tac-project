@@ -56,10 +56,10 @@ const TYPE_COLORS: Record<NotificationType, string> = {
 
 // Type badge styles using semantic badge classes
 const TYPE_BADGE_STYLES: Record<NotificationType, string> = {
-  success: 'DELIVERED',
-  error: 'EXCEPTION',
-  warning: 'IN_TRANSIT',
-  info: 'CREATED',
+  success: 'badge--delivered',
+  error: 'badge--cancelled',
+  warning: 'badge--in-transit',
+  info: 'badge--created',
 };
 
 function groupNotificationsByDate(notifications: Notification[]) {
@@ -263,7 +263,7 @@ export const Notifications: React.FC = () => {
         </div>
 
         {/* Notification List */}
-        <div className="rounded-lg">
+        <div className="rounded-lg border border-border/40 overflow-hidden bg-card">
           {filteredNotifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-4">
@@ -286,10 +286,12 @@ export const Notifications: React.FC = () => {
             <div className="flex flex-col gap-6">
               {groupedNotifications.map((group) => (
                 <div key={group.label}>
-                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
-                    {group.label}
-                  </h3>
-                  <div className="flex flex-col gap-2">
+                  <div className="bg-muted/20 px-4 py-2 border-b border-border/40">
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                      {group.label}
+                    </h3>
+                  </div>
+                  <div className="flex flex-col">
                     {group.items.map((notification) => {
                       const Icon = CATEGORY_ICONS[notification.category] || Info;
                       const timeAgo = formatDistanceToNow(new Date(notification.created_at), {
@@ -301,92 +303,81 @@ export const Notifications: React.FC = () => {
                           key={notification.id}
                           onClick={() => handleNotificationClick(notification)}
                           className={cn(
-                            'w-full text-left rounded-lg p-4 border transition hover:shadow-md',
-                            notification.is_read
-                              ? 'bg-transparent border-border opacity-70'
-                              : 'bg-accent/20 border-accent/30'
+                            'group w-full text-left py-4 px-4 border-b border-border/40 last:border-b-0 transition-colors hover:bg-muted/30 flex items-start gap-4',
+                            notification.is_read ? 'opacity-70' : 'bg-primary/5'
                           )}
                         >
-                          <div className="flex items-start gap-4">
-                            <div
+                          <div
+                            className={cn(
+                              'w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5',
+                              notification.is_read ? 'bg-muted' : 'bg-primary/10'
+                            )}
+                          >
+                            <AppIcon
+                              icon={Icon}
+                              size={16}
                               className={cn(
-                                'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
-                                notification.is_read ? 'bg-muted' : 'bg-primary/10'
+                                notification.is_read ? 'text-muted-foreground' : 'text-primary'
                               )}
-                            >
-                              <AppIcon
-                                icon={Icon}
-                                size={20}
-                                className={cn(
-                                  'w-5 h-5',
-                                  notification.is_read ? 'text-muted-foreground' : 'text-primary'
-                                )}
-                              />
-                            </div>
+                            />
+                          </div>
 
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-4">
-                                <div>
-                                  <div className="flex items-center gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={cn(
+                                      'text-sm font-medium group-hover:text-primary transition-colors',
+                                      !notification.is_read && 'text-foreground'
+                                    )}
+                                  >
+                                    {notification.title}
+                                  </span>
+                                  {!notification.is_read && (
                                     <span
                                       className={cn(
-                                        'font-medium',
-                                        !notification.is_read && 'text-foreground'
+                                        'h-1.5 w-1.5 rounded-full',
+                                        TYPE_COLORS[notification.type]
                                       )}
-                                    >
-                                      {notification.title}
-                                    </span>
-                                    {!notification.is_read && (
-                                      <span
-                                        className={cn(
-                                          'h-2 w-2 rounded-full',
-                                          TYPE_COLORS[notification.type]
-                                        )}
-                                      />
-                                    )}
-                                  </div>
-
-                                  {notification.message && (
-                                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                                      {notification.message}
-                                    </p>
-                                  )}
-
-                                  <div className="flex items-center gap-4 mt-2">
-                                    <span className="text-xs text-muted-foreground">{timeAgo}</span>
-                                    <Badge variant="outline" className="text-[10px]">
-                                      {notification.category}
-                                    </Badge>
-                                    <Badge
-                                      className={cn(
-                                        'text-[10px]',
-                                        TYPE_BADGE_STYLES[notification.type]
-                                      )}
-                                    >
-                                      {notification.type}
-                                    </Badge>
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                  {notification.href && (
-                                    <span className="text-xs text-primary underline">View →</span>
-                                  )}
-                                  <button
-                                    onClick={(e) => handleDelete(notification.id, e)}
-                                    className="p-1 rounded-md hover:bg-muted transition-colors"
-                                    title="Delete"
-                                  >
-                                    <AppIcon
-                                      icon={Trash2}
-                                      size={16}
-                                      className="text-muted-foreground hover:text-destructive"
                                     />
-                                  </button>
+                                  )}
                                 </div>
+
+                                {notification.message && (
+                                  <p className="text-xs text-muted-foreground mt-1 line-clamp-1 pr-8">
+                                    {notification.message}
+                                  </p>
+                                )}
+
+                                <div className="flex items-center gap-3 mt-2">
+                                  <span className="text-[10px] font-mono text-muted-foreground">{timeAgo}</span>
+                                  <Badge variant="outline" className="text-[9px] h-4 px-1.5 uppercase tracking-wider">
+                                    {notification.category}
+                                  </Badge>
+                                  <Badge
+                                    className={cn(
+                                      'text-[9px] h-4 px-1.5 uppercase tracking-wider',
+                                      TYPE_BADGE_STYLES[notification.type]
+                                    )}
+                                  >
+                                    {notification.type}
+                                  </Badge>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={(e) => handleDelete(notification.id, e)}
+                                  className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive"
+                                  title="Delete"
+                                >
+                                  <AppIcon icon={Trash2} size={16} />
+                                </button>
                               </div>
                             </div>
                           </div>
+
                         </button>
                       );
                     })}

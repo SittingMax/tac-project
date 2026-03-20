@@ -418,8 +418,8 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
   };
 
   return (
-    <Card className="flex flex-col h-full border border-border/40 bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300">
-      <CardHeader className="flex flex-row items-start justify-between pb-4 border-b border-border/40 space-y-0">
+    <Card className="flex flex-col h-full border border-border/50 bg-background shadow-none hover:bg-muted/5 transition-colors duration-300">
+      <CardHeader className="flex flex-row items-start justify-between pb-4 border-b border-border/50 space-y-0">
         <div>
           <CardTitle className="text-xs text-muted-foreground">Hub Shipment Profile</CardTitle>
           <div className="text-lg font-semibold text-foreground mt-1">
@@ -427,7 +427,7 @@ export const HubPerformanceChart: React.FC<{ isLoading?: boolean }> = ({
           </div>
         </div>
         <Select value={chartType} onValueChange={(v) => setChartType(v as ChartType)}>
-          <SelectTrigger className="w-[110px] h-8 text-xs border-border bg-transparent shadow-none">
+          <SelectTrigger className="w-[110px] h-8 text-xs border-border/50 bg-transparent shadow-none">
             <SelectValue placeholder="Chart Type" />
           </SelectTrigger>
           <SelectContent>

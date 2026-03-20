@@ -269,6 +269,7 @@ export const Finance: React.FC = () => {
           searchPlaceholder="Search invoices..."
           emptyState={<EmptyInvoices onCreate={() => setIsCreateOpen(true)} />}
           emptyMessage="No invoices found."
+          density="compact"
         />
       </SectionCard>
 

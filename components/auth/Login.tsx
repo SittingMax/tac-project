@@ -8,11 +8,8 @@ import {
   ArrowLeft,
   Eye,
   EyeOff,
-  Mail,
-  Lock,
   Shield,
   LogIn,
-  Wifi,
   Loader2,
   AlertCircle,
   Check,
@@ -210,39 +207,14 @@ export const Login: React.FC = () => {
 
       <main className="relative flex min-h-screen items-center justify-center p-4 sm:p-6">
         {/* Card */}
-        <div ref={cardRef} className="relative z-10 w-full max-w-3xl opacity-0">
-          <div className="group relative overflow-hidden rounded-lg border border-black/10 dark:border-white/10 bg-white/70 dark:bg-white/10 backdrop-blur-lg shadow-2xl shadow-black/10 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/10 transition-all duration-300 hover:border-black/15 dark:hover:border-white/20 hover:ring-black/10 dark:hover:ring-white/20">
+        <div ref={cardRef} className="relative z-10 w-full max-w-md mx-auto opacity-0">
+          <div className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/40 dark:bg-black/40 backdrop-blur-2xl shadow-2xl ring-1 ring-black/5 dark:ring-white/10">
             {/* Top hairline */}
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/20 to-transparent" />
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
 
-            {/* Split: Image + Form */}
-            <div className="relative flex flex-col sm:flex-row">
-              {/* Image (Left) */}
-              <div
-                ref={imageRef}
-                className="relative w-full sm:w-1/2 h-40 sm:h-auto sm:min-h-[320px] overflow-hidden opacity-0"
-              >
-                <img
-                  src="/tac-hero-bg.jpeg"
-                  alt="TAC logistics"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[8s] ease-out group-hover:scale-[1.03]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-black/60 via-black/30 to-transparent" />
-
-                {/* Overlay badge */}
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-md border border-white/10 bg-black/30 px-4 py-2 backdrop-blur-md">
-                  <div className="flex items-center gap-2 text-xs text-white/80">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/30 text-primary">
-                      <Wifi className="h-3 w-3" />
-                    </div>
-                    <span className="text-xs font-medium tracking-tight">System Online</span>
-                  </div>
-                  <span className="text-[11px] text-white/60">TAC v4.1</span>
-                </div>
-              </div>
-
-              {/* Form (Right) */}
-              <div className="p-4 sm:p-8 w-full sm:w-1/2">
+            {/* Unified Centered Form */}
+            <div className="relative flex flex-col">
+              <div className="p-8 sm:p-10 w-full">
                 <div ref={formItemsRef}>
                   {/* Logo */}
                   <div className="mb-6 flex items-center justify-between">
@@ -289,17 +261,12 @@ export const Login: React.FC = () => {
                         Email address
                       </Label>
                       <div
-                        className={`group/input relative flex items-center rounded-md border bg-background px-4 h-12 transition-all duration-200 ${
+                        className={`group/input relative flex items-center rounded-lg border-0 bg-muted/30 px-4 h-12 transition-all duration-200 ${
                           focusedField === 'email'
-                            ? 'border-primary ring-2 ring-primary/10'
-                            : 'border-border hover:border-border/80'
-                        } ${error ? 'border-destructive/50 ring-1 ring-destructive/20' : ''}`}
+                            ? 'ring-1 ring-primary/50 bg-muted/50'
+                            : ''
+                        } ${error ? 'ring-1 ring-destructive/50 bg-destructive/10' : ''}`}
                       >
-                        <Mail
-                          className={`mr-3 h-5 w-5 shrink-0 transition-colors ${
-                            focusedField === 'email' ? 'text-primary' : 'text-muted-foreground'
-                          }`}
-                        />
                         <Input
                           id="login-email"
                           type="email"
@@ -313,9 +280,9 @@ export const Login: React.FC = () => {
                           disabled={isLoading}
                           data-testid="login-email-input"
                           aria-describedby={error ? 'login-error-message' : undefined}
-                          className="w-full border-0 bg-transparent px-0 text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-50 shadow-none"
+                          className="w-full border-0 bg-transparent px-0 text-sm font-medium text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-50 shadow-none"
                         />
-                        {email && <Check className="ml-2 h-4 w-4 text-status-success shrink-0" />}
+                        {email && <Check className="ml-2 h-4 w-4 text-primary shrink-0 transition-opacity opacity-70" />}
                       </div>
                     </div>
 
@@ -336,17 +303,12 @@ export const Login: React.FC = () => {
                         </a>
                       </div>
                       <div
-                        className={`group/input relative flex items-center rounded-md border bg-background px-4 h-12 transition-all duration-200 ${
+                        className={`group/input relative flex items-center rounded-lg border-0 bg-muted/30 px-4 h-12 transition-all duration-200 ${
                           focusedField === 'password'
-                            ? 'border-primary ring-2 ring-primary/10'
-                            : 'border-border hover:border-border/80'
-                        } ${error ? 'border-destructive/50 ring-1 ring-destructive/20' : ''}`}
+                            ? 'ring-1 ring-primary/50 bg-muted/50'
+                            : ''
+                        } ${error ? 'ring-1 ring-destructive/50 bg-destructive/10' : ''}`}
                       >
-                        <Lock
-                          className={`mr-3 h-5 w-5 shrink-0 transition-colors ${
-                            focusedField === 'password' ? 'text-primary' : 'text-muted-foreground'
-                          }`}
-                        />
                         <Input
                           id="login-password"
                           type={showPassword ? 'text' : 'password'}
@@ -359,19 +321,19 @@ export const Login: React.FC = () => {
                           disabled={isLoading}
                           data-testid="login-password-input"
                           aria-describedby={error ? 'login-error-message' : undefined}
-                          className="w-full border-0 bg-transparent px-0 text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-50 shadow-none"
+                          className="w-full border-0 bg-transparent px-0 text-sm font-medium text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-50 shadow-none"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="ml-2 grid h-8 w-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                          className="ml-2 grid h-8 w-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors focus-visible:ring-1 focus-visible:ring-primary/50 outline-none"
                           aria-label={showPassword ? 'Hide password' : 'Show password'}
                           title={showPassword ? 'Hide password' : 'Show password'}
                         >
                           {showPassword ? (
-                            <EyeOff className="h-4 w-4" />
+                            <EyeOff className="h-4 w-4 opacity-70" />
                           ) : (
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-4 w-4 opacity-70" />
                           )}
                         </button>
                       </div>

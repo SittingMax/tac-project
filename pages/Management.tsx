@@ -180,6 +180,8 @@ export const Management: React.FC = () => {
           searchKey="staff"
           searchPlaceholder="Search staff..."
           emptyMessage="No staff members found."
+          density="compact"
+          className="[&_tr]:border-border/40"
         />
       </SectionCard>
 
