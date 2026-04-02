@@ -30,7 +30,7 @@ export function FormSection({
               <Icon className="size-4" />
             </div>
           )}
-          <div className="space-y-0.5">
+          <div className="flex flex-col gap-0.5">
             <h3 className="text-base font-medium leading-none tracking-tight">{title}</h3>
             {description && <p className="text-xs text-muted-foreground">{description}</p>}
           </div>

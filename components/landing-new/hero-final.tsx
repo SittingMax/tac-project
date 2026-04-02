@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowUpRight, PlaneTakeoff, Truck, Package, Globe } from 'lucide-react';
@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 
 const HeroFinal = () => {
   const [animationData, setAnimationData] = useState(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     fetch('/lottie/hero-truck.json')
@@ -33,20 +34,24 @@ const HeroFinal = () => {
       </div>
 
       {/* Main Content Wrapper */}
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pt-20 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex flex-col px-4 pt-20 sm:px-6 lg:px-8">
         {/* Main Grid Area */}
         <main className="grid flex-grow grid-cols-1 items-center gap-y-12 pb-12 pt-8 lg:grid-cols-2 lg:gap-16 lg:pt-16">
           {/* Content Column */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, ease: 'easeOut' }}
             className="z-20 flex flex-col justify-center pt-8 lg:pt-0"
           >
             {/* Badge */}
-            <div className="mb-8 inline-flex items-center gap-3 border border-border/50 bg-background/50 backdrop-blur-md p-1.5 shadow-sm rounded-md z-30">
-              <div className="flex h-10 w-10 items-center justify-center bg-background border border-border/50 rounded-md shadow-sm">
-                <Globe className="h-5 w-5 text-primary stroke-[1.5]" />
+            <div className="mb-8 inline-flex items-center gap-3 border border-border/50 bg-background/50 backdrop-blur-md p-1.5 shadow-sm rounded-md z-30 focus:ring-2 focus:ring-primary/50">
+              <div
+                className="flex h-10 w-10 items-center justify-center bg-background border border-border/50 rounded-md shadow-sm"
+                aria-hidden="true"
+                tabIndex={-1}
+              >
+                <Globe size={20} strokeWidth={1.5} className="text-primary stroke-[1.5]" />
               </div>
               <div className="pr-3 flex flex-col justify-center">
                 <h3 className="text-xs font-semibold leading-none text-foreground flex items-center gap-2">
@@ -60,7 +65,7 @@ const HeroFinal = () => {
             </div>
 
             {/* Headline */}
-            <h1 className="mb-8 text-5xl font-bold leading-[1.1] tracking-tight text-foreground lg:text-7xl">
+            <h1 className="mb-8 text-5xl font-bold leading-[1.1] tracking-tight text-foreground lg:text-7xl [text-wrap:balance]">
               Your Trusted <br />
               <span className="text-muted-foreground">Cargo Partner.</span>
             </h1>
@@ -72,13 +77,13 @@ const HeroFinal = () => {
             </p>
 
             {/* CTA & Avatar Group */}
-            <div className="mb-16 flex flex-wrap items-center gap-8">
+            <div className="mb-16 flex-wrap items-center gap-8">
               <Button
                 size="lg"
                 asChild
-                className="rounded-md shadow-xl shadow-primary/20 group gap-3 text-sm font-semibold h-14 px-8 border border-primary relative overflow-hidden bg-primary/90 hover:bg-primary transition-all duration-300"
+                className="rounded-md shadow-xl shadow-primary/20 group gap-3 text-sm font-semibold h-14 px-8 border border-primary relative overflow-hidden bg-primary/90 hover:bg-primary transition duration-300 focus:ring-2 focus:ring-primary/50"
               >
-                <a href="#contact">
+                <a href="#contact" tabIndex={0}>
                   {/* Shimmer Effect */}
                   <div className="absolute inset-0 -translate-x-full animate-[shimmer_2.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-15deg]"></div>
 
@@ -86,22 +91,34 @@ const HeroFinal = () => {
                     Start a Shipment
                   </span>
                   <span className="relative z-10 flex h-7 w-7 items-center justify-center bg-background/20 backdrop-blur-md border border-background/30 rounded-md transition-transform group-hover:translate-x-1 group-hover:-translate-y-1">
-                    <ArrowUpRight className="h-5 w-5 stroke-primary-foreground" />
+                    <ArrowUpRight size={20} strokeWidth={1.5} className="stroke-primary-foreground" />
                   </span>
-                  <div className="absolute inset-0 h-full w-full scale-0 rounded-md transition-all duration-500 ease-out group-hover:scale-100 group-hover:bg-primary-foreground/10 z-0"></div>
+                  <div className="absolute inset-0 h-full w-full scale-0 rounded-md transition duration-500 ease-out group-hover:scale-100 group-hover:bg-primary-foreground/10 z-0"></div>
                 </a>
               </Button>
 
               {/* Metric Items - Avatar Stack Style */}
-              <div className="flex items-center -space-x-2 drop-shadow-sm">
-                <div className="h-12 w-12 bg-background border border-border flex items-center justify-center text-primary rounded-md relative z-40 transition-transform hover:-translate-y-1 hover:z-50 shadow-[0_0_10px_oklch(0%_0_0deg/0.02)]">
-                  <PlaneTakeoff className="h-5 w-5 stroke-[1.5]" />
+              <div className="flex items-center -flex gap-2 items-center drop-shadow-sm">
+                <div
+                  className="h-12 w-12 bg-background border border-border flex items-center justify-center text-primary rounded-md relative z-40 transition-transform hover:-translate-y-1 hover:z-50 shadow-[0_0_10px_oklch(0%_0_0deg/0.02)]"
+                  aria-hidden="true"
+                  tabIndex={-1}
+                >
+                  <PlaneTakeoff size={20} strokeWidth={1.5} className="stroke-[1.5]" />
                 </div>
-                <div className="h-12 w-12 bg-background border border-border flex items-center justify-center text-primary rounded-md relative z-30 transition-transform hover:-translate-y-1 hover:z-50 shadow-[0_0_10px_oklch(0%_0_0deg/0.02)]">
-                  <Truck className="h-5 w-5 stroke-[1.5]" />
+                <div
+                  className="h-12 w-12 bg-background border border-border flex items-center justify-center text-primary rounded-md relative z-30 transition-transform hover:-translate-y-1 hover:z-50 shadow-[0_0_10px_oklch(0%_0_0deg/0.02)]"
+                  aria-hidden="true"
+                  tabIndex={-1}
+                >
+                  <Truck size={20} strokeWidth={1.5} className="stroke-[1.5]" />
                 </div>
-                <div className="h-12 w-12 bg-background border border-border flex items-center justify-center text-primary rounded-md relative z-20 transition-transform hover:-translate-y-1 hover:z-50 shadow-[0_0_10px_oklch(0%_0_0deg/0.02)]">
-                  <Package className="h-5 w-5 stroke-[1.5]" />
+                <div
+                  className="h-12 w-12 bg-background border border-border flex items-center justify-center text-primary rounded-md relative z-20 transition-transform hover:-translate-y-1 hover:z-50 shadow-[0_0_10px_oklch(0%_0_0deg/0.02)]"
+                  aria-hidden="true"
+                  tabIndex={-1}
+                >
+                  <Package size={20} strokeWidth={1.5} className="stroke-[1.5]" />
                 </div>
                 <div className="h-12 w-[3.5rem] bg-secondary border border-border border-l-0 flex items-center justify-center text-secondary-foreground rounded-md relative z-10 transition-transform hover:-translate-y-1 hover:z-50 shadow-[0_0_10px_oklch(0%_0_0deg/0.02)]">
                   <span className="text-xs font-bold font-mono tracking-tighter">15y</span>
@@ -112,9 +129,13 @@ const HeroFinal = () => {
 
           {/* Lottie Animation Column */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
+            transition={
+              prefersReducedMotion
+                ? { duration: 0 }
+                : { duration: 0.8, delay: 0.2, ease: 'easeOut' }
+            }
             className="relative flex h-[500px] items-center justify-center lg:h-auto"
           >
             {/* Main Lottie Animation */}
@@ -146,13 +167,15 @@ const HeroFinal = () => {
 
             {/* Floating Annotation 1 (Top Left) */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8 }}
+              transition={prefersReducedMotion ? { duration: 0 } : { delay: 0.8 }}
               className="absolute left-0 top-10 hidden max-w-[180px] glass-panel px-5 py-4 md:block lg:-left-12"
+              role="complementary"
+              aria-label="Air Freight service description"
             >
               <div className="mb-2 flex items-center gap-2 border-b border-border/30 pb-2">
-                <PlaneTakeoff className="h-5 w-5 stroke-primary drop-shadow-md drop-shadow-primary/50" />
+                <PlaneTakeoff size={20} strokeWidth={1.5} className="stroke-primary drop-shadow-md drop-shadow-primary/50" />
                 <span className="text-xs font-semibold text-foreground">Air Freight</span>
               </div>
               <p className="text-[10px] leading-snug text-muted-foreground font-mono">
@@ -167,13 +190,15 @@ const HeroFinal = () => {
 
             {/* Floating Annotation 2 (Bottom Right) */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.0 }}
+              transition={prefersReducedMotion ? { duration: 0 } : { delay: 1.0 }}
               className="absolute bottom-20 right-0 hidden max-w-[200px] glass-panel px-5 py-4 md:block lg:-right-4"
+              role="complementary"
+              aria-label="Expert Packing service description"
             >
               <div className="mb-2 flex items-center gap-2 border-b border-border/30 pb-2">
-                <Package className="h-5 w-5 stroke-primary drop-shadow-md drop-shadow-primary/50" />
+                <Package size={20} strokeWidth={1.5} className="stroke-primary drop-shadow-md drop-shadow-primary/50" />
                 <span className="text-xs font-semibold text-foreground">Expert Packing</span>
               </div>
               <p className="text-[10px] leading-snug text-muted-foreground font-mono">
@@ -188,13 +213,15 @@ const HeroFinal = () => {
 
             {/* Floating Annotation 3 (Mid Left) */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.2 }}
+              transition={prefersReducedMotion ? { duration: 0 } : { delay: 1.2 }}
               className="absolute bottom-1/3 left-4 hidden items-center gap-4 glass-panel px-4 py-3 md:flex lg:-left-8"
+              role="complementary"
+              aria-label="Surface and Delivery service description"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 border border-primary/20">
-                <Truck className="h-5 w-5 stroke-primary" />
+                <Truck size={20} strokeWidth={1.5} className="stroke-primary" />
               </div>
               <div>
                 <span className="block text-[10px] uppercase font-mono tracking-widest font-bold text-foreground">

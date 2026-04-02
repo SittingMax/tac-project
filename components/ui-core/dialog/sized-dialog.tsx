@@ -42,12 +42,14 @@ export function SizedDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className={cn('gap-6', sizeClasses[size])}>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
+      <DialogContent
+        className={cn('flex flex-col max-h-[90dvh] overflow-hidden p-0 gap-0', sizeClasses[size])}
+      >
+        <DialogHeader className="shrink-0 px-6 py-5 border-b border-border/40 bg-muted/10">
+          <DialogTitle className="text-xl font-semibold tracking-tight">{title}</DialogTitle>
+          {description && <DialogDescription className="mt-1.5">{description}</DialogDescription>}
         </DialogHeader>
-        {children}
+        <div className="flex-1 overflow-y-auto p-6">{children}</div>
       </DialogContent>
     </Dialog>
   );

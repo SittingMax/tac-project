@@ -9,7 +9,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
           {/* Brand */}
-          <div className="md:col-span-2 space-y-6">
+          <div className="md:col-span-2 flex flex-col gap-6">
             <TacLogo size="lg" showSubtitle />
             <p className="text-muted-foreground text-sm font-mono max-w-sm leading-loose">
               Serving you with dedication for over 15 years. We proudly connect Imphal and New Delhi
@@ -23,11 +23,11 @@ export function Footer() {
             <h3 className="font-bold text-foreground mb-6 text-xs uppercase tracking-widest font-mono border-b border-border/40 pb-2">
               Platform
             </h3>
-            <ul className="space-y-4 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            <ul className="flex flex-col gap-4 text-xs font-mono uppercase tracking-wider text-muted-foreground">
               <li>
                 <a
                   href="#tracking"
-                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
                 >
                   Track Shipment
                 </a>
@@ -35,7 +35,7 @@ export function Footer() {
               <li>
                 <a
                   href="#system-capabilities"
-                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
                 >
                   Capabilities
                 </a>
@@ -43,7 +43,7 @@ export function Footer() {
               <li>
                 <a
                   href="#contact"
-                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
                 >
                   Contact Us
                 </a>
@@ -55,11 +55,11 @@ export function Footer() {
             <h3 className="font-bold text-foreground mb-6 text-xs uppercase tracking-widest font-mono border-b border-border/40 pb-2">
               Legal
             </h3>
-            <ul className="space-y-4 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            <ul className="flex flex-col gap-4 text-xs font-mono uppercase tracking-wider text-muted-foreground">
               <li>
                 <Link
                   to="/privacy"
-                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
                 >
                   Privacy Policy
                 </Link>
@@ -67,7 +67,7 @@ export function Footer() {
               <li>
                 <Link
                   to="/terms"
-                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:opacity-0 hover:before:opacity-100 before:transition-opacity"
                 >
                   Terms of Service
                 </Link>
@@ -79,14 +79,14 @@ export function Footer() {
             <h3 className="font-bold text-foreground mb-6 text-xs uppercase tracking-widest font-mono border-b border-border/40 pb-2">
               Social
             </h3>
-            <ul className="space-y-4 text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            <ul className="flex flex-col gap-4 text-xs font-mono uppercase tracking-wider text-muted-foreground">
               <li>
                 <a
                   href="#"
-                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all flex items-center gap-2 group w-fit"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition flex items-center gap-2 group w-fit"
                 >
-                  <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-md group-hover:shadow-primary/30 transition-all">
-                    <Linkedin className="w-3 h-3" strokeWidth={2} />
+                  <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-md group-hover:shadow-primary/30 transition">
+                    <Linkedin size={12} strokeWidth={1.5} />
                   </div>
                   LinkedIn
                 </a>
@@ -94,10 +94,10 @@ export function Footer() {
               <li>
                 <a
                   href="#"
-                  className="opacity-70 hover:opacity-100 hover:text-foreground transition-all flex items-center gap-2 group w-fit"
+                  className="opacity-70 hover:opacity-100 hover:text-foreground transition flex items-center gap-2 group w-fit"
                 >
-                  <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-md group-hover:shadow-primary/30 transition-all">
-                    <Twitter className="w-3 h-3" strokeWidth={2} />
+                  <div className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-md group-hover:shadow-primary/30 transition">
+                    <Twitter size={12} strokeWidth={1.5} />
                   </div>
                   Twitter
                 </a>

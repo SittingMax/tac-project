@@ -94,13 +94,13 @@ export const AnimatedThemeToggler = ({
       ref={buttonRef}
       onClick={toggleTheme}
       className={cn(
-        'relative inline-flex items-center justify-center rounded-md p-2 transition-colors hover:bg-muted',
+        'relative inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground/70 transition-colors hover:text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
         className
       )}
       {...props}
     >
       <div
-        className={cn('relative transition-all', isAnimating && 'animate-spin')}
+        className={cn('relative transition', isAnimating && 'animate-spin')}
         style={{
           animationDuration: `${duration}ms`,
           animationTimingFunction: 'ease-in-out',
@@ -109,16 +109,18 @@ export const AnimatedThemeToggler = ({
         {isDark ? (
           <Sun
             className={cn(
-              'h-5 w-5 transition-all duration-300',
+              'h-4 w-4 transition duration-300',
               isAnimating ? 'scale-110 text-status-warning' : 'scale-100'
             )}
+            strokeWidth={1.5}
           />
         ) : (
           <Moon
             className={cn(
-              'h-5 w-5 transition-all duration-300',
+              'h-4 w-4 transition duration-300',
               isAnimating ? 'scale-110 text-primary' : 'scale-100'
             )}
+            strokeWidth={1.5}
           />
         )}
       </div>

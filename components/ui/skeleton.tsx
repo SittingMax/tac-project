@@ -17,12 +17,12 @@ function Skeleton({ className, ...props }: SkeletonProps) {
  */
 function KPICardSkeleton() {
   return (
-    <div className="bg-card border border-border rounded-md p-6 space-y-4">
+    <div className="bg-card border border-border rounded-md p-6 flex flex-col gap-4">
       <div className="flex justify-between items-start">
         <Skeleton className="h-10 w-10 rounded-md" />
         <Skeleton className="h-6 w-16 rounded-md" />
       </div>
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <Skeleton className="h-8 w-20" />
         <Skeleton className="h-4 w-32" />
       </div>
@@ -111,7 +111,7 @@ function TableSkeleton({ rows = 5, columns = 5 }: { rows?: number; columns?: num
 function PageHeaderSkeleton() {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-4 w-64" />
       </div>
@@ -128,7 +128,7 @@ function PageHeaderSkeleton() {
  */
 function PageSkeleton() {
   return (
-    <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
+    <div className="flex flex-col gap-6 animate-[fadeIn_0.5s_ease-out]">
       <PageHeaderSkeleton />
       <KPIGridSkeleton />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -147,9 +147,9 @@ function CardSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn('bg-card border border-border rounded-md p-6', className)}>
       <Skeleton className="h-6 w-1/3 mb-4" />
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-4/5" />
+        <Skeleton className="h-4 w-4 /5" />
         <Skeleton className="h-4 w-3/5" />
       </div>
     </div>

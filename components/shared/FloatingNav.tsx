@@ -28,7 +28,7 @@ export function FloatingNav() {
   return (
     <div
       className={cn(
-        'fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ease-in-out',
+        'fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition duration-500 ease-in-out',
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0 pointer-events-none'
       )}
     >
@@ -39,7 +39,7 @@ export function FloatingNav() {
             size="sm"
             className="rounded-full px-4 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
           >
-            <Home className="w-4 h-4 mr-2" />
+            <Home size={16} strokeWidth={1.5} className="mr-2" />
             Home
           </Button>
         </Link>
@@ -50,7 +50,7 @@ export function FloatingNav() {
           onClick={scrollToTop}
           className="rounded-full px-4 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
         >
-          <ArrowUp className="w-4 h-4 mr-2" />
+          <ArrowUp size={16} strokeWidth={1.5} className="mr-2" />
           Top
         </Button>
       </div>

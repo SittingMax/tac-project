@@ -43,9 +43,9 @@ export function TrackingResultCard({ data, className, onClose }: TrackingResultC
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-muted-foreground/50 text-[10px] font-mono">
-              <Wifi className="h-3 w-3" />
-              <Battery className="h-3 w-3" />
-              <Signal className="h-3 w-3" />
+              <Wifi size={12} strokeWidth={1.5} />
+              <Battery size={12} strokeWidth={1.5} />
+              <Signal size={12} strokeWidth={1.5} />
               <span>SYS_OK</span>
             </div>
             {onClose && (
@@ -82,9 +82,9 @@ export function TrackingResultCard({ data, className, onClose }: TrackingResultC
                   className="absolute top-1/2 -translate-y-1/2 left-1/2"
                 >
                   {shipment.mode === 'AIR' ? (
-                    <Plane className="w-5 h-5 text-primary fill-primary/20 rotate-90" />
+                    <Plane size={20} strokeWidth={1.5} className="text-primary fill-primary/20 rotate-90" />
                   ) : (
-                    <Truck className="w-5 h-5 text-primary fill-primary/20" />
+                    <Truck size={20} strokeWidth={1.5} className="text-primary fill-primary/20" />
                   )}
                 </motion.div>
               </div>
@@ -123,7 +123,7 @@ export function TrackingResultCard({ data, className, onClose }: TrackingResultC
             </div>
             <div className="text-sm font-medium text-foreground">{latestEvent?.description}</div>
             <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              <MapPin className="w-3 h-3" /> {shipment.consignee_city || 'In Transit'}
+              <MapPin size={12} strokeWidth={1.5} /> {shipment.consignee_city || 'In Transit'}
             </div>
           </div>
         </div>
@@ -153,7 +153,7 @@ const InfoBlock = ({
         highlight ? 'text-primary' : 'text-foreground'
       )}
     >
-      {Icon && <Icon className="w-3 h-3 opacity-70" />}
+      {Icon && <Icon size={12} strokeWidth={1.5} className="opacity-70" />}
       {value}
     </div>
   </div>

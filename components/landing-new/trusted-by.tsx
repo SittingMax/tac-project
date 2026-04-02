@@ -31,7 +31,7 @@ export function TrustedBy() {
           aria-label={`Partners: ${PARTNER_NAMES.join(', ')}`}
         >
           {/* Primary content - visible to screen readers */}
-          <div className="animate-marquee flex items-center gap-16 whitespace-nowrap opacity-50 grayscale transition-all duration-500 hover:opacity-100 hover:grayscale-0">
+          <div className="animate-marquee flex items-center gap-16 whitespace-nowrap opacity-50 grayscale transition duration-500 hover:opacity-100 hover:grayscale-0">
             {PARTNER_NAMES.map((name, i) => (
               <span
                 key={`primary-${name}`}
@@ -43,7 +43,7 @@ export function TrustedBy() {
           </div>
           {/* Duplicated content for seamless loop - hidden from screen readers */}
           <div
-            className="animate-marquee flex items-center gap-16 whitespace-nowrap opacity-50 grayscale transition-all duration-500 hover:opacity-100 hover:grayscale-0"
+            className="animate-marquee flex items-center gap-16 whitespace-nowrap opacity-50 grayscale transition duration-500 hover:opacity-100 hover:grayscale-0"
             aria-hidden="true"
           >
             {PARTNER_NAMES.map((name, i) => (

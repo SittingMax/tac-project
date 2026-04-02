@@ -43,8 +43,8 @@ export function TrackingDialog({ trigger, children }: TrackingDialogProps) {
       size="md"
     >
       {!result ? (
-        <div className="space-y-4 py-4">
-          <div className="text-center space-y-2">
+        <div className="flex flex-col gap-4 py-4">
+          <div className="text-center flex flex-col gap-2">
             <h2 className="text-lg font-bold tracking-tight">Track Your Shipment</h2>
             <p className="text-sm text-muted-foreground">
               Enter your AWB or Order ID to get real-time status.
@@ -53,7 +53,7 @@ export function TrackingDialog({ trigger, children }: TrackingDialogProps) {
 
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search size={16} strokeWidth={1.5} className="absolute left-2.5 top-2.5 text-muted-foreground" />
               <Input
                 placeholder="ENTER CN (e.g. WGS882190)"
                 value={awb}
@@ -64,7 +64,7 @@ export function TrackingDialog({ trigger, children }: TrackingDialogProps) {
               />
             </div>
             <Button onClick={handleTrace} disabled={loading || !awb}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Trace'}
+              {loading ? <Loader2 size={16} strokeWidth={1.5} className="animate-spin" /> : 'Trace'}
             </Button>
           </div>
 

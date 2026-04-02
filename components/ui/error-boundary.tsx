@@ -83,7 +83,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   return (
     <div className="flex flex-col items-center justify-center p-8 text-center min-h-[200px] bg-destructive/5 border border-destructive/20 rounded-md">
       <div className="w-12 h-12 rounded-lg bg-destructive/10 flex items-center justify-center mb-4">
-        <AlertTriangle className="w-6 h-6 text-destructive" />
+        <AlertTriangle size={24} strokeWidth={1.5} className="text-destructive" />
       </div>
 
       <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
@@ -109,7 +109,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
 
       {onRetry && (
         <Button onClick={onRetry} variant="outline" size="sm">
-          <RefreshCw className="w-4 h-4 mr-2" />
+          <RefreshCw size={16} strokeWidth={1.5} className="mr-2" />
           Try Again
         </Button>
       )}
@@ -126,7 +126,7 @@ export const InlineError: React.FC<{
 }> = ({ message, onRetry }) => {
   return (
     <div className="flex items-center gap-2 p-4 bg-destructive/5 border border-destructive/20 rounded-md text-sm">
-      <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
+      <AlertTriangle size={16} strokeWidth={1.5} className="text-destructive flex-shrink-0" />
       <span className="text-destructive flex-1">{message}</span>
       {onRetry && (
         <Button onClick={onRetry} variant="ghost" size="sm" className="h-6 px-2">

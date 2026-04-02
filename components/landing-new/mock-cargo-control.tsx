@@ -25,12 +25,12 @@ export function MockCargoControlCenter() {
         {/* Fake Sidebar */}
         <div className="hidden md:flex flex-col w-16 border-r border-border bg-foreground/[0.02] items-center py-6 gap-6 z-10">
           <div className="w-8 h-8 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
-            <Box className="w-4 h-4 text-primary" />
+            <Box size={16} strokeWidth={1.5} className="text-primary" />
           </div>
-          <Globe className="w-5 h-5 text-foreground/40 hover:text-foreground transition-colors cursor-pointer" />
-          <Network className="w-5 h-5 text-foreground/40 hover:text-foreground transition-colors cursor-pointer" />
-          <Database className="w-5 h-5 text-foreground/40 hover:text-foreground transition-colors cursor-pointer" />
-          <Shield className="w-5 h-5 text-foreground/40 hover:text-foreground transition-colors cursor-pointer mt-auto" />
+          <Globe size={20} strokeWidth={1.5} className="text-foreground/40 hover:text-foreground transition-colors cursor-pointer" />
+          <Network size={20} strokeWidth={1.5} className="text-foreground/40 hover:text-foreground transition-colors cursor-pointer" />
+          <Database size={20} strokeWidth={1.5} className="text-foreground/40 hover:text-foreground transition-colors cursor-pointer" />
+          <Shield size={20} strokeWidth={1.5} className="text-foreground/40 hover:text-foreground transition-colors cursor-pointer mt-auto" />
         </div>
 
         {/* Fake Main Content Area */}
@@ -89,7 +89,7 @@ export function MockCargoControlCenter() {
             {/* Main Graph Area */}
             <div className="flex-1 rounded-md border border-border bg-foreground/[0.01] overflow-hidden relative group">
               <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                <Activity className="w-4 h-4 text-primary" />
+                <Activity size={16} strokeWidth={1.5} className="text-primary" />
                 <span className="text-sm font-medium text-foreground/80">
                   Global Telemetry Stream
                 </span>

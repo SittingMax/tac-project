@@ -6,12 +6,13 @@
 import { motion, AnimatePresence } from '@/lib/motion';
 import { useLocation } from 'react-router-dom';
 import { ReactNode } from 'react';
+import type { Variants } from '@/lib/motion';
 
 interface PageTransitionProps {
   children: ReactNode;
 }
 
-const pageVariants = {
+const pageVariants: Variants = {
   initial: {
     opacity: 0,
     y: 10,
@@ -21,7 +22,7 @@ const pageVariants = {
     y: 0,
     transition: {
       duration: 0.2,
-      ease: 'easeOut',
+      ease: [0, 0, 0.2, 1],
     },
   },
   exit: {
@@ -29,7 +30,7 @@ const pageVariants = {
     y: -10,
     transition: {
       duration: 0.15,
-      ease: 'easeIn',
+      ease: [0.4, 0, 1, 1],
     },
   },
 };
@@ -71,7 +72,7 @@ export const staggerItem = {
     y: 0,
     transition: {
       duration: 0.2,
-      ease: 'easeOut',
+      ease: [0, 0, 0.2, 1],
     },
   },
 };

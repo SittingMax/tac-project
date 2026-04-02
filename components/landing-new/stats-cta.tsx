@@ -47,10 +47,10 @@ export function StatsCTA() {
             <a href="#contact" className="inline-flex">
               <Button
                 size="lg"
-                className="h-14 rounded-md px-10 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5 bg-primary text-primary-foreground hover:bg-primary/90 group"
+                className="h-14 rounded-md px-10 text-sm font-semibold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition duration-300 hover:-translate-y-0.5 bg-primary text-primary-foreground hover:bg-primary/90 group"
               >
                 Get a Quote
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight size={16} strokeWidth={1.5} className="ml-2 transition-transform group-hover:translate-x-1" />
               </Button>
             </a>
           </FadeUp>
@@ -64,18 +64,18 @@ export function StatsCTA() {
               visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
             }}
             whileHover={{ y: -5, transition: { duration: 0.3 } }}
-            className="group relative bg-card/40 backdrop-blur-md border border-border/50 rounded-md p-10 text-center hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 overflow-hidden"
+            className="group relative bg-card/40 backdrop-blur-md border border-border/50 rounded-md p-10 text-center hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition duration-300 overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
             <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
 
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative z-10">
-              <div className="w-16 h-16 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-8 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-sm relative overflow-hidden">
+              <div className="w-16 h-16 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-8 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition duration-500 shadow-sm relative overflow-hidden">
                 <LottieSlot
                   src="/lottie/rising-bar-chart .json"
                   className="w-12 h-12 relative z-10"
-                  fallbackIcon={<Package className="w-8 h-8 relative z-10" />}
+                  fallbackIcon={<Package size={32} strokeWidth={1.5} className="relative z-10" />}
                 />
                 <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/50 transition-colors z-0"></div>
               </div>
@@ -99,15 +99,15 @@ export function StatsCTA() {
               visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
             }}
             whileHover={{ y: -5, transition: { duration: 0.3 } }}
-            className="group relative bg-card/40 backdrop-blur-md border border-border/50 rounded-md p-10 text-center hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 overflow-hidden"
+            className="group relative bg-card/40 backdrop-blur-md border border-border/50 rounded-md p-10 text-center hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition duration-300 overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
             <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
 
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative z-10">
-              <div className="w-16 h-16 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-8 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-sm relative overflow-hidden">
-                <ShieldCheck className="w-8 h-8 relative z-10" />
+              <div className="w-16 h-16 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-8 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition duration-500 shadow-sm relative overflow-hidden">
+                <ShieldCheck size={32} strokeWidth={1.5} className="relative z-10" />
                 <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/50 transition-colors z-0"></div>
               </div>
               <div className="text-5xl lg:text-6xl font-extrabold text-foreground mb-3 tracking-tighter font-mono tabular-nums">
@@ -129,15 +129,15 @@ export function StatsCTA() {
               visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
             }}
             whileHover={{ y: -5, transition: { duration: 0.3 } }}
-            className="group relative bg-card/40 backdrop-blur-md border border-border/50 rounded-md p-10 text-center hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 overflow-hidden"
+            className="group relative bg-card/40 backdrop-blur-md border border-border/50 rounded-md p-10 text-center hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition duration-300 overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
             <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-primary/20 pointer-events-none group-hover:border-primary transition-colors duration-500"></div>
 
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative z-10">
-              <div className="w-16 h-16 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-8 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-sm relative overflow-hidden">
-                <Clock className="w-8 h-8 relative z-10" />
+              <div className="w-16 h-16 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-8 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition duration-500 shadow-sm relative overflow-hidden">
+                <Clock size={32} strokeWidth={1.5} className="relative z-10" />
                 <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/50 transition-colors z-0"></div>
               </div>
               <div className="text-5xl lg:text-6xl font-extrabold text-foreground mb-3 tracking-tighter font-mono tabular-nums">
