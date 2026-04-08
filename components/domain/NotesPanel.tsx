@@ -55,7 +55,7 @@ const NoteItem = memo<NoteItemProps>(({ note, currentUserId, onEdit, onDelete, o
     <>
       <div
         className={cn(
-          'group relative rounded-md border bg-card p-4 transition-all hover:shadow-sm',
+          'group relative rounded-md border bg-card p-4 transition hover:shadow-sm',
           note.isPinned && 'border-primary/50 bg-primary/5'
         )}
       >
@@ -74,8 +74,8 @@ const NoteItem = memo<NoteItemProps>(({ note, currentUserId, onEdit, onDelete, o
           </div>
 
           <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-            {note.isPinned && <Pin className="h-3 w-3 text-primary" />}
-            {note.isInternal && <Lock className="h-3 w-3 text-status-warning" />}
+            {note.isPinned && <Pin size={12} strokeWidth={1.5} className="text-primary" />}
+            {note.isInternal && <Lock size={12} strokeWidth={1.5} className="text-status-warning" />}
           </div>
         </div>
 
@@ -93,7 +93,7 @@ const NoteItem = memo<NoteItemProps>(({ note, currentUserId, onEdit, onDelete, o
             onClick={() => onTogglePin(note.id)}
             title={note.isPinned ? 'Unpin' : 'Pin'}
           >
-            {note.isPinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
+            {note.isPinned ? <PinOff size={12} strokeWidth={1.5} /> : <Pin size={12} strokeWidth={1.5} />}
           </Button>
           {isOwner && (
             <>
@@ -104,7 +104,7 @@ const NoteItem = memo<NoteItemProps>(({ note, currentUserId, onEdit, onDelete, o
                 onClick={() => onEdit(note)}
                 title="Edit"
               >
-                <Edit2 className="h-3 w-3" />
+                <Edit2 size={12} strokeWidth={1.5} />
               </Button>
               <Button
                 variant="ghost"
@@ -113,7 +113,7 @@ const NoteItem = memo<NoteItemProps>(({ note, currentUserId, onEdit, onDelete, o
                 onClick={() => setShowDeleteConfirm(true)}
                 title="Delete"
               >
-                <Trash2 className="h-3 w-3" />
+                <Trash2 size={12} strokeWidth={1.5} />
               </Button>
             </>
           )}
@@ -246,7 +246,7 @@ export const NotesPanel = memo<NotesPanelProps>(
           aria-expanded={collapsible ? !isCollapsed : undefined}
         >
           <div className="flex items-center gap-2 min-w-0">
-            <MessageSquare className="h-4 w-4 text-muted-foreground shrink-0" />
+            <MessageSquare size={16} strokeWidth={1.5} className="text-muted-foreground shrink-0" />
             <h3 className="text-sm font-semibold truncate">{title}</h3>
             <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground shrink-0">
               {notes.length}
@@ -263,15 +263,15 @@ export const NotesPanel = memo<NotesPanelProps>(
                   handleStartAdd();
                 }}
               >
-                <Plus className="h-3 w-3" />
+                <Plus size={12} strokeWidth={1.5} />
                 Add Note
               </Button>
             )}
             {collapsible &&
               (isCollapsed ? (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown size={16} strokeWidth={1.5} className="text-muted-foreground" />
               ) : (
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                <ChevronUp size={16} strokeWidth={1.5} className="text-muted-foreground" />
               ))}
           </div>
         </div>
@@ -279,10 +279,10 @@ export const NotesPanel = memo<NotesPanelProps>(
         {/* Notes List */}
         {!isCollapsed && (
           <div className="p-4">
-            <div className="space-y-4 overflow-y-auto pr-1" style={{ maxHeight }}>
+            <div className="flex flex-col gap-4 overflow-y-auto pr-1" style={{ maxHeight }}>
               {notes.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <MessageSquare className="mb-2 h-8 w-8 text-muted-foreground/50" />
+                  <MessageSquare size={32} strokeWidth={1.5} className="mb-2 text-muted-foreground/50" />
                   <p className="text-sm text-muted-foreground">No notes yet</p>
                   <Button
                     variant="link"
@@ -336,7 +336,7 @@ export const NotesPanel = memo<NotesPanelProps>(
             />
           </div>
 
-          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 sm:justify-between">
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:justify-between">
             <Button
               variant="ghost"
               size="sm"
@@ -345,12 +345,12 @@ export const NotesPanel = memo<NotesPanelProps>(
             >
               {isInternal ? (
                 <>
-                  <Lock className="h-3.5 w-3.5" />
+                  <Lock size={12} strokeWidth={1.5} className=".5 .5" />
                   Internal Only
                 </>
               ) : (
                 <>
-                  <Unlock className="h-3.5 w-3.5" />
+                  <Unlock size={12} strokeWidth={1.5} className=".5 .5" />
                   Visible to All
                 </>
               )}
@@ -364,7 +364,7 @@ export const NotesPanel = memo<NotesPanelProps>(
                 onClick={editingNote ? handleUpdateNote : handleCreateNote}
                 disabled={!content.trim() || content === '<p></p>'}
               >
-                <Check className="h-3.5 w-3.5 mr-1.5" />
+                <Check size={12} strokeWidth={1.5} className=".5 .5 mr-1.5" />
                 {editingNote ? 'Update' : 'Save Note'}
               </Button>
             </div>

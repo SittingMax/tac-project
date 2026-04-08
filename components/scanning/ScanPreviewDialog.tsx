@@ -75,7 +75,7 @@ function InfoRow({
   if (!value && value !== 0) return null;
   return (
     <div className="flex items-center gap-4 text-sm">
-      <Icon className="w-4 h-4 text-muted-foreground shrink-0" />
+      <Icon size={16} strokeWidth={1.5} className="text-muted-foreground shrink-0" />
       <span className="text-muted-foreground min-w-[80px]">{label}</span>
       <span className="font-medium text-foreground truncate">{value}</span>
     </div>
@@ -92,10 +92,10 @@ function ShipmentPreview({
   const statusClass = statusColors[data.status] || 'bg-muted text-muted-foreground';
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Package className="w-5 h-5 text-primary" />
+          <Package size={20} strokeWidth={1.5} className="text-primary" />
           <span className="font-mono text-lg font-bold tracking-wide">{data.cn_number}</span>
         </div>
         <Badge variant="outline" className={statusClass}>
@@ -105,7 +105,7 @@ function ShipmentPreview({
 
       <Separator />
 
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <InfoRow icon={User} label="Customer" value={data.customer?.name || data.consignor_name} />
         <InfoRow icon={Phone} label="Phone" value={data.customer?.phone || data.consignee_phone} />
         <InfoRow icon={Hash} label="Packages" value={data.package_count} />
@@ -116,7 +116,7 @@ function ShipmentPreview({
         />
 
         <div className="flex items-center gap-2 text-sm pt-2 border-t">
-          <MapPin className="w-4 h-4 text-muted-foreground" />
+          <MapPin size={16} strokeWidth={1.5} className="text-muted-foreground" />
           <span className="font-medium">
             {data.origin_hub?.name || data.origin_hub?.code || '—'}
           </span>
@@ -127,9 +127,9 @@ function ShipmentPreview({
           {data.mode && (
             <Badge variant="secondary" className="ml-auto text-xs">
               {data.mode === 'AIR' ? (
-                <Plane className="w-3 h-3 mr-1" />
+                <Plane size={12} strokeWidth={1.5} className="mr-1" />
               ) : (
-                <Truck className="w-3 h-3 mr-1" />
+                <Truck size={12} strokeWidth={1.5} className="mr-1" />
               )}
               {data.mode}
             </Badge>
@@ -139,7 +139,7 @@ function ShipmentPreview({
         {invoice && (
           <div className="flex items-center justify-between p-4 rounded-md bg-primary/5 border border-primary/20">
             <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-primary" />
+              <DollarSign size={16} strokeWidth={1.5} className="text-primary" />
               <span className="text-sm font-medium text-muted-foreground">
                 Invoice {invoice.invoice_no}
               </span>
@@ -158,7 +158,7 @@ function ManifestPreview({ data }: { data: ManifestWithRelations }) {
   const statusClass = statusColors[data.status] || 'bg-muted text-muted-foreground';
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <span className="font-mono text-lg font-bold tracking-wide">{data.manifest_no}</span>
         <Badge variant="outline" className={statusClass}>
@@ -168,17 +168,17 @@ function ManifestPreview({ data }: { data: ManifestWithRelations }) {
 
       <Separator />
 
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 text-sm">
-          <MapPin className="w-4 h-4 text-muted-foreground" />
+          <MapPin size={16} strokeWidth={1.5} className="text-muted-foreground" />
           <span className="font-medium">{data.from_hub?.name || data.from_hub?.code || '—'}</span>
           <span className="text-muted-foreground">→</span>
           <span className="font-medium">{data.to_hub?.name || data.to_hub?.code || '—'}</span>
           <Badge variant="secondary" className="ml-auto text-xs">
             {data.type === 'AIR' ? (
-              <Plane className="w-3 h-3 mr-1" />
+              <Plane size={12} strokeWidth={1.5} className="mr-1" />
             ) : (
-              <Truck className="w-3 h-3 mr-1" />
+              <Truck size={12} strokeWidth={1.5} className="mr-1" />
             )}
             {data.type}
           </Badge>
@@ -325,11 +325,11 @@ export function ScanPreviewDialog({
         <span className="flex items-center gap-2.5 text-lg">
           {scanType === 'shipment' ? (
             <div className="p-2 rounded-md bg-primary/10">
-              <FileText className="w-5 h-5 text-primary" />
+              <FileText size={20} strokeWidth={1.5} className="text-primary" />
             </div>
           ) : (
             <div className="p-2 rounded-md bg-primary/10">
-              <Package className="w-5 h-5 text-primary" />
+              <Package size={20} strokeWidth={1.5} className="text-primary" />
             </div>
           )}
           <span className="font-semibold">{dialogTitle}</span>
@@ -348,9 +348,9 @@ export function ScanPreviewDialog({
         <div className="relative z-0 flex-1 min-h-0 py-2 overflow-y-auto pr-1">
           {/* Loading — show scanned code immediately while fetching */}
           {loading && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="flex items-center gap-4 p-4 rounded-md bg-muted/50 border border-border">
-                <Package className="w-5 h-5 text-primary animate-pulse" />
+                <Package size={20} strokeWidth={1.5} className="text-primary animate-pulse" />
                 <div>
                   <p className="font-mono text-sm font-bold tracking-wide">{scannedData}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
@@ -361,9 +361,9 @@ export function ScanPreviewDialog({
                         : 'Processing...'}
                   </p>
                 </div>
-                <Loader2 className="w-4 h-4 animate-spin text-muted-foreground ml-auto" />
+                <Loader2 size={16} strokeWidth={1.5} className="animate-spin text-muted-foreground ml-auto" />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <div className="h-4 w-3/4 bg-muted animate-pulse rounded-md" />
                 <div className="h-4 w-1/2 bg-muted animate-pulse rounded-md" />
                 <div className="h-4 w-2/3 bg-muted animate-pulse rounded-md" />
@@ -374,7 +374,7 @@ export function ScanPreviewDialog({
           {/* Error */}
           {error && !loading && (
             <div className="flex items-start gap-4 p-4 rounded-md bg-destructive/10 text-destructive">
-              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+              <AlertCircle size={20} strokeWidth={1.5} className="shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium text-sm">{error}</p>
                 <p className="text-xs mt-1 opacity-70">
@@ -395,7 +395,7 @@ export function ScanPreviewDialog({
 
           {/* Unknown format */}
           {!loading && scanType === 'unknown' && scannedData && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="p-4 rounded-md bg-muted">
                 <p className="text-xs text-muted-foreground mb-1">Scanned Value</p>
                 <p className="font-mono text-lg font-bold break-all">{scannedData}</p>
@@ -415,14 +415,14 @@ export function ScanPreviewDialog({
             onClick={handleCopy}
             className="gap-1.5 w-full sm:w-auto"
           >
-            <Copy className="w-3.5 h-3.5" />
+            <Copy size={12} strokeWidth={1.5} className=".5 .5" />
             Copy
           </Button>
           <div className="hidden sm:block flex-1" />
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:ml-auto">
             {scanType !== 'unknown' && (
               <Button size="sm" onClick={handleNavigate} className="gap-1.5 w-full sm:w-auto">
-                <ExternalLink className="w-3.5 h-3.5" />
+                <ExternalLink size={12} strokeWidth={1.5} className=".5 .5" />
                 View Full Details
               </Button>
             )}

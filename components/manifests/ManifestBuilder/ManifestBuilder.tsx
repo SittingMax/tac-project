@@ -152,7 +152,7 @@ export function ManifestBuilder({
                     onClick={() => setPhase('settings')}
                     className="h-8 w-8"
                   >
-                    <ArrowLeft className="h-4 w-4" />
+                    <ArrowLeft size={16} strokeWidth={1.5} />
                   </Button>
                 )}
                 <div>
@@ -173,7 +173,7 @@ export function ManifestBuilder({
               </div>
               {builder.isUpdatingStatus && (
                 <div className="flex items-center text-xs text-muted-foreground">
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 size={16} strokeWidth={1.5} className="mr-2 animate-spin" />
                   Updating...
                 </div>
               )}
@@ -195,7 +195,7 @@ export function ManifestBuilder({
             </div>
           ) : (
             <div className="h-full grid grid-cols-1 lg:grid-cols-12 gap-0">
-              <div className="lg:col-span-4 p-6 border-r overflow-y-auto space-y-6">
+              <div className="lg:col-span-4 p-6 border-r overflow-y-auto flex flex-col gap-6">
                 <ManifestScanPanel
                   manifestId={manifestId!}
                   staffId={currentStaff?.id}
@@ -206,11 +206,11 @@ export function ManifestBuilder({
                 />
 
                 {builder.manifest && (
-                  <div className="rounded-md border p-4 space-y-4">
+                  <div className="rounded-md border p-4 flex flex-col gap-4">
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase">
                       Manifest Details
                     </h3>
-                    <div className="space-y-2 text-sm">
+                    <div className="flex flex-col gap-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Route:</span>
                         <span className="font-medium">
@@ -229,11 +229,11 @@ export function ManifestBuilder({
                   </div>
                 )}
 
-                <div className="rounded-md border p-4 space-y-2">
+                <div className="rounded-md border p-4 flex flex-col gap-2">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase">
                     Active Rules
                   </h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex-wrap gap-2">
                     {rules.onlyReady && (
                       <Badge variant="outline" className="text-xs">
                         Only READY
@@ -253,7 +253,7 @@ export function ManifestBuilder({
                 </div>
               </div>
 
-              <div className="lg:col-span-8 p-6 overflow-hidden h-full flex flex-col">
+              <div className="lg:col-span-8 p-6 overflow-hidden h-full flex-col">
                 <ManifestShipmentsTable
                   items={builder.items}
                   isLoading={builder.isLoading}

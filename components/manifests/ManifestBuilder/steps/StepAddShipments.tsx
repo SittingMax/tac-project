@@ -79,12 +79,12 @@ export function StepAddShipments({
   const getResultIcon = (result: ScanResponse | null) => {
     if (!result) return null;
     if (result.success && !result.duplicate) {
-      return <CheckCircle2 className="h-5 w-5 text-status-success" />;
+      return <CheckCircle2 size={16} strokeWidth={1.5} className="text-status-success" />;
     }
     if (result.duplicate) {
-      return <AlertCircle className="h-5 w-5 text-status-warning" />;
+      return <AlertCircle size={16} strokeWidth={1.5} className="text-status-warning" />;
     }
-    return <XCircle className="h-5 w-5 text-status-error" />;
+    return <XCircle size={16} strokeWidth={1.5} className="text-status-error" />;
   };
 
   const totalWeight = items.reduce((sum, item) => sum + (item.shipment?.total_weight || 0), 0);
@@ -94,7 +94,7 @@ export function StepAddShipments({
   );
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {/* Route Banner */}
       {fromHub && toHub && (
         <div className="flex items-center gap-4 px-4 py-2 rounded-md bg-primary/10 border border-primary/20">
@@ -102,7 +102,7 @@ export function StepAddShipments({
           <div className="flex items-center gap-2 text-sm font-bold">
             <span className="font-mono">{fromHub.code}</span>
             <span className="text-muted-foreground">{fromHub.name}</span>
-            <ArrowRight className="h-4 w-4 text-primary" />
+            <ArrowRight size={16} strokeWidth={1.5} className="text-primary" />
             <span className="font-mono">{toHub.code}</span>
             <span className="text-muted-foreground">{toHub.name}</span>
           </div>
@@ -111,16 +111,16 @@ export function StepAddShipments({
 
       <div className="grid gap-6 lg:grid-cols-12 h-[calc(100vh-250px)] min-h-[500px]">
         {/* Left Panel: Scan Controls */}
-        <div className="lg:col-span-5 space-y-4 flex flex-col h-full overflow-hidden">
-          <Card className="border-border bg-card/50 shrink-0">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Scan className="h-5 w-5 text-primary" />
+        <div className="lg:col-span-5 flex flex-col gap-4 flex flex-col h-full overflow-hidden">
+          <Card className="border-border bg-card/50 shrink-0 transition duration-300 hover:shadow-sm hover:border-border/80 relative">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Scan size={16} strokeWidth={1.5} className="text-primary" />
                 Scan Controls
               </CardTitle>
               <CardDescription>Scan CN / Barcode to add shipments</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-3 pt-0 flex flex-col gap-3">
               <Tabs
                 value={scanMode}
                 onValueChange={(value) => setScanMode(value as ManifestScanMode)}
@@ -128,21 +128,21 @@ export function StepAddShipments({
               >
                 <TabsList className="w-full flex">
                   <TabsTrigger value="manual" className="flex-1 flex gap-2">
-                    <Keyboard className="h-3.5 w-3.5" />
+                    <Keyboard size={16} strokeWidth={1.5} />
                     <span>Type</span>
                   </TabsTrigger>
                   <TabsTrigger value="scanner" className="flex-1 flex gap-2">
-                    <Scan className="h-3.5 w-3.5" />
+                    <Scan size={16} strokeWidth={1.5} />
                     <span>Scan</span>
                   </TabsTrigger>
                   <TabsTrigger value="camera" className="flex-1 flex gap-2">
-                    <Camera className="h-3.5 w-3.5" />
+                    <Camera size={16} strokeWidth={1.5} />
                     <span>Lens</span>
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="manual" className="mt-4 space-y-4">
-                  <div className="space-y-2">
+                <TabsContent value="manual" className="mt-4 flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
                     <form onSubmit={scanner.handleSubmit}>
                       <div className="flex gap-2">
                         <div className="relative flex-1">
@@ -155,7 +155,7 @@ export function StepAddShipments({
                             onKeyDown={scanner.handleKeyDown}
                             disabled={scanner.isScanning}
                             className={cn(
-                              'pr-10 font-mono text-base h-12',
+                              'pr-10 font-mono text-sm h-8',
                               scanner.isScanning && 'animate-pulse'
                             )}
                             autoComplete="off"
@@ -172,7 +172,7 @@ export function StepAddShipments({
                         <Button
                           type="submit"
                           disabled={scanner.isScanning || !scanner.inputValue.trim()}
-                          className="h-12 px-6"
+                          className="h-8 px-4 text-sm"
                         >
                           Add
                         </Button>
@@ -184,9 +184,9 @@ export function StepAddShipments({
                   </div>
                 </TabsContent>
 
-                <TabsContent value="scanner" className="mt-4">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground p-4 bg-muted/50 rounded-md">
-                    <Keyboard className="h-4 w-4" />
+                <TabsContent value="scanner" className="mt-3">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground p-3 bg-muted/50 rounded-md">
+                    <Keyboard size={16} strokeWidth={1.5} />
                     USB scanner active. Keep input focused.
                   </div>
                   <form
@@ -202,10 +202,10 @@ export function StepAddShipments({
                   </form>
                 </TabsContent>
 
-                <TabsContent value="camera" className="mt-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground p-4 bg-muted/50 rounded-md">
-                      <Camera className="h-4 w-4" />
+                <TabsContent value="camera" className="mt-3">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground p-3 bg-muted/50 rounded-md">
+                      <Camera size={16} strokeWidth={1.5} />
                       Use the camera or upload a barcode image to add shipments.
                     </div>
                     <BarcodeScanner
@@ -231,10 +231,10 @@ export function StepAddShipments({
                 !scanner.lastResult.success && 'border-status-error/50 bg-status-error/10'
               )}
             >
-              <CardContent className="p-4">
-                <div className="flex items-start gap-4">
+              <CardContent className="p-3">
+                <div className="flex items-start gap-3">
                   {getResultIcon(scanner.lastResult)}
-                  <div className="space-y-1 flex-1">
+                  <div className="flex flex-col gap-1 flex-1">
                     <p
                       className={cn(
                         'text-sm font-medium',
@@ -264,7 +264,7 @@ export function StepAddShipments({
                         className="h-8 w-8"
                         onClick={() => scanner.handleSubmit()}
                       >
-                        <RotateCcw className="h-4 w-4" />
+                        <RotateCcw size={16} strokeWidth={1.5} />
                       </Button>
                     )}
                 </div>
@@ -273,27 +273,27 @@ export function StepAddShipments({
           )}
 
           {/* Stats */}
-          <div className="grid grid-cols-4 gap-2 shrink-0">
-            <Card className="border-border bg-card/50">
-              <CardContent className="p-4 text-center">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 shrink-0">
+            <Card className="border-border bg-card/50 transition duration-300 hover:shadow-sm hover:border-border/80 relative">
+              <CardContent className="p-3 text-center">
                 <p className="text-2xl font-bold text-primary">{scanner.successCount}</p>
                 <p className="text-xs text-muted-foreground">Added</p>
               </CardContent>
             </Card>
-            <Card className="border-border bg-card/50">
-              <CardContent className="p-4 text-center">
+            <Card className="border-border bg-card/50 transition duration-300 hover:shadow-sm hover:border-border/80 relative">
+              <CardContent className="p-3 text-center">
                 <p className="text-2xl font-bold text-status-warning">{scanner.duplicateCount}</p>
                 <p className="text-xs text-muted-foreground">Dups</p>
               </CardContent>
             </Card>
-            <Card className="border-border bg-card/50">
-              <CardContent className="p-4 text-center">
+            <Card className="border-border bg-card/50 transition duration-300 hover:shadow-sm hover:border-border/80 relative">
+              <CardContent className="p-3 text-center">
                 <p className="text-2xl font-bold text-status-error">{scanner.errorCount}</p>
                 <p className="text-xs text-muted-foreground">Errors</p>
               </CardContent>
             </Card>
-            <Card className="border-border bg-card/50">
-              <CardContent className="p-4 text-center">
+            <Card className="border-border bg-card/50 transition duration-300 hover:shadow-sm hover:border-border/80 relative">
+              <CardContent className="p-3 text-center">
                 <p className="text-lg font-bold truncate" title={totalWeight.toFixed(1)}>
                   {totalWeight.toFixed(1)}
                 </p>
@@ -309,13 +309,13 @@ export function StepAddShipments({
         </div>
 
         {/* Right Panel: Shipments List */}
-        <div className="lg:col-span-7 h-full overflow-hidden flex flex-col">
-          <Card className="border-border bg-card/50 h-full flex flex-col">
-            <CardHeader className="pb-4 shrink-0">
+        <div className="lg:col-span-7 h-full overflow-hidden flex-col">
+          <Card className="border-border bg-card/50 h-full flex flex-col transition duration-300 hover:shadow-sm hover:border-border/80 relative">
+            <CardHeader className="pb-3 shrink-0">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Package className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Package size={16} strokeWidth={1.5} className="text-primary" />
                     Manifest Shipments
                   </CardTitle>
                   <CardDescription>

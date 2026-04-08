@@ -4,7 +4,7 @@ import React from 'react';
 import { Invoice, Shipment } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/domain/status-badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { formatCurrency } from '@/lib/utils';
 import { NotesPanel } from '@/components/domain/NotesPanel';
@@ -26,15 +26,6 @@ import {
 } from 'lucide-react';
 import { HUBS } from '@/lib/constants';
 import { toast } from 'sonner';
-
-// Status styles using semantic badge classes from globals.css
-const STATUS_STYLES: Record<string, string> = {
-  PAID: 'badge--delivered',
-  ISSUED: 'badge--manifested',
-  OVERDUE: 'badge--exception',
-  DRAFT: 'badge--cancelled',
-  CANCELLED: 'badge--cancelled',
-};
 
 interface InvoiceDetailsProps {
   invoice: Invoice;
@@ -88,7 +79,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
 
   return (
     <TooltipProvider>
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         {/* Header */}
         <div className="flex justify-between items-start">
           <div>
@@ -96,7 +87,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
               <h2 className="text-2xl font-bold font-mono text-foreground">
                 {invoice.invoiceNumber}
               </h2>
-              <Badge className={STATUS_STYLES[invoice.status]}>{invoice.status}</Badge>
+              <StatusBadge status={invoice.status} />
             </div>
             <div className="flex items-center gap-2 mt-1">
               <p className="text-sm text-muted-foreground">
@@ -112,7 +103,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                         className="h-6 w-6 p-0"
                         onClick={handleCopyAwb}
                       >
-                        <Copy className="w-3 h-3" />
+                        <Copy size={12} strokeWidth={1.5} />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Copy AWB</TooltipContent>
@@ -125,7 +116,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                         className="h-6 w-6 p-0"
                         onClick={handleTrackShipment}
                       >
-                        <ExternalLink className="w-3 h-3" />
+                        <ExternalLink size={12} strokeWidth={1.5} />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Track Shipment</TooltipContent>
@@ -142,7 +133,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button onClick={() => onDownloadInvoice(invoice)} variant="outline" size="sm">
-                <FileText className="w-4 h-4 mr-2" /> Invoice PDF
+                <FileText size={16} strokeWidth={1.5} className="mr-2" /> Invoice PDF
               </Button>
             </TooltipTrigger>
             <TooltipContent>Download Invoice as PDF</TooltipContent>
@@ -150,7 +141,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button onClick={() => onDownloadLabel(invoice)} variant="outline" size="sm">
-                <Printer className="w-4 h-4 mr-2" /> Label
+                <Printer size={16} strokeWidth={1.5} className="mr-2" /> Label
               </Button>
             </TooltipTrigger>
             <TooltipContent>Print Shipping Label</TooltipContent>
@@ -163,20 +154,20 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Invoice Details */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 flex flex-col gap-4">
           {/* Customer & Shipment Info */}
           <Card className="p-4">
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <h3 className="text-xs font-bold text-muted-foreground uppercase mb-2 flex items-center gap-1">
-                  <User className="w-3 h-3" /> Customer
+                  <User size={12} strokeWidth={1.5} /> Customer
                 </h3>
                 <div className="text-sm font-medium text-foreground">{invoice.customerName}</div>
                 <div className="text-xs text-muted-foreground mt-1">ID: {invoice.customerId}</div>
               </div>
               <div>
                 <h3 className="text-xs font-bold text-muted-foreground uppercase mb-2 flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> Payment
+                  <Calendar size={12} strokeWidth={1.5} /> Payment
                 </h3>
                 <div className="text-sm font-medium">{invoice.paymentMode}</div>
                 <div className="text-xs text-muted-foreground mt-1">
@@ -190,7 +181,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
           {shipment && origin && dest && (
             <Card className="p-4">
               <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3 flex items-center gap-1">
-                <MapPin className="w-3 h-3" /> Route
+                <MapPin size={12} strokeWidth={1.5} /> Route
               </h3>
               <div className="flex items-center justify-between">
                 <div className="text-center">
@@ -203,9 +194,9 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                     <div className="absolute top-1/2 right-0 -translate-y-1/2 w-2 h-2 rounded-full bg-primary" />
                     <div className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-card px-2">
                       {shipment.mode === 'AIR' ? (
-                        <Plane className="w-4 h-4 text-muted-foreground" />
+                        <Plane size={16} strokeWidth={1.5} className="text-muted-foreground" />
                       ) : (
-                        <Truck className="w-4 h-4 text-muted-foreground" />
+                        <Truck size={16} strokeWidth={1.5} className="text-muted-foreground" />
                       )}
                     </div>
                   </div>
@@ -235,9 +226,9 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
           {/* Financial Breakdown */}
           <Card className="p-4">
             <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3 flex items-center gap-1">
-              <CreditCard className="w-3 h-3" /> Financial Summary
+              <CreditCard size={12} strokeWidth={1.5} /> Financial Summary
             </h3>
-            <div className="space-y-2 text-sm">
+            <div className="flex flex-col gap-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Base Freight</span>
                 <span className="font-mono">{formatCurrency(invoice.financials.baseFreight)}</span>
@@ -311,7 +302,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
         </div>
 
         {/* Right Column - Notes & Actions */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {/* Share Actions */}
           <Card className="p-4">
             <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3">
@@ -324,7 +315,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                 className="text-status-success border-status-success/30 hover:bg-status-success/10"
                 onClick={handleShareWhatsapp}
               >
-                <MessageCircle className="w-4 h-4 mr-2" /> Compose WhatsApp
+                <MessageCircle size={16} strokeWidth={1.5} className="mr-2" /> Compose WhatsApp
               </Button>
               <Button
                 variant="outline"
@@ -332,7 +323,7 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
                 className="text-status-info border-status-info/30 hover:bg-status-info/10"
                 onClick={handleShareEmail}
               >
-                <Mail className="w-4 h-4 mr-2" /> Compose Email
+                <Mail size={16} strokeWidth={1.5} className="mr-2" /> Compose Email
               </Button>
             </div>
           </Card>
@@ -351,10 +342,10 @@ export const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
               <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3">
                 Quick Actions
               </h3>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 {onMarkPaid && (
                   <Button className="w-full" onClick={() => onMarkPaid(invoice.id)}>
-                    <CheckCircle className="w-4 h-4 mr-2" /> Mark as Paid
+                    <CheckCircle size={16} strokeWidth={1.5} className="mr-2" /> Mark as Paid
                   </Button>
                 )}
                 {onCancel && (

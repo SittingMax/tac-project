@@ -91,9 +91,9 @@ export const Header: React.FC = () => {
       <div className="flex flex-1 items-center justify-end gap-3 md:gap-5">
         <button
           onClick={() => setCommandOpen(true)}
-          className="group hidden lg:flex h-9 w-full max-w-[280px] items-center gap-2 rounded-full border border-border/50 bg-muted/40 px-4 text-sm text-muted-foreground transition-all hover:bg-accent/80 hover:text-accent-foreground hover:border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+          className="group hidden lg:flex h-9 w-full max-w-[280px] items-center gap-2 rounded-full border border-border/50 bg-muted/40 px-4 text-sm text-muted-foreground transition hover:bg-accent/80 hover:text-accent-foreground hover:border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
         >
-          <Search className="h-4 w-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+          <Search size={16} strokeWidth={1.5} className="opacity-70 group-hover:opacity-100 transition-opacity" />
           <span className="flex-1 text-left text-[13px] font-medium tracking-wide">
             Search everywhere...
           </span>
@@ -105,14 +105,14 @@ export const Header: React.FC = () => {
         <div className="flex items-center gap-1.5 border-l border-border/50 pl-3 md:pl-5">
           <button
             onClick={handleManualScan}
-            className="flex items-center justify-center p-2 rounded-full text-muted-foreground/70 hover:text-primary hover:bg-primary/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground/70 hover:text-primary hover:bg-primary/10 transition focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             title="Scan QR/Barcode"
           >
-            <ScanBarcode className="h-[18px] w-[18px]" strokeWidth={2.5} />
+            <ScanBarcode className="h-4 w-4" strokeWidth={1.5} />
           </button>
 
           <AnimatedThemeToggler
-            className="flex items-center justify-center p-2 rounded-full text-muted-foreground/70 hover:text-foreground hover:bg-accent transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            className="flex items-center justify-center p-2 rounded-full text-muted-foreground/70 hover:text-foreground hover:bg-accent transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20"
             duration={500}
             onThemeChange={setTheme}
           />

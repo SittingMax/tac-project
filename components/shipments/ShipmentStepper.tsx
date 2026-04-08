@@ -1,6 +1,7 @@
 import React from 'react';
 import { Check, Truck, Package, MapPin, Flag, AlertTriangle, Box } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatDateTime } from '@/lib/formatters';
 
 // The canonical order of standard shipment statuses
 const STANDARD_FLOW = [
@@ -14,8 +15,12 @@ const STANDARD_FLOW = [
 
 interface ShipmentStepperProps {
   currentStatus: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  events: any[];
+  events: Array<{
+    event_code?: string;
+    eventCode?: string;
+    event_time?: string;
+    eventTime?: string;
+  }>;
 }
 
 export const ShipmentStepper: React.FC<ShipmentStepperProps> = ({ currentStatus, events }) => {
@@ -30,6 +35,7 @@ export const ShipmentStepper: React.FC<ShipmentStepperProps> = ({ currentStatus,
     // Look at events to see how far it got
     events.forEach((evt) => {
       const code = evt.event_code || evt.eventCode;
+      if (!code) return;
       const idx = STANDARD_FLOW.indexOf(code);
       if (idx !== -1) {
         reachedIndexes.add(idx);
@@ -50,19 +56,19 @@ export const ShipmentStepper: React.FC<ShipmentStepperProps> = ({ currentStatus,
   const getStepIcon = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return <Box className="w-4 h-4" />;
+        return <Box size={16} strokeWidth={1.5} />;
       case 'PICKED_UP':
-        return <Package className="w-4 h-4" />;
+        return <Package size={16} strokeWidth={1.5} />;
       case 'IN_TRANSIT':
-        return <Truck className="w-4 h-4" />;
+        return <Truck size={16} strokeWidth={1.5} />;
       case 'RECEIVED_AT_DEST':
-        return <MapPin className="w-4 h-4" />;
+        return <MapPin size={16} strokeWidth={1.5} />;
       case 'OUT_FOR_DELIVERY':
-        return <Truck className="w-4 h-4" />;
+        return <Truck size={16} strokeWidth={1.5} />;
       case 'DELIVERED':
-        return <Flag className="w-4 h-4" />;
+        return <Flag size={16} strokeWidth={1.5} />;
       default:
-        return <Check className="w-4 h-4" />;
+        return <Check size={16} strokeWidth={1.5} />;
     }
   };
 
@@ -75,12 +81,8 @@ export const ShipmentStepper: React.FC<ShipmentStepperProps> = ({ currentStatus,
     const evt = [...events].reverse().find((e) => (e.event_code || e.eventCode) === status);
     if (!evt) return null;
     const time = evt.event_time || evt.eventTime;
-    return new Date(time).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    if (!time) return null;
+    return formatDateTime(time);
   };
 
   return (
@@ -106,14 +108,14 @@ export const ShipmentStepper: React.FC<ShipmentStepperProps> = ({ currentStatus,
                         : 'border-muted bg-muted text-muted-foreground'
                   )}
                 >
-                  {isCompleted ? <Check className="w-5 h-5" /> : getStepIcon(stepStatus)}
+                  {isCompleted ? <Check size={20} strokeWidth={1.5} /> : getStepIcon(stepStatus)}
                 </div>
 
                 {/* Exception branching indicator if this is the furthest step */}
                 {idx === furthestIndex && isException && (
                   <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center animate-in slide-in-from-bottom-2">
                     <div className="bg-destructive text-destructive-foreground text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider whitespace-nowrap shadow-sm mb-1 flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" /> Exception
+                      <AlertTriangle size={12} strokeWidth={1.5} /> Exception
                     </div>
                     <div className="w-0.5 h-4 bg-destructive rounded-full" />
                   </div>
@@ -141,7 +143,7 @@ export const ShipmentStepper: React.FC<ShipmentStepperProps> = ({ currentStatus,
                 <div className="flex-1 h-0.5 bg-muted mx-2 relative -top-6">
                   <div
                     className={cn(
-                      'absolute top-0 left-0 h-full bg-primary transition-all duration-1000',
+                      'absolute top-0 left-0 h-full bg-primary transition duration-1000',
                       isCompleted ? 'w-full' : 'w-0'
                     )}
                   />

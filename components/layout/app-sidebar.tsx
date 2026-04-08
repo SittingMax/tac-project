@@ -174,7 +174,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <CollapsibleTrigger asChild>
                   <SidebarGroupLabel className="h-8 text-[10px] uppercase tracking-widest text-muted-foreground/60 font-bold transition-colors hover:text-foreground cursor-pointer group-data-[collapsible=icon]:hidden px-2 mb-1">
                     {group.title}
-                    <ChevronRight className="ml-auto w-3 h-3 transition-transform duration-200 group-data-[state=open]/nav-group:rotate-90 opacity-50" />
+                    <ChevronRight size={12} strokeWidth={1.5} className="ml-auto transition-transform duration-200 group-data-[state=open]/nav-group:rotate-90 opacity-50" />
                   </SidebarGroupLabel>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -203,7 +203,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     tooltip={item.label}
                                     isActive={isActive}
                                     className={cn(
-                                      'h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0',
+                                      'h-9 px-3 text-sm font-medium transition group-data-[collapsible=icon]:px-0',
                                       isActive
                                         ? 'bg-primary/10 text-primary border-l-2 border-primary rounded-none rounded-r-md font-semibold'
                                         : 'hover:bg-accent/50 hover:text-accent-foreground text-muted-foreground border-l-2 border-transparent'
@@ -213,7 +213,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                       <item.icon className="w-4 h-4 shrink-0" strokeWidth={2} />
                                     )}
                                     <span>{item.label}</span>
-                                    <ChevronRight className="ml-auto w-4 h-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 opacity-50" />
+                                    <ChevronRight size={16} strokeWidth={1.5} className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 opacity-50" />
                                   </SidebarMenuButton>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
@@ -226,7 +226,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                             asChild
                                             isActive={isSubActive}
                                             className={cn(
-                                              'h-8 text-xs font-medium transition-all group-data-[collapsible=icon]:hidden',
+                                              'h-8 text-xs font-medium transition group-data-[collapsible=icon]:hidden',
                                               isSubActive
                                                 ? 'text-primary font-bold'
                                                 : 'text-muted-foreground hover:text-foreground'
@@ -254,7 +254,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               isActive={isActive}
                               tooltip={item.label}
                               className={cn(
-                                'h-9 px-3 text-sm font-medium transition-all group-data-[collapsible=icon]:px-0',
+                                'h-9 px-3 text-sm font-medium transition group-data-[collapsible=icon]:px-0',
                                 isActive
                                   ? 'bg-primary/10 text-primary border-l-2 border-primary rounded-none rounded-r-md font-semibold'
                                   : 'hover:bg-accent/50 hover:text-accent-foreground text-muted-foreground border-l-2 border-transparent'

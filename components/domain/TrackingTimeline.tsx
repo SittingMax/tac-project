@@ -1,6 +1,6 @@
 import React from 'react';
+import { formatDateTime, formatDate } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
 import { TrackingEvent, HubLocation } from '@/types';
 import {
   Package,
@@ -18,7 +18,7 @@ interface TrackingTimelineProps {
   className?: string;
 }
 
-const EVENT_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+const EVENT_ICONS: Record<string, React.ComponentType<{ className?: string; size?: number; strokeWidth?: number }>> = {
   CREATED: Package,
   PICKUP_SCHEDULED: Clock,
   PICKED_UP: Truck,
@@ -63,7 +63,7 @@ export function TrackingTimeline({ events, className }: TrackingTimelineProps) {
   );
 
   return (
-    <div className={cn('space-y-0', className)}>
+    <div className={cn('flex flex-col gap-0', className)}>
       {sortedEvents.map((event, index) => {
         const Icon = EVENT_ICONS[event.eventCode] || EVENT_ICONS.DEFAULT;
         const color = EVENT_COLORS[event.eventCode] || EVENT_COLORS.DEFAULT;
@@ -82,7 +82,7 @@ export function TrackingTimeline({ events, className }: TrackingTimelineProps) {
                   isFirst && color.replace('bg-', 'ring-')
                 )}
               >
-                <Icon className="w-5 h-5 text-primary-foreground" />
+                <Icon size={20} strokeWidth={1.5} className="text-primary-foreground" />
               </div>
               {!isLast && (
                 <div className="w-0.5 flex-1 bg-gradient-to-b from-border to-muted min-h-[40px]" />
@@ -93,7 +93,7 @@ export function TrackingTimeline({ events, className }: TrackingTimelineProps) {
             <div className={cn('flex-1 pb-8', isFirst && 'pt-0', !isFirst && 'pt-1')}>
               <div
                 className={cn(
-                  'rounded-md p-4 transition-all',
+                  'rounded-md p-4 transition',
                   isFirst ? 'bg-card border border-white/10' : 'bg-transparent'
                 )}
               >
@@ -109,17 +109,17 @@ export function TrackingTimeline({ events, className }: TrackingTimelineProps) {
                     </p>
                     {event.hubId && (
                       <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                        <MapPin className="w-3 h-3" />
+                        <MapPin size={12} strokeWidth={1.5} />
                         {HUB_NAMES[event.hubId]}
                       </p>
                     )}
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-muted-foreground">
-                      {format(new Date(event.timestamp), 'dd MMM yyyy')}
+                      {formatDate(event.timestamp)}
                     </p>
                     <p className="text-xs text-muted-foreground font-mono">
-                      {format(new Date(event.timestamp), 'HH:mm')}
+                      {formatDateTime(event.timestamp)}
                     </p>
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
 import { format, startOfDay, subDays } from 'date-fns';
+import { formatDateShort, formatDate } from '@/lib/formatters';
 
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import {
@@ -74,8 +75,8 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
   if (chartData.every((d) => d.issued === 0 && d.paid === 0)) {
     return (
       <Card className="flex flex-col h-full border border-border/40 bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300">
-        <CardHeader className="flex flex-col items-stretch space-y-0 border-b border-border/40 p-0 sm:flex-row">
-          <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-4 sm:py-6">
+        <CardHeader className="flex flex-col items-stretch flex flex-col gap-0 border-b border-border/40 p-0 sm:flex-row">
+          <div className="flex-1 flex flex-col justify-center gap-1 px-6 py-4 sm:py-6">
             <CardTitle className="text-xs text-muted-foreground">Invoice Totals</CardTitle>
             <div className="text-lg font-semibold text-foreground">Billing Activity</div>
           </div>
@@ -94,8 +95,8 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
 
   return (
     <Card className="flex flex-col h-full border border-border/40 bg-card shadow-sm py-0 p-0">
-      <CardHeader className="flex flex-col items-stretch space-y-0 border-b border-border/40 p-0! sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:py-6">
+      <CardHeader className="flex flex-col items-stretch flex flex-col gap-0 border-b border-border/40 p-0! sm:flex-row">
+        <div className="flex-1 flex flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:py-6">
           <CardTitle className="flex justify-between items-center text-xs text-muted-foreground">
             <span>Invoice Totals</span>
             <Select value={timeRange} onValueChange={setTimeRange}>
@@ -118,7 +119,7 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
               <button
                 key={chart}
                 data-active={activeChart === chart}
-                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t border-border/40 px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-6 transition-colors"
+                className="relative z-30 flex-1 flex flex-col justify-center gap-1 border-t border-border/40 px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-t-0 sm:border-l sm:px-8 sm:py-6 transition-colors"
                 onClick={() => setActiveChart(chart)}
               >
                 <span className="text-xs text-muted-foreground">{chartConfig[chart].label}</span>
@@ -153,11 +154,7 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
               tickMargin={12}
               tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
               tickFormatter={(value) => {
-                const date = new Date(value);
-                return date.toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                });
+                return formatDateShort(value);
               }}
             />
             <ChartTooltip
@@ -171,11 +168,7 @@ export const RevenueTrendChart: React.FC<{ isLoading?: boolean }> = ({
                   className="w-[150px] backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl"
                   nameKey="views"
                   labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    });
+                    return formatDate(value, 'en-US');
                   }}
                 />
               }

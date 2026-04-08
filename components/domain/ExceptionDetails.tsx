@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
+import { formatDateTime } from '@/lib/formatters';
 import { Exception } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { NotesPanel } from '@/components/domain/NotesPanel';
-import { StatusBadge } from '@/components/domain/StatusBadge';
+import { StatusBadge } from '@/components/domain/status-badge';
 import { X, AlertTriangle, Package, Calendar, User, CheckCircle, Clock } from 'lucide-react';
-import { format } from 'date-fns';
 
 interface ExceptionDetailsProps {
   exception: Exception;
@@ -40,12 +40,12 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
   currentUserId = 'System',
 }) => {
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-lg bg-status-error/10 flex items-center justify-center">
-            <AlertTriangle className="w-7 h-7 text-status-error" />
+            <AlertTriangle size={28} strokeWidth={1.5} className="text-status-error" />
           </div>
           <div>
             <div className="flex items-center gap-4">
@@ -64,7 +64,7 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Exception Info */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 flex flex-col gap-4">
           {/* Overview */}
           <Card>
             <div className="grid grid-cols-3 gap-6">
@@ -102,18 +102,18 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
           {/* Timeline */}
           <Card>
             <h3 className="text-xs font-bold text-muted-foreground uppercase mb-4 flex items-center gap-1">
-              <Clock className="w-3 h-3" /> Timeline
+              <Clock size={12} strokeWidth={1.5} /> Timeline
             </h3>
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 rounded-md bg-status-error/10 flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle className="w-4 h-4 text-status-error" />
+                  <AlertTriangle size={16} strokeWidth={1.5} className="text-status-error" />
                 </div>
                 <div>
                   <div className="font-medium text-foreground">Exception Reported</div>
                   <div className="text-sm text-muted-foreground flex items-center gap-2">
-                    <Calendar className="w-3 h-3" />
-                    {format(new Date(exception.reportedAt), 'PPpp')}
+                    <Calendar size={12} strokeWidth={1.5} />
+                    {formatDateTime(exception.reportedAt)}
                   </div>
                 </div>
               </div>
@@ -121,7 +121,7 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
               {exception.assignedTo && (
                 <div className="flex items-start gap-4">
                   <div className="w-8 h-8 rounded-md bg-status-info/10 flex items-center justify-center flex-shrink-0">
-                    <User className="w-4 h-4 text-status-info" />
+                    <User size={16} strokeWidth={1.5} className="text-status-info" />
                   </div>
                   <div>
                     <div className="font-medium text-foreground">
@@ -135,13 +135,13 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
               {exception.resolvedAt && (
                 <div className="flex items-start gap-4">
                   <div className="w-8 h-8 rounded-md bg-status-success/10 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-4 h-4 text-status-success" />
+                    <CheckCircle size={16} strokeWidth={1.5} className="text-status-success" />
                   </div>
                   <div>
                     <div className="font-medium text-foreground">Exception Resolved</div>
                     <div className="text-sm text-muted-foreground flex items-center gap-2">
-                      <Calendar className="w-3 h-3" />
-                      {format(new Date(exception.resolvedAt), 'PPpp')}
+                      <Calendar size={12} strokeWidth={1.5} />
+                      {formatDateTime(exception.resolvedAt)}
                     </div>
                   </div>
                 </div>
@@ -152,7 +152,7 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
           {/* Shipment Reference */}
           <Card>
             <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3 flex items-center gap-1">
-              <Package className="w-3 h-3" /> Related Shipment
+              <Package size={12} strokeWidth={1.5} /> Related Shipment
             </h3>
             <div className="flex items-center justify-between">
               <div>
@@ -169,7 +169,7 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
         </div>
 
         {/* Right Column - Notes & Actions */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <NotesPanel
             entityType="EXCEPTION"
             entityId={exception.id}
@@ -185,7 +185,7 @@ export const ExceptionDetails: React.FC<ExceptionDetailsProps> = ({
                 Quick Actions
               </h3>
               <Button className="w-full" variant="default" onClick={() => onResolve(exception.id)}>
-                <CheckCircle className="w-4 h-4 mr-2" />
+                <CheckCircle size={16} strokeWidth={1.5} className="mr-2" />
                 Resolve Exception
               </Button>
             </Card>

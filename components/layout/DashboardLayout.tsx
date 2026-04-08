@@ -18,7 +18,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
       <TooltipProvider>
         <SidebarProvider className="w-full">
           <AppSidebar />
-          <SidebarInset className="flex flex-1 flex-col h-screen overflow-hidden">
+          <SidebarInset className="flex flex-1 flex flex-col h-screen overflow-hidden">
             <Header />
             <motion.main
               id="main-content"

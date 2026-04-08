@@ -105,7 +105,7 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="profile" className="space-y-4 py-4">
+        <TabsContent value="profile" className="flex flex-col gap-4 py-4">
           <div className="flex justify-center mb-6">
             <div className="relative group">
               <Avatar className="h-24 w-24 border-2 border-primary/20">
@@ -119,7 +119,7 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
 
           <FormSection icon={UserIcon} title="Personal Information">
             <FormGrid columns={1} className="gap-y-6">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   Full Name
                 </Label>
@@ -130,7 +130,7 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   Avatar Image
                 </Label>
@@ -143,7 +143,9 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
                     disabled={isUploading}
                   />
                   {isUploading && (
-                    <span className="text-xs text-muted-foreground animate-pulse">Uploading...</span>
+                    <span className="text-xs text-muted-foreground animate-pulse">
+                      Uploading...
+                    </span>
                   )}
                 </div>
                 <p className="text-[10px] text-muted-foreground">
@@ -152,12 +154,12 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label className="text-sm font-medium leading-none opacity-50">Email</Label>
                   <Input value={user.email} disabled className="bg-muted opacity-50" />
                 </div>
 
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label className="text-sm font-medium leading-none opacity-50">Role</Label>
                   <Input value={user.role} disabled className="bg-muted opacity-50" />
                 </div>
@@ -172,29 +174,29 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onOpenChange
           </div>
         </TabsContent>
 
-        <TabsContent value="preferences" className="space-y-6 py-4">
-          <div className="space-y-4">
+        <TabsContent value="preferences" className="flex flex-col gap-6 py-4">
+          <div className="flex flex-col gap-4">
             <h4 className="text-sm font-medium">Theme</h4>
             <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={() => setTheme('light')}
-                className={`flex flex-col items-center justify-center p-4 rounded-md border-2 transition-all ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
+                className={`flex flex-col items-center justify-center p-4 rounded-md border-2 transition ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
               >
-                <Sun className="w-5 h-5 mb-2" />
+                <Sun size={20} strokeWidth={1.5} className="mb-2" />
                 <span className="text-xs">Light</span>
               </button>
               <button
                 onClick={() => setTheme('dark')}
-                className={`flex flex-col items-center justify-center p-4 rounded-md border-2 transition-all ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
+                className={`flex flex-col items-center justify-center p-4 rounded-md border-2 transition ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
               >
-                <Moon className="w-5 h-5 mb-2" />
+                <Moon size={20} strokeWidth={1.5} className="mb-2" />
                 <span className="text-xs">Dark</span>
               </button>
               <button
                 onClick={() => setTheme('system')}
-                className={`flex flex-col items-center justify-center p-4 rounded-md border-2 transition-all ${theme === 'system' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
+                className={`flex flex-col items-center justify-center p-4 rounded-md border-2 transition ${theme === 'system' ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-muted'}`}
               >
-                <Monitor className="w-5 h-5 mb-2" />
+                <Monitor size={20} strokeWidth={1.5} className="mb-2" />
                 <span className="text-xs">System</span>
               </button>
             </div>

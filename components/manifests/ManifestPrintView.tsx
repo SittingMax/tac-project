@@ -1,16 +1,30 @@
-/* eslint-disable @typescript-eslint/no-explicit-any -- Data mapping requires any */
-
 import React from 'react';
-import { ManifestWithRelations } from '../../hooks/useManifests';
+import { ManifestWithRelations, type ManifestItemWithRelations } from '@/hooks/useManifests';
+import { formatDate, formatDateTime } from '@/lib/formatters';
 
 interface Props {
   manifest: ManifestWithRelations;
-  items: any[];
+  items: ManifestPrintItem[];
 }
+
+type ManifestPrintItem = ManifestItemWithRelations & {
+  shipment: ManifestItemWithRelations['shipment'] & {
+    destination_hub_id?: string | null;
+  };
+};
 
 // Using Global Standard Layout (IATA inspired)
 export const ManifestPrintView = React.forwardRef<HTMLDivElement, Props>(
   ({ manifest, items }, ref) => {
+    const vehicleMeta =
+      manifest.vehicle_meta &&
+      typeof manifest.vehicle_meta === 'object' &&
+      !Array.isArray(manifest.vehicle_meta)
+        ? (manifest.vehicle_meta as Record<string, unknown>)
+        : null;
+    const transportIdentifier =
+      typeof vehicleMeta?.identifier === 'string' ? vehicleMeta.identifier : '';
+
     return (
       <div ref={ref} className="p-8 bg-white text-black font-sans print-container">
         {/* Header */}
@@ -23,9 +37,7 @@ export const ManifestPrintView = React.forwardRef<HTMLDivElement, Props>(
             </div>
             <div className="text-right">
               <div className="text-3xl font-mono font-bold">{manifest.manifest_no}</div>
-              <div className="text-sm mt-1">
-                Date: {new Date(manifest.created_at).toLocaleDateString()}
-              </div>
+              <div className="text-sm mt-1">Date: {formatDate(manifest.created_at)}</div>
             </div>
           </div>
         </div>
@@ -55,7 +67,7 @@ export const ManifestPrintView = React.forwardRef<HTMLDivElement, Props>(
               </div>
               <div>
                 <div className="text-xs text-muted-foreground">Vehicle / Flight</div>
-                <div className="font-bold">{(manifest.vehicle_meta as any)?.identifier}</div>
+                <div className="font-bold">{transportIdentifier}</div>
               </div>
             </div>
           </div>
@@ -108,7 +120,7 @@ export const ManifestPrintView = React.forwardRef<HTMLDivElement, Props>(
           <div className="border-t border-black pt-2">
             <div className="font-bold">Dispatch Officer</div>
             <div className="text-xs mt-1">Name: {manifest.creator?.full_name}</div>
-            <div className="text-xs">Date: {new Date().toLocaleString()}</div>
+            <div className="text-xs">Date: {formatDateTime(new Date())}</div>
           </div>
           <div className="border-t border-black pt-2">
             <div className="font-bold">Received By</div>

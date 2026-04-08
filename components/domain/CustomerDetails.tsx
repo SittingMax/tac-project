@@ -27,15 +27,15 @@ interface CustomerDetailsProps {
 
 export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onClose }) => {
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center">
             {customer.type === 'BUSINESS' ? (
-              <Building className="w-7 h-7 text-primary" />
+              <Building size={28} strokeWidth={1.5} className="text-primary" />
             ) : (
-              <User className="w-7 h-7 text-primary" />
+              <User size={28} strokeWidth={1.5} className="text-primary" />
             )}
           </div>
           <div>
@@ -59,7 +59,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onCl
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Customer Info */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 flex flex-col gap-4">
           {/* Contact Information */}
           <Card>
             <h3 className="text-xs font-bold text-muted-foreground uppercase mb-4">
@@ -69,7 +69,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onCl
               <div>
                 <div className="text-xs text-muted-foreground mb-1">Contact Person</div>
                 <div className="font-medium text-foreground flex items-center gap-2">
-                  <User className="w-4 h-4 text-muted-foreground" />
+                  <User size={16} strokeWidth={1.5} className="text-muted-foreground" />
                   {customer.contactPerson || customer.name}
                 </div>
               </div>
@@ -79,7 +79,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onCl
                   href={`mailto:${customer.email}`}
                   className="font-medium text-primary hover:underline flex items-center gap-2"
                 >
-                  <Mail className="w-4 h-4" />
+                  <Mail size={16} strokeWidth={1.5} />
                   {customer.email}
                 </a>
               </div>
@@ -89,14 +89,14 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onCl
                   href={`tel:${customer.phone}`}
                   className="font-medium text-foreground flex items-center gap-2"
                 >
-                  <Phone className="w-4 h-4 text-muted-foreground" />
+                  <Phone size={16} strokeWidth={1.5} className="text-muted-foreground" />
                   {customer.phone}
                 </a>
               </div>
               <div>
                 <div className="text-xs text-muted-foreground mb-1">Address</div>
                 <div className="font-medium text-foreground flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-muted-foreground" />
+                  <MapPin size={16} strokeWidth={1.5} className="text-muted-foreground" />
                   {customer.address}
                 </div>
               </div>
@@ -113,7 +113,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onCl
                 <div>
                   <div className="text-xs text-muted-foreground mb-1">GSTIN</div>
                   <div className="font-mono text-sm text-foreground flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-muted-foreground" />
+                    <FileText size={16} strokeWidth={1.5} className="text-muted-foreground" />
                     {customer.gstin}
                   </div>
                 </div>
@@ -127,7 +127,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onCl
               <div>
                 <div className="text-xs text-muted-foreground mb-1">Member Since</div>
                 <div className="text-sm text-foreground flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  <Calendar size={16} strokeWidth={1.5} className="text-muted-foreground" />
                   {customer.createdAt.split('T')[0]}
                 </div>
               </div>
@@ -175,7 +175,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onCl
                 <div>
                   <div className="text-xs text-muted-foreground mb-1">Total Invoices</div>
                   <div className="font-bold text-2xl text-foreground flex items-center gap-2">
-                    <Package className="w-5 h-5 text-muted-foreground" />
+                    <Package size={20} strokeWidth={1.5} className="text-muted-foreground" />
                     {customer.invoiceCount}
                   </div>
                 </div>
@@ -183,7 +183,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, onCl
                   <div>
                     <div className="text-xs text-muted-foreground mb-1">Avg. Invoice Value</div>
                     <div className="font-bold text-lg text-foreground flex items-center gap-2">
-                      <CreditCard className="w-5 h-5 text-muted-foreground" />
+                      <CreditCard size={20} strokeWidth={1.5} className="text-muted-foreground" />
                       {formatCurrency(customer.avgInvoiceValue)}
                     </div>
                   </div>

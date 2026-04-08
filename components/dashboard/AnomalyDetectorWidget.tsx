@@ -17,13 +17,13 @@ export const AnomalyDetectorWidget: React.FC = () => {
       <Card className="h-full border-border bg-card shadow-sm col-span-1 lg:col-span-2">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <BrainCircuit className="w-5 h-5 text-primary animate-pulse" />
+            <BrainCircuit size={20} strokeWidth={1.5} className="text-primary animate-pulse" />
             <Skeleton className="w-48 h-6" />
           </div>
           <Skeleton className="w-64 h-4 mt-2" />
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <Skeleton className="w-full h-16 rounded-md" />
             <Skeleton className="w-full h-16 rounded-md" />
             <Skeleton className="w-full h-16 rounded-md" />
@@ -51,23 +51,23 @@ export const AnomalyDetectorWidget: React.FC = () => {
   const getTypeIcon = (type: ShipmentAnomaly['type']) => {
     switch (type) {
       case 'ROUTE_MISMATCH':
-        return <AlertTriangle className="w-4 h-4" />;
+        return <AlertTriangle size={16} strokeWidth={1.5} />;
       case 'STALLED':
-        return <AlertCircle className="w-4 h-4" />;
+        return <AlertCircle size={16} strokeWidth={1.5} />;
       case 'DELAY':
-        return <TrendingUp className="w-4 h-4" />;
+        return <TrendingUp size={16} strokeWidth={1.5} />;
       default:
-        return <Info className="w-4 h-4" />;
+        return <Info size={16} strokeWidth={1.5} />;
     }
   };
 
   return (
     <Card className="h-full border-border bg-card shadow-sm col-span-1 lg:col-span-2 flex flex-col xl:col-span-3 border-primary/20 relative overflow-hidden group">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50 pointer-events-none" />
-      <CardHeader className="relative z-10 pb-4 flex flex-row items-start justify-between">
+      <CardHeader className="relative z-10 pb-4 flex-row items-start justify-between">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <BrainCircuit className="w-5 h-5 text-primary" />
+            <BrainCircuit size={20} strokeWidth={1.5} className="text-primary" />
             <CardTitle className="text-xl">Shipment Alert Monitor</CardTitle>
           </div>
           <CardDescription>
@@ -95,7 +95,7 @@ export const AnomalyDetectorWidget: React.FC = () => {
         {error ? (
           <div className="flex flex-col items-center justify-center p-8 text-center h-48">
             <div className="w-12 h-12 rounded-lg bg-destructive/10 flex items-center justify-center mb-4">
-              <AlertTriangle className="w-6 h-6 text-destructive" />
+              <AlertTriangle size={24} strokeWidth={1.5} className="text-destructive" />
             </div>
             <p className="text-sm font-medium text-foreground">Alert Check Failed</p>
             <p className="text-xs text-muted-foreground mt-1 max-w-[250px] mb-4">
@@ -108,7 +108,7 @@ export const AnomalyDetectorWidget: React.FC = () => {
         ) : anomalies.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center h-48">
             <div className="w-12 h-12 rounded-lg bg-status-success/20 flex items-center justify-center mb-4">
-              <BrainCircuit className="w-6 h-6 text-status-success" />
+              <BrainCircuit size={24} strokeWidth={1.5} className="text-status-success" />
             </div>
             <p className="text-sm font-medium text-foreground">All Clear</p>
             <p className="text-xs text-muted-foreground mt-1 max-w-[250px]">
@@ -122,7 +122,7 @@ export const AnomalyDetectorWidget: React.FC = () => {
                 key={`${anomaly.shipment.id}-${idx}`}
                 className="p-4 hover:bg-muted/30 transition-colors flex flex-col sm:flex-row gap-4 items-start sm:items-center"
               >
-                <div className="flex-1 space-y-1">
+                <div className="flex-1 flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <span
                       className="font-mono text-sm font-bold cursor-pointer hover:underline text-primary"

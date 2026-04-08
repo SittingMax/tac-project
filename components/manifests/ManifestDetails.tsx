@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { formatDateTime } from '@/lib/formatters';
 import { PageSkeleton } from '@/components/ui/skeleton';
 import {
   useManifest,
@@ -13,10 +14,9 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowLeft, Printer, Truck, Plane, Package } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Manifest } from '../../types';
-import { format } from 'date-fns';
 import { ManifestPrintView } from '@/components/manifests/ManifestPrintView';
 import { useReactToPrint } from 'react-to-print';
-import { StatusBadge } from '../domain/StatusBadge';
+import { StatusBadge } from '@/components/domain/status-badge';
 import { logger } from '@/lib/logger';
 import { IdBadge } from '@/components/ui-core/data/id-badge';
 
@@ -61,7 +61,7 @@ export const ManifestDetails: React.FC = () => {
         cell: ({ row }) => (
           <div className="text-right text-xs text-muted-foreground">
             {row.original.scanned_at
-              ? format(new Date(row.original.scanned_at), 'HH:mm dd/MM')
+              ? formatDateTime(row.original.scanned_at)
               : '-'}
           </div>
         ),
@@ -93,11 +93,11 @@ export const ManifestDetails: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={() => navigate('/manifests')}>
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft size={20} strokeWidth={1.5} />
           </Button>
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-4">
@@ -115,7 +115,7 @@ export const ManifestDetails: React.FC = () => {
             <ManifestPrintView ref={printRef} manifest={manifest} items={items || []} />
           </div>
           <Button variant="secondary" onClick={() => handlePrint()}>
-            <Printer className="w-4 h-4 mr-2" /> Print Standard Manifest
+            <Printer size={16} strokeWidth={1.5} className="mr-2" /> Print Standard Manifest
           </Button>
           {manifest.status === 'OPEN' && (
             <Button onClick={() => handleUpdateStatus('DEPARTED')}>Mark Departed</Button>
@@ -135,7 +135,7 @@ export const ManifestDetails: React.FC = () => {
         <Card className="md:col-span-2 p-0 border border-border bg-white dark:bg-card overflow-hidden">
           <div className="p-4 border-b border-border bg-muted">
             <h3 className="font-bold flex items-center gap-2">
-              <Package className="w-4 h-4" /> Manifested Shipments
+              <Package size={16} strokeWidth={1.5} /> Manifested Shipments
             </h3>
           </div>
           <div className="border border-border/40 bg-card overflow-hidden shadow-xs border-x-0 border-b-0">
@@ -148,19 +148,19 @@ export const ManifestDetails: React.FC = () => {
           </div>
         </Card>
 
-        <Card className="p-6 space-y-6 h-fit bg-white dark:bg-card border border-border">
+        <Card className="p-6 flex flex-col gap-6 h-fit bg-white dark:bg-card border border-border">
           <div>
             <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3">
               Transport Details
             </h3>
-            <div className="bg-muted p-4 rounded-md space-y-4">
+            <div className="bg-muted p-4 rounded-md flex flex-col gap-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Mode</span>
                 <span className="font-bold flex items-center gap-2">
                   {manifest.type === 'AIR' ? (
-                    <Plane className="w-4 h-4" />
+                    <Plane size={16} strokeWidth={1.5} />
                   ) : (
-                    <Truck className="w-4 h-4" />
+                    <Truck size={16} strokeWidth={1.5} />
                   )}
                   {manifest.type}
                 </span>
@@ -184,7 +184,7 @@ export const ManifestDetails: React.FC = () => {
 
           <div>
             <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3">Summary</h3>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Total Shipments</span>
                 <span className="font-bold">{manifest.total_shipments}</span>
@@ -202,7 +202,7 @@ export const ManifestDetails: React.FC = () => {
 
           <div className="text-xs text-muted-foreground pt-4 border-t border-border">
             <div>Created by: {manifest.creator?.full_name || 'System'}</div>
-            <div>Created at: {format(new Date(manifest.created_at), 'dd MMM yyyy HH:mm')}</div>
+            <div>Created at: {formatDateTime(manifest.created_at)}</div>
           </div>
         </Card>
       </div>

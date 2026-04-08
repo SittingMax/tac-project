@@ -41,32 +41,18 @@ export const GlobalScanListener: React.FC = () => {
     pathnameRef.current = location.pathname;
   }, [canNavigate, activeContext, location.pathname]);
 
-  const handleScan = useCallback((data: string, source: ScanSource) => {
+  const handleScan = useCallback((data: string, _source: ScanSource) => {
     const cleanData = data.trim().toUpperCase();
-    const currentContext = activeContextRef.current;
     const currentCanNavigate = canNavigateRef.current();
     const currentPath = pathnameRef.current;
 
-    // eslint-disable-next-line no-console
-    console.debug('[GlobalScanListener] Scan received:', {
-      data: cleanData,
-      source,
-      activeContext: currentContext,
-      canNavigate: currentCanNavigate,
-      pathname: pathnameRef.current,
-    });
-
     // Rule 1: Dedicated scanning page always handles scans locally
     if (currentPath?.startsWith('/scanning')) {
-      // eslint-disable-next-line no-console
-      console.debug('[GlobalScanListener] Skipping - /scanning handles locally');
       return;
     }
 
     // Rule 2: If a local handler owns scanning, skip entirely
     if (!currentCanNavigate) {
-      // eslint-disable-next-line no-console
-      console.debug(`[GlobalScanListener] Skipping - local context active: ${currentContext}`);
       return;
     }
 

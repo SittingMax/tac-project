@@ -7,45 +7,65 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
-import { ShipmentStatus, ManifestStatus, InvoiceStatus } from '@/types';
+import { ShipmentStatus, ManifestStatus, InvoiceStatus, ExceptionSeverity } from '@/types';
 
 // Extended status type for all domain entities
-type StatusVariant = ShipmentStatus | ManifestStatus | InvoiceStatus | 'NEUTRAL';
+export type StatusVariant =
+  | ShipmentStatus
+  | ManifestStatus
+  | InvoiceStatus
+  | ExceptionSeverity
+  | 'INVESTIGATING'
+  | 'NEUTRAL'
+  | 'PRIMARY';
 
 const statusBadgeVariants = cva(
-  'inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider transition-all duration-200',
+  'inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider transition duration-200',
   {
     variants: {
       variant: {
         // Shipment Statuses
-        CREATED: 'badge--created',
-        PICKUP_SCHEDULED: 'badge--created',
-        PICKED_UP: 'badge--manifested',
-        RECEIVED_AT_ORIGIN: 'badge--manifested',
-        IN_TRANSIT: 'badge--in-transit',
-        RECEIVED_AT_DEST: 'badge--arrived',
-        OUT_FOR_DELIVERY: 'badge--in-transit',
-        DELIVERED: 'badge--delivered',
-        CANCELLED: 'badge--cancelled',
-        RTO: 'badge--returned',
-        EXCEPTION: 'badge--exception',
+        CREATED: 'bg-status-success/15 text-status-success border border-status-success/35',
+        PICKUP_SCHEDULED:
+          'bg-status-success/15 text-status-success border border-status-success/35',
+        PICKED_UP: 'bg-status-info/15 text-status-info border border-status-info/35',
+        RECEIVED_AT_ORIGIN: 'bg-status-info/15 text-status-info border border-status-info/35',
+        IN_TRANSIT: 'bg-status-info/15 text-status-info border border-status-info/35',
+        RECEIVED_AT_DEST:
+          'bg-status-success/15 text-status-success border border-status-success/35',
+        OUT_FOR_DELIVERY: 'bg-status-info/15 text-status-info border border-status-info/35',
+        DELIVERED: 'bg-status-success/15 text-status-success border border-status-success/35',
+        CANCELLED: 'bg-muted-foreground/15 text-muted-foreground border border-muted-foreground/35',
+        RTO: 'bg-status-warning/15 text-status-warning border border-status-warning/35',
+        EXCEPTION: 'bg-status-error/15 text-status-error border border-status-error/35',
 
         // Manifest Statuses
-        DRAFT: 'badge--neutral',
-        // BUILDING: 'badge--manifested',
-        OPEN: 'badge--in-transit',
-        CLOSED: 'badge--arrived',
-        DEPARTED: 'badge--in-transit',
-        ARRIVED: 'badge--arrived',
-        // RECONCILED: 'badge--delivered',
+        DRAFT: 'bg-muted/30 text-muted-foreground border border-border/30',
+        OPEN: 'bg-status-info/15 text-status-info border border-status-info/35',
+        CLOSED: 'bg-status-success/15 text-status-success border border-status-success/35',
+        DEPARTED: 'bg-status-info/15 text-status-info border border-status-info/35',
+        ARRIVED: 'bg-status-success/15 text-status-success border border-status-success/35',
 
         // Invoice Statuses
-        ISSUED: 'badge--manifested',
-        PAID: 'badge--delivered',
-        OVERDUE: 'badge--exception',
+        ISSUED: 'bg-status-info/15 text-status-info border border-status-info/35',
+        PAID: 'bg-status-success/15 text-status-success border border-status-success/35',
+        OVERDUE: 'bg-status-error/15 text-status-error border border-status-error/35',
 
         // Neutral
-        NEUTRAL: 'badge--neutral',
+        NEUTRAL: 'bg-muted/30 text-muted-foreground border border-border/30',
+
+        // Exception Severities
+        LOW: 'bg-muted-foreground/15 text-muted-foreground border border-muted-foreground/35',
+        MEDIUM: 'bg-status-info/15 text-status-info border border-status-info/35',
+        HIGH: 'bg-status-error/15 text-status-error border border-status-error/35',
+        CRITICAL: 'bg-status-error/15 text-status-error border border-status-error/35',
+
+        // Exception & Manifest extra statuses
+        INVESTIGATING: 'bg-status-info/15 text-status-info border border-status-info/35',
+        BUILDING: 'bg-status-info/15 text-status-info border border-status-info/35',
+        RECONCILED: 'bg-status-success/15 text-status-success border border-status-success/35',
+        RESOLVED: 'bg-status-success/15 text-status-success border border-status-success/35',
+        PRIMARY: 'bg-primary/15 text-primary border border-primary/35',
       },
       size: {
         sm: 'text-[10px] px-2 py-0.5',
@@ -65,8 +85,19 @@ const statusBadgeVariants = cva(
   }
 );
 
+// Animate-pulse statuses
+const ANIMATED_STATUSES = new Set([
+  'IN_TRANSIT',
+  'OUT_FOR_DELIVERY',
+  'HIGH',
+  'CRITICAL',
+  'INVESTIGATING',
+  'BUILDING',
+  'OVERDUE',
+]);
+
 // Status display labels
-const STATUS_LABELS: Record<StatusVariant, string> = {
+const STATUS_LABELS: Record<string, string> = {
   // Shipment
   CREATED: 'Created',
   PICKUP_SCHEDULED: 'Pickup Scheduled',
@@ -96,10 +127,22 @@ const STATUS_LABELS: Record<StatusVariant, string> = {
 
   // Neutral
   NEUTRAL: 'Pending',
+
+  // Exception Severities
+  LOW: 'Low',
+  MEDIUM: 'Medium',
+  HIGH: 'High',
+  CRITICAL: 'Critical',
+
+  // Extra manifest/exception statuses
+  INVESTIGATING: 'Investigating',
+  BUILDING: 'Building',
+  RECONCILED: 'Reconciled',
+  RESOLVED: 'Resolved',
 };
 
 // Status icons mapping (using Lucide icon names as strings)
-const STATUS_ICONS: Record<StatusVariant, string> = {
+const STATUS_ICONS: Record<string, string> = {
   CREATED: 'Plus',
   PICKUP_SCHEDULED: 'Calendar',
   PICKED_UP: 'Package',
@@ -126,8 +169,10 @@ const STATUS_ICONS: Record<StatusVariant, string> = {
 
 export interface StatusBadgeProps
   extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof statusBadgeVariants> {
-  status: StatusVariant;
+  status: StatusVariant | string;
   showIcon?: boolean;
+  /** showDot for backward compat with old StatusBadge.tsx */
+  showDot?: boolean;
   iconClassName?: string;
 }
 
@@ -143,20 +188,30 @@ export function StatusBadge({
   size,
   animated,
   showIcon = false,
+  showDot = false,
   className,
   ...props
 }: StatusBadgeProps) {
-  const label = STATUS_LABELS[status] || status;
+  const label = (STATUS_LABELS as Record<string, string>)[status] ?? status.replace(/_/g, ' ');
+  const isAnimated = animated ?? ANIMATED_STATUSES.has(status);
 
   return (
     <span
       className={cn(
-        statusBadgeVariants({ variant: status as StatusVariant, size, animated }),
+        statusBadgeVariants({ variant: status as StatusVariant, size, animated: isAnimated }),
         className
       )}
       {...props}
     >
-      {showIcon && <span className="size-3 shrink-0" aria-hidden="true" />}
+      {(showDot || showIcon) && (
+        <span
+          className={cn(
+            'w-1.5 h-1.5 rounded-full bg-current shrink-0',
+            isAnimated && 'animate-pulse'
+          )}
+          aria-hidden="true"
+        />
+      )}
       {label}
     </span>
   );

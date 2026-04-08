@@ -11,8 +11,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
 import {
   Select,
@@ -22,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import { FormSection, FormGrid, FormFooter } from '@/components/ui-core';
+import { FormSection, FormGrid, FormFooter, FieldGroup } from '@/components/ui-core';
 import { useCustomers } from '@/hooks/useCustomers';
 import { useCreateShipment } from '@/hooks/useShipments';
 import { HUBS, SHIPMENT_MODES, SERVICE_LEVELS } from '@/lib/constants';
@@ -131,8 +129,6 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
   const selectedCustomer = customers.find((customer) => customer.id === selectedCustomerId);
 
   const onSubmit = async (data: FormData) => {
-    // eslint-disable-next-line no-console
-    console.debug('Submitting CreateShipmentForm', data);
     if (customers.length === 0) {
       toast.error('Unable to load customers. Please check your connection.');
       return;
@@ -193,7 +189,7 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
         <FormSection title="Routing, Shipper & Service">
           <FormGrid columns={2}>
             <FormField
@@ -201,24 +197,24 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               name="originHub"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Origin Hub
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="w-full h-11 bg-transparent hover:border-ring/50 transition-colors">
-                        <SelectValue placeholder="Select Hub" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Object.values(HUBS).map((hub) => (
-                        <SelectItem key={hub.id} value={hub.id}>
-                          {hub.name} ({hub.code})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
+                  <FormControl>
+                    <FieldGroup label="Origin Hub">
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-full h-8 bg-transparent hover:border-ring/50 transition-colors">
+                            <SelectValue placeholder="Select Hub" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.values(HUBS).map((hub) => (
+                            <SelectItem key={hub.id} value={hub.id}>
+                              {hub.name} ({hub.code})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FieldGroup>
+                  </FormControl>
                 </FormItem>
               )}
             />
@@ -227,24 +223,24 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               name="destinationHub"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Destination Hub
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="w-full h-11 bg-transparent hover:border-ring/50 transition-colors">
-                        <SelectValue placeholder="Select Hub" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Object.values(HUBS).map((hub) => (
-                        <SelectItem key={hub.id} value={hub.id}>
-                          {hub.name} ({hub.code})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
+                  <FormControl>
+                    <FieldGroup label="Destination Hub">
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-full h-8 bg-transparent hover:border-ring/50 transition-colors">
+                            <SelectValue placeholder="Select Hub" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.values(HUBS).map((hub) => (
+                            <SelectItem key={hub.id} value={hub.id}>
+                              {hub.name} ({hub.code})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FieldGroup>
+                  </FormControl>
                 </FormItem>
               )}
             />
@@ -256,24 +252,24 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                 name="customerId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      Customer / Shipper
-                    </FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-full h-11 bg-transparent hover:border-ring/50 transition-colors">
-                          <SelectValue placeholder="Select Customer" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {customers.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>
-                            {c.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
+                    <FormControl>
+                      <FieldGroup label="Customer / Shipper">
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="w-full h-8 bg-transparent hover:border-ring/50 transition-colors">
+                              <SelectValue placeholder="Select Customer" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {customers.map((c) => (
+                              <SelectItem key={c.id} value={c.id}>
+                                {c.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FieldGroup>
+                    </FormControl>
                   </FormItem>
                 )}
               />
@@ -290,35 +286,33 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               name="mode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Transport Mode
-                  </FormLabel>
                   <FormControl>
-                    <div className="flex bg-muted/30 p-1 border border-input rounded-md h-11">
-                      {SHIPMENT_MODES.map((mode) => (
-                        <label
-                          key={mode.id}
-                          className={`flex-1 cursor-pointer flex items-center justify-center text-sm font-medium rounded-sm transition-all
-                      ${field.value === mode.id ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
-                        >
-                          <input
-                            type="radio"
-                            value={mode.id}
-                            checked={field.value === mode.id}
-                            onChange={() => field.onChange(mode.id)}
-                            className="hidden"
-                          />
-                          {mode.id === 'AIR' ? (
-                            <Plane className="w-4 h-4 mr-2" />
-                          ) : (
-                            <Truck className="w-4 h-4 mr-2" />
-                          )}
-                          {mode.label}
-                        </label>
-                      ))}
-                    </div>
+                    <FieldGroup label="Transport Mode">
+                      <div className="flex bg-muted/30 p-1 border border-input rounded-md h-8">
+                        {SHIPMENT_MODES.map((mode) => (
+                          <label
+                            key={mode.id}
+                            className={`flex-1 cursor-pointer flex items-center justify-center text-[10px] font-medium rounded-sm transition
+                        ${field.value === mode.id ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
+                          >
+                            <input
+                              type="radio"
+                              value={mode.id}
+                              checked={field.value === mode.id}
+                              onChange={() => field.onChange(mode.id)}
+                              className="hidden"
+                            />
+                            {mode.id === 'AIR' ? (
+                              <Plane size={14} strokeWidth={1.5} className="mr-1.5" />
+                            ) : (
+                              <Truck size={14} strokeWidth={1.5} className="mr-1.5" />
+                            )}
+                            {mode.label}
+                          </label>
+                        ))}
+                      </div>
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -327,35 +321,33 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               name="serviceLevel"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Service Level
-                  </FormLabel>
                   <FormControl>
-                    <div className="flex bg-muted/30 p-1 border border-input rounded-md h-11">
-                      {SERVICE_LEVELS.map((level) => (
-                        <label
-                          key={level.id}
-                          className={`flex-1 cursor-pointer flex items-center justify-center text-sm font-medium rounded-sm transition-all
-                      ${field.value === level.id ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
-                        >
-                          <input
-                            type="radio"
-                            value={level.id}
-                            checked={field.value === level.id}
-                            onChange={() => field.onChange(level.id)}
-                            className="hidden"
-                          />
-                          {level.id === 'EXPRESS' ? (
-                            <Zap className="w-4 h-4 mr-2" />
-                          ) : (
-                            <Clock className="w-4 h-4 mr-2" />
-                          )}
-                          {level.label.split(' ')[0]}
-                        </label>
-                      ))}
-                    </div>
+                    <FieldGroup label="Service Level">
+                      <div className="flex bg-muted/30 p-1 border border-input rounded-md h-8">
+                        {SERVICE_LEVELS.map((level) => (
+                          <label
+                            key={level.id}
+                            className={`flex-1 cursor-pointer flex items-center justify-center text-[10px] font-medium rounded-sm transition
+                        ${field.value === level.id ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
+                          >
+                            <input
+                              type="radio"
+                              value={level.id}
+                              checked={field.value === level.id}
+                              onChange={() => field.onChange(level.id)}
+                              className="hidden"
+                            />
+                            {level.id === 'EXPRESS' ? (
+                              <Zap size={14} strokeWidth={1.5} className="mr-1.5" />
+                            ) : (
+                              <Clock size={14} strokeWidth={1.5} className="mr-1.5" />
+                            )}
+                            {level.label.split(' ')[0]}
+                          </label>
+                        ))}
+                      </div>
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -369,16 +361,14 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               name="consigneeName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Name
-                  </FormLabel>
                   <FormControl>
-                    <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                      {...field}
-                    />
+                    <FieldGroup label="Name">
+                      <Input
+                        className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                        {...field}
+                      />
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -387,16 +377,14 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               name="consigneePhone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Phone
-                  </FormLabel>
                   <FormControl>
-                    <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                      {...field}
-                    />
+                    <FieldGroup label="Phone">
+                      <Input
+                        className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                        {...field}
+                      />
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -406,16 +394,14 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                 name="consigneeAddress"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      Delivery Address
-                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                        {...field}
-                      />
+                      <FieldGroup label="Delivery Address">
+                        <Input
+                          className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                          {...field}
+                        />
+                      </FieldGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -425,16 +411,14 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               name="consigneeCity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Destination City
-                  </FormLabel>
                   <FormControl>
-                    <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                      {...field}
-                    />
+                    <FieldGroup label="Destination City">
+                      <Input
+                        className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                        {...field}
+                      />
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -443,16 +427,14 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               name="consigneeState"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Destination State
-                  </FormLabel>
                   <FormControl>
-                    <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                      {...field}
-                    />
+                    <FieldGroup label="Destination State">
+                      <Input
+                        className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                        {...field}
+                      />
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -462,16 +444,14 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
                 name="consigneeZip"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                      Destination Zip
-                    </FormLabel>
                     <FormControl>
-                      <Input
-                        className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                        {...field}
-                      />
+                      <FieldGroup label="Destination Zip">
+                        <Input
+                          className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                          {...field}
+                        />
+                      </FieldGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -486,18 +466,16 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               name="packageCount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Total Pieces
-                  </FormLabel>
                   <FormControl>
-                    <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                      type="number"
-                      {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                    />
+                    <FieldGroup label="Total Pieces">
+                      <Input
+                        className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                        type="number"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      />
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -506,85 +484,79 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               name="weightDead"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Dead Weight (KG)
-                  </FormLabel>
                   <FormControl>
-                    <Input
-                      className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                      type="number"
-                      step="0.1"
-                      {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                    />
+                    <FieldGroup label="Dead Weight (KG)">
+                      <Input
+                        className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                        type="number"
+                        step="0.1"
+                        {...field}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      />
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
             <div className="md:col-span-2">
-              <FormLabel className="text-xs font-mono text-muted-foreground uppercase mb-2 block">
-                Package Dimensions (L × W × H in cm)
-              </FormLabel>
-              <div className="grid grid-cols-3 gap-4">
-                <FormField
-                  control={form.control}
-                  name="dimL"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                          type="number"
-                          placeholder="Length"
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                          onFocus={(e) => e.target.select()}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="dimW"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                          type="number"
-                          placeholder="Width"
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                          onFocus={(e) => e.target.select()}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="dimH"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          className="h-11 bg-transparent hover:border-ring/50 transition-colors"
-                          type="number"
-                          placeholder="Height"
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                          onFocus={(e) => e.target.select()}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FieldGroup label="Package Dimensions (L × W × H in cm)">
+                <div className="grid grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="dimL"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                            type="number"
+                            placeholder="Length"
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                            onFocus={(e) => e.target.select()}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="dimW"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                            type="number"
+                            placeholder="Width"
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                            onFocus={(e) => e.target.select()}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="dimH"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            className="h-8 bg-transparent hover:border-ring/50 transition-colors px-3 text-sm"
+                            type="number"
+                            placeholder="Height"
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                            onFocus={(e) => e.target.select()}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </FieldGroup>
             </div>
           </FormGrid>
         </FormSection>
@@ -596,20 +568,18 @@ export const CreateShipmentForm: React.FC<Props> = ({ onSuccess, onCancel }) => 
               name="specialInstructions"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-mono text-muted-foreground uppercase">
-                    Special Instructions & Branding Notes
-                  </FormLabel>
                   <FormControl>
-                    <RichTextEditor
-                      content={field.value}
-                      onChange={field.onChange}
-                      placeholder="Add handling instructions, branding notes, etc."
-                      minHeight="100px"
-                      maxHeight="200px"
-                      toolbarVariant="minimal"
-                    />
+                    <FieldGroup label="Special Instructions & Branding Notes">
+                      <RichTextEditor
+                        content={field.value}
+                        onChange={field.onChange}
+                        placeholder="Add handling instructions, branding notes, etc."
+                        minHeight="100px"
+                        maxHeight="200px"
+                        toolbarVariant="minimal"
+                      />
+                    </FieldGroup>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />

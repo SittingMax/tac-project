@@ -2,24 +2,24 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { CrudRowActions } from '@/components/crud/CrudRowActions';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge, type StatusVariant } from '@/components/domain/status-badge';
 import { User as UserIcon, Check, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { IconButton } from '@/components/ui-core/feedback/icon-button';
 import { Staff } from '@/hooks/useStaff';
 
 // Role color mapping using semantic badge classes
-const ROLE_COLORS: Record<string, string> = {
-  SUPER_ADMIN: 'bg-primary text-primary-foreground border-transparent',
-  ADMIN: 'bg-primary text-primary-foreground border-transparent',
-  MANAGER: 'badge--manifested',
-  OPS: 'badge--created',
-  OPS_STAFF: 'badge--created',
-  WAREHOUSE_IMPHAL: 'badge--in-transit',
-  WAREHOUSE_DELHI: 'badge--in-transit',
-  WAREHOUSE_STAFF: 'badge--in-transit',
-  INVOICE: 'badge--delivered',
-  FINANCE_STAFF: 'badge--delivered',
-  SUPPORT: 'badge--cancelled',
+const ROLE_COLORS: Record<string, StatusVariant> = {
+  SUPER_ADMIN: 'PRIMARY',
+  ADMIN: 'PRIMARY',
+  MANAGER: 'PICKED_UP',
+  OPS: 'CREATED',
+  OPS_STAFF: 'CREATED',
+  WAREHOUSE_IMPHAL: 'IN_TRANSIT',
+  WAREHOUSE_DELHI: 'IN_TRANSIT',
+  WAREHOUSE_STAFF: 'IN_TRANSIT',
+  INVOICE: 'DELIVERED',
+  FINANCE_STAFF: 'DELIVERED',
+  SUPPORT: 'CANCELLED',
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -54,7 +54,7 @@ export function getStaffColumns(params: StaffColumnsParams): ColumnDef<Staff>[] 
       cell: ({ row }) => (
         <div className="flex items-center gap-4">
           <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center border border-white/10">
-            <UserIcon className="w-4 h-4 text-muted-foreground" />
+            <UserIcon size={16} strokeWidth={1.5} className="text-muted-foreground" />
           </div>
           <div>
             <div className="font-medium text-foreground">{row.original.full_name}</div>
@@ -67,9 +67,9 @@ export function getStaffColumns(params: StaffColumnsParams): ColumnDef<Staff>[] 
       accessorKey: 'role',
       header: 'Role',
       cell: ({ row }) => (
-        <Badge className={ROLE_COLORS[row.original.role] || ROLE_COLORS.SUPPORT}>
+        <StatusBadge status={ROLE_COLORS[row.original.role] || 'NEUTRAL'} className="font-bold">
           {ROLE_LABELS[row.original.role] || row.original.role.replace(/_/g, ' ')}
-        </Badge>
+        </StatusBadge>
       ),
     },
     {
@@ -105,22 +105,13 @@ export function getStaffColumns(params: StaffColumnsParams): ColumnDef<Staff>[] 
       header: '',
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
-          <Button
+          <IconButton
             variant={row.original.is_active ? 'ghost' : 'secondary'}
-            size="sm"
+            label={row.original.is_active ? 'Deactivate' : 'Activate'}
+            icon={row.original.is_active ? X : Check}
             onClick={() => params.onToggleStatus(row.original)}
             className={row.original.is_active ? 'text-destructive hover:text-destructive/80' : ''}
-          >
-            {row.original.is_active ? (
-              <>
-                <X className="w-3 h-3 mr-1" /> Deactivate
-              </>
-            ) : (
-              <>
-                <Check className="w-3 h-3 mr-1" /> Activate
-              </>
-            )}
-          </Button>
+          />
           <CrudRowActions
             onEdit={() => params.onEdit(row.original)}
             onDelete={() => params.onDelete(row.original)}

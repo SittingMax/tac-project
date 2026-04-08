@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 import { format, subDays, startOfDay } from 'date-fns';
+import { formatDateShort, formatDate } from '@/lib/formatters';
 
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import {
@@ -82,7 +83,7 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
 
   return (
     <Card className="pt-0 h-full flex flex-col border-border bg-card shadow-sm hover:bg-muted/5 transition-colors duration-300">
-      <CardHeader className="flex items-start gap-4 space-y-0 pb-4 sm:flex-row sm:items-center">
+      <CardHeader className="flex items-start gap-4 flex flex-col gap-0 pb-4 sm:flex-row sm:items-center">
         <div className="grid flex-1 gap-1">
           <CardTitle className="text-xs text-muted-foreground">Shipment Volume Trend</CardTitle>
           <div className="text-lg font-semibold text-foreground">Inbound / Outbound</div>
@@ -138,11 +139,7 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
                 minTickGap={32}
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
                 tickFormatter={(value) => {
-                  const date = new Date(value);
-                  return date.toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                  });
+                  return formatDateShort(value);
                 }}
               />
               <ChartTooltip
@@ -155,11 +152,7 @@ export const ShipmentTrendChart: React.FC<{ isLoading?: boolean }> = ({
                   <ChartTooltipContent
                     className="backdrop-blur-xl bg-background/80 border-border/50 shadow-xl rounded-xl"
                     labelFormatter={(value) => {
-                      return new Date(value).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      });
+                      return formatDate(value, 'en-US');
                     }}
                     indicator="dot"
                   />

@@ -7,6 +7,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { formatDateShort } from '@/lib/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { StatusBadge } from './status-badge';
@@ -138,7 +139,7 @@ export function WarehouseScanPanel({
   };
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn('flex flex-col gap-6', className)}>
       {/* Scan Input Card */}
       <Card className="border-2 border-dashed border-border hover:border-primary/50 transition-colors">
         <CardHeader className="pb-4">
@@ -154,7 +155,7 @@ export function WarehouseScanPanel({
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           {/* Input Field */}
           <form onSubmit={handleSubmit}>
             <div className="relative">
@@ -186,10 +187,7 @@ export function WarehouseScanPanel({
           {/* Status Indicator */}
           {scanResult.status !== 'idle' && (
             <div
-              className={cn(
-                'p-4 rounded-lg border transition-all',
-                getStatusStyles(scanResult.status)
-              )}
+              className={cn('p-4 rounded-lg border transition', getStatusStyles(scanResult.status))}
             >
               <div className="flex items-start gap-3">
                 {getStatusIcon(scanResult.status)}
@@ -198,7 +196,7 @@ export function WarehouseScanPanel({
 
                   {/* Shipment Details */}
                   {scanResult.shipment && (
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-3 flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         <Package className="size-4 text-muted-foreground" />
                         <span className="font-mono font-bold">{scanResult.shipment.cn_number}</span>
@@ -259,7 +257,7 @@ export function WarehouseScanPanel({
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-2 max-h-48 overflow-y-auto">
+            <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
               {recentScans.map((scan) => (
                 <div
                   key={scan.id}
@@ -370,7 +368,7 @@ function formatTimestamp(date: Date): string {
   const diffHours = Math.floor(diffMins / 60);
   if (diffHours < 24) return `${diffHours}h ago`;
 
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return formatDateShort(date);
 }
 
 export default WarehouseScanPanel;

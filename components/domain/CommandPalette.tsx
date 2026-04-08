@@ -202,7 +202,7 @@ export function CommandPalette({ open: controlledOpen, onOpenChange }: CommandPa
           <CommandList>
             <CommandEmpty>
               <div className="py-6 text-center">
-                <Search className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
+                <Search size={40} strokeWidth={1.5} className="mx-auto text-muted-foreground mb-2" />
                 <p className="text-muted-foreground">No results found</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Try searching for a CN or action
@@ -218,13 +218,13 @@ export function CommandPalette({ open: controlledOpen, onOpenChange }: CommandPa
                     value={shipment.cn_number}
                     onSelect={() => handleSelect(shipment.cn_number)}
                   >
-                    <Package className="mr-2 h-4 w-4 text-primary" />
+                    <Package size={16} strokeWidth={1.5} className="mr-2 text-primary" />
                     <span className="font-mono">{shipment.cn_number}</span>
                     <span className="ml-2 text-muted-foreground text-sm">
                       {shipment.customer?.name || 'Unknown Customer'}
                     </span>
                     <CommandShortcut>
-                      <Clock className="h-3 w-3" />
+                      <Clock size={12} strokeWidth={1.5} />
                     </CommandShortcut>
                   </CommandItem>
                 ))}

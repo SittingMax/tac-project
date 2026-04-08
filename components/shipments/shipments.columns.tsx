@@ -2,7 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { CrudRowActions } from '@/components/crud/CrudRowActions';
-import { StatusBadge } from '@/components/domain/StatusBadge';
+import { StatusBadge } from '@/components/domain/status-badge';
 import { Plane, Truck, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { HUBS } from '@/lib/constants';
@@ -29,9 +29,9 @@ export function getShipmentsColumns(
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           {row.original.mode === 'AIR' ? (
-            <Plane className="w-4 h-4 text-feature-air" />
+            <Plane size={16} strokeWidth={1.5} className="text-feature-air" />
           ) : (
-            <Truck className="w-4 h-4 text-feature-ground" />
+            <Truck size={16} strokeWidth={1.5} className="text-feature-ground" />
           )}
           <IdBadge
             entity="shipment"
@@ -112,7 +112,7 @@ export function getShipmentsColumns(
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" onClick={() => params.onView(row.original)}>
-            <Eye className="w-4 h-4 mr-1" /> View
+            <Eye size={16} strokeWidth={1.5} className="mr-1" /> View
           </Button>
 
           {params.onDelete && (

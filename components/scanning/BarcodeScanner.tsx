@@ -30,6 +30,10 @@ interface BarcodeScannerProps {
   enableTorch?: boolean;
 }
 
+interface ScannerControls {
+  stop: () => void;
+}
+
 export function BarcodeScanner({
   onScan,
   onError,
@@ -39,8 +43,7 @@ export function BarcodeScanner({
 }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<ScannerControls | null>(null);
 
   // Stable refs for callbacks to prevent stale closures in decode loop
   const onScanRef = useRef(onScan);
@@ -67,8 +70,9 @@ export function BarcodeScanner({
   const playBeep = useCallback(() => {
     if (!soundEnabledRef.current) return;
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!AudioContextClass) return;
 
       const audioContext = new AudioContextClass();
@@ -105,14 +109,9 @@ export function BarcodeScanner({
   useEffect(() => {
     if (!active) return;
 
-    // eslint-disable-next-line no-console
-    console.debug('[BarcodeScanner] Initializing camera...', { active });
-
     // Get available cameras via static method (@zxing/browser API)
     BrowserCodeReader.listVideoInputDevices()
       .then((devices) => {
-        // eslint-disable-next-line no-console
-        console.debug('[BarcodeScanner] Cameras found:', devices);
         setCameras(devices);
         if (devices.length > 0) {
           // Prefer back camera on mobile
@@ -166,11 +165,7 @@ export function BarcodeScanner({
       .decodeFromConstraints(constraints, videoRef.current!, (result, _error) => {
         if (result) {
           const text = result.getText();
-          // eslint-disable-next-line no-console
-          console.debug('[BarcodeScanner] Decoded text:', text);
           if (text !== lastScannedRef.current) {
-            // eslint-disable-next-line no-console
-            console.debug('[BarcodeScanner] Valid new scan (not debounced):', text);
             lastScannedRef.current = text;
             setLastScanned(text);
             onScanRef.current(text);
@@ -255,16 +250,11 @@ export function BarcodeScanner({
     try {
       const reader = new BrowserMultiFormatReader();
       const url = URL.createObjectURL(file);
-
-      // eslint-disable-next-line no-console
-      console.debug('[BarcodeScanner] Decoding image file...');
       const result = await reader.decodeFromImageUrl(url);
       URL.revokeObjectURL(url);
 
       if (result) {
         const text = result.getText();
-        // eslint-disable-next-line no-console
-        console.debug('[BarcodeScanner] Decoded from image:', text);
         playBeep();
         onScanRef.current(text);
       }
@@ -346,7 +336,7 @@ export function BarcodeScanner({
         {/* Zoom Slider */}
         {supportsZoom && (
           <div className="w-full max-w-xs flex items-center gap-2 bg-background/40 backdrop-blur rounded-md px-4 py-1">
-            <ZoomOut className="w-4 h-4 text-foreground" />
+            <ZoomOut size={16} strokeWidth={1.5} className="text-foreground" />
             <Slider
               value={[zoomLevel]}
               min={minZoom}
@@ -355,7 +345,7 @@ export function BarcodeScanner({
               onValueChange={handleZoomChange}
               className="flex-1"
             />
-            <ZoomIn className="w-4 h-4 text-foreground" />
+            <ZoomIn size={16} strokeWidth={1.5} className="text-foreground" />
           </div>
         )}
 
@@ -368,7 +358,7 @@ export function BarcodeScanner({
             onClick={() => fileInputRef.current?.click()}
             title="Scan Image"
           >
-            <Upload className="w-5 h-5" />
+            <Upload size={20} strokeWidth={1.5} />
           </Button>
           <input
             type="file"
@@ -385,7 +375,7 @@ export function BarcodeScanner({
               className="rounded-md bg-muted/30 hover:bg-muted/50 text-foreground backdrop-blur-md"
               onClick={switchCamera}
             >
-              <RefreshCw className="w-5 h-5" />
+              <RefreshCw size={20} strokeWidth={1.5} />
             </Button>
           )}
 
@@ -397,9 +387,9 @@ export function BarcodeScanner({
               onClick={toggleTorch}
             >
               {torchEnabled ? (
-                <Flashlight className="w-5 h-5" />
+                <Flashlight size={20} strokeWidth={1.5} />
               ) : (
-                <FlashlightOff className="w-5 h-5" />
+                <FlashlightOff size={20} strokeWidth={1.5} />
               )}
             </Button>
           )}
@@ -410,7 +400,7 @@ export function BarcodeScanner({
             className="rounded-md bg-muted/30 hover:bg-muted/50 text-foreground backdrop-blur-md"
             onClick={() => setSoundEnabled(!soundEnabled)}
           >
-            {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+            {soundEnabled ? <Volume2 size={20} strokeWidth={1.5} /> : <VolumeX size={20} strokeWidth={1.5} />}
           </Button>
         </div>
       </div>

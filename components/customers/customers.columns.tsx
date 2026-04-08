@@ -25,9 +25,9 @@ export function getCustomersColumns(params: CustomersColumnsParams): ColumnDef<C
         <div className="flex items-center gap-4">
           <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center text-primary">
             {row.original.type === 'BUSINESS' ? (
-              <Building className="w-4 h-4" />
+              <Building size={16} strokeWidth={1.5} />
             ) : (
-              <User className="w-4 h-4" />
+              <User size={16} strokeWidth={1.5} />
             )}
           </div>
           <div>
@@ -53,14 +53,14 @@ export function getCustomersColumns(params: CustomersColumnsParams): ColumnDef<C
                 href={`mailto:${row.original.email}`}
                 className="text-muted-foreground hover:text-primary flex items-center gap-1"
               >
-                <Mail className="w-3 h-3" /> {row.original.email}
+                <Mail size={12} strokeWidth={1.5} /> {row.original.email}
               </a>
             )}
             <a
               href={`tel:${row.original.phone}`}
               className="text-muted-foreground hover:text-primary flex items-center gap-1"
             >
-              <Phone className="w-3 h-3" /> {row.original.phone}
+              <Phone size={12} strokeWidth={1.5} /> {row.original.phone}
             </a>
           </div>
         </div>
@@ -77,7 +77,7 @@ export function getCustomersColumns(params: CustomersColumnsParams): ColumnDef<C
       cell: ({ row }) =>
         row.original.gstin ? (
           <div className="font-mono text-xs flex items-center gap-1">
-            <FileText className="w-3 h-3 text-muted-foreground" />
+            <FileText size={12} strokeWidth={1.5} className="text-muted-foreground" />
             {row.original.gstin}
           </div>
         ) : (
